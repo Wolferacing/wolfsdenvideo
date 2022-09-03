@@ -13,7 +13,7 @@ class Injection {
                     let objects = keys.map(k=>this.currentFrame[k]);
                     const isGeoUpdate = d => d.geometry && d.geometry.needsUpdate;
                     const isMatUpdate = d => d.material && d.material.needsUpdate;
-                    const staleItems = window.api.isStale();
+                    const staleItems = window.api.getStale();
                     window.api.write3D(
                         JSON.stringify(
                             {
@@ -88,13 +88,6 @@ class Injection {
                 needsUpdate = true;
             }
         });
-        /* if(object.quaternion[0] !== prevObject.quaternion[0] ||
-            object.quaternion[1] !== prevObject.quaternion[1] ||
-            object.quaternion[2] !== prevObject.quaternion[2] ||
-            object.quaternion[3] !== prevObject.quaternion[3]
-        ) {
-            needsUpdate = true;
-        }*/
         if(object.parent !== prevObject.parent) {
             needsUpdate = true;
         }
@@ -153,8 +146,6 @@ class Injection {
     parseGeometry(geometry){
         const object = {};
         Object.assign(object, {
-            /* parameters: geometry.parameters, */
-            /* attributes: geometry.attributes, */
             type: geometry.metadata ? geometry.metadata.type : geometry.type,
             isGeometry: true,
             needsUpdate: geometry.needsUpdate||false
@@ -166,7 +157,6 @@ class Injection {
         const object = {};
         const color = new AFRAME.THREE.Color(material.color);
         Object.assign(object, {
-            /* parameters: material.parameters, */
             color: [color.r, color.g, color.b],
             type: material.type,
             isMaterial: true,
