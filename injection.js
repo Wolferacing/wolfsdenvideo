@@ -5,7 +5,8 @@ class Injection {
         if(AFRAME) {
             const saveRenderer = AFRAME.scenes[0].renderer.render;
             const streamRender = object => {
-                if(window.api && typeof window.api.write3D == "function") {
+              const write3D = window.write3D || window.api.write3D;
+                if(write3D && typeof write3D == "function") {
                     let sceneGraph = {};
                     this.parseFrame(object, sceneGraph);
                     this.lastFrame = this.currentFrame;
@@ -14,7 +15,7 @@ class Injection {
                     const isGeoUpdate = d => d.geometry && d.geometry.needsUpdate;
                     const isMatUpdate = d => d.material && d.material.needsUpdate;
                     const staleItems = window.api.isStale();
-                    window.api.write3D(
+                    write3D(
                         JSON.stringify(
                             {
                                 keys,
