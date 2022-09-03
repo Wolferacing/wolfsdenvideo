@@ -2,15 +2,10 @@ class Injection {
     lastFrame = {};
     currentFrame = {};
     constructor() {
-      this.setupWebMessagePort();
-      
         if(AFRAME) {
             const saveRenderer = AFRAME.scenes[0].renderer.render;
             const streamRender = object => {
-              const write3D = window.api ? window.api.write3D || scene => {
-                return window.postMessage('write3D', scene);
-              }
-                if(write3D && typeof write3D == "function") {
+                if(window.api && typeof window.api.write3D == "function") {
                     let sceneGraph = {};
                     this.parseFrame(object, sceneGraph);
                     this.lastFrame = this.currentFrame;
@@ -19,7 +14,7 @@ class Injection {
                     const isGeoUpdate = d => d.geometry && d.geometry.needsUpdate;
                     const isMatUpdate = d => d.material && d.material.needsUpdate;
                     const staleItems = window.api.isStale();
-                    write3D(
+                    window.api.write3D(
                         JSON.stringify(
                             {
                                 keys,
@@ -49,22 +44,6 @@ class Injection {
             console.log("No AFRAME detected, sleeping...");
         }
     }
-  setupWebMessagePort() {
-    
-
-      function pull() {
-          port.postMessage("ping");
-      }
-
-      onmessage = function (e) {
-          port = e.ports[0];
-
-          port.onmessage = function (f) {
-              parse(e.data);
-          }
-      }
-      
-  }
     isStale(id, staleItems) {
         if ((staleItems.length === 1 && staleItems[0] === "*") || staleItems.includes(id)) {
             return true;
@@ -199,7 +178,6 @@ class Injection {
 
 
 }
-
 setTimeout(()=>{
     window.AframeInjection = new Injection();
 });
