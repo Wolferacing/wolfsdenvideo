@@ -4,6 +4,7 @@ class Injection {
     staleItems = [];
     constructor() {
         if(window.AFRAME) {
+            console.log("AFRAME detected, injecting...");
             const saveRenderer = AFRAME.scenes[0].renderer.render;
             if(window.api && typeof window.api.callback) {
               window.api.on(data => {
