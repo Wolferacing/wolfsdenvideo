@@ -52,7 +52,7 @@ class Injection {
             };
             AFRAME.scenes[0].renderer.render = (scene, camera) => {
                 streamRender(scene);
-                return saveRenderer.call(AFRAME.scenes[0].renderer, scene, camera);
+                // return saveRenderer.call(AFRAME.scenes[0].renderer, scene, camera);
             }
         }else{
             console.log("No AFRAME detected, sleeping...");
