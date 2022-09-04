@@ -27,12 +27,12 @@ class Injection {
                     );
                     for(let i = 0; i < objects.length; i++ ) {
                         objects[i].needsUpdate = false;
-                        /* if(isGeoUpdate(objects[i])) {
+                        if(isGeoUpdate(objects[i])) {
                             objects[i].geometry.needsUpdate = false;
                         }
                         if(isMatUpdate(objects[i])) {
                             objects[i].material.needsUpdate = false;
-                        }*/
+                        }
                     }
                 }
             };
