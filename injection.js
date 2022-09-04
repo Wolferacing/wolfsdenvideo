@@ -3,7 +3,7 @@ class Injection {
     currentFrame = {};
     staleItems = [];
     constructor() {
-        if(AFRAME) {
+        if(window.AFRAME) {
             const saveRenderer = AFRAME.scenes[0].renderer.render;
             if(window.api && typeof window.api.callback) {
               window.api.on(data => {
