@@ -6,10 +6,8 @@ class Injection {
         if(AFRAME) {
             const saveRenderer = AFRAME.scenes[0].renderer.render;
             if(window.api && typeof window.api.callback) {
-              window.api.on(d => {
-                try{
-                  const data = JSON.parse(d);
-                  switch(data.type){
+              window.api.on(data => {
+                switch(data.type){
                     case "MissingItems":
                       if(data.fullRefresh) {
                         this.staleItems = ["*"]
@@ -18,9 +16,6 @@ class Injection {
                       }
                       break;
                   }
-                }catch(e){
-                  console.warn(e);
-                }
               })
             }
             const streamRender = object => {
@@ -43,6 +38,7 @@ class Injection {
                             }
                         )
                     );
+                    this.staleItems = [];
                     for(let i = 0; i < objects.length; i++ ) {
                         objects[i].needsUpdate = false;
                         if(isGeoUpdate(objects[i])) {
