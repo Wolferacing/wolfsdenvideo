@@ -8,7 +8,7 @@ class Injection {
             if(window.api && typeof window.api.callback) {
               window.api.on(d => {
                 try{
-                  const data = JSON.decode(d);
+                  const data = JSON.parse(d);
                   switch(data.type){
                     case "MissingItems":
                       if(data.fullRefresh) {
@@ -18,6 +18,8 @@ class Injection {
                       }
                       break;
                   }
+                }catch(e){
+                  console.warn(e);
                 }
               })
             }
