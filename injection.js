@@ -1,9 +1,26 @@
 class Injection {
     lastFrame = {};
     currentFrame = {};
+    staleItems = [];
     constructor() {
         if(AFRAME) {
             const saveRenderer = AFRAME.scenes[0].renderer.render;
+            if(window.api && typeof window.api.callback) {
+              window.api.on(d => {
+                try{
+                  const data = JSON.decode(d);
+                  switch(data.type){
+                    case "MissingItems":
+                      if(data.fullRefresh) {
+                        this.staleItems = ["*"]
+                      }else{
+                        this.staleItems = data.objects;
+                      }
+                      break;
+                  }
+                }
+              })
+            }
             const streamRender = object => {
                 if(window.api && typeof window.api.write3D == "function") {
                     let sceneGraph = {};
@@ -13,14 +30,13 @@ class Injection {
                     let objects = keys.map(k=>this.currentFrame[k]);
                     const isGeoUpdate = d => d.geometry && d.geometry.needsUpdate;
                     const isMatUpdate = d => d.material && d.material.needsUpdate;
-                    const staleItems = window.api.getStale();
                     window.api.write3D(
                         JSON.stringify(
                             {
                                 keys,
                                 objects: objects
                                     .filter(d=>{
-                                        return this.isStale(d.id, staleItems) || d.needsUpdate || isGeoUpdate(d) || isMatUpdate(d)
+                                        return this.isStale(d.id) || d.needsUpdate || isGeoUpdate(d) || isMatUpdate(d)
                                     })
                             }
                         )
@@ -44,8 +60,8 @@ class Injection {
             console.log("No AFRAME detected, sleeping...");
         }
     }
-    isStale(id, staleItems) {
-        if ((staleItems.length === 1 && staleItems[0] === "*") || staleItems.includes(id)) {
+    isStale(id) {
+        if ((this.staleItems.length === 1 && this.staleItems[0] === "*") || this.staleItems.includes(id)) {
             return true;
         }
         return false;
