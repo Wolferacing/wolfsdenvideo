@@ -3,7 +3,6 @@ class Injection {
     currentFrame = {};
     staleItems = [];
     constructor() {
-        this._uuid = new Date().getTime();
         if(window.AFRAME) {
             console.log("AFRAME detected, injecting...");
             const saveRenderer = AFRAME.scenes[0].renderer.render;
@@ -123,10 +122,10 @@ class Injection {
             console.log(object.id, object.scale.x);
         }
         Object.assign(sceneGraph, {
-            id: this._uuid + "--" + object.id,
+            id: object.id,
             name: object.name,
             type: "Object3D",
-            parent: object.parent ? this._uuid + "--" + object.parent.id : null,
+            parent: object.parent ? object.parent.id : null,
             children: [],
             visible: object.visible,
             receiveShadow: object.receiveShadow,
