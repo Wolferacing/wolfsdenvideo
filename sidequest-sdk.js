@@ -38,6 +38,6 @@ AFRAME.registerComponent('sq-climbable', {
 //     if (data.color !== oldData.color) {
 //       el.getObject3D('mesh').material.color = new THREE.Color(data.color);
 //     }
-    this.el.getObject3D('mesh').geometry.climbable = true;
+    this.el.getObject3D('mesh').geometry.userData.climbable = true;
   }
 });
