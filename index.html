@@ -13,15 +13,19 @@
       
       <a-entity  position="15 0.2 0" rotation="0 -90 0" scale="0.75 0.75 0.75">
         <a-entity position="0 0 0">
-          <a-box mixin="spinAnimation" animation position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9" animation__yoyo="property: scale;dir: alternate;dur: 10000;easing: easeInOutSine;loop: true;to: 0 0 0"></a-box>
-          <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E" animation animation__yoyo="property: scale;dir: alternate;dur: 10000;easing: easeInOutSine;loop: true;to: 0 0 0"></a-sphere>
-          <a-cylinder mixin="orbitAnimation" animation position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D" animation__yoyo="property: scale;dir: alternate;dur: 10000;easing: easeInOutSine;loop: true;to: 0 0 0"></a-cylinder>
+          <a-box mixin="spinAnimation" animation position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"
+                 animation__yoyo="property: scale;dir: alternate;dur: 10000;easing: easeInOutSine;loop: true;to: 0 0 0"></a-box>
+          <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E" animation 
+                    animation__yoyo="property: scale;dir: alternate;dur: 10000;easing: easeInOutSine;loop: true;to: 0 0 0"></a-sphere>
+          <a-cylinder mixin="orbitAnimation" animation position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D" 
+                      animation__yoyo="property: scale;dir: alternate;dur: 10000;easing: easeInOutSine;loop: true;to: 0 0 0"></a-cylinder>
         </a-entity>
       </a-entity>
       
       <a-box sq-climbable position="-3 5 10" rotation="60 45 0" color="#4CC3D9" scale="0.2 10 0.2"></a-box>
       <a-box sq-climbable position="-3 8 10" rotation="0 0 0" color="#4CC3D9" scale="0.2 10 0.2"></a-box>
-      <a-box sq-climbable position="-9 4 10" rotation="5 5 0" src="https://cdn.glitch.global/3c5c516a-4b0a-4ecb-8800-7e086a01359d/frontend-large.jpg" scale="10 0.2 10"></a-box>
+      <a-box sq-climbable position="-9 4 10" rotation="5 5 0" scale="10 0.2 10"
+             src="https://cdn.glitch.global/3c5c516a-4b0a-4ecb-8800-7e086a01359d/frontend-large.jpg"></a-box>
 
     </a-scene>
   </body>
