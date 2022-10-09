@@ -3,7 +3,7 @@
     update: function (oldData) {
       const mesh = this.el.getObject3D('mesh')
       if(mesh){
-        mesh.geometry.userData[d] = true;
+        mesh.userData[d] = true;
       }
     }
   });
