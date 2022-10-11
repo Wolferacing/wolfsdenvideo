@@ -11,9 +11,9 @@
 
 AFRAME.registerComponent('sq-streetview', {
   update: function (oldData) {
-    const mesh = this.el.getObject3D('mesh')
+    const mesh = this.el.object3D;
     if(mesh){
-      mesh.userData.streetView = this.data;
+       mesh.userData.streetView = this.data; 
     }
   }
 });
