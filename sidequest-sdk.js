@@ -26,7 +26,7 @@ AFRAME.registerComponent('sq-streetview', {
 
 AFRAME.registerComponent('sq-customhome', {
    schema: {
-    customHome: {type: 'string', default: 'https://cdn.sidequestvr.com/file/167634/matrix_loading_void_environment.apk'}
+    customHome: {type: 'string', default: 'https://cdn.sidequestvr.com/file/167567/canyon_environment.apk'}
   },
   update: function (oldData) {
     const mesh = this.el.object3D;
