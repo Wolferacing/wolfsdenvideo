@@ -22,3 +22,17 @@ AFRAME.registerComponent('sq-streetview', {
     }
   }
 });
+
+
+AFRAME.registerComponent('sq-customhome', {
+   schema: {
+    customHome: {type: 'string', default: 'https://cdn.sidequestvr.com/file/167634/matrix_loading_void_environment.apk'}
+  },
+  update: function (oldData) {
+    const mesh = this.el.object3D;
+    if(mesh){
+       mesh.userData.customHome = this.data.customHome; 
+      console.log(this.el.object3D);
+    }
+  }
+});
