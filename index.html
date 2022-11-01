@@ -1,97 +1,547 @@
 <html>
   <head>
-   <!-- Primary Meta Tags -->
-<title>THis is the main title</title>
-<meta name="title" content="">
-<meta name="description" content="This is a description">
-
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://void5.glitch.me/">
-<meta property="og:title" content="">
-<meta property="og:description" content="This is a description">
-<meta property="og:image" content="">
-
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://void5.glitch.me/">
-<meta property="twitter:title" content="">
-<meta property="twitter:description" content="This is a description">
-<meta property="twitter:image" content="">
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="/sidequest-sdk.js"></script>
   </head>
   <body>
     <a-scene>
-      <a-assets>
-        <a-asset id="brickTexture" src="https://cdn.glitch.global/3c5c516a-4b0a-4ecb-8800-7e086a01359d/frontend-large.jpg"></a-asset>
-        <a-asset id="otherBrickTexture" src="https://cdn.glitch.global/3c5c516a-4b0a-4ecb-8800-7e086a01359d/1zCi3it.jpg"></a-asset>
-        <a-mixin id="scaleAnimation" animation__yoyo="property: scale;dir: alternate;dur: 10000;easing: easeInOutSine;loop: true;to: 0 0 0"></a-mixin>
-        <a-mixin id="spinAnimation" animation="property: object3D.rotation.z; to: 360; loop: true; easing: linear; dur: 6000"></a-mixin>
-        <a-mixin id="orbitAnimation" animation="property: object3D.rotation.x; to: 360; loop: true; easing: linear; dur: 3000"></a-mixin>
-      
-        <a-mixin id="poleOne" position="-5 3 8" rotation="60 45 0" scale="0.2 5 0.2"></a-mixin>
-        <a-mixin id="poleTwo" position="-13.023 8.428 7.196" rotation="60 45 0" scale="0.2 5 0.2"></a-mixin>
-        <a-mixin id="poleThree" position="-3.6 5.5 9.3" rotation="0 0 0" scale="0.2 3 0.2"></a-mixin>
-        <a-mixin id="poleFour" position="-14.523 5.885 5.612" rotation="0 0 0" scale="0.2 3 0.2"></a-mixin>
-        <a-mixin id="poleFive" position="-11.577 19.427 8.659" rotation="0 0 0" scale="0.2 20 0.2"></a-mixin>
-      </a-assets>
-      
-              <a-box sq-climbable position="0 0 0" rotation="0 0 0" scale="100 0.1 100" color="#44ff44"></a-box>
+      <a-box
+        sq-slippery
+        position="-1 3.5 0"
+        rotation="0 0 0"
+        scale="0.300 7 0.300"
+        color="#550d06"
+      ></a-box>
+      <a-box
+        sq-slippery
+        position="1 3.5 0"
+        rotation="0 0 0"
+        scale="0.300 7 0.300"
+        color="#550d06"
+      ></a-box>
+      <a-box
+        sq-slippery
+        position="-1 3.5 14"
+        rotation="0 0 0"
+        scale="0.300 7 0.300"
+        color="#550d06"
+      ></a-box>
+      <a-box
+        sq-slippery
+        position="1 3.5 14"
+        rotation="0 0 0"
+        scale="0.300 7 0.300"
+        color="#550d06"
+      ></a-box>
+      <a-box
+        sq-slippery
+        position="-1 3.5 28"
+        rotation="0 0 0"
+        scale="0.300 7 0.300"
+        color="#550d06"
+      ></a-box>
+      <a-box
+        sq-slippery
+        position="1 3.5 28"
+        rotation="0 0 0"
+        scale="0.300 7 0.300"
+        color="#550d06"
+      ></a-box>
 
-      
-<!--       <a-image scale="200 100 0" position="0 0 40" src="https://i.imgur.com/Bguxal3.png"></a-image> -->
-<!--       <a-entity sq-customhome="customHome: https://cdn.sidequestvr.com/file/167728/peachs_castle_exterior_environment.apk"></a-entity> -->
-      <a-entity position="10 0.2 4" rotation="0 -90 0" scale="0.75 0.75 0.75">
-        <a-entity position="0 0 0">
-          <a-box mixin="spinAnimation scaleAnimation" animation position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-          <a-sphere mixin="scaleAnimation" position="0 1.25 -5" radius="1.25" color="#EF2D5E" animation ></a-sphere>
-          <a-cylinder mixin="orbitAnimation scaleAnimation" animation position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D" ></a-cylinder>
-        </a-entity>
-      </a-entity>
-      
-      <a-entity  rotation="0 190 0">
-            <a-entity camera look-controls wasd-controls="fly: true"  position="0 10 1"></a-entity>
+      <!-- Up right box extra yellow -->
+      <a-box
+        sq-collider
+        position="-1 3.45 0"
+        rotation="0 0 0"
+        scale="0.2 7 0.31"
+        color="#7D5208"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="1 3.45 0"
+        rotation="0 0 0"
+        scale="0.2 7 0.31"
+        color="#7D5208"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="-1 3.45 14"
+        rotation="0 0 0"
+        scale="0.2 7 0.31"
+        color="#7D5208"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="1 3.45 14"
+        rotation="0 0 0"
+        scale="0.2 7 0.31"
+        color="#7D5208"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="-1 3.45 28"
+        rotation="0 0 0"
+        scale="0.2 7 0.31"
+        color="#7D5208"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="1 3.45 28"
+        rotation="0 0 0"
+        scale="0.2 7 0.31"
+        color="#7D5208"
+      ></a-box>
 
-      </a-entity>
-      
-      <a-entity position="13.5 0 7.4">
-        <a-box sq-climbable mixin="poleOne" color="#4CC3D9" ></a-box>
-        <a-box sq-climbable mixin="poleTwo" color="#4CC3D9"></a-box>
+    
+      <!-- cross bars -->
+      <a-cylinder sq-climbable position="0 6.9 0" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 1.272727272727273" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 2.545454545454546" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 3.818181818181819" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 5.090909090909092" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 6.363636363636365" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 7.636363636363638" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 8.909090909090911" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 10.18181818181818" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 11.45454545454546" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 12.72727272727273" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 14" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 15.27272727272728" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 16.54545454545455" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 17.81818181818182" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 19.09090909090909" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 20.36363636363637" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 21.63636363636364" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 22.90909090909091" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 24.18181818181819" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 25.45454545454546" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 26.72727272727273" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder sq-climbable position="0 6.9 28.0000000000000" radius="0.03" height="2" rotation="90 0 90" color="#6C776E"
+      ></a-cylinder>
 
-        <a-box sq-climbable mixin="poleThree" color="#4CC3D9"></a-box>
-        <a-box sq-climbable mixin="poleFour" color="#4CC3D9"></a-box>
-        <a-box sq-climbable mixin="poleFive" color="#4CC3D9"></a-box>
-        
-        
-        <a-box sq-slippery position="-30 1 -0.5" rotation="80 60 0" scale="0.9 40 0.05" color="#ff0000"></a-box>
-        <a-box sq-collider position="-28 1 -0.5" rotation="80 60 0" scale="0.9 40 0.05" color="#00ff00"></a-box>
+      <!--Climb bars up -->
+      <a-cylinder
+        sq-climbable
+        position="-0.6 3 0"
+        radius="0.03"
+        height="1.2"
+        rotation="0 0 -50"
+        color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder
+        sq-climbable
+        position="-0.6 5 0"
+        radius="0.03"
+        height="1.2"
+        rotation="0 0 -50"
+        color="#6C776E"
+      ></a-cylinder>
 
-        <a-box sq-slippery position="-29 1 -0.5" rotation="80 60 0" scale="0.05 40 0.9" color="#ff0000"></a-box>
+      <a-cylinder
+        sq-climbable
+        position="0.6 2 0"
+        radius="0.03"
+        height="1.2"
+        rotation="0 0 50"
+        color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder
+        sq-climbable
+        position="0.6 4 0"
+        radius="0.03"
+        height="1.2"
+        rotation="0 0 50"
+        color="#6C776E"
+      ></a-cylinder>
+      <a-cylinder
+        sq-climbable
+        position="0.6 6 0"
+        radius="0.03"
+        height="1.2"
+        rotation="0 0 50"
+        color="#6C776E"
+      ></a-cylinder>
 
-        <a-box sq-slippery position="-31 1 -0.5" rotation="80 60 0" scale="0.05 40 0.9" color="#ff0000"></a-box>
-        <a-box sq-slippery position="-30 53.75 -0.5" rotation="80 60 0" scale="0.05 500 0.5" color="#ff0000"></a-box>
+      <!-- long bars -->
+      <a-cylinder
+        sq-slippery
+        position="1 6.9 7"
+        radius="0.03"
+        height="14"
+        rotation="90 0 0"
+        color="#816954"
+      ></a-cylinder>
+      <a-cylinder
+        sq-slippery
+        position="-1 6.9 7"
+        radius="0.03"
+        height="14"
+        rotation="90 0 0"
+        color="#816954"
+      ></a-cylinder>
+      <a-cylinder
+        sq-slippery
+        position="1 6.9 21"
+        radius="0.03"
+        height="14"
+        rotation="90 0 0"
+        color="#816954"
+      ></a-cylinder>
+      <a-cylinder
+        sq-slippery
+        position="-1 6.9 21"
+        radius="0.03"
+        height="14"
+        rotation="90 0 0"
+        color="#816954"
+      ></a-cylinder>
 
-        <a-box sq-climbable position="-9 4 10" rotation="5 5 0" scale="10 0.2 10" color="#ff00ff"></a-box>
+<!-- Walk way -->
       
-        <a-box sq-climbable position="-6.5 27 10" rotation="5 5 0" scale="10 0.2 10" color="#ffff00"></a-box>
-   
-      </a-entity>
-      
-      <a-entity position="13.5 28 7.4">
-        <a-box sq-climbable mixin="poleOne" color="#4CC3D9" ></a-box>
-        <a-box sq-climbable mixin="poleTwo" color="#4CC3D9"></a-box>
+      <a-box
+        sq-collider
+        position="-2.80 4.7 31.3"
+        rotation="0 40 0"
+        scale="10 0.21 0.15"
+        color="#000000"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="-2.80 4.7 31.3"
+        rotation="0 40 0"
+        scale="10 0.25 0.14"
+        color="#B3AE21"
+      ></a-box>
+      <a-cylinder
+        sq-collider
+        position="1 4.7 28"
+        radius="1"
+        height="0.26"
+        rotation="0 0 0"
+        color="#B3AE21"
+      ></a-cylinder>
+      <a-cylinder
+        sq-collider
+        position="1 4.7 28"
+        radius="1.01"
+        height="0.21"
+        rotation="0 0 0"
+        color="#000000"
+      ></a-cylinder>
+      <a-cylinder
+        sq-collider
+        position="-8.4 4.7 35"
+        radius="2"
+        height="0.26"
+        rotation="0 0 0"
+        color="#B3AE21"
+      ></a-cylinder>
+      <a-cylinder
+        sq-collider
+        position="-8.4 4.7 35"
+        radius="2.01"
+        height="0.21"
+        rotation="0 0 0"
+        color="#000000"
+      ></a-cylinder>
 
-        <a-box sq-climbable mixin="poleThree" color="#4CC3D9"></a-box>
-        <a-box sq-climbable mixin="poleFour" color="#4CC3D9"></a-box>
-        <a-box sq-climbable mixin="poleFive" color="#4CC3D9"></a-box>
-        
-      
-        <a-box sq-climbable position="-9 4 10" rotation="5 5 0" scale="10 0.2 10" color="#0000ff"></a-box>
-      
-        <a-box sq-climbable position="-10.5 27 13.5" scale="20 0.2 10" src="#brickTexture"></a-box>
-   
-      </a-entity>
+<!-- pointless angled support -->
+        <a-box
+        sq-slippery
+        position="-8.4 2.4 32.6"
+        rotation="0 90 53"
+        scale="0.300 7 0.300"
+        color="#550d06"
+        ></a-box>
+        <a-box
+        sq-climbable
+        position="-8.4 2.4 32.6"
+        rotation="0 90 53"
+        scale="0.2 6.9 0.31"
+        color="#7D5208"
+        ></a-box>
+
+<!-- Climbing wall -->
+ <a-box
+        sq-collider
+        position="-09.3 12 35.8"
+        rotation="0 -45 0"
+        scale="2 15 0.5"
+        color="#492EB6"
+      ></a-box>
+      <a-box
+        sq-climbable
+        position="-09.3 19.5 35.8"
+        rotation="0 -45 0"
+        scale="2.05 0.2 0.6"
+        color="#E618D2"
+      ></a-box>
+      <a-cylinder
+        sq-collider
+        position="-10.5 19.46 37.1"
+        radius="2"
+        height="0.26"
+        rotation="0 0 0"
+        color="#B3AE21"
+      ></a-cylinder>
+<a-cylinder
+        sq-collider
+        position="-10.5 19.46 37.1"
+        radius="2.02"
+        height="0.24"
+        rotation="0 0 0"
+        color="#000000"
+      ></a-cylinder>
+<!-- slide poles -->
+<a-cylinder
+        sq-slippery
+        position="1.3 13.2 16.7"
+        radius="0.03"
+        height="50"
+        rotation="0 60 70"
+        color="#816954"
+      ></a-cylinder>
+<a-box
+        sq-slippery
+        position="-10.5 21 37.1"
+        rotation="0 0 0"
+        scale="0.300 3 0.300"
+        color="#550d06"
+      ></a-box>
+      <a-box
+        sq-slippery
+        position="13 3.5 -3.8"
+        rotation="0 0 0"
+        scale="0.300 7 0.300"
+        color="#550d06"
+      ></a-box>
+       <a-box
+        sq-slippery
+        position="13 3.48 -3.8"
+        rotation="0 0 0"
+        scale="0.2 7 0.31"
+        color="#7D5208"
+      ></a-box>
+<!--       Slide -->
+<a-box
+        sq-slippery
+        position="-11.2 9.36 19.1"
+        rotation="60 0 0"
+        scale="2 40 0.2"
+        color="#28DBE8"
+      ></a-box>
+<a-box
+        sq-slippery
+        position="-12.2 9.7 19"
+        rotation="60 0 0"
+        scale="0.2 40 1.5"
+        color="#28DBE8"
+      ></a-box>
+<a-box
+        sq-slippery
+        position="-10.2 9.7 19"
+        rotation="60 0 0"
+        scale="0.2 40 1.5"
+        color="#28DBE8"
+      ></a-box>
+<!-- pointless angled support for climbing wall-->
+        <a-box
+        sq-slippery
+        position="-10.4 18 37"
+        rotation="0 45 45"
+        scale="0.300 4 0.300"
+        color="#550d06"
+        ></a-box>
+        <a-box
+        sq-climbable
+         position="-10.4 18 37"
+        rotation="0 45 45"
+        scale="0.2 3.96 0.31"
+        color="#7D5208"
+        ></a-box>
+<!-- Climbing wall blocks -->
+<a-box
+        sq-climbable
+        position="-09.4 7 35.25"
+        rotation="0 -45 30"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-08.66 8 36.05"
+        rotation="15 -45 14"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+ <a-box
+        sq-climbable
+        position="-09.15 9 35.6"
+        rotation="0 -45 36"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-08.66 10 36.05"
+        rotation="15 -45 14"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+ <a-box
+        sq-climbable
+        position="-09.15 11 35.6"
+        rotation="0 -45 25"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-09.4 11.5 35.25"
+        rotation="10 -45 30"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-08.66 12 36.05"
+        rotation="15 -45 14"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-09.4 12.7 35.26"
+        rotation="10 -45 30"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-08.66 13.5 36.05"
+        rotation="15 -45 14"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-09.15 14 35.6"
+        rotation="0 -45 25"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-09.15 15 35.6"
+        rotation="0 -45 25"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-09.4 15.75 35.6"
+        rotation="10 -45 30"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-08.66 16.1 36.05"
+        rotation="15 -45 14"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+      <a-box
+        sq-climbable
+        position="-09.4 16.7 35.26"
+        rotation="10 -45 30"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+      <a-box
+        sq-climbable
+        position="-09.4 17.5 35.26"
+        rotation="10 -45 30"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+      <a-box
+        sq-climbable
+        position="-08.66 18 36.05"
+        rotation="15 -45 14"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+<a-box
+        sq-climbable
+        position="-09.15 18.7 35.6"
+        rotation="0 -45 25"
+        scale="0.115 0.115 0.115"
+        color="#E618D2"
+      ></a-box>
+
+<!-- Trees -->
+      <a-entity gltf-model="https://aframe.io/aframe/examples/assets/models/tree1.glb" sq-climbable position="10 0 13" rotation="-2 53 0" scale="2 4 2"
+        ></a-entity>
+      <a-entity gltf-model="https://aframe.io/aframe/examples/assets/models/tree1.glb" sq-climbable position="12 0 14" rotation="-2 10 0" scale="2 5 2"
+        ></a-entity>
+      <a-entity gltf-model="https://aframe.io/aframe/examples/assets/models/tree1.glb" sq-climbable position="15 -3 16" rotation="-2 10 -1" scale="2 6 2"
+        ></a-entity>
+      <a-entity gltf-model="https://aframe.io/aframe/examples/assets/models/tree1.glb" sq-climbable position="-15 0 3" rotation="2 80 0" scale="1.75 3 1.75"
+        ></a-entity>
+      <a-entity gltf-model="https://aframe.io/aframe/examples/assets/models/tree1.glb" sq-climbable position="-10 -2 25" rotation="-2 55 -1" scale="2.25 5 1.75"
+        ></a-entity>
+      <!-- Floor -->
+      <a-box
+        sq-collider
+        position="10 0.1 0"
+        rotation="1 0 0"
+        scale="20 0.2 20"
+        color="#23A23D"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="-10 0.1 0"
+        rotation="0 270 -1"
+        scale="20 0.2 20"
+        color="#0A7720"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="10 0.1 20"
+        rotation="0 270 1"
+        scale="20 0.2 20"
+        color="#66cc00"
+      ></a-box>
+      <a-box
+        sq-collider
+        position="-10 0.1 20"
+        rotation="0 90 -1"
+        scale="20 0.2 20"
+        color="#23A23D"
+      ></a-box> 
     
     </a-scene>
   </body>
