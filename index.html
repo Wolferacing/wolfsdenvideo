@@ -38,9 +38,9 @@
       
       
       <a-cylinder
-        animation="property: position; from 0 0 0; to: 0 2 0; dur: 2000; easing: linear; autoplay: false; startEvents: startAnimation"
+        animation="property: position; from: 0 0 0; to: 0 2 0; dur: 2000; easing: easeInOutElastic; autoplay: false; startEvents: startAnimation"
+        animation__2="property: position; from: 0 2 0; to: 0 0 0; dur: 2000; delay: 3000; easing: easeInOutElastic; autoplay: false; startEvents: startAnimation"
         sq-syncloop="secondsOffset: 5"
-        sq-righthand="scaleOffset: 0.1 0.1 0.1"
         color="#550d06"
       ></a-cylinder>
       
@@ -62,8 +62,8 @@
         position="1 3.5 0"
         rotation="0 0 0"
         scale="0.300 7 0.300"
-        color="#550d06"
-      ></a-box>
+        color="#550d06">
+      </a-box>
       <a-box
         sq-slippery
         position="-1 3.5 14"
