@@ -1,4 +1,4 @@
-['climbable', 'collider', 'sticky', 'slippery'].forEach(d => {
+['climbable', 'collider', 'invertedcollider', 'sticky', 'slippery'].forEach(d => {
     AFRAME.registerComponent('sq-' + d, {
         update: function (oldData) {
             const mesh = this.el.getObject3D('mesh')
