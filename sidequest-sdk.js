@@ -80,3 +80,33 @@ AFRAME.registerComponent('sq-questhome', {
         }
     }
 });
+
+AFRAME.registerComponent('sq-syncloop', {
+  schema: {
+      secondsOffset: {type: 'number', default: 0}
+  },
+  update: function (oldData) {
+      if(this.data.secondsOffset) {
+          
+      }
+  },
+  tick: function() {
+      let now = new Date().getTime();
+      
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
