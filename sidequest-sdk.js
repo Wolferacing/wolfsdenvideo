@@ -81,23 +81,25 @@ AFRAME.registerComponent('sq-questhome', {
     }
 });
 
-AFRAME.registerComponent('sq-syncloop', {
+AFRAME.registerComponent('sq-syncloop',{
+  hasTriggered: false,
   schema: {
       secondsOffset: {type: 'number', default: 0}
   },
-  update: function (oldData) {
-      if(this.data.secondsOffset) {
-          
-      }
-  },
   tick: function() {
-      let now = new Date().getTime();
-      
+      let nowInMs = new Date().getTime();
+      let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / 5000) * this.data.secondsOffset;
+      if(timeSinceLast > this.data.secondsOffset - 0.5 && !this.hasTriggered) {
+        this.el.emit('startAnimation');
+        this.hasTriggered = true;
+        console.log("fire trigger");
+      }
+      if(timeSinceLast < 0.5 && this.hasTriggered) {
+        this.hasTriggered = false;
+        console.log("reset trigger");
+      }
   }
 });
-
-
-
 
 
 
