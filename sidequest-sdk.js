@@ -82,21 +82,25 @@ AFRAME.registerComponent('sq-questhome', {
 });
 
 AFRAME.registerComponent('sq-syncloop',{
-  hasTriggered: false,
   schema: {
       secondsOffset: {type: 'number', default: 0}
   },
+  // update: function() {
+  //     this.el.setAttribute("animation", {'startEvents': 'startAnimation'});
+  // },
   tick: function() {
-      let nowInMs = new Date().getTime();
-      let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / 5000) * this.data.secondsOffset;
-      if(timeSinceLast > this.data.secondsOffset - 0.5 && !this.hasTriggered) {
-        this.el.emit('startAnimation');
-        this.hasTriggered = true;
-        console.log("fire trigger");
-      }
-      if(timeSinceLast < 0.5 && this.hasTriggered) {
-        this.hasTriggered = false;
-        console.log("reset trigger");
+      if(this.data.secondsOffset) {
+        let nowInMs = new Date().getTime();
+        let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / 5000) * this.data.secondsOffset;
+        if(timeSinceLast > this.data.secondsOffset - 1 && !this.readyToTrigger) {
+          this.readyToTrigger = true;
+          console.log("prime trigger");
+        }
+        if(timeSinceLast < 1 && this.readyToTrigger) {
+          this.readyToTrigger = false;
+          this.el.emit('startAnimation', null, false);
+          console.log("fire trigger");
+        }
       }
   }
 });
