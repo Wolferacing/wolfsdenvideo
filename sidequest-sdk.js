@@ -13,7 +13,7 @@
   AFRAME.registerComponent('sq-' + d, {
         schema: {
             positionOffset: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
-            rotationOffset: {type: 'vec3', default: {x: 0, y: 0, z: 0, w: 0}},
+            rotationOffset: {type: 'vec4', default: {x: 0, y: 0, z: 0, w: 0}},
             scaleOffset: {type: 'vec3', default: {x: 1, y: 1, z: 1}},
         },
         update: function (oldData) {
