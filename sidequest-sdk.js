@@ -1,4 +1,4 @@
-['climbable', 'collider', 'sticky', 'slippery',].forEach(d => {
+['climbable', 'collider', 'sticky', 'slippery', 'hideavatars', 'hidedefaulttextures'].forEach(d => {
     AFRAME.registerComponent('sq-' + d, {
         update: function (oldData) {
             const mesh = this.el.getObject3D('mesh')
@@ -9,7 +9,7 @@
     });
 });
 
-[ 'lefthand', 'righthand', 'head' ].forEach(d => {
+['lefthand', 'righthand', 'head' ].forEach(d => {
   AFRAME.registerComponent('sq-' + d, {
         schema: {
             positionOffset: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
