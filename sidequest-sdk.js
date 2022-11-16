@@ -1,7 +1,18 @@
-['climbable', 'collider', 'sticky', 'slippery', 'hideavatars', 'hidedefaulttextures'].forEach(d => {
+['climbable', 'collider', 'sticky', 'slippery'].forEach(d => {
     AFRAME.registerComponent('sq-' + d, {
         update: function (oldData) {
             const mesh = this.el.getObject3D('mesh')
+            if(mesh){
+                mesh.userData[d] = true;
+            }
+        }
+    });
+});
+
+['hideavatars', 'hidedefaulttextures'].forEach(d => {
+    AFRAME.registerComponent('sq-' + d, {
+        update: function (oldData) {
+            const mesh = this.el.object3D;
             if(mesh){
                 mesh.userData[d] = true;
             }
