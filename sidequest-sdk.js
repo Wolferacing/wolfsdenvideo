@@ -83,7 +83,7 @@ AFRAME.registerComponent('sq-questhome', {
 
 AFRAME.registerComponent('sq-syncloop',{
   schema: {
-      secondsOffset: {type: 'number', default: 0}
+      interval: {type: 'number', default: 0}
   },
   tick: function() {
       if(this.data.secondsOffset) {
