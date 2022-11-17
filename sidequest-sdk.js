@@ -86,10 +86,10 @@ AFRAME.registerComponent('sq-syncloop',{
       interval: {type: 'number', default: 0}
   },
   tick: function() {
-      if(this.data.secondsOffset) {
+      if(this.data.interval) {
         let nowInMs = new Date().getTime();
-        let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / 5000) * this.data.secondsOffset;
-        if(timeSinceLast > this.data.secondsOffset - 1 && !this.readyToTrigger) {
+        let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / 5000) * this.data.interval;
+        if(timeSinceLast > this.data.interval - 1 && !this.readyToTrigger) {
           this.readyToTrigger = true;
         }
         if(timeSinceLast < 1 && this.readyToTrigger) {
