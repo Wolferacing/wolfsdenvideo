@@ -83,7 +83,9 @@ AFRAME.registerComponent('sq-questhome', {
 
 AFRAME.registerComponent('sq-syncloop',{
   schema: {
-      interval: {type: 'number', default: 0}
+      interval: {type: 'number', default: 0},
+      eventName: {type: 'string', default: 'startAnimation'},
+      remote: {type: 'string', default: null}
   },
   tick: function() {
       if(this.data.interval) {
@@ -94,7 +96,7 @@ AFRAME.registerComponent('sq-syncloop',{
         }
         if(timeSinceLast < 1 && this.readyToTrigger) {
           this.readyToTrigger = false;
-          this.el.emit('startAnimation', null, false);
+          this.el.emit(this.data.eventName, null, false);
         }
       }
   }
