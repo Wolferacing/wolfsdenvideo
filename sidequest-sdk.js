@@ -23,18 +23,18 @@
 ['lefthand', 'righthand', 'head' ].forEach(d => {
   AFRAME.registerComponent('sq-' + d, {
         schema: {
-            positionOffset: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
-            rotationOffset: {type: 'vec4', default: {x: 0, y: 0, z: 0, w: 0}},
-            scaleOffset: {type: 'vec3', default: {x: 1, y: 1, z: 1}},
+            position: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
+            rotation: {type: 'vec3', default: {x: 0, y: 0, z: 0}},
+            scale: {type: 'vec3', default: {x: 1, y: 1, z: 1}},
         },
         update: function (oldData) {
             const mesh = this.el.getObject3D('mesh')
             if(mesh){
                 mesh.userData[d] = {
                   enabled: true, 
-                  position: this.data.positionOffset,
-                  rotation: this.data.rotationOffset,
-                  scale: this.data.scaleOffset,
+                  position: this.data.position,
+                  rotation: this.data.rotation,
+                  scale: this.data.scale,
                 };
             }
         }
