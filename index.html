@@ -10,10 +10,19 @@
                 }
             }
         });
+      AFRAME.registerComponent('sq-onclick', {
+            init: function () {
+                this.el.addEventListener('click', () => {
+                  console.log('this jsut got clicked!');
+                })
+            }
+        });
     </script>
   </head>
   <body>
-    <a-scene >
+    <a-scene>
+      <a-box color="blue" sq-onclick sq-clickable sq-collider></a-box>
+
       <a-entity position="0 0 10" sq-mirror></a-entity>
       <a-link position="0 0 10" title="test title" href="https://bobclimbnew.glitch.me" image="https://i.imgur.com/GNvMYQP.jpeg"></a-link>
       
