@@ -75,7 +75,10 @@
                 position: {type: 'vec3', default: {x: 0, y: 0, z: 0}}
             },
             update: function () {
-                window.api.write3D("spawnPoint:" + this.data.x + "," + this.data.y + "," + this.data.z);
+                window.api.write3D("spawnPoint:" + 
+                                   (this.data.position.x||0) + "," + 
+                                   (this.data.position.y||0) + "," + 
+                                   (this.data.position.z||0));
             }
         });
 
