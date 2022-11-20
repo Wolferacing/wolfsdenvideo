@@ -5,16 +5,17 @@
     <script>
       AFRAME.registerComponent('sq-triggermove', {
             update: function () {
-                setTimeout(() => {
-                  window.movePlayer({x: 10, y: 1, z: 0})
-                }, 5000);
+                window.buttonPressCallback = d => {
+                  console.log(d);
+                }
             }
         });
     </script>
   </head>
   <body>
     <a-scene >
-    <a-link position="0 0 10" title="test title" href="https://bobclimbnew.glitch.me" image="https://i.imgur.com/GNvMYQP.jpeg"></a-link>
+      <a-entity position="0 0 10" sq-mirror></a-entity>
+      <a-link position="0 0 10" title="test title" href="https://bobclimbnew.glitch.me" image="https://i.imgur.com/GNvMYQP.jpeg"></a-link>
       
       <a-text value="this is the text"></a-text>
 <!--       <a-box position="0 1 0" src="https://i.imgur.com/GNvMYQP.jpeg" repeat="1 1" material="opacity: 0.5; transparent: true"></a-box>
