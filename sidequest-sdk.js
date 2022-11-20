@@ -94,15 +94,15 @@
                     var rot = [this.el.object3D.rotation.x,this.el.object3D.rotation.y,this.el.object3D.rotation.z];
                     if(this.data.type === "head") {
                         pos = [window.userpose[0], window.userpose[1], -window.userpose[2]];
-                        rot = [-window.userpose[3], -window.userpose[4], window.userpose[5]];
+                        rot = [window.userpose[3], window.userpose[4], window.userpose[5]];
                     }
                     if(this.data.type === "lefthand") {
-                        pos = [-window.userpose[6], window.userpose[7], -window.userpose[8]];
-                        rot = [-window.userpose[9], -window.userpose[10], window.userpose[11]];
+                        pos = [-window.userpose[8], window.userpose[7], -window.userpose[6]];
+                        rot = [window.userpose[9], window.userpose[10], window.userpose[11]];
                     }
                     if(this.data.type === "righthand") {
-                        pos = [window.userpose[12], window.userpose[13], -window.userpose[14]];
-                        rot = [-window.userpose[15], -window.userpose[16], window.userpose[17]];
+                        pos = [-window.userpose[14], window.userpose[13], -window.userpose[12]];
+                        rot = [window.userpose[15], window.userpose[16], window.userpose[17]];
                     }
                     this.el.object3D.position.set(pos[0], pos[1], pos[2]);
                     this.el.object3D.rotation.set(rot[0], rot[1], rot[2]);
