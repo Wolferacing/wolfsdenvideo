@@ -1,4 +1,4 @@
- ['climbable', 'collider', 'invertedcollider', 'sticky', 'clickable', 'hidedefaulttextures'].forEach(d => {
+ ['climbable', 'collider', 'invertedcollider', 'sticky', 'clickable'].forEach(d => {
             AFRAME.registerComponent('sq-' + d, {
                 update: function (oldData) {
                     const mesh = this.el.getObject3D('mesh')
@@ -39,7 +39,7 @@
                 }
             }
         });
-        ['hideavatars', 'mirror'].forEach(d => {
+        ['hideavatars', 'mirror', 'hidedefaulttextures'].forEach(d => {
             AFRAME.registerComponent('sq-' + d, {
                 update: function (oldData) {
                     const mesh = this.el.object3D;
