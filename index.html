@@ -6,7 +6,7 @@
       AFRAME.registerComponent('sq-onclick', {
           init: function () {
               this.el.addEventListener('click', () => {
-                 this.el.emit('startAnimation', null, false);
+                 this.el.parentElement.emit('startAnimation', null, false);
               })
           }
       });
@@ -28,52 +28,56 @@
         <a-box depth="0.1" width="1" position="7.5 0.5 -5" color="green"></a-box>
         <a-box depth="0.1" width="1" position="-6.5 0.5 -5" color="green"></a-box>
 
-
-        <a-entity position="8 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  delay: 2000; dur: 700; easing: easeInOutExpo;">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red">
+        
+        <a-entity position="8 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
+          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
             <a-text value="24" position="0 0.1 0.11" align="center"></a-text>
           </a-box>
         </a-entity>
         
-        <a-entity position="6 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  delay: 2000; dur: 700; easing: easeInOutExpo;">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red">
+        <a-entity position="6 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
+          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
             <a-text value="23" position="0 0.1 0.11" align="center"></a-text>
           </a-box>
         </a-entity>
 
 
-        <a-entity position="4 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  delay: 2000; dur: 700; easing: easeInOutExpo;">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red">
+        <a-entity position="4 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
+          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
             <a-text value="22" position="0 0.1 0.11" align="center"></a-text>
           </a-box>
         </a-entity>
 
-        <a-entity position="2 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  delay: 2000; dur: 700; easing: easeInOutExpo;">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red">
+        <a-entity position="2 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
+          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
             <a-text value="21" position="0 0.1 0.11" align="center"></a-text>
           </a-box>
         </a-entity>
 
-        <a-entity position="0 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; delay: 1000; dur: 700; easing: easeInOutExpo;">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red">
-            <a-text value="20" position="0 0.1 0.11" align="center"></a-text>
-          </a-box>
+        
+        <a-entity position="0 0 -5" >
+          <a-plane src=""></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="20" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
         </a-entity>
-
-        <a-entity position="-2 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red">
+        
+        <a-entity position="-2 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
+          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
           <a-text value="19" position="0 0.1 0.11" align="center"></a-text>
           </a-box>
         </a-entity>
 
-        <a-entity position="-4 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; delay: 1000; dur: 700; easing: easeInOutExpo;">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red">
+        <a-entity position="-4 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
             <a-text value="18" position="0 0.1 0.11" align="center"></a-text>
           </a-box>
         </a-entity>
 
-        <a-entity position="-6 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; delay: 1000; dur: 700; easing: easeInOutExpo;">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red">
+        <a-entity position="-6 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick >
             <a-text value="17" position="0 0.1 0.11" align="center"></a-text>
           </a-box>
         </a-entity>
