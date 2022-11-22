@@ -17,6 +17,12 @@
       <a-entity position="0 0 10" rotation="0 180 0" scale="2 2 2" sq-mirror></a-entity>
      
       <a-box color="darkgreen" sq-collider scale="30 0.1 30"></a-box>
+      
+      
+      
+      
+      
+      
       <a-entity position="0 0 0">
         <a-box depth="0.1" width="17" position="1 1.5 -5" color="green"></a-box>
         <a-box depth="0.1" width="1" position="-0.5 0.5 -5" color="green"></a-box>
@@ -27,29 +33,44 @@
         <a-box depth="0.1" width="1" position="-4.5 0.5 -5" color="green"></a-box>
         <a-box depth="0.1" width="1" position="7.5 0.5 -5" color="green"></a-box>
         <a-box depth="0.1" width="1" position="-6.5 0.5 -5" color="green"></a-box>
-<!--         startEvents: startAnimation -->
+        <a-box depth="0.1" width="1" position="9.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-7.5 0.5 -5" color="green"></a-box>
+<!--          -->
         
-        <a-entity position="8 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; ">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
-            <a-text value="24" position="0 0.1 0.11" align="center"></a-text>
-          </a-box>
+        
+        <a-entity position="8 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/honeypot-256x256-30663.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="24" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
         </a-entity>
         
-        <a-entity position="6 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; ">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
-            <a-text value="23" position="0 0.1 0.11" align="center"></a-text>
-          </a-box>
+        <a-entity position="6 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/candy-256x256-30693.png"></a-plane>
+          
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo;startEvents: startAnimation ">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="23" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
         </a-entity>
 
 
-        <a-entity position="4 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; ">
-          <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
-            <a-text value="22" position="0 0.1 0.11" align="center"></a-text>
-          </a-box>
+        <a-entity position="4 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/chicken-256x256-30650.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="22" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
         </a-entity>
-        <a-entity position="-6 0 -5">
-          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/bread-256x256-30654.png"></a-plane>
-          <a-entity position="2 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; ">
+        
+        
+        <a-entity position="2 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/cake-256x256-30680.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
             <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
               <a-text value="21" position="0 0.1 0.11" align="center"></a-text>
             </a-box>
@@ -59,7 +80,7 @@
         
         <a-entity position="0 0 -5" >
           <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/apple-256x256-30677.png"></a-plane>
-          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; ">
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
             <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
               <a-text value="20" position="0 0.1 0.11" align="center"></a-text>
             </a-box>
@@ -68,7 +89,7 @@
         
         <a-entity position="-2 0 -5" >
           <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/banana-256x256-30652.png"></a-plane>
-          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;  ">
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
             <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
             <a-text value="19" position="0 0.1 0.11" align="center"></a-text>
             </a-box>
@@ -77,7 +98,7 @@
 
         <a-entity position="-4 0 -5" >
           <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/beer-256x256-30679.png"></a-plane>
-          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;">
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;startEvents: startAnimation">
             <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
               <a-text value="18" position="0 0.1 0.11" align="center"></a-text>
             </a-box>
@@ -86,7 +107,7 @@
         
         <a-entity position="-6 0 -5">
           <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/bread-256x256-30654.png"></a-plane>
-          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; ">
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
             <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick >
               <a-text value="17" position="0 0.1 0.11" align="center"></a-text>
             </a-box>
@@ -94,7 +115,191 @@
         </a-entity>
       </a-entity>
 
+       <a-entity position="0 2 0">
+        <a-box depth="0.1" width="17" position="1 1.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-0.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="1.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="3.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-2.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="5.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-4.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="7.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-6.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="9.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-7.5 0.5 -5" color="green"></a-box>
+<!--          -->
+        
+        
+        <a-entity position="8 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/cherry-256x256-30656.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="16" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+        
+        <a-entity position="6 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/cookie-256x256-30657.png"></a-plane>
+          
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="15" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+
+
+        <a-entity position="4 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/donut-256x256-30698.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation ">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="14" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+        
+        
+        <a-entity position="2 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/food-256x256-30675.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation ">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="13" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+
+        
+        <a-entity position="0 0 -5" >
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/fork-256x256-30658.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation ">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="12" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+        
+        <a-entity position="-2 0 -5" >
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/french-256x256-30659.png"></a-plane>
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+            <a-text value="11" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+
+        <a-entity position="-4 0 -5" >
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/grapes-256x256-30661.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="10" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+        
+        <a-entity position="-6 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/hamburger-256x256-30703.png"></a-plane>
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick >
+              <a-text value="9" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+      </a-entity>
       
+      
+
+       <a-entity position="0 4 0">
+        <a-box depth="0.1" width="17" position="1 1.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-0.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="1.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="3.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-2.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="5.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-4.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="7.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-6.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="9.5 0.5 -5" color="green"></a-box>
+        <a-box depth="0.1" width="1" position="-7.5 0.5 -5" color="green"></a-box>
+<!--          -->
+        
+        
+        <a-entity position="8 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/soft.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="8" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+        
+        <a-entity position="6 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/pineapple-256x256-30674.png"></a-plane>
+          
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="7" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+
+
+        <a-entity position="4 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/pear-256x256-30673.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation ">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="6" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+        
+        
+        <a-entity position="2 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/peach-256x256-30672.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="5" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+
+        
+        <a-entity position="0 0 -5" >
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/pastry-256x256-30671.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;  startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="4" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+        
+        <a-entity position="-2 0 -5" >
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/mushroom-256x256-30669.png"></a-plane>
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+            <a-text value="3" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+
+        <a-entity position="-4 0 -5" >
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/meat-256x256-30667.png"></a-plane>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+              <a-text value="2" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+        
+        <a-entity position="-6 0 -5">
+          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/lolipop-256x256-30702.png"></a-plane>
+          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
+            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick >
+              <a-text value="1" position="0 0.1 0.11" align="center"></a-text>
+            </a-box>
+          </a-entity>
+        </a-entity>
+      </a-entity>
     </a-scene>
   </body>
 </html>
