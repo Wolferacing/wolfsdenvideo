@@ -5,13 +5,14 @@
   </head>
   <body>
     <a-scene>
-      <a-sound id="bonebackSound" position="10 1 0" autoplay="true" loop="true" volume="0.5" src="https://cdn.glitch.global/376b5e69-e989-4420-887c-8925a3e39012/boneback.mp3"></a-sound>
       <a-entity position="0 0 10" rotation="0 180 0" scale="2 2 2" sq-mirror></a-entity>
-      <a-link position="-2 0 -4" title="Bobstacle Course" href="https://bobclimbnew.glitch.me" image="https://i.imgur.com/GNvMYQP.jpeg"></a-link>
-      <a-link position="0 0 -4" title="Patricks Room" href="https://patricks-room.glitch.me" image="https://i.imgur.com/GNvMYQP.jpeg"></a-link>
-      <a-link position="2 0 -4" title="Street View" href="https://sq-streetview.glitch.me" image="https://i.imgur.com/GNvMYQP.jpeg"></a-link>
-
-      <a-box color="darkgreen" sq-collider scale="20 0.1 20"></a-box>
+     
+      <a-box color="darkgreen" sq-collider scale="30 0.1 30"></a-box>
+      
+      <a-box depth="0.1" width="5" position="0.5 1.5 -5" color="green"></a-box>
+      <a-entity position="0 0 -5" animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo;">
+        <a-box depth="0.1" position="0.5 0.5 0" color="red"></a-box>
+      </a-entity>
     </a-scene>
   </body>
 </html>
