@@ -7,7 +7,7 @@
     <script src="/sidequest-sdk.js"></script>
     <script>
       // A simple aframe component to handle the click
-      AFRAME.registerComponent('sq-onclick', {
+      AFRAME.registerComponent('handle-click', {
           init: function () {
               // When you click on an element, run the animation on the parent element
               this.el.addEventListener('click', () => {
@@ -43,8 +43,9 @@
         <!-- Door 1 honeypot! -->
         <a-entity position="-2 0 -5">
           <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/honeypot-256x256-30663.png"></a-plane>
+          <!-- animation uses startEvents to trigger it, this also sets autoplay to false -->
           <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
-            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+            <a-box sq-collider sq-interactable handle-click depth="0.1" position="0.5 0.5 0" color="red">
               <a-text value="1" position="0 0.1 0.11" align="center"></a-text>
             </a-box>
           </a-entity>
@@ -53,9 +54,8 @@
         <!-- Door 2 candy! -->
         <a-entity position="0 0 -5">
           <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/candy-256x256-30693.png"></a-plane>
-          
-          <a-entity  animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo;startEvents: startAnimation ">
-            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo;startEvents: startAnimation ">
+            <a-box sq-collider sq-interactable handle-click depth="0.1" position="0.5 0.5 0" color="red">
               <a-text value="2" position="0 0.1 0.11" align="center"></a-text>
             </a-box>
           </a-entity>
@@ -65,7 +65,7 @@
         <a-entity position="2 0 -5">
           <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/chicken-256x256-30650.png"></a-plane>
           <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
-            <a-box depth="0.1" position="0.5 0.5 0" color="red" sq-collider sq-clickable sq-onclick>
+            <a-box sq-collider sq-interactable handle-click depth="0.1" position="0.5 0.5 0" color="red">
               <a-text value="3" position="0 0.1 0.11" align="center"></a-text>
             </a-box>
           </a-entity>
