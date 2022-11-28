@@ -16,12 +16,9 @@
         <a-entity rotation="0 -90 -100" position="0.005 0.04 0" scale="1.3 1.3 1.3" gltf-model="https://cdn.glitch.global/0ceaf1b7-2447-419e-af99-1dabf6a151a2/watch.glb?v=1669637172886"></a-entity>
       </a-entity>
     
-      <a-box sq-collider sq-lefthand="scale: 0.1 0.1 0.4; position: 0 0 0.2" ></a-box>
+      <a-box sq-collider sq-lefthand="scale: 0.4 0.1 0.1; position: 0.1 0.3 -0.1" ></a-box>
       
-      <a-box sq-collider sq-righthand color="#000">
-        <a-box sq-collider scale="0.1 0.1 0.4;" position="0 0 0.2" color="#000"></a-box>
-        <a-box sq-collider scale="0.1 0.1 0.4;" position="0 0 0.2" color="#000"></a-box>
-      </a-box>
+      <a-torus sq-collider sq-righthand="scale:0.1 0.2 0.1;" arc="180"></a-torus>
       
       <!-- A mirror! -->
       <a-entity sq-mirror position="0 1 10" rotation="0 180 0" scale="4 4 4"></a-entity>
