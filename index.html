@@ -2,12 +2,26 @@
   <head>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script>
-      // A simple aframe component to handle the click
-      AFRAME.registerComponent('handle-click', {
+      // Setup an aframe component to handle clicking on boxes to load in different street view items.
+      AFRAME.registerComponent('open-streetview', {
           init: function () {
-              // When you click on an element, run the animation on the parent element
               this.el.addEventListener('click', () => {
-                 this.el.parentElement.emit('startAnimation', null, false);
+                // Is the existing streetview still in the scene? If so, remove it before adding a new one.
+                let old_one = document.getElementById('streetViewObject');
+                if(old_one) {
+                  old_one.parentElement.removeChild(old_one);
+                }
+                // Create a new entity to setup the next streetview.                
+                let new_one = document.createElement('a-entity');
+                new_one.id = 'streetViewObject';
+                new_one.setAttribute('scale', '0.6 0.6 0.6');
+                // Offset the rotation of each point to better fit for walking in to.
+                new_one.setAttribute('rotation', '0 ' + this.el.dataset.rotation + ' 0');
+                new_one.setAttribute('position', '0 0 -46.5');
+                // Grab the panoid from the data-panoid property
+                new_one.setAttribute('sq-streetview', {panoId: this.el.dataset.panoid});
+                // Add to the scene.
+                document.querySelector('a-scene').appendChild(new_one);
               })
           }
       });
@@ -16,65 +30,67 @@
   <body>
     <a-scene>
       
-      <!-- A big box for the floor with a collider on it -->
-      <a-box sq-collider color="darkgreen" scale="30 0.1 30"></a-box>
+      <!-- A portaL back to the community hub -->
+      <a-link position="0 0 3" rotation="0 45 0" title="Community Hub" href="https://sq-community-hub.glitch.me" image="https://logo.clearbit.com/sidequestvr.com"></a-link>
       
-      <!-- A 3d model of a christmas tree! -->
-      <a-entity position="-7 0 -4" scale=".02 .02 .02" gltf-model="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/christmas_tree_polycraft.glb?v=1669127630594"></a-entity>
-      
-      <!-- Some ambiance! -->
-      <a-sound position="10 1 0" autoplay="true" loop="true" volume="0.05" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/christmas.mp3?v=1669127746032"></a-sound>
-      
-      <a-entity position="0 0 0">
+      <!-- Five buttons and five corresponding pano ids  -->
+      <a-entity position="0 0 -47">
         
-        <!-- A big box for the horizontal empty section -->
-        <a-box depth="0.1" width="8" position="0.5 1.5 -5" color="green"></a-box>
-        
-        <!-- Several smaller sections for blanking in between each door -->
-        <a-box depth="0.1" width="1" position="-0.5 0.5 -5" color="green"></a-box>
-        <a-box depth="0.1" width="1" position="1.5 0.5 -5" color="green"></a-box>
-        <a-box depth="0.1" width="1" position="3.5 0.5 -5" color="green"></a-box>
-        <a-box depth="0.1" width="1" position="-2.5 0.5 -5" color="green"></a-box>
-        
-        <!-- Door 1 honeypot! -->
-        <a-entity position="-2 0 -5">
-          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/honeypot-256x256-30663.png"></a-plane>
-          <!-- animation uses startEvents to trigger it, this also sets autoplay to false -->
-          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0; dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
-            <a-box sq-collider sq-interactable handle-click depth="0.1" position="0.5 0.5 0" color="red">
-              <a-text value="1" position="0 0.1 0.11" align="center"></a-text>
-            </a-box>
-          </a-entity>
+        <a-entity position="-1.2 0.1 0" rotation="-30 65 0">
+          <a-box  sq-collider sq-interactable open-streetview data-panoid="gZ5vtLnBWJxOSp9CE4MDTg" data-rotation="200" scale="0.4 0.1 0.05" color="#476930"></a-box>
+          <a-text value="Desert" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text>
         </a-entity>
         
-        <!-- Door 2 candy! -->
-        <a-entity position="0 0 -5">
-          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/candy-256x256-30693.png"></a-plane>
-          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo;startEvents: startAnimation ">
-            <a-box sq-collider sq-interactable handle-click depth="0.1" position="0.5 0.5 0" color="red">
-              <a-text value="2" position="0 0.1 0.11" align="center"></a-text>
-            </a-box>
-          </a-entity>
+        <a-entity position="1.2 0.1 0" rotation="-30 -65 0">
+          <a-box  sq-collider sq-interactable open-streetview data-panoid="Bocmr5QwQpVeFeE58jlKKQ" data-rotation="200" scale="0.4 0.1 0.05" color="#476930"></a-box>
+          <a-text value="South Pole" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text> 
         </a-entity>
-
-        <!-- Door 3 chicken! -->
-        <a-entity position="2 0 -5">
-          <a-plane position="0.5 0.5 0" src="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/chicken-256x256-30650.png"></a-plane>
-          <a-entity animation="property: rotation; from: 0 0 0; to: 0 -90 0;  dur: 700; easing: easeInOutExpo; startEvents: startAnimation">
-            <a-box sq-collider sq-interactable handle-click depth="0.1" position="0.5 0.5 0" color="red">
-              <a-text value="3" position="0 0.1 0.11" align="center"></a-text>
-            </a-box>
-          </a-entity>
+        
+        <a-entity position="0 0.1 -0.8" rotation="-30 0 0">
+          <a-box sq-collider sq-interactable open-streetview data-panoid="cz9MFY7Md8XjZQQqA0mJkw" data-rotation="0" scale="0.4 0.1 0.05" color="#476930"></a-box>
+          <a-text value="Dartmoor" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text>
+        </a-entity>
+        
+        <a-entity position="-1.2 0.1 1" rotation="-30 115 0">
+          <a-box sq-collider sq-interactable open-streetview data-panoid="C210xivSkMNL0sRKSZRttQ" data-rotation="0" scale="0.4 0.1 0.05" color="#476930"></a-box>
+          <a-text value="Las Vegas" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text>
+        </a-entity>
+        
+        <a-entity position="1.2 0.1 1" rotation="-30 -115 0">
+          <a-box sq-collider sq-interactable open-streetview data-panoid="Q0pE0282cJi5FKRtVXLkjw" data-rotation="0" scale="0.4 0.1 0.05" color="#476930" ></a-box>
+          <a-text value="British Columbia" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text>
         </a-entity>
         
       </a-entity>
       
-      <!-- A mirror! -->
-      <a-entity sq-mirror position="0 1 10" rotation="0 180 0" scale="4 4 4"></a-entity>
+<!-- Two circular platforms with a bridge joining them -->
       
-      <!-- A portal back to the previous space! -->
-      <a-link id="portal" position="-10 0 8" rotation="0 45 0" title="Community Hub" href="https://sq-community-hub.glitch.me" image="https://logo.clearbit.com/sidequestvr.com"></a-link>
+      <a-cylinder sq-collider scale="5 0.1 5" rotation="0 0 0" repeat="4 4" color="grey" src="https://cdn.glitch.global/81dfa872-8a65-44e2-906f-a31548168f95/3b38f221d29a8673fd1dea8d7d3b646e.jpg"></a-cylinder>
+      <a-cylinder sq-collider scale="1.5 0.1 1.5" position="0 0 -46.5" repeat="1.2 1.2" rotation="0 0 0" color="grey" src="https://cdn.glitch.global/81dfa872-8a65-44e2-906f-a31548168f95/3b38f221d29a8673fd1dea8d7d3b646e.jpg"></a-cylinder>
+      <a-box sq-collider depth="2" rotation="0 90 0" width="41" height="0.1" repeat="20 1"  position="0 -0.001 -25" rotation="0 0 0" color="grey" src="https://cdn.glitch.global/81dfa872-8a65-44e2-906f-a31548168f95/3b38f221d29a8673fd1dea8d7d3b646e.jpg"></a-box>
       
+      Some nice trimmings for the platform 
+      
+      <a-sphere scale="0.3 0.3 0.3" position="1 0 -4.65" color="#DC828F"></a-sphere>
+      <a-sphere scale="0.3 0.3 0.3" position="-1 0 -4.65" color="#DC828F"></a-sphere>
+      
+      <a-entity position="0 0 -40.45">
+        <a-sphere scale="0.3 0.3 0.3" position="1 0 -4.85" color="#DC828F" material="opacity: 0.5; transparent: true"></a-sphere>
+        <a-sphere scale="0.3 0.3 0.3" position="-1 0 -4.85" color="#DC828F" material="opacity: 0.5; transparent: true"></a-sphere>
+      </a-entity>
+
+      <a-cylinder sq-invertedcollider caps="false" scale="5 5 5" rotation="0 -231 0" position="0 2 0" color="#DC828F" theta-length="339" material="opacity: 0.1; transparent: true; side: double"></a-cylinder>
+
+      
+      <a-torus sq-collider rotation="90 78.5 0" position="0 0 0" scale="1 1 1" radius="5" radius-tubular="0.1" arc="337" color="#DC828F" material="opacity: 0.5; transparent: true"></a-torus>
+
+      <a-cylinder sq-collider rotation="90 0 0" scale="0.2 40.5 0.2" position="1 0 -24.8" color="#DC828F" material="opacity: 0.5; transparent: true"></a-cylinder>
+      <a-cylinder sq-collider rotation="90 0 0" scale="0.2 40.5 0.2" position="-1 0 -24.8" color="#DC828F" material="opacity: 0.5; transparent: true"></a-cylinder>
+      
+      <a-torus sq-collider rotation="90 -125 0" radius="1.5" position="0 0 -46.5" radius-tubular="0.1" arc="290" color="#DC828F" material="opacity: 0.5; transparent: true"></a-torus>
+    
+<!--         <a-entity id="streetViewObject" scale="0.6 0.6 0.6" rotation="0 0 0" position="0 0 -46.5" sq-streetview="panoId: C210xivSkMNL0sRKSZRttQ" ></a-entity> -->
+
     </a-scene>
   </body>
 </html>
