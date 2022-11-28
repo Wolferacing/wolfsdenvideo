@@ -1,97 +1,11 @@
 <html>
   <head>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script>
-      // Setup an aframe component to handle clicking on boxes to load in different street view items.
-      AFRAME.registerComponent('open-streetview', {
-          init: function () {
-              this.el.addEventListener('click', () => {
-                // Is the existing streetview still in the scene? If so, remove it before adding a new one.
-                let old_one = document.getElementById('streetViewObject');
-                if(old_one) {
-                  old_one.parentElement.removeChild(old_one);
-                }
-                // Create a new entity to setup the next streetview.                
-                let new_one = document.createElement('a-entity');
-                new_one.id = 'streetViewObject';
-                new_one.setAttribute('scale', '0.6 0.6 0.6');
-                // Offset the rotation of each point to better fit for walking in to.
-                new_one.setAttribute('rotation', '0 ' + this.el.dataset.rotation + ' 0');
-                new_one.setAttribute('position', '0 0 -46.5');
-                // Grab the panoid from the data-panoid property
-                new_one.setAttribute('sq-streetview', {panoId: this.el.dataset.panoid});
-                // Add to the scene.
-                document.querySelector('a-scene').appendChild(new_one);
-              })
-          }
-      });
-    </script>
   </head>
   <body>
     <a-scene>
-      
-      <!-- A portaL back to the community hub -->
-      <a-link position="0 0 3" rotation="0 45 0" title="Community Hub" href="https://sq-community-hub.glitch.me" image="https://logo.clearbit.com/sidequestvr.com"></a-link>
-      
-      <!-- Five buttons and five corresponding pano ids  -->
-      <a-entity position="0 0 -47">
-        
-        <a-entity position="-1.2 0.1 0" rotation="-30 65 0">
-          <a-box  sq-collider sq-interactable open-streetview data-panoid="gZ5vtLnBWJxOSp9CE4MDTg" data-rotation="200" scale="0.4 0.1 0.05" color="#476930"></a-box>
-          <a-text value="Desert" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text>
-        </a-entity>
-        
-        <a-entity position="1.2 0.1 0" rotation="-30 -65 0">
-          <a-box  sq-collider sq-interactable open-streetview data-panoid="Bocmr5QwQpVeFeE58jlKKQ" data-rotation="200" scale="0.4 0.1 0.05" color="#476930"></a-box>
-          <a-text value="South Pole" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text> 
-        </a-entity>
-        
-        <a-entity position="0 0.1 -0.8" rotation="-30 0 0">
-          <a-box sq-collider sq-interactable open-streetview data-panoid="cz9MFY7Md8XjZQQqA0mJkw" data-rotation="0" scale="0.4 0.1 0.05" color="#476930"></a-box>
-          <a-text value="Dartmoor" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text>
-        </a-entity>
-        
-        <a-entity position="-1.2 0.1 1" rotation="-30 115 0">
-          <a-box sq-collider sq-interactable open-streetview data-panoid="C210xivSkMNL0sRKSZRttQ" data-rotation="0" scale="0.4 0.1 0.05" color="#476930"></a-box>
-          <a-text value="Las Vegas" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text>
-        </a-entity>
-        
-        <a-entity position="1.2 0.1 1" rotation="-30 -115 0">
-          <a-box sq-collider sq-interactable open-streetview data-panoid="Q0pE0282cJi5FKRtVXLkjw" data-rotation="0" scale="0.4 0.1 0.05" color="#476930" ></a-box>
-          <a-text value="British Columbia" scale="0.15 0.15 0.15" position="0 -0.02 0.026" align="center"></a-text>
-        </a-entity>
-        
-      </a-entity>
-      
-      <!-- Two circular platforms with a bridge joining them -->
-      
-      <a-cylinder sq-collider scale="5 0.1 5" rotation="0 0 0" repeat="4 4" color="grey" src="https://cdn.glitch.global/81dfa872-8a65-44e2-906f-a31548168f95/3b38f221d29a8673fd1dea8d7d3b646e.jpg"></a-cylinder>
-      <a-cylinder sq-collider scale="1.5 0.1 1.5" position="0 0 -46.5" repeat="1.2 1.2" rotation="0 0 0" color="grey" src="https://cdn.glitch.global/81dfa872-8a65-44e2-906f-a31548168f95/3b38f221d29a8673fd1dea8d7d3b646e.jpg"></a-cylinder>
-      <a-box sq-collider depth="2" rotation="0 90 0" width="41" height="0.1" repeat="20 1"  position="0 -0.001 -25" rotation="0 0 0" color="grey" src="https://cdn.glitch.global/81dfa872-8a65-44e2-906f-a31548168f95/3b38f221d29a8673fd1dea8d7d3b646e.jpg"></a-box>
-      
-      <!-- Some nice trimmings for the platforms/bridge -->
-      
-      <a-sphere scale="0.3 0.3 0.3" position="1 0 -4.65" color="#DC828F"></a-sphere>
-      <a-sphere scale="0.3 0.3 0.3" position="-1 0 -4.65" color="#DC828F"></a-sphere>
-      
-      <a-entity position="0 0 -40.45">
-        <a-sphere scale="0.3 0.3 0.3" position="1 0 -4.85" color="#DC828F" material="opacity: 0.5; transparent: true"></a-sphere>
-        <a-sphere scale="0.3 0.3 0.3" position="-1 0 -4.85" color="#DC828F" material="opacity: 0.5; transparent: true"></a-sphere>
-      </a-entity>
-
-      <a-cylinder sq-invertedcollider caps="false" scale="5 5 5" rotation="0 -231 0" position="0 2 0" color="#DC828F" theta-length="339" material="opacity: 0.1; transparent: true; side: double"></a-cylinder>
-
-      
-      <a-torus sq-collider rotation="90 78.5 0" position="0 0 0" scale="1 1 1" radius="5" radius-tubular="0.1" arc="337" color="#DC828F" material="opacity: 0.5; transparent: true"></a-torus>
-
-      <a-cylinder sq-collider rotation="90 0 0" scale="0.2 40.5 0.2" position="1 0 -24.8" color="#DC828F" material="opacity: 0.5; transparent: true"></a-cylinder>
-      <a-cylinder sq-collider rotation="90 0 0" scale="0.2 40.5 0.2" position="-1 0 -24.8" color="#DC828F" material="opacity: 0.5; transparent: true"></a-cylinder>
-      
-      <a-torus sq-collider rotation="90 -125 0" radius="1.5" position="0 0 -46.5" radius-tubular="0.1" arc="290" color="#DC828F" material="opacity: 0.5; transparent: true"></a-torus>
-      
-      <!-- Our street view object looks like this, but it gets added dynamically so this is just for illustrative purposes -->
-      <!-- <a-entity id="streetViewObject" scale="0.6 0.6 0.6" rotation="0 0 0" position="0 0 -46.5" sq-streetview="panoId: C210xivSkMNL0sRKSZRttQ" ></a-entity> -->
-
+      <!-- Using a direct link to a custom home APK file, you can load in a custom home into banter -->
+      <a-entity position="0 0 1" sq-questhome="url: https://cdn.sidequestvr.com/file/167752/star_trek_tng_bridge_environment.apk"></a-entity>
     </a-scene>
   </body>
 </html>
