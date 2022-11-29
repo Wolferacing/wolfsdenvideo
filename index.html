@@ -1,3 +1,4 @@
+
 <html>
   <head>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
@@ -12,10 +13,10 @@
       <a-entity position="-7 0 -4" scale=".02 .02 .02" gltf-model="https://cdn.glitch.global/537d3be1-3c9d-4443-b94c-e84d2ba3ced3/christmas_tree_polycraft.glb?v=1669127630594"></a-entity>
       
       <!-- Add a watch to the left wrist! -->
-      <a-entity sq-trackpose="type: lefthand" >
+<!--       <a-entity sq-trackpose="type: lefthand" >
         <a-entity rotation="0 -90 -100" position="0.005 0.04 0" scale="1.3 1.3 1.3" gltf-model="https://cdn.glitch.global/0ceaf1b7-2447-419e-af99-1dabf6a151a2/watch.glb?v=1669637172886"></a-entity>
-      </a-entity>
-    
+      </a-entity> -->
+      <a-entity sq-lefthand gltf-model="https://cdn.glitch.global/0ceaf1b7-2447-419e-af99-1dabf6a151a2/watch.glb?v=1669637172886"></a-entity>
       <a-box sq-collider sq-lefthand="scale: 0.4 0.1 0.1; position: 0.1 0.3 -0.2; rotation: 0 0 -30"></a-box>
       
       <a-box sq-collider sq-righthand="scale:0.4 0.1 0.1; position: -0.1 0.3 -0.2; rotation: 0 0 30">
