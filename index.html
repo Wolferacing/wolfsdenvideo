@@ -15,13 +15,13 @@
       <a-entity sq-lefthand rotation="0 -90 160" position="0.005 0 0.055 -0.038" scale="1.2 1.2 1.2" gltf-model="https://cdn.glitch.global/0ceaf1b7-2447-419e-af99-1dabf6a151a2/watch.glb?v=1669637172886"></a-entity>
       
       <!-- A zip line, whats this for? -->
-      <a-box sq-collider sq-slippery position="55 -13 0" rotation="0 0 70" scale="0.1 100 0.1" color="green"></a-box>
+      <a-box sq-collider sq-slippery position="55 -12.5 0" rotation="0 0 70" scale="0.1 100 0.1" color="green"></a-box>
       <a-text value="You know what to do..." align="center" rotation="-120 90 180" position="14 0.3 0"></a-text>
       
       <!-- A hook ? -->
-      <a-entity sq-rigidbody="collisionDetectionMode: " position="10 1.2 2" >
-        <a-box sq-collider sq-grabbable color="red" scale="0.3 0.1 0.1"></a-box>
-        <a-box sq-collider sq-grabbable position="0.1 0 0.1" color="red" scale="0.1 0.1 0.3"></a-box>
+      <a-entity sq-rigidbody="collisionDetectionMode: continous" position="10 1.2 2" >
+        <a-box sq-collider sq-grabbable color="red" position="-0.15 0 0" scale="0.6 0.1 0.1"></a-box>
+        <a-box sq-collider sq-grabbable position="0.1 0 0.15" color="red" scale="0.09 0.09 0.4"></a-box>
         <a-box sq-collider sq-grabbable position="-0.15 0 0.3" color="red" scale="0.6 0.1 0.1"></a-box>
       </a-entity>
       
