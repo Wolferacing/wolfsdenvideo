@@ -18,6 +18,15 @@
       <a-box sq-collider sq-slippery position="55 -13 0" rotation="0 0 70" scale="0.1 100 0.1" color="green"></a-box>
       <a-text value="You know what to do..." align="center" rotation="-120 90 180" position="14 0.3 0"></a-text>
       
+      <!-- A hook ? -->
+      <a-entity sq-rigidbody="collisionDetectionMode: " position="10 1.2 2" >
+        <a-box sq-collider sq-grabbable color="red" scale="0.3 0.1 0.1"></a-box>
+        <a-box sq-collider sq-grabbable position="0.1 0 0.1" color="red" scale="0.1 0.1 0.3"></a-box>
+        <a-box sq-collider sq-grabbable position="-0.15 0 0.3" color="red" scale="0.6 0.1 0.1"></a-box>
+      </a-entity>
+      
+      <a-box sq-collider color="green" position="10 0.5 2"></a-box>
+      
       <!-- A mirror! -->
       <a-entity sq-mirror position="0 1 10" rotation="0 180 0" scale="4 4 4"></a-entity>
     
