@@ -8,7 +8,7 @@
       AFRAME.registerComponent('video-player', {
           init: function() {
               this.el.addEventListener('video-player', () => {
-                  console.log(this.el.object3D.userData);
+                  console.log(this.el.object3D.userData.eventType);
               });
           }
       });
