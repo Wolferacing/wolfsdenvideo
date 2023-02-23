@@ -10,15 +10,29 @@
         "https://www.youtube.com/watch?v=KqcOR6x8PTo",
         "https://www.youtube.com/watch?v=FMdNObc5vAQ"
       ];
+      
       let currentlyPlaying = 0;
-      async getNextVideo() {
+      
+      const getNextVideo = async () => {
         if(currentlyPlaying < videos.length && videos[currentlyPlaying]) {
-          return fetch("https://video-tools.glitch.me/video/" + videos[currentlyPlaying].split("?v=")[1]);
+          console.log("getting video", "https://video-tools.glitch.me/url/" + videos[currentlyPlaying].split("?v=")[1]);
+          return fetch("https://video-tools.glitch.me/url/" + videos[currentlyPlaying].split("?v=")[1]).then(d => d.text());
         }
       }
+      
+      const playPrevVideo = async (id) => {
+        currentlyPlaying--;
+        playVideo(id, await getNextVideo())
+      }
+      
+      const playNextVideo = async (id) => {
+        currentlyPlaying++;
+        playVideo(id, await getNextVideo())
+      }
+      
       AFRAME.registerComponent('video-player', {
           init: async function() {
-            const duration = 0;
+            let duration = 0;
               this.el.addEventListener('video-player', () => {
                 switch(this.el.object3D.userData.eventType) {
                   case "MetaDataReady":
@@ -30,9 +44,8 @@
                     console.log(this.el.object3D.userData.eventType);
                     break;
                   case "FinishedPlaying":
-                    currentlyPlaying++;
-                    playVideo(this.el.object3D.id, await getNextVideo())
                     console.log(this.el.object3D.userData.eventType);
+                    playNextVideo(this.el.object3D.id);
                     break;
                 }
               });
