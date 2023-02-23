@@ -9,6 +9,9 @@
           init: function() {
               this.el.addEventListener('video-player', () => {
                   console.log(this.el.object3D.userData.eventType);
+                  console.log(this.el.object3D.userData.elapsed);
+                  console.log(this.el.object3D.userData.source);
+                  console.log(this.el.object3D.userData.duration);
               });
           }
       });
