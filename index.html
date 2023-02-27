@@ -27,6 +27,7 @@
           init: async function() {
             let duration = 0;
               this.el.addEventListener('video-player', (e) => {
+                    console.log(e.detail);
                 switch(this.el.object3D.userData.eventType) {
                   case "MetaDataReady":
                     duration = this.el.object3D.userData.duration;
