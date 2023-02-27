@@ -27,18 +27,18 @@
           init: async function() {
             let duration = 0;
               this.el.addEventListener('video-player', (e) => {
-                    console.log(e.detail);
+                    console.log(e.detail.eventType);
                 switch(this.el.object3D.userData.eventType) {
                   case "MetaDataReady":
                     duration = this.el.object3D.userData.duration;
-                    console.log(this.el.object3D.userData.eventType);
+                    // console.log(this.el.object3D.userData.eventType);
                     break;
                   case "Started":
                     // duration = this.el.object3D.userData.duration;
-                    console.log(this.el.object3D.userData.eventType);
+                    // console.log(this.el.object3D.userData.eventType);
                     break;
                   case "FinishedPlaying":
-                    console.log(this.el.object3D.userData.eventType);
+                    // console.log(this.el.object3D.userData.eventType);
                     // playNextVideo(this.el.object3D.id);
                     break;
                 }
@@ -60,7 +60,7 @@
       <!-- A 3d model of a christmas tree, because why not! -->
       <a-entity position="-7 0 -4" scale="40 40 40" gltf-model="https://cdn.glitch.global/7af396ad-5845-48f2-8441-58c6ffec91ad/low-poly_fangding_food_vessel.glb?v=1670411591590"></a-entity>
             
-      <a-video src="https://www.youtube.com/watch?v=-72P_EFphSc" video-player></a-video>
+      <a-video src="https://www.youtube.com/watch?v=-72P_EFphSc" video-player rotation="0 180 0" position="0 0 -5"></a-video>
       
       
       <!-- A mirror! -->
