@@ -13,27 +13,20 @@
       
       let currentlyPlaying = 0;
       
-      const getNextVideo = async () => {
-        if(currentlyPlaying < videos.length && videos[currentlyPlaying]) {
-          console.log("getting video", "https://video-tools.glitch.me/url/" + videos[currentlyPlaying].split("?v=")[1]);
-          return fetch("https://video-tools.glitch.me/url/" + videos[currentlyPlaying].split("?v=")[1]).then(d => d.text());
-        }
-      }
-      
       const playPrevVideo = async (id) => {
         currentlyPlaying--;
-        playVideo(id, await getNextVideo())
+        playVideo(id, videos[currentlyPlaying])
       }
       
       const playNextVideo = async (id) => {
         currentlyPlaying++;
-        playVideo(id, await getNextVideo())
+        playVideo(id, videos[currentlyPlaying])
       }
       
       AFRAME.registerComponent('video-player', {
           init: async function() {
             let duration = 0;
-              this.el.addEventListener('video-player', () => {
+              this.el.addEventListener('video-player', (e) => {
                 switch(this.el.object3D.userData.eventType) {
                   case "MetaDataReady":
                     duration = this.el.object3D.userData.duration;
@@ -45,7 +38,7 @@
                     break;
                   case "FinishedPlaying":
                     console.log(this.el.object3D.userData.eventType);
-                    playNextVideo(this.el.object3D.id);
+                    // playNextVideo(this.el.object3D.id);
                     break;
                 }
               });
@@ -66,7 +59,7 @@
       <!-- A 3d model of a christmas tree, because why not! -->
       <a-entity position="-7 0 -4" scale="40 40 40" gltf-model="https://cdn.glitch.global/7af396ad-5845-48f2-8441-58c6ffec91ad/low-poly_fangding_food_vessel.glb?v=1670411591590"></a-entity>
             
-      <a-entity sq-videoplayer="url: https://cdn.glitch.global/a2da7d14-70de-4ac1-98be-65da0e7747aa/file_example_MP4_640_3MG.mp4?v=1677085089204" video-player position="0 1.5 -1.5"></a-entity>
+      <a-video src="https://www.youtube.com/watch?v=-72P_EFphSc" video-player></a-video>
       
       
       <!-- A mirror! -->
