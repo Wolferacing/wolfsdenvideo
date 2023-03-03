@@ -13,13 +13,11 @@
       
       let currentlyPlaying = 0;
       
-      const playPrevVideo = async (id) => {
-        currentlyPlaying--;
-        playVideo(id, videos[currentlyPlaying])
-      }
-      
       const playNextVideo = async (id) => {
         currentlyPlaying++;
+        if(currentlyPlaying >= videos.length) {
+          currentlyPlaying = 0;
+        }
         playVideo(id, videos[currentlyPlaying])
       }
       
@@ -27,19 +25,9 @@
           init: async function() {
             let duration = 0;
               this.el.addEventListener('video-player', (e) => {
-                    console.log(e.detail.eventType);
                 switch(this.el.object3D.userData.eventType) {
-                  case "MetaDataReady":
-                    // duration = this.el.object3D.userData.duration;
-                    // console.log(this.el.object3D.userData.eventType);
-                    break;
-                  case "Started":
-                    // duration = this.el.object3D.userData.duration;
-                    // console.log(this.el.object3D.userData.eventType);
-                    break;
                   case "FinishedPlaying":
-                    // console.log(this.el.object3D.userData.eventType);
-                    // playNextVideo(this.el.object3D.id);
+                    playNextVideo(this.el.object3D.id);
                     break;
                 }
               });
@@ -65,7 +53,7 @@
             
       <a-video src="#youtube-video" video-player rotation="0 0 0" position="0 1 -3"></a-video>
       
-      
+      <a-entity sq-livestream="type: youtube; url: https://www.youtube.com/watch?v=9Auq9mYxFEE" position="0 1 10"></a-entity>
       <!-- A mirror! -->
       <a-entity sq-mirror position="0 1 10" rotation="0 180 0" scale="4 4 4"></a-entity>
     
