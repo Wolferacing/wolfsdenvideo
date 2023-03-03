@@ -24,7 +24,8 @@
       AFRAME.registerComponent('video-player', {
           init: async function() {
             let duration = 0;
-              this.el.addEventListener('video-player', (e) => {
+              this.el.addEventListener('video-player', e => {
+                console.log(e.detail.eventType)
                 switch(this.el.object3D.userData.eventType) {
                   case "FinishedPlaying":
                     playNextVideo(this.el.object3D.id);
@@ -55,7 +56,7 @@
       
       <a-entity sq-livestream="type: youtube; url: https://www.youtube.com/watch?v=pykpO5kQJ98" position="0 1 10"></a-entity>
       <!-- A mirror! -->
-      <a-entity sq-mirror position="0 1 10" rotation="0 180 0" scale="4 4 4"></a-entity>
+<!--       <a-entity sq-mirror position="0 1 10" rotation="0 180 0" scale="4 4 4"></a-entity> -->
     
       <!-- A portal back to the previous space! -->
       <a-link id="portal" position="-10 0 8" rotation="0 45 0" title="Community Hub" href="https://sq-community-hub.glitch.me" image="https://logo.clearbit.com/sidequestvr.com"></a-link>
