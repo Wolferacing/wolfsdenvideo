@@ -50,15 +50,13 @@
       <script>
         const videos = [
           "https://www.youtube.com/watch?v=H_bB0sAqLNg",
-          "https://www.youtube.com/watch?v=MwcHGHbz528",
           "https://www.youtube.com/watch?v=yr1_GuEb7N0",
-          "https://www.youtube.com/watch?v=MwcHGHbz528",
-          "https://www.youtube.com/watch?v=-72P_EFphSc",
-          "https://www.youtube.com/watch?v=KqcOR6x8PTo",
-          "https://www.youtube.com/watch?v=FMdNObc5vAQ"
+          "https://www.youtube.com/watch?v=MwcHGHbz528"
         ];
 
         const videoPlayer = document.getElementById('youtube-video');
+        
+        videoPlayer.quality = "hd";
 
         let currentlyPlaying = 0;
 
@@ -66,6 +64,7 @@
           if(currentlyPlaying >= videos.length) {
             currentlyPlaying = 0;
           }
+          console.log("playing: ", videos[currentlyPlaying]);
           videoPlayer.src = videos[currentlyPlaying];
           currentlyPlaying++;
         }
