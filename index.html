@@ -6,21 +6,23 @@
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script>
       const videos = [
-        "https://www.youtube.com/watch?v=MwcHGHbz528",
         "https://www.youtube.com/watch?v=yr1_GuEb7N0",
+        "https://www.youtube.com/watch?v=MwcHGHbz528",
         "https://www.youtube.com/watch?v=-72P_EFphSc",
         "https://www.youtube.com/watch?v=KqcOR6x8PTo",
         "https://www.youtube.com/watch?v=FMdNObc5vAQ"
       ];
       
+      const videoPlayer = document.getElementById('youtube-video');
+      
       let currentlyPlaying = 0;
       
-      const playNextVideo = async (id) => {
+      const playNextVideo = async () => {
         currentlyPlaying++;
         if(currentlyPlaying >= videos.length) {
           currentlyPlaying = 0;
         }
-        playVideo(id, videos[currentlyPlaying])
+        videoPlayer.src = videos[currentlyPlaying];
       }
       
       AFRAME.registerComponent('video-player', {
@@ -30,7 +32,7 @@
                 console.log(e.detail.eventType)
                 switch(this.el.object3D.userData.eventType) {
                   case "FinishedPlaying":
-                    playNextVideo(this.el.object3D.id);
+                    playNextVideo();
                     break;
                 }
               });
@@ -41,7 +43,7 @@
   <body>
     <a-scene>
       <a-assets>
-          <video id="youtube-video" src="https://www.youtube.com/watch?v=yr1_GuEb7N0" loop="true" muted="false" volume="0.5"></video>
+          <video id="youtube-video" src="https://www.youtube.com/watch?v=yr1_GuEb7N0" loop="false" muted="false" volume="0.5"></video>
         </a-assets>
 <!--       https://www.youtube.com/watch?v=-72P_EFphSc -->
       <a-sound src="src: url(click.mp3)" autoplay="true" position="0 2 5"></a-sound>
@@ -55,9 +57,9 @@
 <!--       <a-entity position="-7 0 -4" scale="40 40 40" gltf-model="https://cdn.glitch.global/7af396ad-5845-48f2-8441-58c6ffec91ad/low-poly_fangding_food_vessel.glb?v=1670411591590"></a-entity>
              -->
       <a-video src="#youtube-video" video-player position="-3.5 3 -3" rotation="0 20 0" scale="4 4 4"></a-video>
-      <a-text value="chop chop music video playlist!" position="-3.5 0.5 -3" rotation="0 20 0"></a-text>
-      <a-entity sq-livestream="type: youtube; url: https://www.youtube.com/watch?v=pykpO5kQJ98; muted: true; volume: 0.3"  position="3.5 3 -3" rotation="0 -20 0" scale="4 4 4"></a-entity>
-      <a-text value="live stream!" position="3.5 0.5 -3" rotation="0 -20 0" ></a-text>
+      <a-text value="chop chop music video playlist!" position="-3.5 0.5 -3" rotation="0 20 0" align="center"></a-text>
+      <a-entity sq-livestream="type: youtube; url: https://www.youtube.com/watch?v=ljoesdLqfrA; muted: true; volume: 0.3"  position="3.5 3 -3" rotation="0 -20 0" scale="4 4 4"></a-entity>
+      <a-text value="live stream!" position="3.5 0.5 -3" rotation="0 -20 0" align="center"></a-text>
       <!-- A mirror! -->
 <!--       <a-entity sq-mirror position="0 1 10" rotation="0 180 0" scale="4 4 4"></a-entity> -->
     
