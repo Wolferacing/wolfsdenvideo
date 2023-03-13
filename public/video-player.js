@@ -105,6 +105,26 @@ class GameSystem {
     fontLink.setAttribute('href', 'https://fonts.googleapis.com/css2?family=Roboto&display=swap');
     fontLink.setAttribute('rel', 'stylesheet');
   }
+  search() {
+    
+  }
+  debounceSearch(searchVal) {
+    this.searchTimeout = set
+  }
+  setupSearch(playlistContainer) {
+    const searchContainer = this.makeAndAddElement('div', {float: 'right'}, playlistContainer);
+    
+    const searchInput = this.makeAndAddElement('input', {
+      background: 'rgba(0,0,0,0.2)', 
+      margin: '15px', 
+      height: '28px',
+      fontSize: '20px',
+      color: 'white'
+    }, searchContainer);
+    searchInput.placeholder = "Search...";
+    
+    searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.val))
+  }
   setupPlaylistUI() {
     this.setupGoogleFont();
     document.querySelector('a-scene').style.display = 'none';
@@ -113,11 +133,15 @@ class GameSystem {
       margin: 'auto',
       background: '#3f3f3f',
       color: 'white',
-      font: '15px Roboto, sans-serif'
+      font: '15px Roboto, sans-serif',
+      padding: '1 30'
     });
     
-    const playlistTitle = this.makeAndAddElement('h2', playlistContainer);
-    playlistTitle.innerText = "Playlist";
+    this.setupSearch(playlistContainer);
+    
+    const playlistTitle = this.makeAndAddElement('h2', {fontWeight: 'normal'}, playlistContainer);
+    playlistTitle.innerText = "Video Playlist";
+    
   }
 }
 
