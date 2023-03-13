@@ -1,8 +1,9 @@
-const { WebSocket } = require('@encharm/cws');
-const express = require('express');
-const http = require('http');
-const path = require('path');
-const youtube = require('@dofiltra/youtube');
+import { WebSocket } from '@encharm/cws';
+import express from 'express';
+import http from 'http';
+import path from 'path';
+
+
 
 const Responses = {
   YOU_ARE_HOST: 'you-are-host',

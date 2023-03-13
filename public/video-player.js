@@ -121,6 +121,7 @@ class GameSystem {
       background: 'rgba(0,0,0,0.2)', 
       margin: '15px', 
       height: '28px',
+      border: '1px solid white',
       fontSize: '20px',
       color: 'white'
     }, searchContainer);
