@@ -6,17 +6,6 @@ const path = require('path');
 class GameServer{
   constructor() {
     this.setupServer();
-    this.room = {
-      data: {
-        isActive:false,
-        time:0,
-        people: {},
-      },
-      sockets: {},
-    }
-    this.interval = 200;
-    this.gameInterval = 60 * 5 - 9;
-    setInterval(() => this.tick(), this.interval);
   }
   setupServer() {
     this.app = express();
@@ -34,7 +23,6 @@ class GameServer{
     this.wss.startAutoPing(10000);
     
     this.wss.on('connection', (ws, req) => {
-    //  ws.send({path: 'initial-state', data: this.room.data});
       ws.on('message', msg => {
         try{
           this.parseMessage(msg, ws);
