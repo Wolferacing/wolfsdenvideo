@@ -3,6 +3,22 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 
+const Responses = {
+  YOU_ARE_HOST: 'you-are-host',
+  YOU_ARE_NOT_HOST: 'you-are-not-host',
+  OUT_OF_BOUNDS: 'out-of-bounds',
+  DOES_NOT_EXIST: 'does-not-exist',
+  PLAYBACK_UPDATE: 'playback-update'
+}
+
+const Commands = {
+  SET_TIME: 'set-time',
+  SET_TRACK: 'set-track',
+  TOGGLE_LOCK: 'toggle-lock',
+  ADD_TO_PLAYLIST: 'add-to-playlist',
+  MOVE_PLAYLIST_ITEM: 'move-playlist-item'
+}
+
 class GameServer{
   constructor() {
     this.setupServer();
@@ -44,7 +60,7 @@ class GameServer{
               console.log("No users left, deleting video player...");
             }else{
               videoPlayer.host = videoPlayer.sockets[0].u;
-              this.send(videoPlayer.sockets[0], 'you-are-host');
+              this.send(videoPlayer.sockets[0], Responses.YOU_ARE_HOST);
               console.log("Making", videoPlayer.sockets[0].u.name, "the new host...");
             }
           }
@@ -72,20 +88,20 @@ class GameServer{
           this.send(ws, 'error');
         }
         break;
-      case "set-time":
+      case Commands.SET_TIME:
         this.setVideoTime(msg.data, ws);
         break
-      case "set-track":
+      case Commands.SET_TRACK:
         this.setVideoTrack(msg.data, ws);
         break
-      case "toggle-lock":
+      case Commands.TOGGLE_LOCK:
         this.toggleLock(msg.data, ws);
         break
-      case "add-to-playlist":
+      case Commands.ADD_TO_PLAYLIST:
         this.addToPlaylist(msg.data, ws);
         break
-      case "move-playlsit-item":
-        this.movePlaylsitItem(msg.data, ws);
+      case Commands.MOVE_PLAYLIST_ITEM:
+        this.movePlaylistItem(msg.data, ws);
         break
     }
   }
@@ -95,7 +111,7 @@ class GameServer{
          && (this.videoPlayers[ws.i].host.id === ws.u.id || locked === false)) {
         callback();
       }else{
-        this.send(ws, 'you-are-not-host');
+        this.send(ws, Responses.YOU_ARE_NOT_HOST);
       }
     }else{
       this.send(ws, 'error');
@@ -105,6 +121,20 @@ class GameServer{
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         this.videoPlayers[ws.i].playlist.push(url);
+      }, this.videoPlayers[ws.i].locked);
+    }
+  }
+  movePlaylistItem({url, index}, ws) {
+    if(this.videoPlayers[ws.i]) {
+      this.onlyIfHost(ws, () => {
+        const playlist = this.videoPlayers[ws.i].playlist;
+        const oldIndex = playlist.indexOf(url);
+        if(oldIndex > -1) {
+          playlist.splice(index, 0, playlist.splice(oldIndex, 1)[0]);
+          this.updateClients(ws.i)
+        }else{
+          this.send(ws, Responses.DOES_NOT_EXIST);
+        }
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -118,7 +148,7 @@ class GameServer{
       if(index < this.videoPlayers[ws.i].playlist.length - 1) {
         this.videoPlayers[ws.i].currentTrack = index;
       }else{
-        this.send(ws, 'out-of-bounds');
+        this.send(ws, Responses.OUT_OF_BOUNDS);
       }
     });
   }
@@ -137,14 +167,14 @@ class GameServer{
         host: user,
         sockets: [ws]
       };
-      this.send(this.videoPlayers[instanceId].sockets[0], 'you-are-host');
+      this.send(this.videoPlayers[instanceId].sockets[0], Responses.YOU_ARE_HOST);
       console.log("Making", this.videoPlayers[instanceId].sockets[0].u.name, "host...");
     }
   }
   updateClients(instanceId) {
     if(this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId].sockets.forEach(socket => {
-        this.send(socket, 'playback-update', {
+        this.send(socket, Responses.PLAYBACK_UPDATE, {
           playlist: this.videoPlayers[instanceId].playlist, 
           currentTime: this.videoPlayers[instanceId].currentTime, 
           locked: this.videoPlayers[instanceId].locked
