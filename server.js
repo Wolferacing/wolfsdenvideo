@@ -10,6 +10,8 @@ class GameServer{
   setupServer() {
     this.app = express();
     
+    this.videoPlayers = {}
+    
     this.server = http.createServer( this.app );
     
     this.wss = new WebSocket.Server({ noServer: true });
@@ -21,6 +23,10 @@ class GameServer{
     });
     
     this.wss.startAutoPing(10000);
+    
+    // 
+    // playlists: {},
+    // times: {}
     
     this.wss.on('connection', (ws, req) => {
       ws.on('message', msg => {
