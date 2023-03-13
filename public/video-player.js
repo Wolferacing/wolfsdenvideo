@@ -23,6 +23,7 @@ class GameSystem {
     this.instanceId = this.urlParams.get("instanceId");
     await this.getInstanceId();
     await this.setupWebsocket();
+    this.setupPlaylistUI();
   }
   setupWebsocket(){
     return new Promise(resolve => {
@@ -92,6 +93,19 @@ class GameSystem {
   }
   sendMessage(msg){
     this.ws.send(JSON.stringify(msg));
+  }
+  makeAndAddElement(type, parent, style) {
+    const element = document.createElement(type);
+    Object.assign(element.style, style || {})
+    element.className = className;
+    (parent ? parent : document.body).appendChild(element);
+    return element;
+  }
+  setupPlaylistUI() {
+    const playlistContainer = this.makeAndAddElement('div', null, {
+      position: 'relative',
+      margin: 'auto'
+    });
   }
 }
 
