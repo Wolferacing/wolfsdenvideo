@@ -71,6 +71,7 @@ class GameSystem {
         console.log("Im not host!")
         break;
       case Responses.PLAYBACK_UPDATE:
+        this.updatePlaylist(json.data);
         console.log("Im not host!", json.data)
         break;
       case Responses.SEARCH_RESULTS:
@@ -124,6 +125,30 @@ class GameSystem {
   search(data) {
     this.sendMessage({path: 'search', data });
   }
+  updatePlaylist(player) {
+    this.videoPlaylistContainer.innerHTML = '';
+    player.playlist.forEach((v, i) => {
+      const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
+      
+      const videoThumbnail = this.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, videoItemContainer);
+      
+      const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
+      
+      const videoTitle = this.makeAndAddElement('div',{
+        padding: '7 10', 
+        textOverflow: 'ellipsis', 
+        overflow: 'hidden', 
+        whiteSpace: 'nowrap'
+      }, videoTitleAndAction);
+      
+      this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
+      
+      videoThumbnail.src = v.thumbnail;
+      
+      videoTitle.innerText = v.title;
+      
+    })
+  }
   loadVideos(videos) {
     videos.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoSearchContainer);
@@ -152,8 +177,7 @@ class GameSystem {
       addToPlaylist.innerText = "Add To Playlist";
       
       addToPlaylist.addEventListener('click', () => {
-        this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v.url });
-        this.hideSearch();
+        this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       });
       
       const playNext = this.makeAndAddElement('div',{
@@ -260,7 +284,10 @@ class GameSystem {
       display: 'none',
       boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
     });
-      
+     
+    
+    // https://cdn.glitch.global/e1a76c0e-a722-4204-9089-a5f3e4fe12f9/3-dots-move.svg?v=1678747444591
+    
   }
 }
 
