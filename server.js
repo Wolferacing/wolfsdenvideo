@@ -68,17 +68,35 @@ class GameServer{
           ws.u = msg.u;
           ws.i = msg.data;
         }
-        this.tryCreateVideoPlayer(msg.data, msg.u, ws);
+        this.createVideoPlayer(msg.data, msg.u, ws);
         break;
       case "current-time":
-        this.trySetVideoTime(msg.data, ws);
+        this.setVideoTime(msg.data, ws);
+        break
+      case "toggle-lock":
+        this.toggleLock(msg.data, ws);
+        break
+      case "add-to-playlist":
+        this.addToPlaylist(msg.data, ws);
         break
     }
   }
-  trySetVideoTime(time, ws) {
+  onlyIfUnlocked(ws, callback) {
     if(ws.u && ws.i) {
-      if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].host === ws.u) {
-        this.videoPlayers[ws.i].currentTime = time;
+       if(this.videoPlayers[ws.i] 
+          && (this.videoPlayers[ws.i].host === ws.u || !this.videoPlayers[ws.i].locked)) {
+        callback();
+      }else{
+        this.send(ws, 'you-are-not-allowed');
+      }
+    }else{
+      this.send(ws, 'error');
+    }
+  }
+  onlyIfHost(ws, callback, locked) {
+    if(ws.u && ws.i) {
+      if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].host === ws.u || locked === false)) {
+        callback();
       }else{
         this.send(ws, 'you-are-not-host');
       }
@@ -86,11 +104,25 @@ class GameServer{
       this.send(ws, 'error');
     }
   }
-  tryCreateVideoPlayer(instanceId, user, ws) {
+  addToPlaylist(url, ws) {
+    this.onlyIfUnlocked()
+  }
+  toggleLock(locked, ws) {
+    this.onlyIfHost(ws, () => {
+      this.videoPlayers[ws.i].locked = locked;
+    });
+  }
+  setVideoTime(time, ws) {
+    this.onlyIfHost(ws, () => {
+      this.videoPlayers[ws.i].currentTime = time;
+    });
+  }
+  createVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
         playlist:[],
         currentTime: 0,
+        locked: false,
         host: user,
         sockets: [ws]
       };
