@@ -6,6 +6,7 @@ class GameSystem {
     if(window.AframeInjection) {
       await this.awaitExistance(window, 'user');
     }
+    this.urlParams = new URLSearchParams(window.location.search);
     await this.getInstanceId();
     await this.setupWebsocket();
     
@@ -36,6 +37,21 @@ class GameSystem {
         
         break;
     }
+  }
+  async getInstanceId() {
+    return new Promise(resolve => {
+      if(!this.urlParams["instanceId"]) {
+        let id = (Math.random() + 1).toString(36).substring(7);
+        if(location.href.includes('?')) {
+          window.location.href = location.href + "&instanceId=" + id;
+        }else{
+          window.location.href = location.href + "?instanceId=" + id;
+        }
+      }else{
+        this.instanceId = this.urlParams["instanceId"];
+        resolve();
+      }
+    });
   }
   awaitExistance(parent, object) {
     return new Promise(resolve => {
