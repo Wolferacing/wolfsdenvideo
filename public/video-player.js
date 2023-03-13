@@ -7,15 +7,15 @@ class GameSystem {
       await this.awaitExistance(window, 'user');
     }
     this.urlParams = new URLSearchParams(window.location.search);
+    this.instanceId = this.urlParams.get("instanceId");
     await this.getInstanceId();
     await this.setupWebsocket();
-    
   }
   setupWebsocket(){
     return new Promise(resolve => {
       this.ws = new WebSocket('wss://' + location.host + '/');
       this.ws.onopen = (event) => {
-        this.joinGame();
+        this.sendMessage({t: "instance", d: this.instanceId});
         resolve();
       };
       this.ws.onmessage = (event) => {
@@ -40,7 +40,7 @@ class GameSystem {
   }
   async getInstanceId() {
     return new Promise(resolve => {
-      if(!this.urlParams["instanceId"]) {
+      if(!this.instanceId) {
         let id = (Math.random() + 1).toString(36).substring(7);
         if(location.href.includes('?')) {
           window.location.href = location.href + "&instanceId=" + id;
