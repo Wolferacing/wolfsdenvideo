@@ -1,9 +1,15 @@
-import { WebSocket } from '@encharm/cws';
-import express from 'express';
-import http from 'http';
-import path from 'path';
+const { WebSocket } = require('@encharm/cws');
+const express = require('express');
+const http = require('http');
+const path = require('path');
+global.fetch = require('node-fetch');
+const Scraper = require('scraper-edge').default;
 
+const youtube = new Scraper();
 
+youtube.search('Never gonna give you up').then(results => {
+    console.log(results.videos[0]);
+});
 
 const Responses = {
   YOU_ARE_HOST: 'you-are-host',
@@ -20,7 +26,7 @@ const Commands = {
   TOGGLE_LOCK: 'toggle-lock',
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item'
-}
+} 
 
 class GameServer{
   constructor() {
