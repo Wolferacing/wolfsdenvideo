@@ -76,7 +76,7 @@ class GameServer{
     });
   }
   send(socket, path, data) {
-     socket.send(JSON.stringify({path}));
+     socket.send(JSON.stringify({path, data}));
   }
   parseMessage(msg, ws){
     switch(msg.path) {
@@ -174,18 +174,22 @@ class GameServer{
       this.send(this.videoPlayers[instanceId].sockets[0], Responses.YOU_ARE_HOST);
       console.log("Making", this.videoPlayers[instanceId].sockets[0].u.name, "host for ", instanceId ,"...");
     }else{
+      if(!this.videoPlayers[instanceId].sockets.includes(ws)) {
+         this.videoPlayers[instanceId].sockets.push(ws);
+      }
       console.log("New user", this.videoPlayers[instanceId].sockets[0].u.name);
-      this.send(this.videoPlayers[instanceId].sockets[0], Responses.SYNC_TIME, this.getVideoObject(instanceId));
     }
+    this.send(this.videoPlayers[instanceId].sockets[0], Responses.SYNC_TIME, this.getVideoObject(instanceId));
   }
   getVideoObject(instanceId) {
-    if(this.videoPlayers[instanceId])
-    return {
-      playlist: this.videoPlayers[instanceId].playlist, 
-      currentTime: this.videoPlayers[instanceId].currentTime, 
-      currentTrack: this.videoPlayers[instanceId].currentTrack, 
-      locked: this.videoPlayers[instanceId].locked
-    };
+    if(this.videoPlayers[instanceId]) {
+      return {
+        playlist: this.videoPlayers[instanceId].playlist, 
+        currentTime: this.videoPlayers[instanceId].currentTime, 
+        currentTrack: this.videoPlayers[instanceId].currentTrack, 
+        locked: this.videoPlayers[instanceId].locked
+      };
+    }
   }
   updateClients(instanceId) {
     if(this.videoPlayers[instanceId]) {

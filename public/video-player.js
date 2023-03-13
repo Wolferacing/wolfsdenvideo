@@ -38,14 +38,16 @@ class GameSystem {
       }
       this.ws.onclose =  (event) => {
         setTimeout(() => {
-          window.location.reload();
-//          this.setupWebsocket();
+          if(window.isBanter) {
+            this.setupWebsocket();
+          }else{
+            window.location.reload();
+          } 
         }, 1000);
       };
     });
   } 
   parseMessage(msg) {
-    console.log(msg);
     const json = JSON.parse(event.data);
     switch(json.path) {
       case Responses.SYNC_TIME:
