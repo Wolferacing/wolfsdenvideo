@@ -9,6 +9,15 @@ const Responses = {
   SEARCH_RESULTS: 'search-results'
 }
 
+const Commands = {
+  SEARCH: 'search',
+  SET_TIME: 'set-time',
+  SET_TRACK: 'set-track',
+  TOGGLE_LOCK: 'toggle-lock',
+  ADD_TO_PLAYLIST: 'add-to-playlist',
+  MOVE_PLAYLIST_ITEM: 'move-playlist-item'
+} 
+
 class GameSystem {
   constructor(){
     this.init();
@@ -60,6 +69,9 @@ class GameSystem {
         break;
       case Responses.YOU_ARE_NOT_HOST:
         console.log("Im not host!")
+        break;
+      case Responses.PLAYBACK_UPDATE:
+        console.log("Im not host!", json.data)
         break;
       case Responses.SEARCH_RESULTS:
         this.loadVideos(json.data);
@@ -113,15 +125,15 @@ class GameSystem {
     this.sendMessage({path: 'search', data });
   }
   loadVideos(videos) {
-    videos.forEach(v => {
-      const videoItemContainer = this.makeAndAddElement('div', null, this.videoSearchContainer);
+    videos.forEach((v, i) => {
+      const videoItemContainer = this.makeAndAddElement('div', {background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoSearchContainer);
       
       const videoThumbnail = this.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, videoItemContainer);
       
       const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.makeAndAddElement('div',{
-        padding: '10 10', 
+        padding: '7 10', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
@@ -138,6 +150,11 @@ class GameSystem {
       }, videoTitleAndAction);
       
       addToPlaylist.innerText = "Add To Playlist";
+      
+      addToPlaylist.addEventListener('click', () => {
+        this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v.url });
+        this.hideSearch();
+      });
       
       const playNext = this.makeAndAddElement('div',{
         padding: '10 10', 

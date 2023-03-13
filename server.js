@@ -49,7 +49,9 @@ class GameServer{
       ws.t = new Date().getTime();
       ws.on('message', msg => {
         try{
-          this.parseMessage(JSON.parse(msg), ws);
+          if(msg !== "keepalive") {
+            this.parseMessage(JSON.parse(msg), ws);
+          }
         }catch(e) {
           console.log("parse error: ", e, msg);
         }
@@ -133,6 +135,7 @@ class GameServer{
     }
   }
   addToPlaylist(url, ws) {
+    console.log(url, ws);
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         this.videoPlayers[ws.i].playlist.push(url);
