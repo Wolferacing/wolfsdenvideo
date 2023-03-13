@@ -115,8 +115,9 @@ class GameSystem {
   loadVideos(videos) {
     videos.forEach(v => {
       const videoItemContainer = this.makeAndAddElement('div', null, this.videoContainer);
-      const videoThumbnail = this.makeAndAddElement('img',{height: '120px', float: 'left'}, videoItemContainer);
-      const videoTitle = this.makeAndAddElement('div',{height: '80px', float: 'left'}, videoItemContainer);
+      const videoThumbnail = this.makeAndAddElement('img',{height: '80px', float: 'left'}, videoItemContainer);
+      const videoTitle = this.makeAndAddElement('div',{float: 'left', padding: '10 10', textOverflow: 'ellipsis', overflow: 'hidden', width: 'calc(100% - 150px)'}, videoItemContainer);
+      const addToPlaylist = this.makeAndAddElement('div',{padding: '10 10'}, videoTitle);
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       videoThumbnail.src = v.thumbnail;
       videoTitle.innerText = v.title;
@@ -163,12 +164,13 @@ class GameSystem {
     
     this.videoContainer = this.makeAndAddElement('div', {
       position: 'absolute',
-      margin: 'auto',
-      background: '#cfcfcf',
+      top: '64px',
+      background: '#8f8f8f',
       color: 'white',
       font: '15px Roboto, sans-serif',
       overflow: 'auto',
-      height: 'calc(100% - 64px)'
+      height: 'calc(100% - 64px)',
+      width: '100%'
     });
     
   }
