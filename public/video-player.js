@@ -116,7 +116,7 @@ class GameSystem {
     videos.forEach(v => {
       const videoItemContainer = this.makeAndAddElement('div', null, this.videoSearchContainer);
       
-      const videoThumbnail = this.makeAndAddElement('img',{height: '80px', float: 'left'}, videoItemContainer);
+      const videoThumbnail = this.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, videoItemContainer);
       
       const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
@@ -171,7 +171,7 @@ class GameSystem {
   }
   hideSearch() {
     this.videoSearchContainer.style.display = 'none';
-    this.videoSearchContainer.innerHtml = '';
+    this.videoSearchContainer.innerHTML = '';
     this.searchBackDrop.style.display = 'none';
   }
   setupSearch(playlistContainer) {
@@ -219,7 +219,7 @@ class GameSystem {
     });
     
     this.searchBackDrop = this.makeAndAddElement('div', {
-      background: 'rgba(0,0,0,0.7)',
+      background: 'rgba(0,0,0,0.6)',
       position: 'absolute',
       top: '66px',
       left: '0',
@@ -228,9 +228,7 @@ class GameSystem {
       display: 'none'
     });
     
-    this.searchBackDrop.addEventListener('click', () => {
-      
-    })
+    this.searchBackDrop.addEventListener('click', () => this.hideSearch());
     
     this.videoSearchContainer = this.makeAndAddElement('div', {
       position: 'absolute',
