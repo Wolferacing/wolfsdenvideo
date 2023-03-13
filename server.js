@@ -25,6 +25,7 @@ class GameServer{
     this.wss.startAutoPing(10000);
     
     this.wss.on('connection', (ws, req) => {
+      ws.t = new Date().getTime();
       ws.on('message', msg => {
         try{
           this.parseMessage(JSON.parse(msg), ws);
@@ -36,15 +37,15 @@ class GameServer{
         Object.keys(this.videoPlayers).forEach(key => {
           const videoPlayer = this.videoPlayers[key];
           if(videoPlayer.host === ws.u){
-            videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.socket.u !== videoPlayer.host);
+            videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== videoPlayer.host);
             videoPlayer.sockets.sort((a,b) => a.time - b.time);
             if(!videoPlayer.sockets.length) {
               delete this.videoPlayers[key];
               console.log("No users left, deleting video player...");
             }else{
-              videoPlayer.host = videoPlayer.sockets[0];
+              videoPlayer.host = videoPlayer.sockets[0].u;
               this.send(videoPlayer.sockets[0], 'you-are-host');
-              console.log("Making", videoPlayer.sockets[0].socket.u, "the new host...");
+              console.log("Making", videoPlayer.sockets[0].u, "the new host...");
             }
           }
         });
@@ -58,19 +59,31 @@ class GameServer{
     });
   }
   send(socket, path, data) {
-     socket.socket.send(JSON.stringify({path}));
+     socket.send(JSON.stringify({path}));
   }
   parseMessage(msg, ws){
-    if(msg.u) {
-      ws.u = msg.u;
-    }
     switch(msg.path) {
       case "instance":
+        if(msg.u) {
+          ws.u = msg.u;
+          ws.i = msg.data;
+        }
         this.tryCreateVideoPlayer(msg.data, msg.u, ws);
         break;
       case "current-time":
-        this.tryCreateVideoPlayer(msg.data, msg.u, ws);
+        this.trySetVideoTime(msg.data, ws);
         break
+    }
+  }
+  trySetVideoTime(time, ws) {
+    if(ws.u && ws.i) {
+      if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].host === ws.u) {
+        this.videoPlayers[ws.i].currentTime = time;
+      }else{
+        this.send(ws, 'you-are-not-host');
+      }
+    }else{
+      this.send(ws, 'error');
     }
   }
   tryCreateVideoPlayer(instanceId, user, ws) {
@@ -79,15 +92,10 @@ class GameServer{
         playlist:[],
         currentTime: 0,
         host: user,
-        sockets: [
-          {
-            time: new Date().getTime(),
-            socket: ws
-          }
-        ]
+        sockets: [ws]
       };
       this.send(this.videoPlayers[instanceId].sockets[0], 'you-are-host');
-      console.log("Making", this.videoPlayers[instanceId].sockets[0].socket.u, "host...");
+      console.log("Making", this.videoPlayers[instanceId].sockets[0].u, "host...");
     }
   }
 }
