@@ -8,7 +8,8 @@ const Responses = {
   YOU_ARE_NOT_HOST: 'you-are-not-host',
   OUT_OF_BOUNDS: 'out-of-bounds',
   DOES_NOT_EXIST: 'does-not-exist',
-  PLAYBACK_UPDATE: 'playback-update'
+  PLAYBACK_UPDATE: 'playback-update',
+  SYNC_TIME: 'sync-time'
 }
 
 const Commands = {
@@ -71,7 +72,7 @@ class GameServer{
     this.app.use(express.static(path.join(__dirname, 'public')));
 
     this.server.listen( 3000, function listening(){
-        console.log("game started"); 
+        console.log("Video player sync service started..."); 
     });
   }
   send(socket, path, data) {
@@ -121,6 +122,7 @@ class GameServer{
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         this.videoPlayers[ws.i].playlist.push(url);
+        this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -131,7 +133,7 @@ class GameServer{
         const oldIndex = playlist.indexOf(url);
         if(oldIndex > -1) {
           playlist.splice(index, 0, playlist.splice(oldIndex, 1)[0]);
-          this.updateClients(ws.i)
+          this.updateClients(ws.i);
         }else{
           this.send(ws, Responses.DOES_NOT_EXIST);
         }
@@ -141,12 +143,14 @@ class GameServer{
   toggleLock(locked, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].locked = locked;
+      this.updateClients(ws.i);
     });
   }
   setVideoTrack(index, ws) {
     this.onlyIfHost(ws, () => {
       if(index < this.videoPlayers[ws.i].playlist.length - 1) {
         this.videoPlayers[ws.i].currentTrack = index;
+        this.updateClients(ws.i);
       }else{
         this.send(ws, Responses.OUT_OF_BOUNDS);
       }
@@ -168,17 +172,25 @@ class GameServer{
         sockets: [ws]
       };
       this.send(this.videoPlayers[instanceId].sockets[0], Responses.YOU_ARE_HOST);
-      console.log("Making", this.videoPlayers[instanceId].sockets[0].u.name, "host...");
+      console.log("Making", this.videoPlayers[instanceId].sockets[0].u.name, "host for ", instanceId ,"...");
+    }else{
+      console.log("New user", this.videoPlayers[instanceId].sockets[0].u.name);
+      this.send(this.videoPlayers[instanceId].sockets[0], Responses.SYNC_TIME, this.getVideoObject(instanceId));
     }
+  }
+  getVideoObject(instanceId) {
+    if(this.videoPlayers[instanceId])
+    return {
+      playlist: this.videoPlayers[instanceId].playlist, 
+      currentTime: this.videoPlayers[instanceId].currentTime, 
+      currentTrack: this.videoPlayers[instanceId].currentTrack, 
+      locked: this.videoPlayers[instanceId].locked
+    };
   }
   updateClients(instanceId) {
     if(this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId].sockets.forEach(socket => {
-        this.send(socket, Responses.PLAYBACK_UPDATE, {
-          playlist: this.videoPlayers[instanceId].playlist, 
-          currentTime: this.videoPlayers[instanceId].currentTime, 
-          locked: this.videoPlayers[instanceId].locked
-        });
+        this.send(socket, Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
       });
     }
   }

@@ -1,3 +1,13 @@
+
+const Responses = {
+  YOU_ARE_HOST: 'you-are-host',
+  YOU_ARE_NOT_HOST: 'you-are-not-host',
+  OUT_OF_BOUNDS: 'out-of-bounds',
+  DOES_NOT_EXIST: 'does-not-exist',
+  PLAYBACK_UPDATE: 'playback-update',
+  SYNC_TIME: 'sync-time'
+}
+
 class GameSystem {
   constructor(){
     this.init();
@@ -28,21 +38,23 @@ class GameSystem {
       }
       this.ws.onclose =  (event) => {
         setTimeout(() => {
-          this.setupWebsocket();
+          window.location.reload();
+//          this.setupWebsocket();
         }, 1000);
       };
     });
   } 
   parseMessage(msg) {
+    console.log(msg);
     const json = JSON.parse(event.data);
     switch(json.path) {
-      case "sync-time":
-        
+      case Responses.SYNC_TIME:
+        console.log(Responses.SYNC_TIME, json.data);
         break;
-      case "you-are-host":
+      case Responses.YOU_ARE_HOST:
         console.log("Im host!")
         break;
-      case "you-are-not-host":
+      case Responses.YOU_ARE_NOT_HOST:
         console.log("Im not host!")
         break;
     }
@@ -77,7 +89,6 @@ class GameSystem {
     }
   }
   sendMessage(msg){
-    console.log(msg);
     this.ws.send(JSON.stringify(msg));
   }
 }
