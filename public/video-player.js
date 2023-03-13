@@ -31,7 +31,7 @@ class GameSystem {
         }, 1000);
       };
     });
-  }
+  } 
   parseMessage(msg) {
     const json = JSON.parse(event.data);
     switch(json.path) {
@@ -40,6 +40,9 @@ class GameSystem {
         break;
       case "you-are-host":
         console.log("Im host!")
+        break;
+      case "you-are-not-host":
+        console.log("Im not host!")
         break;
     }
   }

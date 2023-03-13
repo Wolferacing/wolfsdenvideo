@@ -33,11 +33,19 @@ class GameServer{
         }
       });
       ws.on('close', (code, reason) => {
-        Object.keys(this.videoPlayers).forEach(videoPlayer => {
+        Object.keys(this.videoPlayers).forEach(key => {
+          const videoPlayer = this.videoPlayers[key];
           if(videoPlayer.host === ws.u){
+            videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.socket.u !== videoPlayer.host);
             videoPlayer.sockets.sort((a,b) => a.time - b.time);
-            videoPlayer.host = videoPlayer.sockets[0];
-            this.send(videoPlayer.sockets[0], 'you-are-host');
+            if(!videoPlayer.sockets.length) {
+              delete this.videoPlayers[key];
+              console.log("No users left, deleting video player...");
+            }else{
+              videoPlayer.host = videoPlayer.sockets[0];
+              this.send(videoPlayer.sockets[0], 'you-are-host');
+              console.log("Making", videoPlayer.sockets[0].socket.u, "the new host...");
+            }
           }
         });
       });
@@ -60,6 +68,9 @@ class GameServer{
       case "instance":
         this.tryCreateVideoPlayer(msg.data, msg.u, ws);
         break;
+      case "current-time":
+        this.tryCreateVideoPlayer(msg.data, msg.u, ws);
+        break
     }
   }
   tryCreateVideoPlayer(instanceId, user, ws) {
@@ -76,6 +87,7 @@ class GameServer{
         ]
       };
       this.send(this.videoPlayers[instanceId].sockets[0], 'you-are-host');
+      console.log("Making", this.videoPlayers[instanceId].sockets[0].socket.u, "host...");
     }
   }
 }
