@@ -139,6 +139,18 @@ class GameSystem {
       
       addToPlaylist.innerText = "Add To Playlist";
       
+      const playNext = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'olive', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      playNext.innerText = "Play Next";
+      
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       videoThumbnail.src = v.thumbnail;
@@ -151,7 +163,16 @@ class GameSystem {
     if(searchVal.length > 1) {
       clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(() => this.search(searchVal), 500);
+      this.videoSearchContainer.style.display = 'block';
+      this.searchBackDrop.style.display = 'block';
+    }else{
+      this.hideSearch();
     }
+  }
+  hideSearch() {
+    this.videoSearchContainer.style.display = 'none';
+    this.videoSearchContainer.innerHtml = '';
+    this.searchBackDrop.style.display = 'none';
   }
   setupSearch(playlistContainer) {
     const searchContainer = this.makeAndAddElement('div', {float: 'right'}, playlistContainer);
@@ -186,16 +207,43 @@ class GameSystem {
     const playlistTitle = this.makeAndAddElement('h2', {fontWeight: 'normal'}, playlistContainer);
     playlistTitle.innerText = "Video Playlist";
     
+    
+    this.videoPlaylistContainer = this.makeAndAddElement('div', {
+      position: 'relative',
+      background: '#cfcfcf',
+      color: 'white',
+      font: '15px Roboto, sans-serif',
+      overflow: 'auto',
+      height: 'calc(100% - 64px)',
+      width: '100%'
+    });
+    
+    this.searchBackDrop = this.makeAndAddElement('div', {
+      background: 'rgba(0,0,0,0.7)',
+      position: 'absolute',
+      top: '66px',
+      left: '0',
+      height: 'calc(100% - 64px)',
+      width: '100%',
+      display: 'none'
+    });
+    
+    this.searchBackDrop.addEventListener('click', () => {
+      
+    })
+    
     this.videoSearchContainer = this.makeAndAddElement('div', {
       position: 'absolute',
-      top: '64px',
+      top: '26px',
       margin: '40px',
       background: '#8f8f8f',
       color: 'white',
       font: '15px Roboto, sans-serif',
       overflow: 'auto',
-      height: 'calc(100% - 144px)',
-      width: 'calc(100% - 80px)'
+      height: 'calc(100% - 108px)',
+      width: 'calc(100% - 80px)',
+      display: 'none',
+      boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
     });
       
   }
