@@ -13,6 +13,7 @@ class GameSystem {
     this.init();
   }
   async init() {
+    this.setupPlaylistUI();
     if(window.isBanter) {
       await this.awaitExistance(window, 'user');
     }else{
@@ -23,7 +24,6 @@ class GameSystem {
     this.instanceId = this.urlParams.get("instanceId");
     await this.getInstanceId();
     await this.setupWebsocket();
-    this.setupPlaylistUI();
   }
   setupWebsocket(){
     return new Promise(resolve => {
@@ -94,18 +94,30 @@ class GameSystem {
   sendMessage(msg){
     this.ws.send(JSON.stringify(msg));
   }
-  makeAndAddElement(type, parent, style) {
+  makeAndAddElement(type, style, parent) {
     const element = document.createElement(type);
-    Object.assign(element.style, style || {})
-    element.className = className;
+    Object.assign(element.style, style || {});
     (parent ? parent : document.body).appendChild(element);
     return element;
   }
+  setupGoogleFont() {
+    const fontLink = this.makeAndAddElement('link', null, document.head);
+    fontLink.setAttribute('href', 'https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+    fontLink.setAttribute('rel', 'stylesheet');
+  }
   setupPlaylistUI() {
-    const playlistContainer = this.makeAndAddElement('div', null, {
+    this.setupGoogleFont();
+    document.querySelector('a-scene').style.display = 'none';
+    const playlistContainer = this.makeAndAddElement('div', {
       position: 'relative',
-      margin: 'auto'
+      margin: 'auto',
+      background: '#3f3f3f',
+      color: 'white',
+      font: '15px Roboto, sans-serif'
     });
+    
+    const playlistTitle = this.makeAndAddElement('h2', playlistContainer);
+    playlistTitle.innerText = "Playlist";
   }
 }
 
