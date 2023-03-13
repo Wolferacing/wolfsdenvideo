@@ -150,6 +150,7 @@ class GameSystem {
     })
   }
   loadVideos(videos) {
+    this.loadingSpinner.style.display = 'none';
     videos.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoSearchContainer);
       
@@ -195,7 +196,7 @@ class GameSystem {
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       videoThumbnail.src = v.thumbnail;
-      
+        
       videoTitle.innerText = v.title;
       
     })
@@ -206,6 +207,7 @@ class GameSystem {
       this.searchTimeout = setTimeout(() => this.search(searchVal), 500);
       this.videoSearchContainer.style.display = 'block';
       this.searchBackDrop.style.display = 'block';
+      this.loadingSpinner.style.display = 'block';
     }else{
       this.hideSearch();
     }
@@ -280,13 +282,13 @@ class GameSystem {
       font: '15px Roboto, sans-serif',
       overflow: 'auto',
       height: 'calc(100% - 108px)',
-      width: 'calc(100% - 80px)',
+      width: 'calc(100% - 80px)', 
       display: 'none',
       boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
     });
-     
     
-    // https://cdn.glitch.global/e1a76c0e-a722-4204-9089-a5f3e4fe12f9/3-dots-move.svg?v=1678747444591
+    this.loadingSpinner = this.makeAndAddElement('img',{height: '80px', width: '80px', position: 'absolute', top: '120px', left: '50%', marginLeft: '-40px', display: 'none'});
+    this.loadingSpinner.src = "https://cdn.glitch.global/e1a76c0e-a722-4204-9089-a5f3e4fe12f9/3-dots-move.svg?v=1678747444591";
     
   }
 }
