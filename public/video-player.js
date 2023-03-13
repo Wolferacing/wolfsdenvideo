@@ -53,7 +53,6 @@ class GameSystem {
           window.location.href = location.href + "?instanceId=" + id;
         }
       }else{
-        this.instanceId = this.urlParams["instanceId"];
         resolve();
       }
     });
@@ -71,6 +70,7 @@ class GameSystem {
     }
   }
   sendMessage(msg){
+    console.log(msg);
     this.ws.send(JSON.stringify(msg));
   }
 }
