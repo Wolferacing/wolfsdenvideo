@@ -62,7 +62,7 @@ class GameSystem {
         console.log("Im not host!")
         break;
       case Responses.SEARCH_RESULTS:
-        console.log("Im not host!");
+        this.loadVideos(json.data);
         break;
     }
   }
@@ -112,10 +112,20 @@ class GameSystem {
   search(data) {
     this.sendMessage({path: 'search', data });
   }
+  loadVideos(videos) {
+    videos.forEach(v => {
+      const videoItemContainer = this.makeAndAddElement('div', null, this.videoContainer);
+      const videoThumbnail = this.makeAndAddElement('img',{height: '120px', float: 'left'}, videoItemContainer);
+      const videoTitle = this.makeAndAddElement('div',{height: '80px', float: 'left'}, videoItemContainer);
+      this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
+      videoThumbnail.src = v.thumbnail;
+      videoTitle.innerText = v.title;
+    })
+  }
   debounceSearch(searchVal) {
     if(searchVal.length > 1) {
       clearTimeout(this.searchTimeout);
-      this.searchTimeout = setTimeout(() => this.search(searchVal));
+      this.searchTimeout = setTimeout(() => this.search(searchVal), 500);
     }
   }
   setupSearch(playlistContainer) {
@@ -131,7 +141,7 @@ class GameSystem {
     }, searchContainer);
     searchInput.placeholder = "Search...";
     
-    searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.val))
+    searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
   }
   setupPlaylistUI() {
     this.setupGoogleFont();
@@ -141,6 +151,7 @@ class GameSystem {
       margin: 'auto',
       background: '#3f3f3f',
       color: 'white',
+      height: '64px',
       font: '15px Roboto, sans-serif',
       padding: '1 30'
     });
@@ -149,6 +160,16 @@ class GameSystem {
     
     const playlistTitle = this.makeAndAddElement('h2', {fontWeight: 'normal'}, playlistContainer);
     playlistTitle.innerText = "Video Playlist";
+    
+    this.videoContainer = this.makeAndAddElement('div', {
+      position: 'absolute',
+      margin: 'auto',
+      background: '#cfcfcf',
+      color: 'white',
+      font: '15px Roboto, sans-serif',
+      overflow: 'auto',
+      height: 'calc(100% - 64px)'
+    });
     
   }
 }

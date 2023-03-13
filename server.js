@@ -114,11 +114,11 @@ class GameServer{
     }
   }
   async search(term, ws) {
-    const results = youtube.search(term, {
+    const results = await youtube.search(term, {
         language: 'en-US',
         searchType: 'video'
     });
-    this.send(ws, Responses.SEARCH_RESULTS, results);
+    this.send(ws, Responses.SEARCH_RESULTS, results.videos || []);
   }
   onlyIfHost(ws, callback, locked) {
     if(ws.u && ws.u.id && ws.i) {
