@@ -33,9 +33,11 @@ class GameServer{
         }
       });
       ws.on('close', (code, reason) => {
-        Object.keys(this.videoPlayer).forEach(videoPlayer => {
+        Object.keys(this.videoPlayers).forEach(videoPlayer => {
           if(videoPlayer.host === ws.u){
-            if(videoPlayer)
+            videoPlayer.sockets.sort((a,b) => a.time - b.time);
+            videoPlayer.host = videoPlayer.sockets[0];
+            this.send(videoPlayer.sockets[0], 'you-are-host');
           }
         });
       });
@@ -44,25 +46,36 @@ class GameServer{
     this.app.use(express.static(path.join(__dirname, 'public')));
 
     this.server.listen( 3000, function listening(){
-        console.log("game started");
+        console.log("game started"); 
     });
   }
+  send(socket, path, data) {
+     socket.socket.send(JSON.stringify({path}));
+  }
   parseMessage(msg, ws){
-    switch(msg.t) {
+    if(msg.u) {
+      ws.u = msg.u;
+    }
+    switch(msg.path) {
       case "instance":
-        this.tryCreateVideoPlayer(msg.d, msg.u);
-        ws.u = msg.u;
+        this.tryCreateVideoPlayer(msg.data, msg.u, ws);
         break;
     }
   }
-  tryCreateVideoPlayer(instanceId, user) {
+  tryCreateVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
         playlist:[],
         currentTime: 0,
         host: user,
-        sockets: []
-      }
+        sockets: [
+          {
+            time: new Date().getTime(),
+            socket: ws
+          }
+        ]
+      };
+      this.send(this.videoPlayers[instanceId].sockets[0], 'you-are-host');
     }
   }
 }

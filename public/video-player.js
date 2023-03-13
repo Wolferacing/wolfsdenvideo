@@ -17,7 +17,7 @@ class GameSystem {
     return new Promise(resolve => {
       this.ws = new WebSocket('wss://' + location.host + '/');
       this.ws.onopen = (event) => {
-        this.sendMessage({t: "instance", d: this.instanceId, u: window.user.id});
+        this.sendMessage({path: "instance", data: this.instanceId, u: window.user.id});
         resolve();
       };
       this.ws.onmessage = (event) => {
@@ -35,8 +35,11 @@ class GameSystem {
   parseMessage(msg) {
     const json = JSON.parse(event.data);
     switch(json.path) {
-      case 'sync-time':
+      case "sync-time":
         
+        break;
+      case "you-are-host":
+        console.log("Im host!")
         break;
     }
   }
