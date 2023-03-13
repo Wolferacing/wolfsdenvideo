@@ -9,7 +9,6 @@
             init: async function() {
               let duration = 0;
                 this.el.addEventListener('video-player', e => {
-                  console.log(e.detail.eventType)
                   switch(this.el.object3D.userData.eventType) {
                     case "FinishedPlaying":
                       playNextVideo();
@@ -23,54 +22,14 @@
   <body>
     <a-scene>
       <a-assets>
-          <video id="youtube-video" loop="false" muted="true" volume="0.5"></video>
-        </a-assets>
-<!--       https://www.youtube.com/watch?v=-72P_EFphSc -->
-      <a-sound src="src: url(click.mp3)" autoplay="true" position="0 2 5"></a-sound>
+        <video id="youtube-video" loop="false" muted="true" volume="0.5"></video>
+      </a-assets>
 
       <a-camera look-controls wasd-controls="fly: true"></a-camera>
       
-      <!-- A big box for the floor with a collider on it -->
       <a-box sq-collider color="olive" scale="30 0.1 30"></a-box>
       
-      <!-- A 3d model of a christmas tree, because why not! -->
-<!--       <a-entity position="-7 0 -4" scale="40 40 40" gltf-model="https://cdn.glitch.global/7af396ad-5845-48f2-8441-58c6ffec91ad/low-poly_fangding_food_vessel.glb?v=1670411591590"></a-entity>
-             -->
-      <a-video src="#youtube-video" video-player position="-3.5 3 -3" rotation="0 20 0" scale="4 4 4"></a-video>
-      <a-text value="chop chop music video playlist!" position="-3.5 0.5 -3" rotation="0 20 0" align="center"></a-text>
-      <a-entity sq-livestream="type: youtube; url: https://www.youtube.com/watch?v=jfKfPfyJRdk; muted: true; volume: 0.3"  position="3.5 3 -3" rotation="0 -20 0" scale="4 4 4"></a-entity>
-      <a-text value="live stream!" position="3.5 0.5 -3" rotation="0 -20 0" align="center"></a-text>
-      <!-- A mirror! -->
-<!--       <a-entity sq-mirror position="0 1 10" rotation="0 180 0" scale="4 4 4"></a-entity> -->
-    
-      <!-- A portal back to the previous space! -->
-      <a-link id="portal" position="-10 0 8" rotation="0 45 0" title="Community Hub" href="https://sq-community-hub.glitch.me" image="https://logo.clearbit.com/sidequestvr.com"></a-link>
-      </a-scene>
-     
-      <script>
-        const videos = [
-          "https://www.youtube.com/watch?v=65f0pb4qDfI",
-          "https://www.youtube.com/watch?v=yr1_GuEb7N0",
-          "https://www.youtube.com/watch?v=MwcHGHbz528"
-        ];
-
-        const videoPlayer = document.getElementById('youtube-video');
-        
-        videoPlayer.quality = "hd";
-
-        let currentlyPlaying = 0;
-
-        const playNextVideo = async () => {
-          if(currentlyPlaying >= videos.length) {
-            currentlyPlaying = 0;
-          }
-          console.log("playing: ", videos[currentlyPlaying]);
-          videoPlayer.src = videos[currentlyPlaying];
-          currentlyPlaying++;
-        }
-        
-        playNextVideo();
-
-      </script>
+      <a-video src="#youtube-video" video-player position="0 3 -3" scale="4 4 4"></a-video>
+    </a-scene>
   </body>
 </html>
