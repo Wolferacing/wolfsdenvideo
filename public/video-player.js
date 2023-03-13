@@ -114,13 +114,37 @@ class GameSystem {
   }
   loadVideos(videos) {
     videos.forEach(v => {
-      const videoItemContainer = this.makeAndAddElement('div', null, this.videoContainer);
+      const videoItemContainer = this.makeAndAddElement('div', null, this.videoSearchContainer);
+      
       const videoThumbnail = this.makeAndAddElement('img',{height: '80px', float: 'left'}, videoItemContainer);
-      const videoTitle = this.makeAndAddElement('div',{float: 'left', padding: '10 10', textOverflow: 'ellipsis', overflow: 'hidden', width: 'calc(100% - 150px)'}, videoItemContainer);
-      const addToPlaylist = this.makeAndAddElement('div',{padding: '10 10'}, videoTitle);
+      
+      const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
+      
+      const videoTitle = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        textOverflow: 'ellipsis', 
+        overflow: 'hidden', 
+        whiteSpace: 'nowrap'
+      }, videoTitleAndAction);
+      
+      const addToPlaylist = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'teal', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      addToPlaylist.innerText = "Add To Playlist";
+      
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
+      
       videoThumbnail.src = v.thumbnail;
+      
       videoTitle.innerText = v.title;
+      
     })
   }
   debounceSearch(searchVal) {
@@ -154,7 +178,7 @@ class GameSystem {
       color: 'white',
       height: '64px',
       font: '15px Roboto, sans-serif',
-      padding: '1 30'
+      padding: '1 30',
     });
     
     this.setupSearch(playlistContainer);
@@ -162,17 +186,18 @@ class GameSystem {
     const playlistTitle = this.makeAndAddElement('h2', {fontWeight: 'normal'}, playlistContainer);
     playlistTitle.innerText = "Video Playlist";
     
-    this.videoContainer = this.makeAndAddElement('div', {
+    this.videoSearchContainer = this.makeAndAddElement('div', {
       position: 'absolute',
       top: '64px',
+      margin: '40px',
       background: '#8f8f8f',
       color: 'white',
       font: '15px Roboto, sans-serif',
       overflow: 'auto',
-      height: 'calc(100% - 64px)',
-      width: '100%'
+      height: 'calc(100% - 144px)',
+      width: 'calc(100% - 80px)'
     });
-    
+      
   }
 }
 
