@@ -5,7 +5,8 @@ const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
   DOES_NOT_EXIST: 'does-not-exist',
   PLAYBACK_UPDATE: 'playback-update',
-  SYNC_TIME: 'sync-time'
+  SYNC_TIME: 'sync-time',
+  SEARCH_RESULTS: 'search-results'
 }
 
 class GameSystem {
@@ -60,6 +61,9 @@ class GameSystem {
       case Responses.YOU_ARE_NOT_HOST:
         console.log("Im not host!")
         break;
+      case Responses.SEARCH_RESULTS:
+        console.log("Im not host!");
+        break;
     }
   }
   getUniquId() {
@@ -105,8 +109,8 @@ class GameSystem {
     fontLink.setAttribute('href', 'https://fonts.googleapis.com/css2?family=Roboto&display=swap');
     fontLink.setAttribute('rel', 'stylesheet');
   }
-  search() {
-    
+  search(data) {
+    this.sendMessage({path: 'search', data });
   }
   debounceSearch(searchVal) {
     if(searchVal.length > 1) {

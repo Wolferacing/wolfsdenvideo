@@ -58,17 +58,8 @@ class Scraper {
                 headers: {
                     'Accept-Language': requestedLang
                 }
-            }).then(res => res.body).then(body => {
-                const reader = body.getReader();
-                let data = '';
-                reader.read().then(function processText({ done, value }) {
-                    if (done) {
-                        resolve(data);
-                        return;
-                    }
-                    data += new TextDecoder("utf-8").decode(value);
-                    return reader.read().then(processText);
-                });
+            }).then(res => res.text()).then(body => {
+                resolve(body);
             }).catch(err => reject(err));
         });
     }

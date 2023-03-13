@@ -2,14 +2,8 @@ const { WebSocket } = require('@encharm/cws');
 const express = require('express');
 const http = require('http');
 const path = require('path');
-global.fetch = require('node-fetch');
-const Scraper = require('scraper-edge').default;
-
-const youtube = new Scraper();
-
-youtube.search('Never gonna give you up').then(results => {
-    console.log(results.videos[0]);
-});
+const Youtube = require('./youtube/scraper.js');
+const youtube = new Youtube();
 
 const Responses = {
   YOU_ARE_HOST: 'you-are-host',
@@ -17,10 +11,12 @@ const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
   DOES_NOT_EXIST: 'does-not-exist',
   PLAYBACK_UPDATE: 'playback-update',
-  SYNC_TIME: 'sync-time'
+  SYNC_TIME: 'sync-time',
+  SEARCH_RESULTS: 'search-results'
 }
 
 const Commands = {
+  SEARCH: 'search',
   SET_TIME: 'set-time',
   SET_TRACK: 'set-track',
   TOGGLE_LOCK: 'toggle-lock',
@@ -112,7 +108,17 @@ class GameServer{
       case Commands.MOVE_PLAYLIST_ITEM:
         this.movePlaylistItem(msg.data, ws);
         break
+      case Commands.SEARCH:
+        this.search(msg.data, ws);
+        break;
     }
+  }
+  async search(term, ws) {
+    const results = youtube.search(term, {
+        language: 'en-US',
+        searchType: 'video'
+    });
+    this.send(ws, Responses.SEARCH_RESULTS, results);
   }
   onlyIfHost(ws, callback, locked) {
     if(ws.u && ws.u.id && ws.i) {
