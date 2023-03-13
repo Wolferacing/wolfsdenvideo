@@ -2,6 +2,7 @@ const { WebSocket } = require('@encharm/cws');
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const youtube = require('@dofiltra/youtube');
 
 const Responses = {
   YOU_ARE_HOST: 'you-are-host',

@@ -109,7 +109,10 @@ class GameSystem {
     
   }
   debounceSearch(searchVal) {
-    this.searchTimeout = set
+    if(searchVal.length > 1) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => this.search(searchVal));
+    }
   }
   setupSearch(playlistContainer) {
     const searchContainer = this.makeAndAddElement('div', {float: 'right'}, playlistContainer);
