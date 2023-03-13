@@ -6,7 +6,8 @@ class GameSystem {
     if(window.isBanter) {
       await this.awaitExistance(window, 'user');
     }else{
-      window.user = {id: this.getUniquId()};
+      const id = this.getUniquId();
+      window.user = {id, name: "Guest " + id};
     }
     this.urlParams = new URLSearchParams(window.location.search);
     this.instanceId = this.urlParams.get("instanceId");
@@ -17,7 +18,7 @@ class GameSystem {
     return new Promise(resolve => {
       this.ws = new WebSocket('wss://' + location.host + '/');
       this.ws.onopen = (event) => {
-        this.sendMessage({path: "instance", data: this.instanceId, u: window.user.id});
+        this.sendMessage({path: "instance", data: this.instanceId, u: window.user});
         resolve();
       };
       this.ws.onmessage = (event) => {

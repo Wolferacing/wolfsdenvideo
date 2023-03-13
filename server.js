@@ -45,7 +45,7 @@ class GameServer{
             }else{
               videoPlayer.host = videoPlayer.sockets[0].u;
               this.send(videoPlayer.sockets[0], 'you-are-host');
-              console.log("Making", videoPlayer.sockets[0].u, "the new host...");
+              console.log("Making", videoPlayer.sockets[0].u.name, "the new host...");
             }
           }
         });
@@ -67,11 +67,16 @@ class GameServer{
         if(msg.u) {
           ws.u = msg.u;
           ws.i = msg.data;
+          this.createVideoPlayer(msg.data, msg.u, ws);
+        }else{
+          this.send(ws, 'error');
         }
-        this.createVideoPlayer(msg.data, msg.u, ws);
         break;
-      case "current-time":
+      case "set-time":
         this.setVideoTime(msg.data, ws);
+        break
+      case "set-track":
+        this.setVideoTrack(msg.data, ws);
         break
       case "toggle-lock":
         this.toggleLock(msg.data, ws);
@@ -79,23 +84,15 @@ class GameServer{
       case "add-to-playlist":
         this.addToPlaylist(msg.data, ws);
         break
-    }
-  }
-  onlyIfUnlocked(ws, callback) {
-    if(ws.u && ws.i) {
-       if(this.videoPlayers[ws.i] 
-          && (this.videoPlayers[ws.i].host === ws.u || !this.videoPlayers[ws.i].locked)) {
-        callback();
-      }else{
-        this.send(ws, 'you-are-not-allowed');
-      }
-    }else{
-      this.send(ws, 'error');
+      case "move-playlsit-item":
+        this.movePlaylsitItem(msg.data, ws);
+        break
     }
   }
   onlyIfHost(ws, callback, locked) {
-    if(ws.u && ws.i) {
-      if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].host === ws.u || locked === false)) {
+    if(ws.u && ws.u.id && ws.i) {
+      if(this.videoPlayers[ws.i] 
+         && (this.videoPlayers[ws.i].host.id === ws.u.id || locked === false)) {
         callback();
       }else{
         this.send(ws, 'you-are-not-host');
@@ -105,11 +102,24 @@ class GameServer{
     }
   }
   addToPlaylist(url, ws) {
-    this.onlyIfUnlocked()
+    if(this.videoPlayers[ws.i]) {
+      this.onlyIfHost(ws, () => {
+        this.videoPlayers[ws.i].playlist.push(url);
+      }, this.videoPlayers[ws.i].locked);
+    }
   }
   toggleLock(locked, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].locked = locked;
+    });
+  }
+  setVideoTrack(index, ws) {
+    this.onlyIfHost(ws, () => {
+      if(index < this.videoPlayers[ws.i].playlist.length - 1) {
+        this.videoPlayers[ws.i].currentTrack = index;
+      }else{
+        this.send(ws, 'out-of-bounds');
+      }
     });
   }
   setVideoTime(time, ws) {
@@ -121,13 +131,25 @@ class GameServer{
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
         playlist:[],
+        currentTrack: 0,
         currentTime: 0,
         locked: false,
         host: user,
         sockets: [ws]
       };
       this.send(this.videoPlayers[instanceId].sockets[0], 'you-are-host');
-      console.log("Making", this.videoPlayers[instanceId].sockets[0].u, "host...");
+      console.log("Making", this.videoPlayers[instanceId].sockets[0].u.name, "host...");
+    }
+  }
+  updateClients(instanceId) {
+    if(this.videoPlayers[instanceId]) {
+      this.videoPlayers[instanceId].sockets.forEach(socket => {
+        this.send(socket, 'playback-update', {
+          playlist: this.videoPlayers[instanceId].playlist, 
+          currentTime: this.videoPlayers[instanceId].currentTime, 
+          locked: this.videoPlayers[instanceId].locked
+        });
+      });
     }
   }
 }
