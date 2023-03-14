@@ -212,7 +212,6 @@ class GameServer{
         sockets: [ws],
         hasNoHost: false
       };
-      
       console.log(user.name, 'is host');
     }else{
       clearTimeout(this.videoPlayers[instanceId].deleteTimeout);

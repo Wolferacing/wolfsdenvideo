@@ -77,9 +77,8 @@ class GameSystem {
           const vidya = document.getElementById('youtube-video');
           if(vidya) {
             if(vidya.src !== json.data.playlist[json.data.currentTrack].link) {
-              
+              vidya.src = json.data.playlist[json.data.currentTrack].link;
             }
-            vidya.src = json.data.playlist[json.data.currentTrack].link;
             vidya.currentTime = json.data.currentTime;
           }
         }else{
@@ -165,6 +164,24 @@ class GameSystem {
       videoThumbnail.src = v.thumbnail;
       
       videoTitle.innerText = v.title;
+      
+      const playTrack = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'green', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      playTrack.innerText = "Play Now";
+      
+      playTrack.addEventListener('click', () => {
+        this.sendMessage({path: Commands.SET_TRACK, data: i });
+        this.sendMessage({path: Commands.SET_TIME, data: 0 });
+      });
+      
       
       const moveDown = this.makeAndAddElement('div',{
         padding: '10 10', 
