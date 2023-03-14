@@ -79,8 +79,12 @@ class GameSystem {
             if(vidya.src !== json.data.playlist[json.data.currentTrack].link) {
               vidya.src = json.data.playlist[json.data.currentTrack].link;
             }
-            vidya.currentTime = json.data.currentTime;
+            if(Math.abs(json.data.currentTime - vidya.currentTime) > 5) {
+              vidya.currentTime = json.data.currentTime;
+            }
           }
+        }else{
+          console.log("")
         }
         break;
       case Responses.PLAYBACK_UPDATE:
@@ -213,7 +217,7 @@ class GameSystem {
         this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
       });
       
-       const remove = this.makeAndAddElement('div',{
+      const remove = this.makeAndAddElement('div',{
         padding: '10 10', 
         display: 'inline-block',
         background: 'red', 
@@ -228,7 +232,6 @@ class GameSystem {
       remove.addEventListener('click', () => {
         this.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
       });
-      
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     })

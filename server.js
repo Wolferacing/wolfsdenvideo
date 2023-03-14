@@ -240,6 +240,7 @@ class GameServer{
       }
     } 
     this.syncWsTime(ws, instanceId);
+    this.send(ws, Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
@@ -254,13 +255,12 @@ class GameServer{
     }
   }
   syncWsTime(socket, key) {
-    const track = this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack];
-    const now = new Date().getTime() / 1000;
-    this.videoPlayers[key].currentTime = now - this.videoPlayers[key].lastStartTime;
-    this.send(socket, Responses.SYNC_TIME, {
-      currentTrack: this.videoPlayers[key].currentTrack,
-      currentTime: this.videoPlayers[key].currentTime,
-    });
+    if(this.videoPlayers[key].playlist.length) {
+      this.send(socket, Responses.SYNC_TIME, {
+        currentTrack: this.videoPlayers[key].currentTrack,
+        currentTime: this.videoPlayers[key].currentTime,
+      });
+    }
   }
   syncTime() {
     Object.keys(this.videoPlayers).forEach(key => {
