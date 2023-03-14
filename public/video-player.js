@@ -229,6 +229,10 @@ class GameSystem {
     
     this.lockPlayer = document.querySelector('.lockPlayer');
     
+    this.lockPlayer.addEventListener('click', () => {
+        
+    });
+    
   }
 }
 
