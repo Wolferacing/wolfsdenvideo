@@ -14,7 +14,8 @@ const Commands = {
   SET_TRACK: 'set-track',
   TOGGLE_LOCK: 'toggle-lock',
   ADD_TO_PLAYLIST: 'add-to-playlist',
-  MOVE_PLAYLIST_ITEM: 'move-playlist-item'
+  MOVE_PLAYLIST_ITEM: 'move-playlist-item',
+  REMOVE_PLAYLIST_ITEM: 'remove-playlist-item'
 } 
 
 class GameSystem {
@@ -146,12 +147,43 @@ class GameSystem {
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
       
-      this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
-      
       videoThumbnail.src = v.thumbnail;
       
       videoTitle.innerText = v.title;
       
+      const moveUp = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'teal', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      moveUp.innerText = "Move Up";
+      
+      moveUp.addEventListener('click', () => {
+        this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
+      });
+      
+      const moveDown = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'teal', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      moveDown.innerText = "Move Down";
+      
+      moveDown.addEventListener('click', () => {
+        this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
+      });
+      
+      this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     })
   }
   loadVideos(videos) {
@@ -225,7 +257,7 @@ class GameSystem {
   setupPlaylistUI() {
     
     this.searchInput = document.querySelector('.searchInput');
-    this.searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
+    this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value))
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     

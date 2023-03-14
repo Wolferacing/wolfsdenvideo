@@ -20,7 +20,8 @@ const Commands = {
   SET_TRACK: 'set-track',
   TOGGLE_LOCK: 'toggle-lock',
   ADD_TO_PLAYLIST: 'add-to-playlist',
-  MOVE_PLAYLIST_ITEM: 'move-playlist-item'
+  MOVE_PLAYLIST_ITEM: 'move-playlist-item',
+  REMOVE_PLAYLIST_ITEM: 'remove-playlist-item'
 } 
 
 class GameServer{
@@ -115,6 +116,9 @@ class GameServer{
       case Commands.MOVE_PLAYLIST_ITEM:
         this.movePlaylistItem(msg.data, ws);
         break
+      case Commands.REMOVE_PLAYLIST_ITEM:
+        this.removePlaylistItem(msg.data, ws);
+        break;
       case Commands.SEARCH:
         this.search(msg.data, ws);
         break;
@@ -141,6 +145,14 @@ class GameServer{
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         this.videoPlayers[ws.i].playlist.push(url);
+        this.updateClients(ws.i);
+      }, this.videoPlayers[ws.i].locked);
+    }
+  }
+  removePlaylistItem(index, ws) {
+    if(this.videoPlayers[ws.i]) {
+      this.onlyIfHost(ws, () => {
+        this.videoPlayers[ws.i].playlist.splice(index, 1);
         this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
