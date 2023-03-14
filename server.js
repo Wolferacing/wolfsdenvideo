@@ -105,6 +105,7 @@ class GameServer{
     switch(msg.path) {
       case "instance":
         if(msg.u) {
+          console.log(msg.u.name, 'connected');
           ws.u = msg.u;
           ws.i = msg.data;
           this.createVideoPlayer(msg.data, msg.u, ws);
@@ -169,6 +170,9 @@ class GameServer{
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         this.videoPlayers[ws.i].playlist.splice(index, 1);
+        if(index <= this.videoPlayers[ws.i].currentTrack) {
+          this.videoPlayers[ws.i].currentTrack--;
+        }
         this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
@@ -217,7 +221,6 @@ class GameServer{
     }, this.videoPlayers[ws.i].locked);
   }
   createVideoPlayer(instanceId, user, ws) {
-    console.log(user.name, 'connected');
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
         playlist:[],
