@@ -57,7 +57,7 @@ class GameServer{
         }
       });
       ws.on('close', (code, reason) => {
-        console.log(ws.u.name, 'disconnected');
+        console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.');
         Object.keys(this.videoPlayers).forEach(key => {
           const videoPlayer = this.videoPlayers[key];
           videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
@@ -158,10 +158,11 @@ class GameServer{
     }
   }
   movePlaylistItem({url, index}, ws) {
+    console.log(url, index);
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         const playlist = this.videoPlayers[ws.i].playlist;
-        const oldIndex = playlist.indexOf(url);
+        const oldIndex = playlist.map(d => d.link).indexOf(url);
         if(oldIndex > -1) {
           playlist.splice(index, 0, playlist.splice(oldIndex, 1)[0]);
           this.updateClients(ws.i);

@@ -151,22 +151,6 @@ class GameSystem {
       
       videoTitle.innerText = v.title;
       
-      const moveUp = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'teal', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
-      
-      moveUp.innerText = "Move Up";
-      
-      moveUp.addEventListener('click', () => {
-        this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
-      });
-      
       const moveDown = this.makeAndAddElement('div',{
         padding: '10 10', 
         display: 'inline-block',
@@ -180,8 +164,38 @@ class GameSystem {
       moveDown.innerText = "Move Down";
       
       moveDown.addEventListener('click', () => {
+        this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
+      });
+      
+      const moveUp = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'teal', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      moveUp.innerText = "Move Up";
+      
+      moveUp.addEventListener('click', () => {
         this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
       });
+      
+       const remove = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'red', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      remove.innerText = "Remove";
+      
+      
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     })
