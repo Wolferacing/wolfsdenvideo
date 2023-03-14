@@ -218,79 +218,24 @@ class GameSystem {
     this.searchBackDrop.style.display = 'none';
   }
   setupSearch(playlistContainer) {
-    const searchContainer = this.makeAndAddElement('div', {float: 'right'}, playlistContainer);
+    // const searchContainer = this.makeAndAddElement('div', {float: 'right'}, playlistContainer);
     
-    const searchInput = this.makeAndAddElement('input', {
-      background: 'rgba(0,0,0,0.2)', 
-      margin: '15px', 
-      height: '28px',
-      border: '1px solid white',
-      fontSize: '20px',
-      color: 'white'
-    }, searchContainer);
-    searchInput.placeholder = "Search...";
+    const searchInput = document.querySelector('.searchInput');
     
     searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
   }
   setupPlaylistUI() {
+    document.querySelector('.searchInput').addEventListener('keyup', () => this.debounceSearch(searchInput.value));
+    this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
-    this.setupGoogleFont();
-    
-    // document.querySelector('a-scene').style.display = 'none';
-    const playlistContainer = this.makeAndAddElement('div', {
-      position: 'relative',
-      margin: 'auto',
-      background: '#3f3f3f',
-      color: 'white',
-      height: '64px',
-      font: '15px Roboto, sans-serif',
-      padding: '1 30',
-    });
-    
-    this.setupSearch(playlistContainer);
-    
-    const playlistTitle = this.makeAndAddElement('h2', {fontWeight: 'normal'}, playlistContainer);
-    playlistTitle.innerText = "Video Playlist";
-    this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer')
-    
-    this.videoPlaylistContainer = this.makeAndAddElement('div', {
-      position: 'relative',
-      background: '#cfcfcf',
-      color: 'white',
-      font: '15px Roboto, sans-serif',
-      overflow: 'auto',
-      height: 'calc(100% - 64px)',
-      width: '100%'
-    });
-    
-    this.searchBackDrop = this.makeAndAddElement('div', {
-      background: 'rgba(0,0,0,0.6)',
-      position: 'absolute',
-      top: '66px',
-      left: '0',
-      height: 'calc(100% - 64px)',
-      width: '100%',
-      display: 'none'
-    });
-    
+    this.searchBackDrop = document.querySelector('.searchBackDrop');
+      
     this.searchBackDrop.addEventListener('click', () => this.hideSearch());
     
-    this.videoSearchContainer = this.makeAndAddElement('div', {
-      position: 'absolute',
-      top: '26px',
-      margin: '40px',
-      background: '#8f8f8f',
-      color: 'white',
-      font: '15px Roboto, sans-serif',
-      overflow: 'auto',
-      height: 'calc(100% - 108px)',
-      width: 'calc(100% - 80px)', 
-      display: 'none',
-      boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
-    });
+    this.videoSearchContainer = document.querySelector('.videoSearchContainer');
     
-    this.loadingSpinner = this.makeAndAddElement('img',{height: '80px', width: '80px', position: 'absolute', top: '120px', left: '50%', marginLeft: '-40px', display: 'none'});
-    this.loadingSpinner.src = "https://cdn.glitch.global/e1a76c0e-a722-4204-9089-a5f3e4fe12f9/3-dots-move.svg?v=1678747444591";
+    
+    this.loadingSpinner = document.querySelector('.loadingSpinner');
     
   }
 }
