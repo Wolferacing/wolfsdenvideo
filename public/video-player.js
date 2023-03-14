@@ -73,14 +73,22 @@ class GameSystem {
     const json = JSON.parse(event.data);
     switch(json.path) {
       case Responses.SYNC_TIME:
-        console.log(Responses.SYNC_TIME, json.data);
+        if(!window.isPlaylist) {
+          console.log(Responses.SYNC_TIME, json.data);
+        }else{
+          this.updatePlaylist(json.data);
+        }
         break;
       case Responses.PLAYBACK_UPDATE:
-        this.updatePlaylist(json.data);
+        if(window.isPlaylist) {
+          this.updatePlaylist(json.data);
+        }
         console.log("PLAYBACK_UPDATE", json.data)
         break;
       case Responses.SEARCH_RESULTS:
-        this.loadVideos(json.data);
+        if(window.isPlaylist) {
+          this.loadVideos(json.data);
+        }
         break;
       case Responses.ERROR:
         alert("I cant let you do that...");

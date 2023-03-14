@@ -216,7 +216,7 @@ class GameServer{
         this.videoPlayers[instanceId].hasNoHost = false;
       }
     } 
-    this.send(ws, Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
+    this.send(ws, Responses.SYNC_TIME, this.getVideoObject(instanceId));
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
