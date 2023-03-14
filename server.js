@@ -57,27 +57,7 @@ class GameServer{
         }
       });
       ws.on('close', (code, reason) => {
-        console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.');
-        Object.keys(this.videoPlayers).forEach(key => {
-          const videoPlayer = this.videoPlayers[key];
-          videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
-          if(videoPlayer.host === ws.u) {
-            console.log(ws.u.name, 'remove user');
-            if(!videoPlayer.sockets.length) {
-              videoPlayer.hasNoHost = true;
-              videoPlayer.deleteTimeout = setTimeout(() => {
-                delete this.videoPlayers[key];
-                console.log("No users left, deleting video player...");
-              }, 60000);
-            }else{
-              videoPlayer.sockets.sort((a,b) => a.time - b.time);
-              videoPlayer.host = videoPlayer.sockets[0].u;
-              this.send(videoPlayer.sockets[0], Responses.YOU_ARE_HOST);
-              console.log("Making", videoPlayer.sockets[0].u.name, "the new host...");
-              this.updateClients(ws.i);
-            }
-          }
-        });
+        this.handleClose(ws);
       });
     });
     
@@ -85,6 +65,34 @@ class GameServer{
 
     this.server.listen( 3000, function listening(){
         console.log("Video player sync service started..."); 
+    });
+    
+    setInterval(() => {
+      this.syncTime();
+    }, 30000);
+    this.syncTime();
+  }
+  handleClose(ws) {
+    console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.');
+    Object.keys(this.videoPlayers).forEach(key => {
+      const videoPlayer = this.videoPlayers[key];
+      videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
+      if(videoPlayer.host === ws.u) {
+        console.log(ws.u.name, 'remove user');
+        if(!videoPlayer.sockets.length) {
+          videoPlayer.hasNoHost = true;
+          videoPlayer.deleteTimeout = setTimeout(() => {
+            delete this.videoPlayers[key];
+            console.log("No users left, deleting video player...");
+          }, 60000);
+        }else{
+          videoPlayer.sockets.sort((a,b) => a.time - b.time);
+          videoPlayer.host = videoPlayer.sockets[0].u;
+          this.send(videoPlayer.sockets[0], Responses.YOU_ARE_HOST);
+          console.log("Making", videoPlayer.sockets[0].u.name, "the new host...");
+          this.updateClients(ws.i);
+        }
+      }
     });
   }
   send(socket, path, data) {
@@ -216,7 +224,7 @@ class GameServer{
         this.videoPlayers[instanceId].hasNoHost = false;
       }
     } 
-    this.send(ws, Responses.SYNC_TIME, this.getVideoObject(instanceId));
+    this.syncWsTime(ws, instanceId);
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
@@ -229,6 +237,19 @@ class GameServer{
         hasNoHost: this.videoPlayers[instanceId].hasNoHost
       };
     }
+  }
+  syncWsTime(socket, key) {
+    this.send(socket, Responses.SYNC_TIME, {
+      currentTrack: this.videoPlayers[key].currentTrack,
+      currentTime: this.videoPlayers[key].currentTime,
+    });
+  }
+  syncTime() {
+    Object.keys(this.videoPlayers).forEach(key => {
+      this.videoPlayers[key].sockets.forEach(socket => {
+        this.syncWsTime(socket, key);
+      });
+    });
   }
   updateClients(instanceId) {
     if(this.videoPlayers[instanceId]) {

@@ -76,6 +76,9 @@ class GameSystem {
         if(!window.isPlaylist) {
           const vidya = document.getElementById('youtube-video');
           if(vidya) {
+            if(vidya.src !== json.data.playlist[json.data.currentTrack].link) {
+              
+            }
             vidya.src = json.data.playlist[json.data.currentTrack].link;
             vidya.currentTime = json.data.currentTime;
           }
