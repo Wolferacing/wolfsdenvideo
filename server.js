@@ -203,7 +203,8 @@ class GameServer{
         playlist: this.videoPlayers[instanceId].playlist, 
         currentTime: this.videoPlayers[instanceId].currentTime, 
         currentTrack: this.videoPlayers[instanceId].currentTrack, 
-        locked: this.videoPlayers[instanceId].locked
+        locked: this.videoPlayers[instanceId].locked,
+        host: this.videoPlayers[instanceId].host,
       };
     }
   }

@@ -64,15 +64,12 @@ class GameSystem {
       case Responses.SYNC_TIME:
         console.log(Responses.SYNC_TIME, json.data);
         break;
-      case Responses.YOU_ARE_HOST:
-        console.log("Im host!")
-        break;
       case Responses.YOU_ARE_NOT_HOST:
         console.log("Im not host!")
         break;
       case Responses.PLAYBACK_UPDATE:
         this.updatePlaylist(json.data);
-        console.log("Im not host!", json.data)
+        console.log("PLAYBACK_UPDATE", json.data)
         break;
       case Responses.SEARCH_RESULTS:
         this.loadVideos(json.data);
@@ -217,15 +214,9 @@ class GameSystem {
     this.videoSearchContainer.innerHTML = '';
     this.searchBackDrop.style.display = 'none';
   }
-  setupSearch(playlistContainer) {
-    // const searchContainer = this.makeAndAddElement('div', {float: 'right'}, playlistContainer);
-    
-    const searchInput = document.querySelector('.searchInput');
-    
-    searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
-  }
   setupPlaylistUI() {
-    document.querySelector('.searchInput').addEventListener('keyup', () => this.debounceSearch(searchInput.value));
+    const searchInput = document.querySelector('.searchInput');
+    searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
     this.searchBackDrop = document.querySelector('.searchBackDrop');
@@ -233,7 +224,6 @@ class GameSystem {
     this.searchBackDrop.addEventListener('click', () => this.hideSearch());
     
     this.videoSearchContainer = document.querySelector('.videoSearchContainer');
-    
     
     this.loadingSpinner = document.querySelector('.loadingSpinner');
     
