@@ -202,9 +202,9 @@ class GameServer{
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
       return {
-        playlist: this.videoPlayers[instanceId].playlist, 
-        currentTime: this.videoPlayers[instanceId].currentTime, 
-        currentTrack: this.videoPlayers[instanceId].currentTrack, 
+        playlist: this.videoPlayers[instanceId].playlist,
+        currentTime: this.videoPlayers[instanceId].currentTime,
+        currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
         host: this.videoPlayers[instanceId].host,
       };

@@ -124,6 +124,7 @@ class GameSystem {
   updatePlaylist(player) {
     this.player = player;
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
+    this.hostTitle.innerText = this.player.host.;
     this.videoPlaylistContainer.innerHTML = '';
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
@@ -216,8 +217,10 @@ class GameSystem {
     this.searchBackDrop.style.display = 'none';
   }
   setupPlaylistUI() {
+    
     const searchInput = document.querySelector('.searchInput');
     searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
+    
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
     this.searchBackDrop = document.querySelector('.searchBackDrop');
@@ -233,6 +236,8 @@ class GameSystem {
     this.lockPlayer.addEventListener('click', () => {
         this.sendMessage({ path: 'toggle-lock', data: !this.player.locked });
     });
+    
+    this.hostTitle = document.querySelector('.hostTitle');
   }
 }
 
