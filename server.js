@@ -153,6 +153,10 @@ class GameServer{
   addToPlaylist(url, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
+        if(!this.videoPlayers[ws.i].playlist.length) {
+          this.videoPlayers[ws.i].currentTrack = 0;
+          this.videoPlayers[ws.i].currentTime = 0;
+        }
         this.videoPlayers[ws.i].playlist.push(url);
         this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
@@ -173,6 +177,9 @@ class GameServer{
         const oldIndex = playlist.map(d => d.link).indexOf(url);
         if(oldIndex > -1) {
           playlist.splice(index, 0, playlist.splice(oldIndex, 1)[0]);
+          if(index === this.videoPlayers[ws.i].currentTrack) {
+            this.videoPlayers[ws.i].currentTrack++;
+          }
           this.updateClients(ws.i);
         }else{
           this.send(ws, Responses.DOES_NOT_EXIST);
@@ -218,7 +225,7 @@ class GameServer{
             const track = this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack];
             const now = new Date().getTime() / 1000;
             this.videoPlayers[instanceId].currentTime = now - this.videoPlayers[instanceId].lastStartTime;
-            if(this.videoPlayers[instanceId].currentTime > track.duration) {
+            if(this.videoPlayers[instanceId].currentTime > track.duration / 1000) {
               this.videoPlayers[instanceId].currentTrack++;
               if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
                 this.videoPlayers[instanceId].currentTrack = 0;
@@ -226,6 +233,8 @@ class GameServer{
               this.videoPlayers[instanceId].currentTime = 0;
               this.updateClients(instanceId);
             }
+          }else{
+             this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;
           }
         }, 1000)
       };
@@ -260,7 +269,7 @@ class GameServer{
       this.send(socket, Responses.SYNC_TIME, {
         currentTrack: this.videoPlayers[key].currentTrack,
         currentTime: this.videoPlayers[key].currentTime,
-        duration: this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack].duration
+        duration: this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack].duration / 1000
       });
     }
   }

@@ -86,7 +86,8 @@ class GameSystem {
         }else{
           const currentTime = document.querySelector('.currentTime');
           if(currentTime != null) {
-            currentTime.style.width = (json.data.currentTime / json.data.duration) * 100) + "%";
+            console.log(json.data.currentTime, json.data.duration);
+            currentTime.style.width = ((json.data.currentTime / json.data.duration) * 100) + "%";
           }
         }
         break;
