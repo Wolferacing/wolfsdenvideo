@@ -26,6 +26,7 @@ const Commands = {
 
 class GameServer{
   constructor() {
+    this.tickInterval = 10000;
     this.setupServer();
   }
   setupServer() {
@@ -43,7 +44,7 @@ class GameServer{
       });
     });
     
-    this.wss.startAutoPing(10000);
+    this.wss.startAutoPing(this.tickInterval);
     
     this.wss.on('connection', (ws, req) => {
       ws.t = new Date().getTime();
@@ -68,8 +69,9 @@ class GameServer{
     });
     
     setInterval(() => {
+      this.setTime();
       this.syncTime();
-    }, 30000);
+    }, this.tickInterval);
     this.syncTime();
   }
   handleClose(ws) {
@@ -210,7 +212,11 @@ class GameServer{
         locked: false,
         host: user,
         sockets: [ws],
-        hasNoHost: false
+        hasNoHost: false,
+        lastStartTime: new Date().getTime(),
+        tick: setInterval(() => {
+          
+        }, this.tickInterval)
       };
       console.log(user.name, 'is host');
     }else{
