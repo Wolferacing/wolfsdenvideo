@@ -74,6 +74,10 @@ class GameSystem {
     switch(json.path) {
       case Responses.SYNC_TIME:
         if(!window.isPlaylist) {
+          const vidya = document.getElementById('youtube-video');
+          if(vidya) {
+            vidya.src=""
+          }
           console.log(Responses.SYNC_TIME, json.data);
         }else{
           this.updatePlaylist(json.data);
@@ -241,19 +245,7 @@ class GameSystem {
       
       addToPlaylist.addEventListener('click', () => {
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-      });
-      
-//       const playNext = this.makeAndAddElement('div',{
-//         padding: '10 10', 
-//         display: 'inline-block',
-//         background: 'olive', 
-//         color: 'white',
-//         cursor: 'pointer',
-//         borderRadius: '3px',
-//         marginLeft: '15px'
-//       }, videoTitleAndAction);
-      
-//       playNext.innerText = "Play Next";
+      }); 
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
