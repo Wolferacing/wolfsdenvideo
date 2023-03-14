@@ -269,8 +269,6 @@ class GameSystem {
         }, currentTime);
         
         currentTimeInner.className = "currentTime";
-        
-        
       }
     })
   }
