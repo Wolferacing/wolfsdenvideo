@@ -26,8 +26,17 @@ class GameSystem {
     if(window.isBanter) {
       await this.awaitExistance(window, 'user');
     }else{
-      const id = this.getUniquId();
-      window.user = {id, name: "Guest " + id};
+      try{
+        window.user = JSON.parse(localStorage.getItem('user'));
+        
+      }catch{
+        const id = this.getUniquId();
+        window.user = {id, name: "Guest " + id};
+        localStorage.setItem('user', JSON.stringify(window.user));
+      }
+      // const user = localStorage.getItem('user');
+      // const id = this.getUniquId();
+      // window.user = {id, name: "Guest " + id};
     } 
     this.urlParams = new URLSearchParams(window.location.search);
     this.instanceId = this.urlParams.get("instanceId");
@@ -119,7 +128,7 @@ class GameSystem {
   updatePlaylist(player) {
     this.player = player;
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
-    this.hostTitle.innerText = (this.player.host.id === window.user.id ? 'You are' : this.player.host.name + ' is') + " the host" + (player.locked ? ' and it\'s locked!' : '.');
+    this.hostTitle.innerText = 'Welcome ' + window.user.name + '.' + (this.player.host.id === window.user.id ? 'You are' : this.player.host.name + ' is') + " the host" + (player.locked ? ' and it\'s locked!' : '.');
     this.videoPlaylistContainer.innerHTML = '';
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
