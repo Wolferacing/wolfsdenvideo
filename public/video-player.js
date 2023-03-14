@@ -243,17 +243,17 @@ class GameSystem {
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       });
       
-      const playNext = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'olive', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
+//       const playNext = this.makeAndAddElement('div',{
+//         padding: '10 10', 
+//         display: 'inline-block',
+//         background: 'olive', 
+//         color: 'white',
+//         cursor: 'pointer',
+//         borderRadius: '3px',
+//         marginLeft: '15px'
+//       }, videoTitleAndAction);
       
-      playNext.innerText = "Play Next";
+//       playNext.innerText = "Play Next";
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
