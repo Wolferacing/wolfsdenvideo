@@ -13,6 +13,7 @@ const Commands = {
   SET_TIME: 'set-time',
   SET_TRACK: 'set-track',
   TOGGLE_LOCK: 'toggle-lock',
+  TOGGLE_CAN_BE_CLAIMED: 'toggle-can-be-claimed',
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item'
@@ -155,9 +156,15 @@ class GameSystem {
   }
   updatePlaylist(player) {
     this.player = player;
+    const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
-    this.hostTitle.innerText = 'Welcome ' + window.user.name + '.' + (this.player.host.id === window.user.id ? 'You are' : this.player.host.name + ' is') + " the host" + (player.locked ? ' and it\'s locked!' : '.');
+    this.takeOver.style.display = !player.locked || isMe ? 'inline-block' : 'none';
+    this.takeOver.innerText = player.canBeClaimed ? 'rocket_launch' : 'rocket';
+    this.hostTitle.innerText = 'Welcome ' + window.user.name + '.' + (isMe ? 'You are' : player.host.name + ' is') + " the host" + (player.locked ? ' and it\'s locked!' : '.');
     this.videoPlaylistContainer.innerHTML = '';
+    
+    
+    
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
       
@@ -351,13 +358,13 @@ class GameSystem {
     this.lockPlayer = document.querySelector('.lockPlayer');
     
     this.lockPlayer.addEventListener('click', () => {
-        this.sendMessage({ path: 'toggle-lock', data: !this.player.locked });
+        this.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.player.locked });
     });
     
-     this.lockPlayer = document.querySelector('.lockPlayer');
+    this.takeOver = document.querySelector('.takeOver');
     
-    this.lockPlayer.addEventListener('click', () => {
-        this.sendMessage({ path: 'toggle-lock', data: !this.player.locked });
+    this.takeOver.addEventListener('click', () => {
+        this.sendMessage({ path: Commands.TOGGLE_CAN_BE_CLAIMED, data: !this.player.canBeClaimed });
     });
     
     this.hostTitle = document.querySelector('.hostTitle');

@@ -19,7 +19,7 @@ const Commands = {
   SET_TIME: 'set-time',
   SET_TRACK: 'set-track',
   TOGGLE_LOCK: 'toggle-lock',
-  TOGGLE_LOCK: 'toggle-lock',
+  TOGGLE_CAN_BE_CLAIMED: 'toggle-can-be-claimed',
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item'
@@ -123,8 +123,8 @@ class GameServer{
       case Commands.TOGGLE_LOCK:
         this.toggleLock(msg.data, ws);
         break
-      case Commands.TOGGLE_LOCK:
-        this.toggleLock(msg.data, ws);
+      case Commands.TOGGLE_CAN_BE_CLAIMED:
+        this.toggleCanBeClaimed(msg.data, ws);
         break
       case Commands.ADD_TO_PLAYLIST:
         this.addToPlaylist(msg.data, ws);
