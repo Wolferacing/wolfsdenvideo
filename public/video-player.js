@@ -27,21 +27,23 @@ class GameSystem {
       await this.awaitExistance(window, 'user');
     }else{
       try{
-        window.user = JSON.parse(localStorage.getItem('user'));
-        
+        //window.user = JSON.parse(localStorage.getItem('user'));
+        if(!window.user) {
+          this.generateGuestUser();
+        }
       }catch{
-        const id = this.getUniquId();
-        window.user = {id, name: "Guest " + id};
-        localStorage.setItem('user', JSON.stringify(window.user));
+        this.generateGuestUser()
       }
-      // const user = localStorage.getItem('user');
-      // const id = this.getUniquId();
-      // window.user = {id, name: "Guest " + id};
     } 
     this.urlParams = new URLSearchParams(window.location.search);
     this.instanceId = this.urlParams.get("instanceId");
     await this.getInstanceId();
     await this.setupWebsocket();
+  }
+  generateGuestUser() {
+    const id = this.getUniquId();
+    window.user = {id, name: "Guest " + id};
+    localStorage.setItem('user', JSON.stringify(window.user));
   }
   setupWebsocket(){
     return new Promise(resolve => {

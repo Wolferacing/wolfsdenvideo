@@ -64,10 +64,10 @@ class GameServer{
             if(!videoPlayer.sockets.length) {
               videoPlayer.hasNoHost = true;
               clearTimeout(videoPlayer.deleteTimeout);
-              videoPlayer.deleteTimeout = setTimeout(() => {
+              // videoPlayer.deleteTimeout = setTimeout(() => {
                 delete this.videoPlayers[key];
                 console.log("No users left, deleting video player...");
-              }, 60000);
+              // }, 60000);
             }else{
               videoPlayer.host = videoPlayer.sockets[0].u;
               this.send(videoPlayer.sockets[0], Responses.YOU_ARE_HOST);
