@@ -6,8 +6,6 @@ const Youtube = require('./youtube/scraper.js');
 const youtube = new Youtube();
 
 const Responses = {
-  YOU_ARE_HOST: 'you-are-host',
-  YOU_ARE_NOT_HOST: 'you-are-not-host',
   OUT_OF_BOUNDS: 'out-of-bounds',
   DOES_NOT_EXIST: 'does-not-exist',
   PLAYBACK_UPDATE: 'playback-update',
@@ -63,8 +61,11 @@ class GameServer{
             videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== videoPlayer.host);
             videoPlayer.sockets.sort((a,b) => a.time - b.time);
             if(!videoPlayer.sockets.length) {
-              delete this.videoPlayers[key];
-              console.log("No users left, deleting video player...");
+              videoPlayer.hasNoHost = true;
+              setTimeout(() => {
+                delete this.videoPlayers[key];
+                console.log("No users left, deleting video player...");
+              }, 60000)
             }else{
               videoPlayer.host = videoPlayer.sockets[0].u;
               this.send(videoPlayer.sockets[0], Responses.YOU_ARE_HOST);
@@ -127,8 +128,6 @@ class GameServer{
       if(this.videoPlayers[ws.i] 
          && (this.videoPlayers[ws.i].host.id === ws.u.id || locked === false)) {
         callback();
-      }else{
-        this.send(ws, Responses.YOU_ARE_NOT_HOST);
       }
     }else{
       this.send(ws, 'error');
@@ -185,17 +184,19 @@ class GameServer{
         currentTime: 0,
         locked: false,
         host: user,
-        sockets: [ws]
+        sockets: [ws],
+        hasNoHost: false
       };
-      this.send(this.videoPlayers[instanceId].sockets[0], Responses.YOU_ARE_HOST);
-      console.log("Making", this.videoPlayers[instanceId].sockets[0].u.name, "host for ", instanceId ,"...");
     }else{
       if(!this.videoPlayers[instanceId].sockets.includes(ws)) {
          this.videoPlayers[instanceId].sockets.push(ws);
       }
-      console.log("New user", this.videoPlayers[instanceId].sockets[0].u.name);
+      if(this.videoPlayers[instanceId].hasNoHost) {
+        this.videoPlayers[instanceId].host = ws.u;
+        this.videoPlayers[instanceId].hasNoHost = false;
+      }
     }
-    this.send(this.videoPlayers[instanceId].sockets[0], Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
+    this.send(ws, Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {

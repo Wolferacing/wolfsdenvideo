@@ -1,7 +1,5 @@
 
 const Responses = {
-  YOU_ARE_HOST: 'you-are-host',
-  YOU_ARE_NOT_HOST: 'you-are-not-host',
   OUT_OF_BOUNDS: 'out-of-bounds',
   DOES_NOT_EXIST: 'does-not-exist',
   PLAYBACK_UPDATE: 'playback-update',
@@ -63,9 +61,6 @@ class GameSystem {
     switch(json.path) {
       case Responses.SYNC_TIME:
         console.log(Responses.SYNC_TIME, json.data);
-        break;
-      case Responses.YOU_ARE_NOT_HOST:
-        console.log("Im not host!")
         break;
       case Responses.PLAYBACK_UPDATE:
         this.updatePlaylist(json.data);
