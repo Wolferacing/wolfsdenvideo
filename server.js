@@ -158,7 +158,6 @@ class GameServer{
     }
   }
   movePlaylistItem({url, index}, ws) {
-    console.log(url, index);
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         const playlist = this.videoPlayers[ws.i].playlist;

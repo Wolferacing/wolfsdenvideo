@@ -195,6 +195,9 @@ class GameSystem {
       
       remove.innerText = "Remove";
       
+      remove.addEventListener('click', () => {
+        this.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
+      });
       
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
