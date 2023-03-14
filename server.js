@@ -83,6 +83,7 @@ class GameServer{
         if(!videoPlayer.sockets.length) {
           videoPlayer.hasNoHost = true;
           videoPlayer.deleteTimeout = setTimeout(() => {
+            clearInterval(this.videoPlayers[key].tick);
             delete this.videoPlayers[key];
             console.log("No users left, deleting video player...");
           }, 60000);
@@ -179,7 +180,11 @@ class GameServer{
         if(oldIndex > -1) {
           playlist.splice(index, 0, playlist.splice(oldIndex, 1)[0]);
           if(index === this.videoPlayers[ws.i].currentTrack) {
-            this.videoPlayers[ws.i].currentTrack++;
+            if(oldIndex > index) {
+              this.videoPlayers[ws.i].currentTrack++;
+            }else{
+              this.videoPlayers[ws.i].currentTrack--;
+            }
           }
           this.updateClients(ws.i);
         }else{
@@ -196,20 +201,19 @@ class GameServer{
   }
   setVideoTrack(index, ws) {
     this.onlyIfHost(ws, () => {
-      console.log("Track", index);
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         this.videoPlayers[ws.i].currentTrack = index;
         this.updateClients(ws.i);
       }else{
         this.send(ws, Responses.OUT_OF_BOUNDS);
       }
-    });
+    }, this.videoPlayers[ws.i].locked);
   }
   setVideoTime(time, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].currentTime = time;
-      console.log("time", this.videoPlayers[ws.i].currentTime);
-    });
+      this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
+    }, this.videoPlayers[ws.i].locked);
   }
   createVideoPlayer(instanceId, user, ws) {
     console.log(user.name, 'connected');
@@ -228,7 +232,7 @@ class GameServer{
             const track = this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack];
             const now = new Date().getTime() / 1000;
             this.videoPlayers[instanceId].currentTime = now - this.videoPlayers[instanceId].lastStartTime;
-            if(this.videoPlayers[instanceId].currentTime > track.duration / 1000) {
+            if(this.videoPlayers[instanceId].currentTime > (track ? track.duration : 0) / 1000) {
               this.videoPlayers[instanceId].currentTrack++;
               if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
                 this.videoPlayers[instanceId].currentTrack = 0;
