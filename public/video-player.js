@@ -28,7 +28,7 @@ class GameSystem {
     }else{
       const id = this.getUniquId();
       window.user = {id, name: "Guest " + id};
-    }
+    } 
     this.urlParams = new URLSearchParams(window.location.search);
     this.instanceId = this.urlParams.get("instanceId");
     await this.getInstanceId();
@@ -113,18 +113,13 @@ class GameSystem {
     (parent ? parent : document.body).appendChild(element);
     return element;
   }
-  setupGoogleFont() {
-    const fontLink = this.makeAndAddElement('link', null, document.head);
-    fontLink.setAttribute('href', 'https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-    fontLink.setAttribute('rel', 'stylesheet');
-  }
   search(data) {
     this.sendMessage({path: 'search', data });
   }
   updatePlaylist(player) {
     this.player = player;
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
-    this.hostTitle.innerText = this.player.host.;
+    this.hostTitle.innerText = (this.player.host.id === window.user.id ? 'You are' : this.player.host.name + ' is') + " the host" + (player.locked ? ' and it\'s locked!' : '.');
     this.videoPlaylistContainer.innerHTML = '';
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
@@ -218,8 +213,8 @@ class GameSystem {
   }
   setupPlaylistUI() {
     
-    const searchInput = document.querySelector('.searchInput');
-    searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
+    this.searchInput = document.querySelector('.searchInput');
+    this.searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     

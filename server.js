@@ -63,10 +63,11 @@ class GameServer{
             videoPlayer.sockets.sort((a,b) => a.time - b.time);
             if(!videoPlayer.sockets.length) {
               videoPlayer.hasNoHost = true;
-              setTimeout(() => {
+              clearTimeout(videoPlayer.deleteTimeout);
+              videoPlayer.deleteTimeout = setTimeout(() => {
                 delete this.videoPlayers[key];
                 console.log("No users left, deleting video player...");
-              }, 60000)
+              }, 60000);
             }else{
               videoPlayer.host = videoPlayer.sockets[0].u;
               this.send(videoPlayer.sockets[0], Responses.YOU_ARE_HOST);
@@ -196,7 +197,7 @@ class GameServer{
         this.videoPlayers[instanceId].host = ws.u;
         this.videoPlayers[instanceId].hasNoHost = false;
       }
-    }
+    } 
     this.send(ws, Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
   }
   getVideoObject(instanceId) {
