@@ -208,6 +208,7 @@ class GameServer{
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
         host: this.videoPlayers[instanceId].host,
+        hasNoHost: this.videoPlayers[instanceId].hasNoHost
       };
     }
   }
