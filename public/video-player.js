@@ -81,8 +81,6 @@ class GameSystem {
             }
             vidya.currentTime = json.data.currentTime;
           }
-        }else{
-          this.updatePlaylist(json.data);
         }
         break;
       case Responses.PLAYBACK_UPDATE:
@@ -144,6 +142,7 @@ class GameSystem {
   }
   updatePlaylist(player) {
     this.player = player;
+    console.log(this.player);
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
     this.hostTitle.innerText = 'Welcome ' + window.user.name + '.' + (this.player.host.id === window.user.id ? 'You are' : this.player.host.name + ' is') + " the host" + (player.locked ? ' and it\'s locked!' : '.');
     this.videoPlaylistContainer.innerHTML = '';
@@ -181,7 +180,6 @@ class GameSystem {
         this.sendMessage({path: Commands.SET_TRACK, data: i });
         this.sendMessage({path: Commands.SET_TIME, data: 0 });
       });
-      
       
       const moveDown = this.makeAndAddElement('div',{
         padding: '10 10', 

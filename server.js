@@ -44,7 +44,7 @@ class GameServer{
       });
     });
     
-    this.wss.startAutoPing(this.tickInterval);
+    this.wss.startAutoPing(10000);
     
     this.wss.on('connection', (ws, req) => {
       ws.t = new Date().getTime();
@@ -69,9 +69,8 @@ class GameServer{
     });
     
     setInterval(() => {
-      this.setTime();
       this.syncTime();
-    }, this.tickInterval);
+    }, 3000);
     this.syncTime();
   }
   handleClose(ws) {
@@ -213,10 +212,21 @@ class GameServer{
         host: user,
         sockets: [ws],
         hasNoHost: false,
-        lastStartTime: new Date().getTime(),
+        lastStartTime: new Date().getTime() / 1000,
         tick: setInterval(() => {
-          
-        }, this.tickInterval)
+          if(this.videoPlayers[instanceId].playlist.length) {
+            const track = this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack];
+            const now = new Date().getTime() / 1000;
+            this.videoPlayers[instanceId].currentTime = now - this.videoPlayers[instanceId].lastStartTime;
+            if(this.videoPlayers[instanceId].currentTime > track.duration) {
+              this.videoPlayers[instanceId].currentTrack++;
+              if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
+                this.videoPlayers[instanceId].currentTrack = 0;
+              }
+              this.videoPlayers[instanceId].currentTime = 0;
+            }
+          }
+        }, 1000)
       };
       console.log(user.name, 'is host');
     }else{
@@ -244,6 +254,9 @@ class GameServer{
     }
   }
   syncWsTime(socket, key) {
+    const track = this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack];
+    const now = new Date().getTime() / 1000;
+    this.videoPlayers[key].currentTime = now - this.videoPlayers[key].lastStartTime;
     this.send(socket, Responses.SYNC_TIME, {
       currentTrack: this.videoPlayers[key].currentTrack,
       currentTime: this.videoPlayers[key].currentTime,
