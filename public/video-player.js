@@ -16,7 +16,8 @@ const Commands = {
   TOGGLE_CAN_BE_CLAIMED: 'toggle-can-be-claimed',
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
-  REMOVE_PLAYLIST_ITEM: 'remove-playlist-item'
+  REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
+  TAKE_OVER: 'take-over'
 } 
 
 class GameSystem {
@@ -158,9 +159,14 @@ class GameSystem {
     this.player = player;
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
-    this.takeOver.style.display = !player.locked || isMe ? 'inline-block' : 'none';
+    this.takeOver.style.display = (player.canBeClaimed || isMe) ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canBeClaimed ? 'rocket_launch' : 'rocket';
-    this.hostTitle.innerText = 'Welcome ' + window.user.name + '.' + (isMe ? 'You are' : player.host.name + ' is') + " the host" + (player.locked ? ' and it\'s locked!' : '.');
+    this.hostTitle.innerText = 
+      'Welcome ' + window.user.name + '.' +
+      (isMe ? 'You are' : player.host.name + ' is') +
+      " the host" + 
+      (player.canBeClaimed ? " and it can be claimed!": "") +
+      (player.locked && !player.canBeClaimed ? " and it's locked!" : !player.canBeClaimed ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
     
     
@@ -364,7 +370,11 @@ class GameSystem {
     this.takeOver = document.querySelector('.takeOver');
     
     this.takeOver.addEventListener('click', () => {
-        this.sendMessage({ path: Commands.TOGGLE_CAN_BE_CLAIMED, data: !this.player.canBeClaimed });
+        if(this.player.host.id === window.user.id) {
+          this.sendMessage({ path: Commands.TOGGLE_CAN_BE_CLAIMED, data: !this.player.canBeClaimed });
+        }else{
+          this.sendMessage({ path: Commands.TAKE_OVER });
+        }
     });
     
     this.hostTitle = document.querySelector('.hostTitle');

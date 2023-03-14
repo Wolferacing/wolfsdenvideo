@@ -22,7 +22,8 @@ const Commands = {
   TOGGLE_CAN_BE_CLAIMED: 'toggle-can-be-claimed',
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
-  REMOVE_PLAYLIST_ITEM: 'remove-playlist-item'
+  REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
+  TAKE_OVER: 'take-over'
 } 
 
 class GameServer{
@@ -126,6 +127,9 @@ class GameServer{
       case Commands.TOGGLE_CAN_BE_CLAIMED:
         this.toggleCanBeClaimed(msg.data, ws);
         break
+      case Commands.TAKE_OVER:
+        this.takeOver(ws);
+        break
       case Commands.ADD_TO_PLAYLIST:
         this.addToPlaylist(msg.data, ws);
         break
@@ -207,6 +211,14 @@ class GameServer{
       this.videoPlayers[ws.i].canBeClaimed = canBeClaimed;
       this.updateClients(ws.i);
     });
+  }
+  takeOver(ws) {
+    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canBeClaimed) {
+      this.videoPlayers[ws.i].host = ws.u;
+      this.updateClients(ws.i);
+    }else{
+      this.send(ws, Responses.ERROR);
+    }
   }
   toggleLock(locked, ws) {
     this.onlyIfHost(ws, () => {
