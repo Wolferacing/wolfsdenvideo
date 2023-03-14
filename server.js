@@ -196,7 +196,7 @@ class GameServer{
       }
       console.log("New user", this.videoPlayers[instanceId].sockets[0].u.name);
     }
-    this.send(this.videoPlayers[instanceId].sockets[0], Responses.SYNC_TIME, this.getVideoObject(instanceId));
+    this.send(this.videoPlayers[instanceId].sockets[0], Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
