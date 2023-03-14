@@ -135,7 +135,6 @@ class GameServer{
     }
   }
   addToPlaylist(url, ws) {
-    console.log(url, ws);
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         this.videoPlayers[ws.i].playlist.push(url);

@@ -233,8 +233,10 @@ class GameSystem {
     searchInput.addEventListener('keyup', () => this.debounceSearch(searchInput.value))
   }
   setupPlaylistUI() {
+    
     this.setupGoogleFont();
-    document.querySelector('a-scene').style.display = 'none';
+    
+    // document.querySelector('a-scene').style.display = 'none';
     const playlistContainer = this.makeAndAddElement('div', {
       position: 'relative',
       margin: 'auto',
