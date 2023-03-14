@@ -13,7 +13,7 @@ const Commands = {
   SET_TIME: 'set-time',
   SET_TRACK: 'set-track',
   TOGGLE_LOCK: 'toggle-lock',
-  TOGGLE_CAN_BE_CLAIMED: 'toggle-can-be-claimed',
+  TOGGLE_CAN_TAKE_OVER: 'toggle-can-take-over',
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
@@ -159,14 +159,14 @@ class GameSystem {
     this.player = player;
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
-    this.takeOver.style.display = (player.canBeClaimed || isMe) ? 'inline-block' : 'none';
-    this.takeOver.innerText = player.canBeClaimed ? 'rocket_launch' : 'rocket';
+    this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
+    this.takeOver.innerText = player.canTakeOver ? 'rocket_launch' : 'rocket';
     this.hostTitle.innerText = 
       'Welcome ' + window.user.name + '.' +
       (isMe ? 'You are' : player.host.name + ' is') +
       " the host" + 
-      (player.canBeClaimed ? " and it can be claimed!": "") +
-      (player.locked && !player.canBeClaimed ? " and it's locked!" : !player.canBeClaimed ? "." : "");
+      (player.canTakeOver ? " and it can be claimed!": "") +
+      (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
     
     
@@ -371,7 +371,7 @@ class GameSystem {
     
     this.takeOver.addEventListener('click', () => {
         if(this.player.host.id === window.user.id) {
-          this.sendMessage({ path: Commands.TOGGLE_CAN_BE_CLAIMED, data: !this.player.canBeClaimed });
+          this.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.player.canTakeOver });
         }else{
           this.sendMessage({ path: Commands.TAKE_OVER });
         }

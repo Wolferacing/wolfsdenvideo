@@ -19,7 +19,7 @@ const Commands = {
   SET_TIME: 'set-time',
   SET_TRACK: 'set-track',
   TOGGLE_LOCK: 'toggle-lock',
-  TOGGLE_CAN_BE_CLAIMED: 'toggle-can-be-claimed',
+  TOGGLE_CAN_TAKE_OVER: 'toggle-can-take-over',
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
@@ -80,23 +80,10 @@ class GameServer{
     Object.keys(this.videoPlayers).forEach(key => {
       const videoPlayer = this.videoPlayers[key];
       videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
+      console.log(ws.u.name, 'remove user');
       if(videoPlayer.host === ws.u) {
-        console.log(ws.u.name, 'remove user');
-        if(!videoPlayer.sockets.length) {
-          videoPlayer.hasNoHost = true;
-            console.log("No users left, deleting video player in 5 mins...");
-          videoPlayer.deleteTimeout = setTimeout(() => {
-            clearInterval(this.videoPlayers[key].tick);
-            delete this.videoPlayers[key];
-            console.log("No users left, deleting video player...");
-          }, 5 * 60 * 1000);
-        }else{
-          videoPlayer.sockets.sort((a,b) => a.time - b.time);
-          videoPlayer.host = videoPlayer.sockets[0].u;
-          this.send(videoPlayer.sockets[0], Responses.YOU_ARE_HOST);
-          console.log("Making", videoPlayer.sockets[0].u.name, "the new host...");
-          this.updateClients(ws.i);
-        }
+        console.log(ws.u.name, 'user was host, enabling takeOver');
+        videoPlayer.canTakeOver = true;
       }
     });
   }
@@ -206,14 +193,14 @@ class GameServer{
       }, this.videoPlayers[ws.i].locked);
     }
   }
-  toggleCanBeClaimed(canBeClaimed, ws) {
+  toggleCanBeClaimed(canTakeOver, ws) {
     this.onlyIfHost(ws, () => {
-      this.videoPlayers[ws.i].canBeClaimed = canBeClaimed;
+      this.videoPlayers[ws.i].canTakeOver = canTakeOver;
       this.updateClients(ws.i);
     });
   }
   takeOver(ws) {
-    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canBeClaimed) {
+    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canTakeOver) {
       this.videoPlayers[ws.i].host = ws.u;
       this.updateClients(ws.i);
     }else{
@@ -252,7 +239,7 @@ class GameServer{
         host: user,
         sockets: [ws],
         hasNoHost: false,
-        canBeClaimed: false,
+        canTakeOver: false,
         lastStartTime: new Date().getTime() / 1000,
         tick: setInterval(() => {
           if(this.videoPlayers[instanceId].playlist.length) {
@@ -294,7 +281,7 @@ class GameServer{
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
-        canBeClaimed: this.videoPlayers[instanceId].canBeClaimed,
+        canTakeOver: this.videoPlayers[instanceId].canTakeOver,
         host: this.videoPlayers[instanceId].host,
         hasNoHost: this.videoPlayers[instanceId].hasNoHost,
         duration: this.videoPlayers[instanceId].playlist.length ? this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000 : 0
