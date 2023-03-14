@@ -4,7 +4,8 @@ const Responses = {
   DOES_NOT_EXIST: 'does-not-exist',
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',
-  SEARCH_RESULTS: 'search-results'
+  SEARCH_RESULTS: 'search-results',
+  ERROR:'error'
 }
 
 const Commands = {
@@ -68,6 +69,9 @@ class GameSystem {
         break;
       case Responses.SEARCH_RESULTS:
         this.loadVideos(json.data);
+        break;
+      case Responses.ERROR:
+        alert("I cant let you do that...");
         break;
     }
   }
@@ -229,7 +233,6 @@ class GameSystem {
     this.lockPlayer.addEventListener('click', () => {
         this.sendMessage({ path: 'toggle-lock', data: !this.player.locked });
     });
-    
   }
 }
 

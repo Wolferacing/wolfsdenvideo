@@ -10,7 +10,8 @@ const Responses = {
   DOES_NOT_EXIST: 'does-not-exist',
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',
-  SEARCH_RESULTS: 'search-results'
+  SEARCH_RESULTS: 'search-results',
+  ERROR:'error'
 }
 
 const Commands = {
@@ -128,9 +129,9 @@ class GameServer{
       if(this.videoPlayers[ws.i] 
          && (this.videoPlayers[ws.i].host.id === ws.u.id || locked === false)) {
         callback();
+      }else{
+        this.send(ws, Responses.ERROR);
       }
-    }else{
-      this.send(ws, 'error');
     }
   }
   addToPlaylist(url, ws) {
