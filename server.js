@@ -56,22 +56,24 @@ class GameServer{
         }
       });
       ws.on('close', (code, reason) => {
+        console.log(ws.u.name, 'disconnected');
         Object.keys(this.videoPlayers).forEach(key => {
           const videoPlayer = this.videoPlayers[key];
-          if(videoPlayer.host === ws.u){
-            videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== videoPlayer.host);
-            videoPlayer.sockets.sort((a,b) => a.time - b.time);
+          videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
+          if(videoPlayer.host === ws.u) {
+            console.log(ws.u.name, 'remove user');
             if(!videoPlayer.sockets.length) {
               videoPlayer.hasNoHost = true;
-              clearTimeout(videoPlayer.deleteTimeout);
-              // videoPlayer.deleteTimeout = setTimeout(() => {
+              videoPlayer.deleteTimeout = setTimeout(() => {
                 delete this.videoPlayers[key];
                 console.log("No users left, deleting video player...");
-              // }, 60000);
+              }, 60000);
             }else{
+              videoPlayer.sockets.sort((a,b) => a.time - b.time);
               videoPlayer.host = videoPlayer.sockets[0].u;
               this.send(videoPlayer.sockets[0], Responses.YOU_ARE_HOST);
               console.log("Making", videoPlayer.sockets[0].u.name, "the new host...");
+              this.updateClients(ws.i);
             }
           }
         });
@@ -179,6 +181,7 @@ class GameServer{
     });
   }
   createVideoPlayer(instanceId, user, ws) {
+    console.log(user.name, 'connected');
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
         playlist:[],
@@ -189,7 +192,10 @@ class GameServer{
         sockets: [ws],
         hasNoHost: false
       };
+      
+      console.log(user.name, 'is host');
     }else{
+      clearTimeout(this.videoPlayers[instanceId].deleteTimeout);
       if(!this.videoPlayers[instanceId].sockets.includes(ws)) {
          this.videoPlayers[instanceId].sockets.push(ws);
       }
