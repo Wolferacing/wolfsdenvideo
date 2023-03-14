@@ -165,7 +165,7 @@ class GameSystem {
       'Welcome ' + window.user.name + '.' +
       (isMe ? 'You are' : player.host.name + ' is') +
       " the host" + 
-      (player.canTakeOver ? " and it can be claimed!": "") +
+      (player.canTakeOver ? " but it can be taken over ( click the rocket " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
     

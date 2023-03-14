@@ -84,6 +84,7 @@ class GameServer{
       if(videoPlayer.host === ws.u) {
         console.log(ws.u.name, 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
+        this.updateClients(ws.i);
       }
     });
   }
@@ -111,8 +112,8 @@ class GameServer{
       case Commands.TOGGLE_LOCK:
         this.toggleLock(msg.data, ws);
         break
-      case Commands.TOGGLE_CAN_BE_CLAIMED:
-        this.toggleCanBeClaimed(msg.data, ws);
+      case Commands.TOGGLE_CAN_TAKE_OVER:
+        this.toggleCanTakeOver(msg.data, ws);
         break
       case Commands.TAKE_OVER:
         this.takeOver(ws);
@@ -193,7 +194,7 @@ class GameServer{
       }, this.videoPlayers[ws.i].locked);
     }
   }
-  toggleCanBeClaimed(canTakeOver, ws) {
+  toggleCanTakeOver(canTakeOver, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].canTakeOver = canTakeOver;
       this.updateClients(ws.i);
