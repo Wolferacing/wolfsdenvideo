@@ -263,7 +263,7 @@ class GameServer{
         locked: this.videoPlayers[instanceId].locked,
         host: this.videoPlayers[instanceId].host,
         hasNoHost: this.videoPlayers[instanceId].hasNoHost,
-        duration: this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000
+        duration: this.videoPlayers[instanceId].playlist.length ? this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000 : 0
       };
     }
   }

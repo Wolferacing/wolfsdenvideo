@@ -91,7 +91,7 @@ class GameSystem {
           
           const currentTimeText = document.querySelector('.currentTimeText');
           if(currentTimeText != null) {
-            currentTimeText.innerText = Math.round(json.data.currentTime) + "s / " + Math.round(json.data.duration) + "s";
+            currentTimeText.innerText = this.timeCode(json.data.currentTime) + " / " + this.timeCode(json.data.duration);
           }
         }
         break;
@@ -250,7 +250,7 @@ class GameSystem {
 
 
         videoTitle.className = "currentTimeText";
-        videoTitle.innerText = Math.round(player.currentTime) + "s / " + Math.round(player.duration) + "s";
+        videoTitle.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
       }
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
@@ -273,6 +273,9 @@ class GameSystem {
         
       }
     })
+  }
+  timeCode(seconds) {
+    return new Date(seconds * 1000).toISOString().substring(14, 19);
   }
   loadVideos(videos) {
     this.loadingSpinner.style.display = 'none';
