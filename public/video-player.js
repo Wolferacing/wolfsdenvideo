@@ -23,7 +23,9 @@ class GameSystem {
     this.init();
   }
   async init() {
-    this.setupPlaylistUI();
+    if(window.isPlaylist) {
+      this.setupPlaylistUI();
+    }
     if(window.isBanter) {
       await this.awaitExistance(window, 'user');
     }else{
