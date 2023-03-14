@@ -86,8 +86,12 @@ class GameSystem {
         }else{
           const currentTime = document.querySelector('.currentTime');
           if(currentTime != null) {
-            console.log(json.data.currentTime, json.data.duration);
             currentTime.style.width = ((json.data.currentTime / json.data.duration) * 100) + "%";
+          }
+          
+          const currentTimeText = document.querySelector('.currentTimeText');
+          if(currentTimeText != null) {
+            currentTimeText.innerText = Math.round(json.data.currentTime) + "s / " + Math.round(json.data.duration) + "s";
           }
         }
         break;
@@ -237,6 +241,18 @@ class GameSystem {
         remove.addEventListener('click', () => {
           this.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
         });
+      }else{
+        
+        const videoTitle = this.makeAndAddElement('div',{
+          padding: '7 10', 
+          textOverflow: 'ellipsis', 
+          overflow: 'hidden', 
+          whiteSpace: 'nowrap'
+        }, videoTitleAndAction);
+
+
+        videoTitle.className = "currentTimeText";
+        videoTitle.innerText = Math.round(player.currentTime) + "s / " + Math.round(player.duration) + "s";
       }
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
@@ -249,10 +265,14 @@ class GameSystem {
         const currentTimeInner = this.makeAndAddElement('div', {
           height: '4px', 
           background: 'red',
-          width: '0',
+          transition: 'width 3s',
+          transitionTimingFunction: 'linear',
+          width: ((player.currentTime / player.duration) * 100) + "%",
         }, currentTime);
         
         currentTimeInner.className = "currentTime";
+        
+        
       }
     })
   }

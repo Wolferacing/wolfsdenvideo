@@ -156,6 +156,7 @@ class GameServer{
         if(!this.videoPlayers[ws.i].playlist.length) {
           this.videoPlayers[ws.i].currentTrack = 0;
           this.videoPlayers[ws.i].currentTime = 0;
+          this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
         this.videoPlayers[ws.i].playlist.push(url);
         this.updateClients(ws.i);
@@ -232,6 +233,7 @@ class GameServer{
               }
               this.videoPlayers[instanceId].currentTime = 0;
               this.updateClients(instanceId);
+              this.videoPlayers[instanceId].lastStartTime = now;
             }
           }else{
              this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;
@@ -260,7 +262,8 @@ class GameServer{
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
         host: this.videoPlayers[instanceId].host,
-        hasNoHost: this.videoPlayers[instanceId].hasNoHost
+        hasNoHost: this.videoPlayers[instanceId].hasNoHost,
+        duration: this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000
       };
     }
   }
