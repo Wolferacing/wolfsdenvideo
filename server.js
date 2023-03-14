@@ -196,7 +196,8 @@ class GameServer{
   }
   setVideoTrack(index, ws) {
     this.onlyIfHost(ws, () => {
-      if(index < this.videoPlayers[ws.i].playlist.length - 1) {
+      console.log("Track", index);
+      if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         this.videoPlayers[ws.i].currentTrack = index;
         this.updateClients(ws.i);
       }else{
@@ -207,6 +208,7 @@ class GameServer{
   setVideoTime(time, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].currentTime = time;
+      console.log("time", this.videoPlayers[ws.i].currentTime);
     });
   }
   createVideoPlayer(instanceId, user, ws) {
