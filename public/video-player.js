@@ -99,7 +99,6 @@ class GameSystem {
         if(window.isPlaylist) {
           this.updatePlaylist(json.data);
         }
-        console.log("PLAYBACK_UPDATE", json.data)
         break;
       case Responses.SEARCH_RESULTS:
         if(window.isPlaylist) {
@@ -154,7 +153,6 @@ class GameSystem {
   }
   updatePlaylist(player) {
     this.player = player;
-    console.log(this.player);
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
     this.hostTitle.innerText = 'Welcome ' + window.user.name + '.' + (this.player.host.id === window.user.id ? 'You are' : this.player.host.name + ' is') + " the host" + (player.locked ? ' and it\'s locked!' : '.');
     this.videoPlaylistContainer.innerHTML = '';
