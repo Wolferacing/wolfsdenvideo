@@ -224,6 +224,7 @@ class GameServer{
                 this.videoPlayers[instanceId].currentTrack = 0;
               }
               this.videoPlayers[instanceId].currentTime = 0;
+              this.updateClients(instanceId);
             }
           }
         }, 1000)
@@ -259,6 +260,7 @@ class GameServer{
       this.send(socket, Responses.SYNC_TIME, {
         currentTrack: this.videoPlayers[key].currentTrack,
         currentTime: this.videoPlayers[key].currentTime,
+        duration: this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack].duration
       });
     }
   }

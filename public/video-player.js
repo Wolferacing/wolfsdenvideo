@@ -84,7 +84,10 @@ class GameSystem {
             }
           }
         }else{
-          console.log("")
+          const currentTime = document.querySelector('.currentTime');
+          if(currentTime != null) {
+            currentTime.style.width = (json.data.currentTime / json.data.duration) * 100) + "%";
+          }
         }
         break;
       case Responses.PLAYBACK_UPDATE:
@@ -167,73 +170,89 @@ class GameSystem {
       videoThumbnail.src = v.thumbnail;
       
       videoTitle.innerText = v.title;
+      if(player.currentTrack !== i) {
       
-      const playTrack = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'green', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
-      
-      playTrack.innerText = "Play Now";
-      
-      playTrack.addEventListener('click', () => {
-        this.sendMessage({path: Commands.SET_TRACK, data: i });
-        this.sendMessage({path: Commands.SET_TIME, data: 0 });
-      });
-      
-      const moveDown = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'teal', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
-      
-      moveDown.innerText = "Move Down";
-      
-      moveDown.addEventListener('click', () => {
-        this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
-      });
-      
-      const moveUp = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'teal', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
-      
-      moveUp.innerText = "Move Up";
-      
-      moveUp.addEventListener('click', () => {
-        this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
-      });
-      
-      const remove = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'red', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
-      
-      remove.innerText = "Remove";
-      
-      remove.addEventListener('click', () => {
-        this.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
-      });
+        const playTrack = this.makeAndAddElement('div',{
+          padding: '10 10', 
+          display: 'inline-block',
+          background: 'green', 
+          color: 'white',
+          cursor: 'pointer',
+          borderRadius: '3px',
+          marginLeft: '15px'
+        }, videoTitleAndAction);
+
+        playTrack.innerText = "Play Now";
+
+        playTrack.addEventListener('click', () => {
+          this.sendMessage({path: Commands.SET_TRACK, data: i });
+          this.sendMessage({path: Commands.SET_TIME, data: 0 });
+        });
+
+        const moveDown = this.makeAndAddElement('div',{
+          padding: '10 10', 
+          display: 'inline-block',
+          background: 'teal', 
+          color: 'white',
+          cursor: 'pointer',
+          borderRadius: '3px',
+          marginLeft: '15px'
+        }, videoTitleAndAction);
+
+        moveDown.innerText = "Move Down";
+
+        moveDown.addEventListener('click', () => {
+          this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
+        });
+
+        const moveUp = this.makeAndAddElement('div',{
+          padding: '10 10', 
+          display: 'inline-block',
+          background: 'teal', 
+          color: 'white',
+          cursor: 'pointer',
+          borderRadius: '3px',
+          marginLeft: '15px'
+        }, videoTitleAndAction);
+
+        moveUp.innerText = "Move Up";
+
+        moveUp.addEventListener('click', () => {
+          this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
+        });
+
+        const remove = this.makeAndAddElement('div',{
+          padding: '10 10', 
+          display: 'inline-block',
+          background: 'red', 
+          color: 'white',
+          cursor: 'pointer',
+          borderRadius: '3px',
+          marginLeft: '15px'
+        }, videoTitleAndAction);
+
+        remove.innerText = "Remove";
+
+        remove.addEventListener('click', () => {
+          this.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
+        });
+      }
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
+      
+      if(player.currentTrack === i) {
+        const currentTime = this.makeAndAddElement('div', {
+          height: '4px', 
+          width: '100%',
+        }, videoItemContainer);
+        const currentTimeInner = this.makeAndAddElement('div', {
+          height: '4px', 
+          background: 'red',
+          width: '0',
+        }, currentTime);
+        
+        currentTimeInner.className = "currentTime";
+      }
     })
   }
   loadVideos(videos) {
