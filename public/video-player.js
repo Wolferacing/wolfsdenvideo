@@ -230,8 +230,11 @@ class GameSystem {
     this.lockPlayer = document.querySelector('.lockPlayer');
     
     this.lockPlayer.addEventListener('click', () => {
-        
+        this.sendMessage({ path: 'toggle-lock' });
     });
+    
+    this.lockPlayer = 
+    // lock_open
     
   }
 }
