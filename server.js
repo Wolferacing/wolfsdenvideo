@@ -82,11 +82,12 @@ class GameServer{
         console.log(ws.u.name, 'remove user');
         if(!videoPlayer.sockets.length) {
           videoPlayer.hasNoHost = true;
+            console.log("No users left, deleting video player in 5 mins...");
           videoPlayer.deleteTimeout = setTimeout(() => {
             clearInterval(this.videoPlayers[key].tick);
             delete this.videoPlayers[key];
             console.log("No users left, deleting video player...");
-          }, 60000);
+          }, 5 * 60 * 1000);
         }else{
           videoPlayer.sockets.sort((a,b) => a.time - b.time);
           videoPlayer.host = videoPlayer.sockets[0].u;
