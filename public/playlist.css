@@ -110,3 +110,10 @@ body{
   /* Support for IE. */
   font-feature-settings: 'liga';
 }
+.lockPlayer{
+  margin-right: 10px;
+}
+.takeOver{
+  margin-left: 10px;
+  display: none;
+}

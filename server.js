@@ -19,6 +19,7 @@ const Commands = {
   SET_TIME: 'set-time',
   SET_TRACK: 'set-track',
   TOGGLE_LOCK: 'toggle-lock',
+  TOGGLE_LOCK: 'toggle-lock',
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item'
@@ -122,6 +123,9 @@ class GameServer{
       case Commands.TOGGLE_LOCK:
         this.toggleLock(msg.data, ws);
         break
+      case Commands.TOGGLE_LOCK:
+        this.toggleLock(msg.data, ws);
+        break
       case Commands.ADD_TO_PLAYLIST:
         this.addToPlaylist(msg.data, ws);
         break
@@ -198,6 +202,12 @@ class GameServer{
       }, this.videoPlayers[ws.i].locked);
     }
   }
+  toggleCanBeClaimed(canBeClaimed, ws) {
+    this.onlyIfHost(ws, () => {
+      this.videoPlayers[ws.i].canBeClaimed = canBeClaimed;
+      this.updateClients(ws.i);
+    });
+  }
   toggleLock(locked, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].locked = locked;
@@ -230,6 +240,7 @@ class GameServer{
         host: user,
         sockets: [ws],
         hasNoHost: false,
+        canBeClaimed: false,
         lastStartTime: new Date().getTime() / 1000,
         tick: setInterval(() => {
           if(this.videoPlayers[instanceId].playlist.length) {
@@ -271,6 +282,7 @@ class GameServer{
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
+        canBeClaimed: this.videoPlayers[instanceId].canBeClaimed,
         host: this.videoPlayers[instanceId].host,
         hasNoHost: this.videoPlayers[instanceId].hasNoHost,
         duration: this.videoPlayers[instanceId].playlist.length ? this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000 : 0

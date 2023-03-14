@@ -354,6 +354,12 @@ class GameSystem {
         this.sendMessage({ path: 'toggle-lock', data: !this.player.locked });
     });
     
+     this.lockPlayer = document.querySelector('.lockPlayer');
+    
+    this.lockPlayer.addEventListener('click', () => {
+        this.sendMessage({ path: 'toggle-lock', data: !this.player.locked });
+    });
+    
     this.hostTitle = document.querySelector('.hostTitle');
   }
 }
