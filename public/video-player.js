@@ -123,6 +123,8 @@ class GameSystem {
     this.sendMessage({path: 'search', data });
   }
   updatePlaylist(player) {
+    this.player = player;
+    this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
     this.videoPlaylistContainer.innerHTML = '';
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
@@ -230,11 +232,8 @@ class GameSystem {
     this.lockPlayer = document.querySelector('.lockPlayer');
     
     this.lockPlayer.addEventListener('click', () => {
-        this.sendMessage({ path: 'toggle-lock' });
+        this.sendMessage({ path: 'toggle-lock', data: !this.player.locked });
     });
-    
-    this.lockPlayer = 
-    // lock_open
     
   }
 }
