@@ -251,7 +251,7 @@ class GameSystem {
     
     const playlistTitle = this.makeAndAddElement('h2', {fontWeight: 'normal'}, playlistContainer);
     playlistTitle.innerText = "Video Playlist";
-    
+    this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer')
     
     this.videoPlaylistContainer = this.makeAndAddElement('div', {
       position: 'relative',

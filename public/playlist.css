@@ -1,0 +1,63 @@
+.playlistContainer{
+  position: relative;
+  margin: auto;
+  background: #3f3f3f;
+  color: white;
+  height: 64px;
+  font: 15px Roboto, sans-serif;
+  padding: 1 30;
+}
+.searchContainer{
+  float: right;
+}
+.searchInput{
+  background: rgba(0,0,0,0.2);
+  margin: 15px;
+  height: 28px;
+  border: 1px solid white;
+  font-size: 20px;
+  color: white;
+}
+.playlistTitle{
+  font-weight: normal;
+}
+.videoPlaylistContainer{
+  position: relative;
+  background: #cfcfcf;
+  color: white;
+  font: 15px Roboto, sans-serif;
+  overflow: auto;
+  height: calc(100% - 64px);
+  width: 100%;
+}
+.searchBackDrop{
+  background: rgba(0,0,0,0.6);
+  position: absolute;
+  top: 66px;
+  left: 0;
+  height: calc(100% - 64px);
+  width: 100%;
+  display: none;
+}
+.videoSearchContainer{
+  position: absolute;
+  top: 26px;
+  margin: 40px;
+  background: #8f8f8f;
+  color: white;
+  font: 15px Roboto, sans-serif;
+  overflow: auto;
+  height: calc(100% - 108px);
+  width: calc(100% - 80px); 
+  display: none;
+  boxShadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+.loadingSpinner{
+  height: 80px;
+  width: 80px;
+  position: absolute; 
+  top: 120px;
+  left: 50%;
+  marginLeft: -40px;
+  display: none;
+}
