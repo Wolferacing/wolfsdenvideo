@@ -227,6 +227,8 @@ class GameSystem {
     
     this.loadingSpinner = document.querySelector('.loadingSpinner');
     
+    this.lockPlayer = document.querySelector('.lockPlayer');
+    
   }
 }
 
