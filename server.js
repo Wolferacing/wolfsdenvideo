@@ -95,7 +95,7 @@ class GameServer{
     switch(msg.path) {
       case "instance":
         if(msg.u) {
-          console.log(msg.u.name, 'connected');
+          console.log(msg.u.name, 'connected', msg.data);
           ws.u = msg.u;
           ws.i = msg.data;
           this.createVideoPlayer(msg.data, msg.u, ws);

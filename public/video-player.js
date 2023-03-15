@@ -80,11 +80,11 @@ class GameSystem {
         if(!window.isPlaylist) {
           const vidya = document.getElementById('youtube-video');
           if(vidya) {
-            if(vidya.src !== json.data.playlist[json.data.currentTrack].link) {
-              vidya.src = json.data.playlist[json.data.currentTrack].link;
+            if(vidya.src !== this.player.playlist[json.data.currentTrack].link) {
+              vidya.src = this.player.playlist[json.data.currentTrack].link;
             }
             if(Math.abs(json.data.currentTime - vidya.currentTime) > 5) {
-              vidya.currentTime = json.data.currentTime;
+              // vidya.currentTime = json.data.currentTime;
             }
           }
         }else{
@@ -100,8 +100,9 @@ class GameSystem {
         }
         break;
       case Responses.PLAYBACK_UPDATE:
+        this.player = json.data;
         if(window.isPlaylist) {
-          this.updatePlaylist(json.data);
+          this.updatePlaylist(this.player);
         }
         break;
       case Responses.SEARCH_RESULTS:
@@ -156,7 +157,6 @@ class GameSystem {
     this.sendMessage({path: 'search', data });
   }
   updatePlaylist(player) {
-    this.player = player;
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
