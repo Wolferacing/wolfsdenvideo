@@ -113,13 +113,12 @@ class GameSystem {
         break;
       case Responses.PLAYBACK_UPDATE:
         this.player = json.data;
-         if(vidya) {
-            this.playVidya(vidya, json.data.currentTrack, json.data.currentTime);
-         }else{
-           
-         }
         if(window.isPlaylist) {
           this.updatePlaylist(this.player);
+        }else{
+          if(vidya) {
+            this.playVidya(vidya, json.data.currentTrack, json.data.currentTime);
+          }
         }
         break;
       case Responses.SEARCH_RESULTS:
