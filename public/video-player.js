@@ -73,19 +73,31 @@ class GameSystem {
       };
     });
   } 
+  playVidya(vidya, currentTrack, currentTime) {
+      if(this.lastUrl !== this.player.playlist[currentTrack].link) {
+        vidya.src = this.player.playlist[currentTrack].link;
+      }
+      if(Math.abs(currentTime - vidya.currentTime) > 5) {
+        // vidya.currentTime = json.data.currentTime;
+      }
+      this.lastUrl = this.player.playlist[currentTrack].link;
+  }
   parseMessage(msg) {
+    const vidya = document.getElementById('youtube-video');
     const json = JSON.parse(event.data);
     switch(json.path) {
       case Responses.SYNC_TIME:
         if(!window.isPlaylist) {
-          const vidya = document.getElementById('youtube-video');
           if(vidya) {
-            if(vidya.src !== this.player.playlist[json.data.currentTrack].link) {
-              vidya.src = this.player.playlist[json.data.currentTrack].link;
-            }
-            if(Math.abs(json.data.currentTime - vidya.currentTime) > 5) {
-              // vidya.currentTime = json.data.currentTime;
-            }
+            this.playVidya(vidya, json.data.currentTrack, json.data.currentTime);
+            // // console.log(vidya.src, this.player.playlist[json.data.currentTrack].link);
+            // if(this.lastUrl !== this.player.playlist[json.data.currentTrack].link) {
+            //   vidya.src = this.player.playlist[json.data.currentTrack].link;
+            // }
+            // if(Math.abs(json.data.currentTime - vidya.currentTime) > 5) {
+            //   // vidya.currentTime = json.data.currentTime;
+            // }
+            // this.lastUrl = this.player.playlist[json.data.currentTrack].link;
           }
         }else{
           const currentTime = document.querySelector('.currentTime');
@@ -101,6 +113,11 @@ class GameSystem {
         break;
       case Responses.PLAYBACK_UPDATE:
         this.player = json.data;
+         if(vidya) {
+            this.playVidya(vidya, json.data.currentTrack, json.data.currentTime);
+         }else{
+           
+         }
         if(window.isPlaylist) {
           this.updatePlaylist(this.player);
         }
@@ -168,9 +185,6 @@ class GameSystem {
       (player.canTakeOver ? " but it can be taken over ( click the rocket " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
-    
-    
-    
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
       
