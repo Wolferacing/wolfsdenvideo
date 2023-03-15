@@ -240,7 +240,7 @@ class GameServer{
         host: user,
         sockets: [ws],
         hasNoHost: false,
-        canTakeOver: false,
+        canTakeOver: true,
         lastStartTime: new Date().getTime() / 1000,
         tick: setInterval(() => {
           if(this.videoPlayers[instanceId].playlist.length) {
