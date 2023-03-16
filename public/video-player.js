@@ -74,6 +74,7 @@ class GameSystem {
     });
   } 
   playVidya(vidya, currentTrack, currentTime, force) {
+    if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         vidya.currentTime = currentTime;
         vidya.src = this.player.playlist[currentTrack].link;
@@ -82,6 +83,7 @@ class GameSystem {
         // vidya.currentTime = json.data.currentTime;
       }
       this.lastUrl = this.player.playlist[currentTrack].link;
+    }
   }
   parseMessage(msg) {
     const vidya = document.getElementById('youtube-video');
