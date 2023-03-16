@@ -73,8 +73,8 @@ class GameSystem {
       };
     });
   } 
-  playVidya(vidya, currentTrack, currentTime) {
-      if(this.lastUrl !== this.player.playlist[currentTrack].link) {
+  playVidya(vidya, currentTrack, currentTime, force) {
+      if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         vidya.src = this.player.playlist[currentTrack].link;
       }
       if(Math.abs(currentTime - vidya.currentTime) > 5) {
@@ -90,14 +90,6 @@ class GameSystem {
         if(!window.isPlaylist) {
           if(vidya) {
             this.playVidya(vidya, json.data.currentTrack, json.data.currentTime);
-            // // console.log(vidya.src, this.player.playlist[json.data.currentTrack].link);
-            // if(this.lastUrl !== this.player.playlist[json.data.currentTrack].link) {
-            //   vidya.src = this.player.playlist[json.data.currentTrack].link;
-            // }
-            // if(Math.abs(json.data.currentTime - vidya.currentTime) > 5) {
-            //   // vidya.currentTime = json.data.currentTime;
-            // }
-            // this.lastUrl = this.player.playlist[json.data.currentTrack].link;
           }
         }else{
           const currentTime = document.querySelector('.currentTime');
@@ -117,7 +109,7 @@ class GameSystem {
           this.updatePlaylist(this.player);
         }else{
           if(vidya) {
-            this.playVidya(vidya, json.data.currentTrack, json.data.currentTime);
+            this.playVidya(vidya, json.data.currentTrack, json.data.currentTime, true);
           }
         }
         break;
