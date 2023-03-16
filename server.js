@@ -84,7 +84,7 @@ class GameServer{
       if(videoPlayer.host === ws.u) {
         console.log(ws.u.name, 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
-        this.updateClients(ws.i);
+        this.updateClients(ws.i, 'host-lost');
       }
     });
   }
@@ -158,7 +158,7 @@ class GameServer{
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
         this.videoPlayers[ws.i].playlist.push(url);
-        this.updateClients(ws.i);
+        this.updateClients(ws.i, 'add-playlist');
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -169,7 +169,7 @@ class GameServer{
         if(index <= this.videoPlayers[ws.i].currentTrack) {
           this.videoPlayers[ws.i].currentTrack--;
         }
-        this.updateClients(ws.i);
+        this.updateClients(ws.i, 'remove-playlist');
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -187,7 +187,7 @@ class GameServer{
               this.videoPlayers[ws.i].currentTrack--;
             }
           }
-          this.updateClients(ws.i);
+          this.updateClients(ws.i, 'move-playlist');
         }else{
           this.send(ws, Responses.DOES_NOT_EXIST);
         }
@@ -197,13 +197,13 @@ class GameServer{
   toggleCanTakeOver(canTakeOver, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].canTakeOver = canTakeOver;
-      this.updateClients(ws.i);
+      this.updateClients(ws.i, 'toggle-take-over');
     });
   }
   takeOver(ws) {
     if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canTakeOver) {
       this.videoPlayers[ws.i].host = ws.u;
-      this.updateClients(ws.i);
+      this.updateClients(ws.i, 'take-over');
     }else{
       this.send(ws, Responses.ERROR);
     }
@@ -211,14 +211,14 @@ class GameServer{
   toggleLock(locked, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].locked = locked;
-      this.updateClients(ws.i);
+      this.updateClients(ws.i, 'set-lock');
     });
   }
   setVideoTrack(index, ws) {
     this.onlyIfHost(ws, () => {
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         this.videoPlayers[ws.i].currentTrack = index;
-        this.updateClients(ws.i);
+        this.updateClients(ws.i, 'set-track');
       }else{
         this.send(ws, Responses.OUT_OF_BOUNDS);
       }
@@ -253,7 +253,7 @@ class GameServer{
                 this.videoPlayers[instanceId].currentTrack = 0;
               }
               this.videoPlayers[instanceId].currentTime = 0;
-              this.updateClients(instanceId);
+              this.updateClients(instanceId, 'next-track');
               this.videoPlayers[instanceId].lastStartTime = now;
             }
           }else{
@@ -305,10 +305,10 @@ class GameServer{
       });
     });
   }
-  updateClients(instanceId) {
+  updateClients(instanceId, type) {
     if(this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId].sockets.forEach(socket => {
-        this.send(socket, Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
+        this.send(socket, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type});
       });
     }
   }

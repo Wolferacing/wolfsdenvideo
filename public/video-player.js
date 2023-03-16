@@ -75,7 +75,6 @@ class GameSystem {
   } 
   playVidya(vidya, currentTrack, currentTime, force) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-        console.log(currentTrack, currentTime);
         vidya.currentTime = currentTime;
         vidya.src = this.player.playlist[currentTrack].link;
       }
@@ -106,12 +105,12 @@ class GameSystem {
         }
         break;
       case Responses.PLAYBACK_UPDATE:
-        this.player = json.data;
+        this.player = json.data.video;
         if(window.isPlaylist) {
           this.updatePlaylist(this.player);
         }else{
-          if(vidya) {
-            this.playVidya(vidya, json.data.currentTrack, json.data.currentTime, true);
+          if(vidya && !json.data.type.includes("playlist")) {
+            this.playVidya(vidya, json.data.video.currentTrack, json.data.video.currentTime, true);
           }
         }
         break;
