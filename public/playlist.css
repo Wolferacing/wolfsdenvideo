@@ -127,3 +127,24 @@ body{
   color: white;
   font-size: 2em;
 }
+.button{
+  padding: 10 10;
+  display: inline-block;
+  color: white;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-left: 15px;
+}
+.slim{
+  padding: 3 3;
+  font-size: 0.8em;
+}
+.teal{
+  background: teal;
+}
+.red{
+  background: red;
+}
+.green{
+  background: green;
+}

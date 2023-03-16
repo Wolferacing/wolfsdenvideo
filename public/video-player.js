@@ -169,9 +169,10 @@ class GameSystem {
   }
   updatePlaylist(player) {
     const isMe = player.host.id === window.user.id;
-    this.lockPlayer.innerText = player.locked ? 'lock' : 'lock_open';
+    this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
+    this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
-    this.takeOver.innerText = player.canTakeOver ? 'rocket_launch' : 'rocket';
+    this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Transfer' : 'Take Over')'rocket_launch' : 'rocket';
     this.hostTitle.innerText = 
       'Welcome ' + window.user.name + '.' +
       (isMe ? 'You are' : player.host.name + ' is') +
@@ -198,64 +199,36 @@ class GameSystem {
       videoTitle.innerText = v.title;
       if(player.currentTrack !== i) {
       
-        const playTrack = this.makeAndAddElement('div',{
-          padding: '10 10', 
-          display: 'inline-block',
-          background: 'green', 
-          color: 'white',
-          cursor: 'pointer',
-          borderRadius: '3px',
-          marginLeft: '15px'
-        }, videoTitleAndAction);
+        const playTrack = this.makeAndAddElement('div',null, videoTitleAndAction);
 
+      
+        playTrack.className = 'button green';
         playTrack.innerText = "Play Now";
 
         playTrack.addEventListener('click', () => {
           this.sendMessage({path: Commands.SET_TRACK, data: i });
         });
 
-        const moveDown = this.makeAndAddElement('div',{
-          padding: '10 10', 
-          display: 'inline-block',
-          background: 'teal', 
-          color: 'white',
-          cursor: 'pointer',
-          borderRadius: '3px',
-          marginLeft: '15px'
-        }, videoTitleAndAction);
+        const moveDown = this.makeAndAddElement('div',null, videoTitleAndAction);
 
+        moveDown.className = 'button teal';
         moveDown.innerText = "Move Down";
 
         moveDown.addEventListener('click', () => {
           this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
         });
 
-        const moveUp = this.makeAndAddElement('div',{
-          padding: '10 10', 
-          display: 'inline-block',
-          background: 'teal', 
-          color: 'white',
-          cursor: 'pointer',
-          borderRadius: '3px',
-          marginLeft: '15px'
-        }, videoTitleAndAction);
-
+        const moveUp = this.makeAndAddElement('div',null, videoTitleAndAction);
+        moveUp.className = 'button teal';
         moveUp.innerText = "Move Up";
 
         moveUp.addEventListener('click', () => {
           this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
         });
 
-        const remove = this.makeAndAddElement('div',{
-          padding: '10 10', 
-          display: 'inline-block',
-          background: 'red', 
-          color: 'white',
-          cursor: 'pointer',
-          borderRadius: '3px',
-          marginLeft: '15px'
-        }, videoTitleAndAction);
+        const remove = this.makeAndAddElement('div',null, videoTitleAndAction);
 
+        remove.className = 'button red';
         remove.innerText = "Remove";
 
         remove.addEventListener('click', () => {
@@ -314,16 +287,9 @@ class GameSystem {
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
       
-      const addToPlaylist = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'teal', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
+      const addToPlaylist = this.makeAndAddElement('div',null, videoTitleAndAction);
       
+      addToPlaylist.className = 'button teal';
       addToPlaylist.innerText = "Add To Playlist";
       
       addToPlaylist.addEventListener('click', () => {
@@ -331,16 +297,9 @@ class GameSystem {
       }); 
       
       
-      const playNow = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'teal', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
+      const playNow = this.makeAndAddElement('div',null, videoTitleAndAction);
       
+      playNow.className = 'button teal';
       playNow.innerText = "Play Now";
       
       playNow.addEventListener('click', () => {
@@ -349,16 +308,9 @@ class GameSystem {
         this.sendMessage({path: Commands.SET_TRACK, data: this.player.playlist.length });
       }); 
       
-      const playNext = this.makeAndAddElement('div',{
-        padding: '10 10', 
-        display: 'inline-block',
-        background: 'teal', 
-        color: 'white',
-        cursor: 'pointer',
-        borderRadius: '3px',
-        marginLeft: '15px'
-      }, videoTitleAndAction);
+      const playNext = this.makeAndAddElement('div',null, videoTitleAndAction);
       
+      playNext.className = 'button teal';
       playNext.innerText = "Play Next";
       
       playNext.addEventListener('click', () => {
@@ -406,13 +358,13 @@ class GameSystem {
     
     this.loadingSpinner = document.querySelector('.loadingSpinner');
     
-    this.lockPlayer = document.querySelector('.lockPlayer');
+    this.lockPlayer = document.querySelector('#lockPlayer');
     
     this.lockPlayer.addEventListener('click', () => {
         this.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.player.locked });
     });
     
-    this.takeOver = document.querySelector('.takeOver');
+    this.takeOver = document.querySelector('#takeOver');
     
     this.takeOver.addEventListener('click', () => {
         if(this.player.host.id === window.user.id) {
