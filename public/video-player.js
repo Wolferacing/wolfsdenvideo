@@ -209,8 +209,8 @@ class GameSystem {
         playTrack.innerText = "Play Now";
 
         playTrack.addEventListener('click', () => {
-          this.sendMessage({path: Commands.SET_TIME, data: 0 });
           this.sendMessage({path: Commands.SET_TRACK, data: i });
+          this.sendMessage({path: Commands.SET_TIME, data: 0 });
         });
 
         const moveDown = this.makeAndAddElement('div',{
@@ -343,6 +343,7 @@ class GameSystem {
       playNow.innerText = "Play Now";
       
       playNow.addEventListener('click', () => {
+        this.hideSearch();
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
         this.sendMessage({path: Commands.SET_TRACK, data: this.player.playlist.length });
         this.sendMessage({path: Commands.SET_TIME, data: 0 });
@@ -358,7 +359,7 @@ class GameSystem {
         marginLeft: '15px'
       }, videoTitleAndAction);
       
-      playNext.innerText = "Play Next";
+      playNext.innerText = "Que Up Next";
       
       playNext.addEventListener('click', () => {
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
