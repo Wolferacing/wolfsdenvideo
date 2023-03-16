@@ -12,7 +12,6 @@
               // When you click on an element, run the animation on the parent element
               this.el.addEventListener('click', () => {
                 if(urlParams.has('instanceId')) {
-                    console.log("https://" + window.location.host + "/playlist.html?instanceId=" + urlParams.get('instanceId'));
                    openPage("https://" + window.location.host + "/playlist.html?instanceId=" + urlParams.get('instanceId'));
                 }
               })
