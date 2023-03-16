@@ -14,6 +14,7 @@
     "express": "^4.18.2",
     "@encharm/cws": "^4.3.0",
     "scraper-edge": "^1.1.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "ytfps": "^1.1.0"
   }
 }

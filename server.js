@@ -4,6 +4,8 @@ const http = require('http');
 const path = require('path');
 const Youtube = require('./youtube/scraper.js');
 const youtube = new Youtube();
+const ytfps = require('ytfps');
+
 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
@@ -23,7 +25,8 @@ const Commands = {
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
-  TAKE_OVER: 'take-over'
+  TAKE_OVER: 'take-over',
+  FROM_PLAYLIST: 'from-playlist'
 } 
 
 class GameServer{
@@ -130,7 +133,14 @@ class GameServer{
       case Commands.SEARCH:
         this.search(msg.data, ws);
         break;
+      case Commands.FROM_PLAYLIST:
+        this.fromPlaylist(msg.data, ws);
+        break;
     }
+  }
+  async fromPlaylist(id, ws) {
+    let playlist = await ytfps(id, { limit: 50 });
+    console.log(playlist);
   }
   async search(term, ws) {
     const results = await youtube.search(term, {

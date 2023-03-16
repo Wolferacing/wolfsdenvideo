@@ -17,7 +17,8 @@ const Commands = {
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
-  TAKE_OVER: 'take-over'
+  TAKE_OVER: 'take-over',
+  FROM_PLAYLIST: 'from-playlist'
 } 
 
 class GameSystem {
@@ -44,6 +45,9 @@ class GameSystem {
     this.instanceId = this.urlParams.get("instanceId");
     await this.getInstanceId();
     await this.setupWebsocket();
+    if(this.urlParams.has("playlistId")) {
+      this.sendMessage({path: Commands.FROM_PLAYLIST, data: this.urlParams.get("playlistId"), u: window.user});
+    }
   }
   generateGuestUser() {
     const id = this.getUniquId();
