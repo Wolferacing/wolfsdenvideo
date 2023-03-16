@@ -273,7 +273,7 @@ class GameServer{
       }
     } 
     this.syncWsTime(ws, instanceId);
-    this.send(ws, Responses.PLAYBACK_UPDATE, this.getVideoObject(instanceId));
+    this.send(ws, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
