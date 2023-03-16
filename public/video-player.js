@@ -172,12 +172,13 @@ class GameSystem {
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
-    this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Transfer' : 'Take Over')'rocket_launch' : 'rocket';
+    this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
+    this.takeOver.className = player.canTakeOver ? (isMe ? 'button slim red' : 'button slim teal') : 'button slim teal';
     this.hostTitle.innerText = 
       'Welcome ' + window.user.name + '.' +
       (isMe ? 'You are' : player.host.name + ' is') +
       " the host" + 
-      (player.canTakeOver ? " but it can be taken over ( click the rocket " + (isMe ? "again to disable" : "to take over") + " )!": "") +
+      (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
     player.playlist.forEach((v, i) => {
