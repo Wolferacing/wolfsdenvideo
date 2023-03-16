@@ -75,6 +75,8 @@ class GameSystem {
   } 
   playVidya(vidya, currentTrack, currentTime, force) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
+        console.log(currentTrack, currentTime);
+        vidya.currentTime = currentTime;
         vidya.src = this.player.playlist[currentTrack].link;
       }
       if(Math.abs(currentTime - vidya.currentTime) > 5) {
@@ -208,8 +210,8 @@ class GameSystem {
         playTrack.innerText = "Play Now";
 
         playTrack.addEventListener('click', () => {
-          this.sendMessage({path: Commands.SET_TRACK, data: i });
           this.sendMessage({path: Commands.SET_TIME, data: 0 });
+          this.sendMessage({path: Commands.SET_TRACK, data: i });
         });
 
         const moveDown = this.makeAndAddElement('div',{
