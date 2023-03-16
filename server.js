@@ -218,6 +218,8 @@ class GameServer{
     this.onlyIfHost(ws, () => {
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         this.videoPlayers[ws.i].currentTrack = index;
+        this.videoPlayers[ws.i].currentTime = 0;
+        this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         this.updateClients(ws.i, 'set-track');
       }else{
         this.send(ws, Responses.OUT_OF_BOUNDS);

@@ -210,7 +210,6 @@ class GameSystem {
 
         playTrack.addEventListener('click', () => {
           this.sendMessage({path: Commands.SET_TRACK, data: i });
-          this.sendMessage({path: Commands.SET_TIME, data: 0 });
         });
 
         const moveDown = this.makeAndAddElement('div',{
@@ -346,7 +345,6 @@ class GameSystem {
         this.hideSearch();
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
         this.sendMessage({path: Commands.SET_TRACK, data: this.player.playlist.length });
-        this.sendMessage({path: Commands.SET_TIME, data: 0 });
       }); 
       
       const playNext = this.makeAndAddElement('div',{
@@ -359,7 +357,7 @@ class GameSystem {
         marginLeft: '15px'
       }, videoTitleAndAction);
       
-      playNext.innerText = "Que Up Next";
+      playNext.innerText = "Play Next";
       
       playNext.addEventListener('click', () => {
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
