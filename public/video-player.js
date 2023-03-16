@@ -109,7 +109,7 @@ class GameSystem {
         if(window.isPlaylist) {
           this.updatePlaylist(this.player);
         }else{
-          if(vidya && !json.data.type === "set-track") {
+          if(vidya && json.data.type === "set-track") {
             this.playVidya(vidya, json.data.video.currentTrack, json.data.video.currentTime, true);
           }
         }
