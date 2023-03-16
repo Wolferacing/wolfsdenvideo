@@ -304,6 +304,7 @@ class GameSystem {
     return new Date(seconds * 1000).toISOString().substring(14, 19);
   }
   loadVideos(videos) {
+    this.videoSearchContainer.innerHTML = '';
     this.loadingSpinner.style.display = 'none';
     videos.forEach((v, i) => {
       const videoItemContainer = this.makeAndAddElement('div', {background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoSearchContainer);
@@ -334,6 +335,43 @@ class GameSystem {
       addToPlaylist.addEventListener('click', () => {
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       }); 
+      
+      
+      const playNow = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'teal', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      playNow.innerText = "Play Now";
+      
+      playNow.addEventListener('click', () => {
+        this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.sendMessage({path: Commands.SET_TRACK, data: this.player.playlist.length });
+        this.sendMessage({path: Commands.SET_TIME, data: 0 });
+      }); 
+      
+      const playNext = this.makeAndAddElement('div',{
+        padding: '10 10', 
+        display: 'inline-block',
+        background: 'teal', 
+        color: 'white',
+        cursor: 'pointer',
+        borderRadius: '3px',
+        marginLeft: '15px'
+      }, videoTitleAndAction);
+      
+      playNext.innerText = "Play Next";
+      
+      playNext.addEventListener('click', () => {
+        this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.player.currentTrack + 1} });
+      }); 
+      
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
