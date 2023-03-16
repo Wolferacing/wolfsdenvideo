@@ -87,7 +87,7 @@ class GameSystem {
   }
   parseMessage(msg) {
     const vidya = document.getElementById('youtube-video');
-    const json = JSON.parse(event.data);
+    const json = JSON.parse(msg);
     switch(json.path) {
       case Responses.SYNC_TIME:
         if(!window.isPlaylist) {
