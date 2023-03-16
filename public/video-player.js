@@ -298,6 +298,7 @@ class GameSystem {
       addToPlaylist.innerText = "Add To Playlist";
       
       addToPlaylist.addEventListener('click', () => {
+        console.log(v);
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       }); 
       

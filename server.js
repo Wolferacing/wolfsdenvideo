@@ -140,6 +140,17 @@ class GameServer{
   }
   async fromPlaylist(id, ws) {
     let playlist = await ytfps(id, { limit: 50 });
+    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length === 0) {
+      playlist.videos.forEach(v=>{
+        this.videoPlayers[ws.i].playlist.push({
+          title: v.title,
+          thumbnail: v.thumbnail_url,
+          duration: v.milis_length ,
+          link: v.url
+        })  
+      });
+    }
+    
     console.log(playlist);
   }
   async search(term, ws) {
