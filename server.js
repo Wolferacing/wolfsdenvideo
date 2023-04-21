@@ -31,10 +31,6 @@ const Commands = {
 
 class GameServer{
   constructor() {
-    this.tickInterval = 10000;
-    this.setupServer();
-  }
-  setupServer() {
     this.app = express();
     
     this.videoPlayers = {}
@@ -75,7 +71,7 @@ class GameServer{
     
     setInterval(() => {
       this.syncTime();
-    }, 3000);
+    }, 1000);
     this.syncTime();
   }
   handleClose(ws) {
