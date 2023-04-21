@@ -33,7 +33,6 @@ class GameSystem {
       await this.awaitExistance(window, 'user');
     }else{
       try{
-        //window.user = JSON.parse(localStorage.getItem('user'));
         if(!window.user) {
           this.generateGuestUser();
         }
@@ -42,7 +41,7 @@ class GameSystem {
       }
     } 
     this.urlParams = new URLSearchParams(window.location.search);
-    this.instanceId = this.urlParams.get("instanceId");
+    this.instanceId = this.urlParams.get("instanceId") || "666";
     await this.getInstanceId();
     await this.setupWebsocket();
     if(this.urlParams.has("playlistId")) {
