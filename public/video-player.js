@@ -44,6 +44,8 @@ class GameSystem {
     
     this.instanceId = this.urlParams.get("instanceId") || document.currentScript.getAttribute("instance") || "666";
     
+    console.log("Instance:", this.instanceId)
+    
     await this.getInstanceId();
     await this.setupWebsocket();
     if(this.urlParams.has("playlistId")) {
