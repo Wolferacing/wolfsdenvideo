@@ -55,8 +55,9 @@ class GameSystem {
   }
   setupWebsocket(){
     return new Promise(resolve => {
-      this.ws = new WebSocket('wss://' + location.host + '/');
+      this.ws = new WebSocket('wss://sq-synced-videoplayer.glitch.me/');
       this.ws.onopen = (event) => {
+        console.log("Websocket connected!");
         this.sendMessage({path: "instance", data: this.instanceId, u: window.user});
         resolve();
       };
@@ -66,6 +67,7 @@ class GameSystem {
         }
       }
       this.ws.onclose =  (event) => {
+        console.log("Websocket closed...");
         setTimeout(() => {
           if(window.isBanter) {
             this.setupWebsocket();
