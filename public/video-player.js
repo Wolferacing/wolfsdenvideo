@@ -1,3 +1,10 @@
+// Polyfill
+
+document.currentScript = document.currentScript || (function() {
+  var scripts = document.getElementsByTagName('script');
+  return scripts[scripts.length - 1];
+})();
+
 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
@@ -21,6 +28,8 @@ const Commands = {
   FROM_PLAYLIST: 'from-playlist'
 } 
 
+const thisScript = document.currentScript;
+
 class GameSystem {
   constructor(){
     this.init();
@@ -42,7 +51,7 @@ class GameSystem {
     } 
     this.urlParams = new URLSearchParams(window.location.search);
     
-    this.instanceId = this.urlParams.get("instanceId") || document.currentScript.getAttribute("instance") || "666";
+    this.instanceId = this.urlParams.get("instanceId") || thisScript.getAttribute("instance") || "666";
     
     console.log("Instance:", this.instanceId)
     
@@ -96,6 +105,7 @@ class GameSystem {
   }
   parseMessage(msg) {
     const vidya = document.getElementById('youtube-video');
+    console.log("recieved message:"  + msg);
     const json = JSON.parse(msg);
     switch(json.path) {
       case Responses.SYNC_TIME:
