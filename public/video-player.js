@@ -41,7 +41,9 @@ class GameSystem {
       }
     } 
     this.urlParams = new URLSearchParams(window.location.search);
-    this.instanceId = this.urlParams.get("instanceId") || "666";
+    
+    this.instanceId = this.urlParams.get("instanceId") || document.currentScript.getAttribute("instance") || "666";
+    
     await this.getInstanceId();
     await this.setupWebsocket();
     if(this.urlParams.has("playlistId")) {
