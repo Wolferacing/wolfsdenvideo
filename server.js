@@ -65,12 +65,6 @@ class GameServer{
     });
     
     this.app.use(express.static(path.join(__dirname, 'public')));
-    
-    this.app.get('/get-direct-url/:id', async (req, res) => {
-      const id = req.params.id;
-      const urls = await this.getDirectUrl(id);
-      res.send(JSON.stringify({id, urls}))
-    });
 
     this.server.listen( 3000, function listening(){
         console.log("Video player sync service started..."); 
@@ -141,34 +135,34 @@ class GameServer{
         break;
     }
   }
-  async getDirectUrl(youtubeId) {
-    const jsonBody = {
-      "context": {
-        "client": {
-          "clientName": "ANDROID",
-          "clientVersion": "17.31.35",
-          "hl": "en"
-        }
-      },
-      "videoId": youtubeId
-    }
-    const res = await fetch("https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", {
-        headers: {
-            "Content-Type": "application/json",
-            "Origin": "https://www.youtube.com",
-            "X-YouTube-Client-Name": "1",
-            "X-YouTube-Client-Version": "2.20220801.00.00"
-        },
-        method: 'post',
-        body: JSON.stringify(jsonBody)
-    });
-    try{
-      const json = await res.json();
-      return json.streamingData.formats;
-    }catch(e) {
-      return false;
-    }
-  }
+  // async getDirectUrl(youtubeId) {
+  //   const jsonBody = {
+  //     "context": {
+  //       "client": {
+  //         "clientName": "ANDROID",
+  //         "clientVersion": "17.31.35",
+  //         "hl": "en"
+  //       }
+  //     },
+  //     "videoId": youtubeId
+  //   }
+  //   const res = await fetch("https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", {
+  //       headers: {
+  //           "Content-Type": "application/json",
+  //           "Origin": "https://www.youtube.com",
+  //           "X-YouTube-Client-Name": "1",
+  //           "X-YouTube-Client-Version": "2.20220801.00.00"
+  //       },
+  //       method: 'post',
+  //       body: JSON.stringify(jsonBody)
+  //   });
+  //   try{
+  //     const json = await res.json();
+  //     return json.streamingData.formats;
+  //   }catch(e) {
+  //     return false;
+  //   }
+  // }
   async fromPlaylist(id, ws) {
     let playlist = await ytfps(id, { limit: 50 });
     if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length === 0) {
@@ -203,9 +197,8 @@ class GameServer{
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         if(!this.videoPlayers[ws.i].playlist.length) {
-          const id = this.parseYoutubeId(v.link);
-          const formatData = await this.getDirectUrl(id);
-          v.formats = formatData.formats;
+          // const id = this.parseYoutubeId(v.link);
+          // v.formats = await this.getDirectUrl(id);
           this.videoPlayers[ws.i].currentTrack = 0;
           this.videoPlayers[ws.i].currentTime = 0;
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
@@ -285,11 +278,11 @@ class GameServer{
       this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
     }, this.videoPlayers[ws.i].locked);
   }
-  parseYoutubeId(url){
-      var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-      var match = url.match(regExp);
-      return (match&&match[7].length==11)? match[7] : false;
-  }
+  // parseYoutubeId(url){
+  //     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+  //     var match = url.match(regExp);
+  //     return (match&&match[7].length==11)? match[7] : false;
+  // }
   createVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
