@@ -14,6 +14,7 @@ const Responses = {
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',
   SEARCH_RESULTS: 'search-results',
+  DIRECT_URL: 'direct-url',
   ERROR:'error'
 }
 
@@ -159,28 +160,19 @@ class GameServer{
               "Origin": "https://www.youtube.com",
               "X-YouTube-Client-Name": "1",
               "X-YouTube-Client-Version": "2.20220801.00.00"
-          }
+          },
+        method: 'post',
+	      body: JSON.stringify(jsonBody)
       });
-      const json = 
-      
-      .then(res => res.json()).then(body => {
-                resolve(body);
-            }).catch(err => reject(err));
+      try{
+        const json = await res.json();
+        // const urls = [];
+        // json.streamingData.formats.map(d => d.url);
+        this.send(ws, Responses.DIRECT_URL, json);
+      }catch(e) {
+        this.send(ws, Responses.ERROR);
+      }
     }
-    /*
-    CheckVideoUrlAndExtractThevideoId(youtubeUrl);
-            WWWForm form = new WWWForm();
-            //string ag = "";
-            string f = "{\"context\": {\"client\": {\"clientName\": \"ANDROID\",\"clientVersion\": \"17.31.35\",\"hl\": \"en\"}},\"videoId\": \"" + youtubeVideoID + "\",}";
-            string fweb = "{\"context\": {\"client\": {\"clientName\": \"WEB\",\"clientVersion\": \"2.20220801.00.00\"}},\"videoId\": \"" + youtubeVideoID + "\",}";
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(f);
-            UnityWebRequest request = UnityWebRequest.Post("https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", form);
-            request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-            request.SetRequestHeader("Content-Type", "application/json");
-            //request.SetRequestHeader("Origin","https://www.youtube.com");
-            request.SetRequestHeader("X-YouTube-Client-Name", "1");
-            request.SetRequestHeader("X-YouTube-Client-Version", "2.20220801.00.00");
-    */
   }
   parseYoutubeId(url){
       var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;

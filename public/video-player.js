@@ -12,6 +12,7 @@ const Responses = {
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',
   SEARCH_RESULTS: 'search-results',
+  DIRECT_URL: 'direct-url',
   ERROR:'error'
 }
 
@@ -25,12 +26,13 @@ const Commands = {
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   TAKE_OVER: 'take-over',
-  FROM_PLAYLIST: 'from-playlist'
+  FROM_PLAYLIST: 'from-playlist',
+  GET_DIRECT_URL: 'get-direct-url'
 } 
 
 const thisScript = document.currentScript;
 
-class GameSystem {
+class VideoSystem {
   constructor(){
     this.init();
   }
@@ -135,6 +137,9 @@ class GameSystem {
           }
         }
         break;
+      case Responses.DIRECT_URL:
+        console.log('data', json.data);
+        break;
       case Responses.SEARCH_RESULTS:
         if(window.isPlaylist) {
           this.loadVideos(json.data);
@@ -183,8 +188,11 @@ class GameSystem {
     (parent ? parent : document.body).appendChild(element);
     return element;
   }
+  getDirectUrl(data) {
+    this.sendMessage({path: Commands.GET_DIRECT_URL, data });
+  }
   search(data) {
-    this.sendMessage({path: 'search', data });
+    this.sendMessage({path: Commands.SEARCH, data });
   }
   updatePlaylist(player) {
     const isMe = player.host.id === window.user.id;
@@ -399,4 +407,4 @@ class GameSystem {
   }
 }
 
-window.gameSystem = new GameSystem();
+window.videoSystem = new VideoSystem();
