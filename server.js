@@ -5,6 +5,7 @@ const path = require('path');
 const Youtube = require('./youtube/scraper.js');
 const youtube = new Youtube();
 const ytfps = require('ytfps');
+const fetch = require('node-fetch');
 
 
 const Responses = {
@@ -26,7 +27,8 @@ const Commands = {
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   TAKE_OVER: 'take-over',
-  FROM_PLAYLIST: 'from-playlist'
+  FROM_PLAYLIST: 'from-playlist',
+  GET_DIRECT_URL: 'get-direct-url'
 } 
 
 class GameServer{
@@ -132,7 +134,58 @@ class GameServer{
       case Commands.FROM_PLAYLIST:
         this.fromPlaylist(msg.data, ws);
         break;
+      case Commands.GET_DIRECT_URL:
+        this.getDirectUrl(msg.data, ws);
+        break;
     }
+  }
+  async getDirectUrl(url, ws) {
+    const youtubeId = this.parseYoutubeId(url);
+    if(youtubeId) {
+      const jsonBody = {
+        "context": {
+          "client": {
+            "clientName": "ANDROID",
+            "clientVersion": "17.31.35",
+            "hl": "en"
+          }
+        },
+        "videoId": youtubeId
+      }
+      
+      const res = await fetch("https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", {
+          headers: {
+              "Content-Type": "application/json",
+              "Origin": "https://www.youtube.com",
+              "X-YouTube-Client-Name": "1",
+              "X-YouTube-Client-Version": "2.20220801.00.00"
+          }
+      });
+      const json = 
+      
+      .then(res => res.json()).then(body => {
+                resolve(body);
+            }).catch(err => reject(err));
+    }
+    /*
+    CheckVideoUrlAndExtractThevideoId(youtubeUrl);
+            WWWForm form = new WWWForm();
+            //string ag = "";
+            string f = "{\"context\": {\"client\": {\"clientName\": \"ANDROID\",\"clientVersion\": \"17.31.35\",\"hl\": \"en\"}},\"videoId\": \"" + youtubeVideoID + "\",}";
+            string fweb = "{\"context\": {\"client\": {\"clientName\": \"WEB\",\"clientVersion\": \"2.20220801.00.00\"}},\"videoId\": \"" + youtubeVideoID + "\",}";
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(f);
+            UnityWebRequest request = UnityWebRequest.Post("https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", form);
+            request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+            request.SetRequestHeader("Content-Type", "application/json");
+            //request.SetRequestHeader("Origin","https://www.youtube.com");
+            request.SetRequestHeader("X-YouTube-Client-Name", "1");
+            request.SetRequestHeader("X-YouTube-Client-Version", "2.20220801.00.00");
+    */
+  }
+  parseYoutubeId(url){
+      var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      var match = url.match(regExp);
+      return (match&&match[7].length==11)? match[7] : false;
   }
   async fromPlaylist(id, ws) {
     let playlist = await ytfps(id, { limit: 50 });
