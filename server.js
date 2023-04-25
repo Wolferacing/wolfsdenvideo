@@ -287,11 +287,6 @@ class GameServer{
       this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
     }, this.videoPlayers[ws.i].locked);
   }
-  // parseYoutubeId(url){
-  //     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-  //     var match = url.match(regExp);
-  //     return (match&&match[7].length==11)? match[7] : false;
-  // }
   createVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
