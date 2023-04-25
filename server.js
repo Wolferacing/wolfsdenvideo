@@ -161,14 +161,12 @@ class GameServer{
               "X-YouTube-Client-Name": "1",
               "X-YouTube-Client-Version": "2.20220801.00.00"
           },
-        method: 'post',
-	      body: JSON.stringify(jsonBody)
+          method: 'post',
+          body: JSON.stringify(jsonBody)
       });
       try{
         const json = await res.json();
-        // const urls = [];
-        // json.streamingData.formats.map(d => d.url);
-        this.send(ws, Responses.DIRECT_URL, json);
+        this.send(ws, Responses.DIRECT_URL, {youtubeId, formats: json.streamingData.formats, adaptiveFormats: json.streamingData.adaptiveFormats});
       }catch(e) {
         this.send(ws, Responses.ERROR);
       }
