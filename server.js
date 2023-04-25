@@ -6,7 +6,7 @@ const Youtube = require('./youtube/scraper.js');
 const youtube = new Youtube();
 const ytfps = require('ytfps');
 const fetch = require('node-fetch');
-
+const twitch = require("twitch-m3u8");
 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
@@ -66,9 +66,13 @@ class GameServer{
     
     this.app.use(express.static(path.join(__dirname, 'public')));
     
-    this.app.get('/get-direct-url/:id', async (req, res) => {
-        const foramts = this.getDirectUrl();
-        res.send(JSON.stringify(foramts))
+    this.app.get('/get-twitch-url/:id', async (req, res) => {
+      try{
+        const data = await twitch.getStream(req.params.id);
+        res.send(JSON.stringify(data));
+      }catch{
+        res.send(JSON.stringify({error: true}));
+      }
     })
     
     this.server.listen( 3000, function listening(){
