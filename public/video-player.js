@@ -97,7 +97,7 @@ class VideoSystem {
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         vidya.currentTime = currentTime;
-        vidya.src = this.player.playlist[currentTrack].formats[2].url;
+        vidya.src = this.player.playlist[currentTrack].link;
       }
       if(Math.abs(currentTime - vidya.currentTime) > 5) {
         // vidya.currentTime = json.data.currentTime;
