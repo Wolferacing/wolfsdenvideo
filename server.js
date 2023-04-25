@@ -146,8 +146,6 @@ class GameServer{
         })  
       });
     }
-    
-    console.log(playlist);
   }
   async search(term, ws) {
     const results = await youtube.search(term, {
