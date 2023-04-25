@@ -32,6 +32,8 @@ const Commands = {
 
 const thisScript = document.currentScript;
 
+const hostUrl = 'sq-synced-videoplayer.glitch.me';
+
 class VideoSystem {
   constructor(){
     this.init();
@@ -70,7 +72,7 @@ class VideoSystem {
   }
   setupWebsocket(){
     return new Promise(resolve => {
-      this.ws = new WebSocket('wss://sq-synced-videoplayer.glitch.me/');
+      this.ws = new WebSocket('wss://' + hostUrl + '/');
       this.ws.onopen = (event) => {
         console.log("Websocket connected!");
         this.sendMessage({path: "instance", data: this.instanceId, u: window.user});
@@ -137,9 +139,6 @@ class VideoSystem {
           }
         }
         break;
-      case Responses.DIRECT_URL:
-        console.log('data', json.data);
-        break;
       case Responses.SEARCH_RESULTS:
         if(window.isPlaylist) {
           this.loadVideos(json.data);
@@ -187,9 +186,6 @@ class VideoSystem {
     Object.assign(element.style, style || {});
     (parent ? parent : document.body).appendChild(element);
     return element;
-  }
-  getDirectUrl(data) {
-    this.sendMessage({path: Commands.GET_DIRECT_URL, data });
   }
   search(data) {
     this.sendMessage({path: Commands.SEARCH, data });
@@ -298,6 +294,11 @@ class VideoSystem {
   timeCode(seconds) {
     return new Date(seconds * 1000).toISOString().substring(11, 19);
   }
+  parseYoutubeId(url){
+      var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      var match = url.match(regExp);
+      return (match&&match[7].length==11)? match[7] : false;
+  }
   loadVideos(videos) {
     this.videoSearchContainer.innerHTML = '';
     this.loadingSpinner.style.display = 'none';
@@ -322,6 +323,7 @@ class VideoSystem {
       
       addToPlaylist.addEventListener('click', () => {
         console.log(v);
+        fetch('https://' + hostUrl + '/get-direct-url',  {method})
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       }); 
       
