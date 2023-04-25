@@ -166,7 +166,7 @@ class GameServer{
       });
       try{
         const json = await res.json();
-        this.send(ws, Responses.DIRECT_URL, {youtubeId, formats: json.streamingData.formats, adaptiveFormats: json.streamingData.adaptiveFormats});
+        this.send(ws, Responses.DIRECT_URL, {url, formats: json.streamingData.formats});
       }catch(e) {
         this.send(ws, Responses.ERROR);
       }
