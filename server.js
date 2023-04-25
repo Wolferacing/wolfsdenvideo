@@ -201,8 +201,11 @@ class GameServer{
   }
   addToPlaylist(v, ws) {
     if(this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, () => {
+      this.onlyIfHost(ws, async () => {
         if(!this.videoPlayers[ws.i].playlist.length) {
+          const id = this.parseYoutubeId(v.link);
+          const formatData = await this.getDirectUrl(id);
+          v.formats = formatData.formats;
           this.videoPlayers[ws.i].currentTrack = 0;
           this.videoPlayers[ws.i].currentTime = 0;
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
@@ -270,7 +273,7 @@ class GameServer{
         this.videoPlayers[ws.i].currentTrack = index;
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
-        this.updateClients(ws.i, 'set-track');
+        this.updateClients(ws.i, Commands.SET_TRACK);
       }else{
         this.send(ws, Responses.OUT_OF_BOUNDS);
       }
@@ -333,11 +336,11 @@ class GameServer{
   }
   async playNewTrack(instanceId, track) {
       const id = this.parseYoutubeId(track.url);
-      const formatData = await getid);
+      const formatData = await this.getDirectUrl(id);
       track.formats = formatData.formats;
       this.videoPlayers[instanceId].currentTime = 0;
-      this.updateClients(instanceId, 'next-track');
       this.videoPlayers[instanceId].lastStartTime = new Date().getTime() / 1000;
+      this.updateClients(instanceId, Commands.SET_TRACK);
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
