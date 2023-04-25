@@ -12,7 +12,6 @@ const Responses = {
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',
   SEARCH_RESULTS: 'search-results',
-  DIRECT_URL: 'direct-url',
   ERROR:'error'
 }
 
@@ -26,8 +25,7 @@ const Commands = {
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   TAKE_OVER: 'take-over',
-  FROM_PLAYLIST: 'from-playlist',
-  GET_DIRECT_URL: 'get-direct-url'
+  FROM_PLAYLIST: 'from-playlist'
 } 
 
 const thisScript = document.currentScript;
@@ -294,11 +292,6 @@ class VideoSystem {
   timeCode(seconds) {
     return new Date(seconds * 1000).toISOString().substring(11, 19);
   }
-  parseYoutubeId(url){
-      var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-      var match = url.match(regExp);
-      return (match&&match[7].length==11)? match[7] : false;
-  }
   loadVideos(videos) {
     this.videoSearchContainer.innerHTML = '';
     this.loadingSpinner.style.display = 'none';
@@ -321,12 +314,9 @@ class VideoSystem {
       addToPlaylist.className = 'button teal';
       addToPlaylist.innerText = "Add To Playlist";
       
-      addToPlaylist.addEventListener('click', () => {
-        console.log(v);
-        fetch('https://' + hostUrl + '/get-direct-url',  {method})
+      addToPlaylist.addEventListener('click', async () => {
         this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       }); 
-      
       
       const playNow = this.makeAndAddElement('div',null, videoTitleAndAction);
       

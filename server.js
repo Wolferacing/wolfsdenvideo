@@ -14,7 +14,6 @@ const Responses = {
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',
   SEARCH_RESULTS: 'search-results',
-  DIRECT_URL: 'direct-url',
   ERROR:'error'
 }
 
@@ -28,8 +27,7 @@ const Commands = {
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   TAKE_OVER: 'take-over',
-  FROM_PLAYLIST: 'from-playlist',
-  GET_DIRECT_URL: 'get-direct-url'
+  FROM_PLAYLIST: 'from-playlist'
 } 
 
 class GameServer{
@@ -141,9 +139,6 @@ class GameServer{
       case Commands.FROM_PLAYLIST:
         this.fromPlaylist(msg.data, ws);
         break;
-      case Commands.GET_DIRECT_URL:
-        this.getDirectUrl(msg.data, ws);
-        break;
     }
   }
   async getDirectUrl(youtubeId) {
@@ -204,7 +199,7 @@ class GameServer{
       }
     }
   }
-  addToPlaylist(url, ws) {
+  addToPlaylist(v, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         if(!this.videoPlayers[ws.i].playlist.length) {
@@ -212,7 +207,7 @@ class GameServer{
           this.videoPlayers[ws.i].currentTime = 0;
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
-        this.videoPlayers[ws.i].playlist.push(url);
+        this.videoPlayers[ws.i].playlist.push(v);
         this.updateClients(ws.i, 'add-playlist');
       }, this.videoPlayers[ws.i].locked);
     }
@@ -287,6 +282,11 @@ class GameServer{
       this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
     }, this.videoPlayers[ws.i].locked);
   }
+  parseYoutubeId(url){
+      var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      var match = url.match(regExp);
+      return (match&&match[7].length==11)? match[7] : false;
+  }
   createVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
@@ -309,9 +309,8 @@ class GameServer{
               if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
                 this.videoPlayers[instanceId].currentTrack = 0;
               }
-              this.videoPlayers[instanceId].currentTime = 0;
-              this.updateClients(instanceId, 'next-track');
-              this.videoPlayers[instanceId].lastStartTime = now;
+              track = this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack];
+              this.playNewTrack(instanceId, track);
             }
           }else{
              this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;
@@ -331,6 +330,14 @@ class GameServer{
     } 
     this.syncWsTime(ws, instanceId);
     this.send(ws, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
+  }
+  async playNewTrack(instanceId, track) {
+      const id = this.parseYoutubeId(track.url);
+      const formatData = await getid);
+      track.formats = formatData.formats;
+      this.videoPlayers[instanceId].currentTime = 0;
+      this.updateClients(instanceId, 'next-track');
+      this.videoPlayers[instanceId].lastStartTime = new Date().getTime() / 1000;
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
