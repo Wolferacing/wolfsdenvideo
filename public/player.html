@@ -48,11 +48,11 @@
           events: {
             'onReady': (event) => {
               console.log('ready');
-              event.target.mute();
+              // event.target.mute();
               event.target.playVideo();
-              setTimeout(() => {
-                event.target.unMute();
-              }, 3000)
+              // setTimeout(() => {
+              //   event.target.unMute();
+              // }, 3000)
               console.log('video should be playing?');
             },
             //'onStateChange': onPlayerStateChange
