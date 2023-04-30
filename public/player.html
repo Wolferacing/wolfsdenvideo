@@ -41,8 +41,8 @@
           events: {
             'onReady': (event) => {
               console.log('ready');
+              event.target.setVolume(15);
               event.target.playVideo();
-              event.target.setVolume(0.5)
               console.log('video should be playing?');
             }
           }
