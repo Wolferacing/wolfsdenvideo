@@ -22,8 +22,8 @@
       }
       let video = document.getElementById("videoFrame");
       const urlParams = new URLSearchParams(window.location.search);      
-      // let url = 'https://www.youtube-nocookie.com/embed/' + getId(url_decode(urlParams.get('youtube'))) + '?autoplay=1&controls=1&disablekb=1&enablejsapi=1&iv_load_policy=3&origin=https%3A%2F%2Fsq-synced-videoplayer.glitch.me&start=0&playsinline=1&widgetid=1';
-      
+      const start = urlParams.get('start');
+      console.log("skipping to ", start);
       var player;
       function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
@@ -36,14 +36,12 @@
             'controls': 0,
             'disablekb': 1,
             'origin': 'https://sq-synced-videoplayer.glitch.me',
-            'start': urlParams.get('start') || 0
+            'start': start ? Number(start) : 0
           },
           events: {
             'onReady': (event) => {
               console.log('ready');
-              event.target.setVolume(15);
-              event.target.playVideo();
-              console.log('video should be playing?');
+              event.target.setVolume(10);
             }
           }
         });
