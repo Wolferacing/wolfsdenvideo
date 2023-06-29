@@ -228,6 +228,7 @@ class GameServer{
       }, this.videoPlayers[ws.i].locked);
     }
   }
+
   movePlaylistItem({url, index}, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
