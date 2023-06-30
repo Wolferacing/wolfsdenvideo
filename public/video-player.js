@@ -406,6 +406,22 @@ class VideoSystem {
     
     this.addItemContainer = document.querySelector('.addItemContainer');
     
+    this.addItemTitle = document.querySelector('.addItemTitle');
+    
+    this.addItemInput = document.querySelector('.addItemInput');
+    
+    this.addPlaylist = document.querySelector('#addPlaylist');
+    
+    this.addPlaylist.addEventListener('click', () => {
+      this.addItemContainer.style.display = 'block';
+      this.addItemTitle.innerHTML = "Add youtube playlist by the playlist ID";
+      this.addItemInput.placeholder = "Playlist ID...";
+      this.add
+    });
+    
+    
+    this.addVideo = document.querySelector('#addVideo');
+    
     this.hostTitle = document.querySelector('.hostTitle');
   }
 }
