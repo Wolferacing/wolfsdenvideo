@@ -407,9 +407,7 @@ class VideoSystem {
     
     this.clearPlaylist = document.querySelector('#clearPlaylist');
     
-    this.clearPlaylist.addEventListener('click', () => {
-        this.clearPlaylist();
-    });
+    this.clearPlaylist.addEventListener('click', () => this.clearPlaylist());
     
     this.addItemContainer = document.querySelector('.addItemContainer');
     
