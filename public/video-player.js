@@ -62,12 +62,12 @@ class VideoSystem {
     await this.setupWebsocket();
     if(this.urlParams.has("playlistId")) {
       this.playlistId = this.urlParams.get("playlistId");
-      this.playPlaylist();
+      this.playPlaylist(false);
     }
   }
-  playPlaylist() {
+  playPlaylist(shouldClear) {
     //this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-    this.sendMessage({path: Commands.FROM_PLAYLIST, data: this.playlistId, u: window.user});
+    this.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId, shouldClear}, u: window.user});
   }
   clearPlaylist() {
     this.sendMessage({path: Commands.CLEAR_PLAYLIST, u: window.user});

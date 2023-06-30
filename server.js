@@ -176,8 +176,8 @@ class GameServer{
       return false;
     }
   }
-  async fromPlaylist(id, ws) {
-    let playlist = await ytfps(id, { limit: 50 });
+  async fromPlaylist(data, ws) {
+    let playlist = await ytfps(data.id, { limit: 50 });
     if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length === 0) {
       playlist.videos.forEach(v=>{
         this.videoPlayers[ws.i].playlist.push({
