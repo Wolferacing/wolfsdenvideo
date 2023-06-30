@@ -31,7 +31,6 @@ const Commands = {
   FROM_PLAYLIST: 'from-playlist',
   CLEAR_PLAYLIST: 'clear-playlist',
   USER_VIDEO_PLAYER: 'user-video-player',
-  IS_VIDEO_PLAYER: 'is-video-player',
   DOWN_VOLUME: 'down-volume',
   UP_VOLUME: 'up-volume'
 } 
@@ -113,7 +112,7 @@ class GameServer{
           ws.u = msg.u;
           ws.i = msg.data;
           this.createVideoPlayer(msg.data, msg.u, ws);
-          this.getUserVideoPlayer();
+          this.getUserVideoPlayer(ws);
         }else{
           this.send(ws, 'error');
         }
@@ -152,10 +151,8 @@ class GameServer{
         this.clearPlaylist(ws);
         break;
       case Commands.USER_VIDEO_PLAYER:
-        this.setUserVideoPlayer(msg.data, ws);
-        break;
-      case Commands.IS_VIDEO_PLAYER:
         ws.is_video_player = true;
+        this.setUserVideoPlayer(msg.data, ws);
         break;
       case Commands.DOWN_VOLUME:
         this.setVolume(ws, true);
@@ -165,10 +162,10 @@ class GameServer{
         break;
     }
   }
-  getUserVideoPlayer() {
+  getUserVideoPlayer(new_ws) {
     this.wss.clients.forEach((ws) => {
-      if(ws.is_video_player && !ws.is_linked) {
-        this.send(ws, Responses.LINK_ME, {});
+      if(ws.is_video_player) {
+        this.send(ws, Responses.LINK_ME, new_ws.u.id);
       }
     });
   }
@@ -177,7 +174,6 @@ class GameServer{
       if(ws.u && ws.u.id === data.id) {
         console.log("set user video player", data.id);
         ws.user_video = user_video;
-        ws.user_video.is_linked = true;
       }
     });
   }

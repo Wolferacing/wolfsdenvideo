@@ -11,8 +11,6 @@
       
     </div>
     <script>
-          document.getElementById('status').innerHTML = "very start...";
-      
       const Responses = {
         LINK_ME: 'link-me',
         DOWN_VOLUME: 'down-volume',
@@ -24,7 +22,6 @@
           this.init();
         }
         init() {
-          document.getElementById('status').innerHTML = "start...";
           this.video = document.getElementById("videoFrame");
           this.urlParams = new URLSearchParams(window.location.search);      
           this.start = this.urlParams.get('start');    
@@ -33,15 +30,14 @@
             id: userStr[0],
             name: userStr[1]
           }
-          document.getElementById('status').innerHTML = "Websocket connect...";
           this.setupWebsocket();
         }
         setupWebsocket(){
           return new Promise(resolve => {
             this.ws = new WebSocket('wss://' + hostUrl + '/');
             this.ws.onopen = (event) => {
-              document.getElementById('status').innerHTML = "Websocket connected!";
-              this.sendMessage({path: "is-video-player", data: {}});
+              console.log("Websocket connected.");
+              this.sendMessage({path: "user-video-player", data: window.user});
               resolve();
             };
             this.ws.onmessage = (event) => {
@@ -66,7 +62,8 @@
           const vol = this.player.getVolume();
           switch(json.path) {
             case Responses.LINK_ME:
-              if(json.data.id === window.user.id) {
+              if(json.data === window.user.id) {
+                console.log("Websocket connected.");
                 this.sendMessage({path: "user-video-player", data: window.user});
               }
               break;
