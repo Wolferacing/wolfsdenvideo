@@ -27,7 +27,8 @@ const Commands = {
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   TAKE_OVER: 'take-over',
-  FROM_PLAYLIST: 'from-playlist'
+  FROM_PLAYLIST: 'from-playlist',
+  CLEAR_PLAYLIST: 'clear-playlist'
 } 
 
 class GameServer{
@@ -140,8 +141,10 @@ class GameServer{
         this.search(msg.data, ws);
         break;
       case Commands.FROM_PLAYLIST:
-        console.log(msg, ws.u, ws.i)
         this.fromPlaylist(msg.data, ws);
+        break;
+      case Commands.CLEAR_PLAYLIST:
+        this.clearPlaylist(ws);
         break;
     }
   }
@@ -183,7 +186,14 @@ class GameServer{
           duration: v.milis_length ,
           link: v.url
         })  
+        this.updateClients(ws.i, 'add-playlist');
       });
+    }
+  }
+  async clearPlaylist(ws) {
+     if(this.videoPlayers[ws.i]) {
+      this.videoPlayers[ws.i].playlist.length = 0;
+      this.updateClients(ws.i, 'add-playlist');
     }
   }
   async search(term, ws) {
