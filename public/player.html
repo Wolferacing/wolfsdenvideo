@@ -23,7 +23,11 @@
           this.video = document.getElementById("videoFrame");
           this.urlParams = new URLSearchParams(window.location.search);      
           this.start = this.urlParams.get('start');    
-          this.user = this.urlParams.get('user');
+          var userStr = this.urlParams.get("user").split("-_-");
+          window.user = {
+            id: userStr[0],
+            name: userStr[1]
+          }
           await this.setupWebsocket();
         }
         setupWebsocket(){
@@ -31,7 +35,7 @@
             this.ws = new WebSocket('wss://' + hostUrl + '/');
             this.ws.onopen = (event) => {
               console.log("Websocket connected!");
-              this.sendMessage({path: "user-video-player", data: this.user});
+              this.sendMessage({path: "user-video-player", data: window.user});
               resolve();
             };
             this.ws.onmessage = (event) => {

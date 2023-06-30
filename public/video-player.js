@@ -50,7 +50,7 @@ class VideoSystem {
       try{
         if(!window.user) {
           if(this.urlParams.has("user")) {
-            var userStr = this.urlParams.get("user").split(":|:");
+            var userStr = this.urlParams.get("user").split("-_-");
             window.user = {
               id: userStr[0],
               name: userStr[1]
@@ -73,6 +73,10 @@ class VideoSystem {
     if(this.urlParams.has("playlistId")) {
       this.playlistId = this.urlParams.get("playlistId");
       this.playPlaylist();
+    }
+    if(!window.isPlaylist) {
+      this.vidya = document.getElementById('youtube-video');
+      this.vidya.setAttribute('sq-browser','url: https://sq-synced-videoplayer.glitch.me/player.html?start=0&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name);
     }
   }
   playPlaylist(shouldClear) {
@@ -114,19 +118,18 @@ class VideoSystem {
   playVidya(vidya, currentTrack, currentTime, force) {
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-        vidya.setAttribute('sq-browser','url: https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime + '&user=' + window.user.id);
+        vidya.setAttribute('sq-browser','url: https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime  + '&instanceId=' + this.instanceId + '&user=' + window.user.id + ':|:' + window.user.name);
       }
       this.lastUrl = this.player.playlist[currentTrack].link;
     }
   }
   parseMessage(msg) {
-    const vidya = document.getElementById('youtube-video');
     const json = JSON.parse(msg);
     switch(json.path) {
       case Responses.SYNC_TIME:
         if(!window.isPlaylist) {
-          if(vidya) {
-            this.playVidya(vidya, json.data.currentTrack, json.data.currentTime);
+          if(this.vidya) {
+            this.playVidya(this.vidya, json.data.currentTrack, json.data.currentTime);
           }
         }else{
           const currentTime = document.querySelector('.currentTime');
@@ -145,8 +148,8 @@ class VideoSystem {
         if(window.isPlaylist) {
           this.updatePlaylist(this.player);
         }else{
-          if(vidya && json.data.type === "set-track") {
-            this.playVidya(vidya, json.data.video.currentTrack, json.data.video.currentTime, true);
+          if(this.vidya && json.data.type === "set-track") {
+            this.playVidya(this.vidya, json.data.video.currentTrack, json.data.video.currentTime, true);
           }
         }
         break;
