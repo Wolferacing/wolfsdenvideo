@@ -159,18 +159,18 @@ class GameServer{
         break;
     }
   }
-  setUserVideoPlayer(userId, ws) {
+  setUserVideoPlayer(data, ws) {
     this.wss.clients.forEach((ws) => {
-      if(ws.u && ws.u.id === userId) {
-        console.log("setting user video for ", userId);
+      if(ws.u && ws.u.id === data.id) {
+        console.log("setting user video for ", data.id);
         ws.user_video = ws;
       }
     });
   }
   setVolume(ws, isDown) {
-        console.log("setting user volume for ", ws.u.id);
     if(ws.user_video) {
-      this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME);
+        console.log("setting user volume for ", ws.u.id);
+      this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME, {});
     }
   }
   async getDirectUrl(youtubeId) {
