@@ -178,23 +178,27 @@ class GameServer{
   }
   async fromPlaylist(id, ws) {
     let playlist = await ytfps(id, { limit: 50 });
-    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length === 0) {
-      this.videoPlayers[ws.i].playlist.length = 0;
-      playlist.videos.forEach(v=>{
-        this.videoPlayers[ws.i].playlist.push({
-          title: v.title,
-          thumbnail: v.thumbnail_url,
-          duration: v.milis_length ,
-          link: v.url
-        })  
-        this.updateClients(ws.i, 'add-playlist');
-      });
-    }
+    this.onlyIfHost(ws, async () => {
+      if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length === 0) {
+        this.videoPlayers[ws.i].playlist.length = 0;
+        playlist.videos.forEach(v=>{
+          this.videoPlayers[ws.i].playlist.push({
+            title: v.title,
+            thumbnail: v.thumbnail_url,
+            duration: v.milis_length ,
+            link: v.url
+          })  
+          this.updateClients(ws.i, 'add-playlist');
+        });
+      }
+    }, this.videoPlayers[ws.i].locked);
   }
   async clearPlaylist(ws) {
      if(this.videoPlayers[ws.i]) {
-      this.videoPlayers[ws.i].playlist.length = 0;
-      this.updateClients(ws.i, 'add-playlist');
+      this.onlyIfHost(ws, async () => {
+        this.videoPlayers[ws.i].playlist.length = 0;
+        this.updateClients(ws.i, 'add-playlist');
+      }, this.videoPlayers[ws.i].locked);
     }
   }
   async search(term, ws) {
