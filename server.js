@@ -159,17 +159,15 @@ class GameServer{
         break;
     }
   }
-  setUserVideoPlayer(data, ws) {
+  setUserVideoPlayer(data, user_video) {
     this.wss.clients.forEach((ws) => {
       if(ws.u && ws.u.id === data.id) {
-        console.log("setting user video for ", data.id);
-        ws.user_video = ws;
+        ws.user_video = user_video;
       }
     });
   }
   setVolume(ws, isDown) {
     if(ws.user_video) {
-        console.log("setting user volume for ", ws.u.id);
       this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME, {});
     }
   }

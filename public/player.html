@@ -4,6 +4,9 @@
     <script src="https://www.youtube.com/iframe_api"></script>
   </head>  
   <body>
+    <div id="status" style="position: absolute; top: 100px; left: 100px; z-index: 99; background: white">
+      Here is the status!!!
+    </div>
     <div id="player">
       
     </div>
@@ -39,7 +42,6 @@
             };
             this.ws.onmessage = (event) => {
               if(typeof event.data === 'string'){
-                document.getElementById('player').innerHTML = event.data;
                 this.parseMessage(event.data);
               }
             }
@@ -61,12 +63,12 @@
           switch(json.path) {
             case Responses.DOWN_VOLUME:
               if(vol > 0) {
-                // this.player.setVolume(player.getVolume()-10)
+                this.player.setVolume(player.getVolume()-10)
               }
               break;
             case Responses.UP_VOLUME:
               if(vol < 100) {
-                // this.player.setVolume(player.getVolume()+10)
+                this.player.setVolume(player.getVolume()+10)
               }
               break;
           }
