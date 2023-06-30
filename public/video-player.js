@@ -43,18 +43,26 @@ class VideoSystem {
     if(window.isPlaylist) {
       this.setupPlaylistUI();
     }
+    this.urlParams = new URLSearchParams(window.location.search);
     if(window.isBanter) {
       await this.awaitExistance(window, 'user');
     }else{
       try{
         if(!window.user) {
-          this.generateGuestUser();
+          if(this.urlParams.has("user")) {
+            var userStr = this.urlParams.get("user").split(":|:");
+            window.user = {
+              id: userStr[0],
+              name: userStr[1]
+            }
+          }else{
+            this.generateGuestUser();
+          }
         }
       }catch{
         this.generateGuestUser()
       }
     } 
-    this.urlParams = new URLSearchParams(window.location.search);
     
     this.instanceId = this.urlParams.get("instanceId") || thisScript.getAttribute("instance") || "666";
     
