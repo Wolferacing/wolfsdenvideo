@@ -93,9 +93,8 @@ class GameServer{
     Object.keys(this.videoPlayers).forEach(key => {
       const videoPlayer = this.videoPlayers[key];
       videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
-      console.log(ws.u.name, 'remove user');
       if(videoPlayer.host === ws.u) {
-        console.log(ws.u.name, 'user was host, enabling takeOver');
+        console.log(ws.u ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
         this.updateClients(ws.i, 'host-lost');
       }
@@ -161,6 +160,7 @@ class GameServer{
     }
   }
   setUserVideoPlayer(userId, ws) {
+    console.log("setting user video for ", userId);
     this.wss.clients.forEach((ws) => {
       if(ws.u === userId) {
         ws.user_video = ws;

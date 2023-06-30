@@ -26,7 +26,9 @@ const Commands = {
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   TAKE_OVER: 'take-over',
   FROM_PLAYLIST: 'from-playlist',
-  CLEAR_PLAYLIST: 'clear-playlist'
+  CLEAR_PLAYLIST: 'clear-playlist',
+  DOWN_VOLUME: 'down-volume',
+  UP_VOLUME: 'up-volume'
 } 
 
 const thisScript = document.currentScript;
@@ -434,6 +436,17 @@ class VideoSystem {
         this.hideAddItem();
       };
       this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
+    });
+    
+    this.volUp = document.querySelector('#volUp');
+    
+    this.volUp.addEventListener('click', () => {
+      this.sendMessage({path: Commands.UP_VOLUME });
+    });
+    
+    this.volDown = document.querySelector('#volDown');
+    this.volDown.addEventListener('click', () => {
+      this.sendMessage({path: Commands.DOWN_VOLUME });
     });
     
     this.hostTitle = document.querySelector('.hostTitle');
