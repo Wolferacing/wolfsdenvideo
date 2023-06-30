@@ -65,8 +65,8 @@ class VideoSystem {
       this.playPlaylist();
     }
   }
-  playPlaylist() {
-    this.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId}, u: window.user});
+  playPlaylist(shouldClear) {
+    this.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId, shouldClear}, u: window.user});
   }
   clearPlaylist() {
     this.sendMessage({path: Commands.CLEAR_PLAYLIST, u: window.user});
@@ -433,7 +433,9 @@ class VideoSystem {
         this.addItemSubmit.removeEventListener(this.addItemHandler);
       }
       this.addItemHandler = () => {
-        console.log(this.addItemInput.value);
+        this.playlistId = this.addItemInput.value;
+        this.playPlaylist();
+        this.hideAddItem();
       };
       this.addItemSubmit.addEventListener('click', this.addItemHandler);
     });
@@ -445,7 +447,7 @@ class VideoSystem {
       this.addItemBackDrop.style.display = 'block';
       this.addItemTitle.innerHTML = "Add youtube video by the video ID";
       this.addItemInput.placeholder = "Video ID...";
-      this.addItemSubmit.innerHTML = "Add Video To Playlist From PlaylistID";
+      this.addItemSubmit.innerHTML = "Add Video To Playlist From VideoID";
       this.addItemSubmit.removeAllListeners();
       if(this.addItemHandler) {
         this.addItemSubmit.removeEventListener(this.addItemHandler);

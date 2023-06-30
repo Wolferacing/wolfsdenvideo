@@ -176,8 +176,8 @@ class GameServer{
       return false;
     }
   }
-  async fromPlaylist(id, ws) {
-    let playlist = await ytfps(id, { limit: 50 });
+  async fromPlaylist(data, ws) {
+    let playlist = await ytfps(data.id, { limit: 50 });
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length === 0) {
         this.videoPlayers[ws.i].playlist.length = 0;

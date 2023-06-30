@@ -91,6 +91,7 @@ body{
   font-size: 1.5em;
   display: block;
   margin-top: 1em;
+  margin-left: 1em;
 }
 .material-icons {
   font-family: 'Material Icons';
@@ -138,6 +139,7 @@ body{
 .slim{
   padding: 5 5;
   font-size: 0.8em;
+  margin-top: -3px;
 }
 .teal{
   background: teal;
