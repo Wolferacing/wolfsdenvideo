@@ -135,6 +135,7 @@ body{
   cursor: pointer;
   border-radius: 3px;
   margin-left: 15px;
+  user-select: none;
 }
 .slim{
   padding: 5 5;
