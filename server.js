@@ -117,25 +117,25 @@ class GameServer{
         break;
       case Commands.SET_TIME:
         this.setVideoTime(msg.data, ws);
-        break
+        break;
       case Commands.SET_TRACK:
         this.setVideoTrack(msg.data, ws);
-        break
+        break;
       case Commands.TOGGLE_LOCK:
         this.toggleLock(msg.data, ws);
-        break
+        break;
       case Commands.TOGGLE_CAN_TAKE_OVER:
         this.toggleCanTakeOver(msg.data, ws);
-        break
+        break;
       case Commands.TAKE_OVER:
         this.takeOver(ws);
-        break
+        break;
       case Commands.ADD_TO_PLAYLIST:
         this.addToPlaylist(msg.data, ws);
-        break
+        break;
       case Commands.MOVE_PLAYLIST_ITEM:
         this.movePlaylistItem(msg.data, ws);
-        break
+        break;
       case Commands.REMOVE_PLAYLIST_ITEM:
         this.removePlaylistItem(msg.data, ws);
         break;
@@ -169,6 +169,7 @@ class GameServer{
   }
   setVolume(ws, isDown) {
     if(ws.user_video) {
+        console.log("set user volume", ws.u.id);
       this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME, {});
     }
   }

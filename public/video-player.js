@@ -76,6 +76,9 @@ class VideoSystem {
     }
     if(!window.isPlaylist) {
       this.vidya = document.getElementById('youtube-video');
+     var url = 'https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime  + '&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name;
+      vidya.setAttribute('sq-browser','url: ' + url);
+      https://sq-synced-videoplayer.glitch.me/playlist.html?instanceId=cabaret&playlistId=PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj
     }
   }
   playPlaylist(shouldClear) {
@@ -118,7 +121,6 @@ class VideoSystem {
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         var url = 'https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime  + '&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name;
-        console.log("Opening video url", url);
         vidya.setAttribute('sq-browser','url: ' + url);
       }
       this.lastUrl = this.player.playlist[currentTrack].link;
