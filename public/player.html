@@ -14,6 +14,7 @@
           document.getElementById('status').innerHTML = "very start...";
       
       const Responses = {
+        LINK_ME: 'link-me',
         DOWN_VOLUME: 'down-volume',
         UP_VOLUME: 'up-volume'
       }
@@ -40,7 +41,7 @@
             this.ws = new WebSocket('wss://' + hostUrl + '/');
             this.ws.onopen = (event) => {
               document.getElementById('status').innerHTML = "Websocket connected!";
-              this.sendMessage({path: "user-video-player", data: window.user});
+              this.sendMessage({path: "is-video-player", data: {}});
               resolve();
             };
             this.ws.onmessage = (event) => {
@@ -64,6 +65,11 @@
           const json = JSON.parse(msg);
           const vol = this.player.getVolume();
           switch(json.path) {
+            case Responses.LINK_ME:
+              if(json.data.id === window.user.id) {
+                this.sendMessage({path: "user-video-player", data: window.user});
+              }
+              break;
             case Responses.DOWN_VOLUME:
               if(vol > 0) {
                 this.player.setVolume(this.player.getVolume()-10)

@@ -14,7 +14,8 @@ const Responses = {
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',
   SEARCH_RESULTS: 'search-results',
-  ERROR:'error'
+  ERROR:'error',
+  LINK_ME: 'link-me'
 }
 
 const Commands = {
@@ -30,6 +31,7 @@ const Commands = {
   FROM_PLAYLIST: 'from-playlist',
   CLEAR_PLAYLIST: 'clear-playlist',
   USER_VIDEO_PLAYER: 'user-video-player',
+  IS_VIDEO_PLAYER: 'is-video-player',
   DOWN_VOLUME: 'down-volume',
   UP_VOLUME: 'up-volume'
 } 
@@ -111,6 +113,7 @@ class GameServer{
           ws.u = msg.u;
           ws.i = msg.data;
           this.createVideoPlayer(msg.data, msg.u, ws);
+          this.getUserVideoPlayer();
         }else{
           this.send(ws, 'error');
         }
@@ -151,6 +154,9 @@ class GameServer{
       case Commands.USER_VIDEO_PLAYER:
         this.setUserVideoPlayer(msg.data, ws);
         break;
+      case Commands.IS_VIDEO_PLAYER:
+        ws.is_video_player = true;
+        break;
       case Commands.DOWN_VOLUME:
         this.setVolume(ws, true);
         break;
@@ -159,11 +165,19 @@ class GameServer{
         break;
     }
   }
+  getUserVideoPlayer() {
+    this.wss.clients.forEach((ws) => {
+      if(ws.is_video_player && !ws.is_linked) {
+        this.send(ws, Responses.LINK_ME, {});
+      }
+    });
+  }
   setUserVideoPlayer(data, user_video) {
     this.wss.clients.forEach((ws) => {
       if(ws.u && ws.u.id === data.id) {
         console.log("set user video player", data.id);
         ws.user_video = user_video;
+        ws.user_video.is_linked = true;
       }
     });
   }
