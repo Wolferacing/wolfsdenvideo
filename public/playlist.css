@@ -12,8 +12,6 @@ body{
   padding: 0;
   width: 100%;
 }
-                                                     
-
 .playlistContainer{
   position: relative;
   margin: auto;
@@ -47,7 +45,7 @@ body{
   height: calc(100% - 64px);
   width: 100%;
 }
-.searchBackDrop{
+.searchBackDrop,.addItemBackDrop{
   background: rgba(0,0,0,0.8);
   position: absolute;
   top: 66px;

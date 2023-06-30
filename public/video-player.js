@@ -195,9 +195,9 @@ class VideoSystem {
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
-    this.clearPlaylist.style.display = player.locked ? 'none' :  'inline-block';
-    this.addPlaylist.style.display = player.locked ? 'none' :  'inline-block';
-    this.addVideo.style.display = player.locked ? 'none' :  'inline-block';
+    this.clearPlaylist.style.display = player.locked && !isMe ? 'none' :  'inline-block';
+    this.addPlaylist.style.display = player.locked && !isMe ? 'none' :  'inline-block';
+    this.addVideo.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button slim red' : 'button slim teal') : 'button slim teal';
@@ -421,7 +421,7 @@ class VideoSystem {
     
     this.addItemTitle = document.querySelector('.addItemTitle');
     
-    this.addItemInput = document.querySelector('.addItemInput');
+    this.addItemInput = document.querySelector('#addItemInput');
     
     this.addItemSubmit =  document.querySelector('#addItemSubmit');
     
