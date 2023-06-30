@@ -8,12 +8,25 @@
     <div id="player">
       
     </div>
-    <script> 
+    <script>
+      
+      const Responses = {
+        DOWN_VOLUME: 'out-of-bounds',
+        UP_VOLUME: 'up-volume',
+        PLAYBACK_UPDATE: 'playback-update',
+        SYNC_TIME: 'sync-time',
+        SEARCH_RESULTS: 'search-results',
+        ERROR:'error'
+      }
       class Player() {
         constructor(){
           this.init();
         }
         async init() {
+          this.video = document.getElementById("videoFrame");
+          this.urlParams = new URLSearchParams(window.location.search);      
+          this.start = urlParams.get('start');    
+          this.user = urlParams.get('user');
           await this.setupWebsocket();
         }
         setupWebsocket(){
@@ -21,7 +34,7 @@
             this.ws = new WebSocket('wss://' + hostUrl + '/');
             this.ws.onopen = (event) => {
               console.log("Websocket connected!");
-              this.sendMessage({path: "instance", data: this.instanceId, u: window.user});
+              this.sendMessage({path: "user-video-player", data: this.user});
               resolve();
             };
             this.ws.onmessage = (event) => {
@@ -41,43 +54,78 @@
             };
           });
         } 
+        parseMessage(msg) {
+          const json = JSON.parse(msg);
+          switch(json.path) {
+            case Responses.DOWN_VOLUME:
+              const vol = player.getVolume();
+              if(vol > 0) {
+                this.player.setVolume(player.getVolume()-10)
+              }
+              break;
+            case Responses.UP_VOLUME:
+              const vol = player.getVolume();
+              if(vol < 100) {
+                this.player.setVolume(player.getVolume()+10)
+              }
+              break;
+              
+          }
+        }
+        sendMessage(msg){
+          this.ws.send(JSON.stringify(msg));
+        }
         onYouTubeIframeAPIReady() {
-          player = new YT.Player('player', {
+          this.player = new YT.Player('player', {
             height: window.innerHeight,
             width: window.innerWidth,
-            videoId: getId(decodeURIComponent(urlParams.get('youtube'))),
+            videoId: this.getId(decodeURIComponent(this.urlParams.get('youtube'))),
             playerVars: {
               'playsinline': 1,
               'autoplay': 0,
               'disablekb': 1,
               'modestbranding': true,
               'origin': 'https://sq-synced-videoplayer.glitch.me',
-              'start': start ? Number(start) : 0
+              'start': this.start ? Number(this.start) : 0
             },
             events: {
               'onReady': (event) => {
-                console.log('ready');
                 event.target.setVolume(10);
-                event.target.seekTo(start ? Number(start) : 0)
+                event.target.seekTo(this.start ? Number(this.start) : 0)
               }
             }
           });
         }
+        getId = (url) => {
+          var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+          var match = url.match(regExp);
+          return (match&&match[7].length==11)? match[7] : false;
+        }
       }
-      
-      
-      
-      let getId = (url) => {
-        var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-        var match = url.match(regExp);
-        return (match&&match[7].length==11)? match[7] : false;
+      const player = new Player();
+      function onYouTubeIframeAPIReady() {
+        // player = new YT.Player('player', {
+        //   height: window.innerHeight,
+        //   width: window.innerWidth,
+        //   videoId: getId(decodeURIComponent(urlParams.get('youtube'))),
+        //   playerVars: {
+        //     'playsinline': 1,
+        //     'autoplay': 0,
+        //     'disablekb': 1,
+        //     'modestbranding': true,
+        //     'origin': 'https://sq-synced-videoplayer.glitch.me',
+        //     'start': start ? Number(start) : 0
+        //   },
+        //   events: {
+        //     'onReady': (event) => {
+        //       console.log('ready');
+        //       event.target.setVolume(10);
+        //       event.target.seekTo(start ? Number(start) : 0)
+        //     }
+        //   }
+        // });
+        player.onYouTubeIframeAPIReady();
       }
-      let video = document.getElementById("videoFrame");
-      const urlParams = new URLSearchParams(window.location.search);      
-      const start = urlParams.get('start');
-      console.log("skipping to ", start);
-      var player;
-      function 
     
     </script>
   </body>
