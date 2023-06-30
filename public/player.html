@@ -9,6 +9,63 @@
       
     </div>
     <script> 
+      class Player() {
+        constructor(){
+          this.init();
+        }
+        async init() {
+          await this.setupWebsocket();
+        }
+        setupWebsocket(){
+          return new Promise(resolve => {
+            this.ws = new WebSocket('wss://' + hostUrl + '/');
+            this.ws.onopen = (event) => {
+              console.log("Websocket connected!");
+              this.sendMessage({path: "instance", data: this.instanceId, u: window.user});
+              resolve();
+            };
+            this.ws.onmessage = (event) => {
+              if(typeof event.data === 'string'){
+                this.parseMessage(event.data);
+              }
+            }
+            this.ws.onclose =  (event) => {
+              console.log("Websocket closed...");
+              setTimeout(() => {
+                if(window.isBanter) {
+                  this.setupWebsocket();
+                }else{
+                  window.location.reload();
+                } 
+              }, 1000);
+            };
+          });
+        } 
+        onYouTubeIframeAPIReady() {
+          player = new YT.Player('player', {
+            height: window.innerHeight,
+            width: window.innerWidth,
+            videoId: getId(decodeURIComponent(urlParams.get('youtube'))),
+            playerVars: {
+              'playsinline': 1,
+              'autoplay': 0,
+              'disablekb': 1,
+              'modestbranding': true,
+              'origin': 'https://sq-synced-videoplayer.glitch.me',
+              'start': start ? Number(start) : 0
+            },
+            events: {
+              'onReady': (event) => {
+                console.log('ready');
+                event.target.setVolume(10);
+                event.target.seekTo(start ? Number(start) : 0)
+              }
+            }
+          });
+        }
+      }
+      
+      
       
       let getId = (url) => {
         var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
@@ -20,29 +77,7 @@
       const start = urlParams.get('start');
       console.log("skipping to ", start);
       var player;
-      function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', {
-          height: window.innerHeight,
-          width: window.innerWidth,
-          videoId: getId(decodeURIComponent(urlParams.get('youtube'))),
-          playerVars: {
-            'playsinline': 1,
-            'autoplay': 0,
-            'controls': 0,
-            'disablekb': 1,
-            'modestbranding': true,
-            'origin': 'https://sq-synced-videoplayer.glitch.me',
-            'start': start ? Number(start) : 0
-          },
-          events: {
-            'onReady': (event) => {
-              console.log('ready');
-              event.target.setVolume(10);
-              event.target.seekTo(start ? Number(start) : 0)
-            }
-          }
-        });
-      }
+      function 
     
     </script>
   </body>

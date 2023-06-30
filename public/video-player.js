@@ -104,7 +104,7 @@ class VideoSystem {
   playVidya(vidya, currentTrack, currentTime, force) {
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-        vidya.setAttribute('sq-browser','url: https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime);
+        vidya.setAttribute('sq-browser','url: https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime + '&user=' + window.user.id);
       }
       this.lastUrl = this.player.playlist[currentTrack].link;
     }
