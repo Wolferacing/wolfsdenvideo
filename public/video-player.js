@@ -72,13 +72,15 @@ class VideoSystem {
     await this.setupWebsocket();
     if(this.urlParams.has("playlistId")) {
       this.playlistId = this.urlParams.get("playlistId");
+    }else if(window.playlistId) {
+      this.playlistId = window.playlistId;
       this.playPlaylist();
     }
     if(!window.isPlaylist) {
       this.vidya = document.getElementById('youtube-video');
-     var url = 'https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime  + '&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name;
-      vidya.setAttribute('sq-browser','url: ' + url);
-      https://sq-synced-videoplayer.glitch.me/playlist.html?instanceId=cabaret&playlistId=PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj
+      var url = 'https://sq-synced-videoplayer.glitch.me/playlist.html?instanceId=' + this.instanceId + (this.playlistId ? '&playlistId=' + this.playlistId : '' ) + '&user=' + window.user.id + '-_-' + window.user.name;
+      console.log("opening url", url);
+      this.vidya.setAttribute('sq-browser','url: ' + url);
     }
   }
   playPlaylist(shouldClear) {
