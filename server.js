@@ -179,7 +179,6 @@ class GameServer{
   }
   setVolume(ws, isDown) {
     if(ws.user_video) {
-        console.log("set user volume", ws.u.id);
       this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME, {});
     }
   }
