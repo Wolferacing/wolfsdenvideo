@@ -311,7 +311,7 @@ class GameServer{
               if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
                 this.videoPlayers[instanceId].currentTrack = 0;
               }
-              track = this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack];
+              // track = this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack];
               this.videoPlayers[instanceId].currentTime = 0;
               this.videoPlayers[instanceId].lastStartTime = now;
               this.updateClients(instanceId, Commands.SET_TRACK);

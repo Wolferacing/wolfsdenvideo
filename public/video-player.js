@@ -104,7 +104,6 @@ class VideoSystem {
   parseMessage(msg) {
     const vidya = document.getElementById('youtube-video');
     const json = JSON.parse(msg);
-    console.log("recieved message:", json);
     switch(json.path) {
       case Responses.SYNC_TIME:
         if(!window.isPlaylist) {
