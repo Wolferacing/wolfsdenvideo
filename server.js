@@ -106,7 +106,7 @@ class GameServer{
   parseMessage(msg, ws){
     switch(msg.path) {
       case "instance":
-        if(msg.u) {
+        if(msg.u) { 
           console.log(msg.u.name, 'connected', msg.data);
           ws.u = msg.u;
           ws.i = msg.data;

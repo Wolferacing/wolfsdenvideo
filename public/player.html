@@ -11,6 +11,7 @@
       
     </div>
     <script>
+          document.getElementById('status').innerHTML = "very start...";
       
       const Responses = {
         DOWN_VOLUME: 'down-volume',
@@ -22,6 +23,7 @@
           this.init();
         }
         init() {
+          document.getElementById('status').innerHTML = "start...";
           this.video = document.getElementById("videoFrame");
           this.urlParams = new URLSearchParams(window.location.search);      
           this.start = this.urlParams.get('start');    
@@ -30,10 +32,8 @@
             id: userStr[0],
             name: userStr[1]
           }
-          setTimeout(()=>{
-            this.setupWebsocket();
-            document.getElementById('status').innerHTML = "setupWebsocket";
-          }, 1500);
+          document.getElementById('status').innerHTML = "Websocket connect...";
+          this.setupWebsocket();
         }
         setupWebsocket(){
           return new Promise(resolve => {

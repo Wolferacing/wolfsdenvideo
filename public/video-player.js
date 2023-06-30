@@ -74,13 +74,15 @@ class VideoSystem {
       this.playlistId = this.urlParams.get("playlistId");
     }else if(window.playlistId) {
       this.playlistId = window.playlistId;
-      this.playPlaylist();
+      if(window.isPlaylist) {
+        
+      }
     }
     if(!window.isPlaylist) {
       this.vidya = document.getElementById('youtube-video');
       var url = 'https://sq-synced-videoplayer.glitch.me/playlist.html?instanceId=' + this.instanceId + (this.playlistId ? '&playlistId=' + this.playlistId : '' ) + '&user=' + window.user.id + '-_-' + window.user.name;
       console.log("opening url", url);
-      this.vidya.setAttribute('sq-browser','url: ' + url);
+      this.vidya.setAttribute('sq-browser','url: ' + url)
     }
   }
   playPlaylist(shouldClear) {
