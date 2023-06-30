@@ -140,6 +140,7 @@ class GameServer{
         this.search(msg.data, ws);
         break;
       case Commands.FROM_PLAYLIST:
+        console.log(msg, ws.u, ws.i)
         this.fromPlaylist(msg.data, ws);
         break;
     }
