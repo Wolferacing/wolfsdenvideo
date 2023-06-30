@@ -26,7 +26,7 @@ body{
 .searchContainer{
   float: right;
 }
-.searchInput{
+.searchInput, .addItemInput{
   background: rgba(0,0,0,0.2);
   margin: 15px;
   height: 28px;
@@ -56,7 +56,7 @@ body{
   width: 100%;
   display: none;
 }
-.videoSearchContainer{
+.videoSearchContainer, .addItemContainer{
   position: absolute;
   top: 0;
   margin-top: 66px;
@@ -83,7 +83,7 @@ body{
 .pointer{
   cursor: pointer;
 }
-.hostTitle{
+.hostTitle, .addItemTitle{
   font-style: italic;
   font-size: 0.8em;
   display: inline-block;

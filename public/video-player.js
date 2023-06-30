@@ -62,12 +62,11 @@ class VideoSystem {
     await this.setupWebsocket();
     if(this.urlParams.has("playlistId")) {
       this.playlistId = this.urlParams.get("playlistId");
-      this.playPlaylist(false);
+      this.playPlaylist();
     }
   }
-  playPlaylist(shouldClear) {
-    //this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-    this.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId, shouldClear}, u: window.user});
+  playPlaylist() {
+    this.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId}, u: window.user});
   }
   clearPlaylist() {
     this.sendMessage({path: Commands.CLEAR_PLAYLIST, u: window.user});
@@ -398,6 +397,14 @@ class VideoSystem {
           this.sendMessage({ path: Commands.TAKE_OVER });
         }
     });
+    
+    this.clearPlaylist = document.querySelector('#clearPlaylist');
+    
+    this.clearPlaylist.addEventListener('click', () => {
+        this.clearPlaylist();
+    });
+    
+    this.addItemContainer = document.querySelector('.addItemContainer');
     
     this.hostTitle = document.querySelector('.hostTitle');
   }
