@@ -24,10 +24,10 @@ body{
 .searchContainer{
   float: right;
 }
-.searchInput, .addItemInput{
+.searchInput, #addItemInput{
   background: rgba(0,0,0,0.2);
   margin: 15px;
-  height: 28px;
+  height: 32px;
   border: 1px solid white;
   font-size: 20px;
   color: white;
@@ -81,10 +81,16 @@ body{
 .pointer{
   cursor: pointer;
 }
-.hostTitle, .addItemTitle{
+.hostTitle{
   font-style: italic;
   font-size: 0.8em;
   display: inline-block;
+}
+.addItemTitle{
+  font-style: italic;
+  font-size: 1.5em;
+  display: block;
+  margin-top: 1em;
 }
 .material-icons {
   font-family: 'Material Icons';
@@ -130,7 +136,7 @@ body{
   margin-left: 15px;
 }
 .slim{
-  padding: 3 3;
+  padding: 5 5;
   font-size: 0.8em;
 }
 .teal{
