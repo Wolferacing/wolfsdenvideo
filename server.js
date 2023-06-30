@@ -28,7 +28,10 @@ const Commands = {
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   TAKE_OVER: 'take-over',
   FROM_PLAYLIST: 'from-playlist',
-  CLEAR_PLAYLIST: 'clear-playlist'
+  CLEAR_PLAYLIST: 'clear-playlist',
+  USER_VIDEO_PLAYER: 'user-video-player',
+  DOWN_VOLUME: 'down-volume',
+  UP_VOLUME: 'up-volume'
 } 
 
 class GameServer{
@@ -146,6 +149,27 @@ class GameServer{
       case Commands.CLEAR_PLAYLIST:
         this.clearPlaylist(ws);
         break;
+      case Commands.USER_VIDEO_PLAYER:
+        this.setUserVideoPlayer(msg.data, ws);
+        break;
+      case Commands.DOWN_VOLUME:
+        this.setVolume(ws, true);
+        break;
+      case Commands.UP_VOLUME:
+        this.setVolume(ws);
+        break;
+    }
+  }
+  setUserVideoPlayer(userId, ws) {
+    this.wss.clients.forEach((ws) => {
+      if(ws.u === userId) {
+        ws.user_video = ws;
+      }
+    });
+  }
+  setVolume(ws, isDown) {
+    if(ws.user_video) {
+      this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME);
     }
   }
   async getDirectUrl(youtubeId) {

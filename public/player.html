@@ -11,22 +11,18 @@
     <script>
       
       const Responses = {
-        DOWN_VOLUME: 'out-of-bounds',
-        UP_VOLUME: 'up-volume',
-        PLAYBACK_UPDATE: 'playback-update',
-        SYNC_TIME: 'sync-time',
-        SEARCH_RESULTS: 'search-results',
-        ERROR:'error'
+        DOWN_VOLUME: 'down-volume',
+        UP_VOLUME: 'up-volume'
       }
-      class Player() {
+      class Player {
         constructor(){
           this.init();
         }
         async init() {
           this.video = document.getElementById("videoFrame");
           this.urlParams = new URLSearchParams(window.location.search);      
-          this.start = urlParams.get('start');    
-          this.user = urlParams.get('user');
+          this.start = this.urlParams.get('start');    
+          this.user = this.urlParams.get('user');
           await this.setupWebsocket();
         }
         setupWebsocket(){
@@ -56,15 +52,14 @@
         } 
         parseMessage(msg) {
           const json = JSON.parse(msg);
+            const vol = player.getVolume();
           switch(json.path) {
             case Responses.DOWN_VOLUME:
-              const vol = player.getVolume();
               if(vol > 0) {
                 this.player.setVolume(player.getVolume()-10)
               }
               break;
             case Responses.UP_VOLUME:
-              const vol = player.getVolume();
               if(vol < 100) {
                 this.player.setVolume(player.getVolume()+10)
               }
