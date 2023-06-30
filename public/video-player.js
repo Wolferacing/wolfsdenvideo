@@ -117,7 +117,9 @@ class VideoSystem {
   playVidya(vidya, currentTrack, currentTime, force) {
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-        vidya.setAttribute('sq-browser','url: https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime  + '&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name);
+        var url = 'https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent(this.player.playlist[currentTrack].link) + '&start=' + currentTime  + '&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name;
+        console.log("Opening video url", url);
+        vidya.setAttribute('sq-browser','url: ' + url);
       }
       this.lastUrl = this.player.playlist[currentTrack].link;
     }

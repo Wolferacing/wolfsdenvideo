@@ -162,6 +162,7 @@ class GameServer{
   setUserVideoPlayer(data, user_video) {
     this.wss.clients.forEach((ws) => {
       if(ws.u && ws.u.id === data.id) {
+        console.log("set user video player", data.id);
         ws.user_video = user_video;
       }
     });
