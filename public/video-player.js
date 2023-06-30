@@ -25,7 +25,8 @@ const Commands = {
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   TAKE_OVER: 'take-over',
-  FROM_PLAYLIST: 'from-playlist'
+  FROM_PLAYLIST: 'from-playlist',
+  CLEAR_PLAYLIST: 'clear-playlist'
 } 
 
 const thisScript = document.currentScript;
@@ -60,8 +61,16 @@ class VideoSystem {
     await this.getInstanceId();
     await this.setupWebsocket();
     if(this.urlParams.has("playlistId")) {
-      this.sendMessage({path: Commands.FROM_PLAYLIST, data: this.urlParams.get("playlistId"), u: window.user});
+      this.playlistId = this.urlParams.get("playlistId");
+      this.playPlaylist();
     }
+  }
+  playPlaylist() {
+    //this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+    this.sendMessage({path: Commands.FROM_PLAYLIST, data: this.playlistId, u: window.user});
+  }
+  clearPlaylist() {
+    this.sendMessage({path: Commands.CLEAR_PLAYLIST, u: window.user});
   }
   generateGuestUser() {
     const id = this.getUniquId();
