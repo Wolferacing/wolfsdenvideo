@@ -177,9 +177,10 @@ class GameServer{
     }
   }
   async fromPlaylist(data, ws) {
+    console.log(data, "fromPlaylist");
     let playlist = await ytfps(data.id, { limit: 50 });
     this.onlyIfHost(ws, async () => {
-      if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length === 0) {
+      if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
         this.videoPlayers[ws.i].playlist.length = 0;
         playlist.videos.forEach(v=>{
           this.videoPlayers[ws.i].playlist.push({

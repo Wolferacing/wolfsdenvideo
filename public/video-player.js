@@ -197,7 +197,6 @@ class VideoSystem {
     this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
     this.clearPlaylistButton.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.addPlaylist.style.display = player.locked && !isMe ? 'none' :  'inline-block';
-    this.addVideo.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button slim red' : 'button slim teal') : 'button slim teal';
@@ -419,43 +418,22 @@ class VideoSystem {
     
     this.addItemInput = document.querySelector('#addItemInput');
     
-    this.addItemSubmit =  document.querySelector('#addItemSubmit');
+    this.addItemSubmit = document.querySelector('#addItemSubmit');
     
     this.addPlaylist = document.querySelector('#addPlaylist');
     
     this.addPlaylist.addEventListener('click', () => {
       this.addItemContainer.style.display = 'block';
       this.addItemBackDrop.style.display = 'block';
-      this.addItemTitle.innerHTML = "Add youtube playlist by the playlist ID (will clear the existing playlist!)";
-      this.addItemInput.placeholder = "Playlist ID...";
-      this.addItemSubmit.innerHTML = "Add Playlist From PlaylistID";
-      if(this.addItemHandler) {
-        this.addItemSubmit.removeEventListener(this.addItemHandler);
+      if(this.addPlaylistHandler) {
+        this.addItemSubmit.removeEventListener('click', this.addPlaylistHandler);
       }
-      this.addItemHandler = () => {
+      this.addPlaylistHandler = () => {
         this.playlistId = this.addItemInput.value;
         this.playPlaylist();
         this.hideAddItem();
       };
-      this.addItemSubmit.addEventListener('click', this.addItemHandler);
-    });
-    
-    this.addVideo = document.querySelector('#addVideo');
-    
-    this.addVideo.addEventListener('click', () => {
-      this.addItemContainer.style.display = 'block';
-      this.addItemBackDrop.style.display = 'block';
-      this.addItemTitle.innerHTML = "Add youtube video by the video ID";
-      this.addItemInput.placeholder = "Video ID...";
-      this.addItemSubmit.innerHTML = "Add Video To Playlist From VideoID";
-      this.addItemSubmit.removeAllListeners();
-      if(this.addItemHandler) {
-        this.addItemSubmit.removeEventListener(this.addItemHandler);
-      }
-      this.addItemHandler = () => {
-        console.log(this.addItemInput.value);
-      }
-      this.addItemSubmit.addEventListener('click', this.addItemHandler);
+      this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
     });
     
     this.hostTitle = document.querySelector('.hostTitle');
