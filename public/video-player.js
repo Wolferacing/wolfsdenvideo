@@ -417,8 +417,6 @@ class VideoSystem {
       
     this.addItemBackDrop.addEventListener('click', () => this.hideAddItem());
     
-    this.closeAddItem = document.querySelector('.closeAddItem');
-    
     this.addItemTitle = document.querySelector('.addItemTitle');
     
     this.addItemInput = document.querySelector('#addItemInput');
@@ -432,7 +430,7 @@ class VideoSystem {
       this.addItemTitle.innerHTML = "Add youtube playlist by the playlist ID (will clear the existing playlist!)";
       this.addItemInput.placeholder = "Playlist ID...";
       this.addItemSubmit.innerHTML = "Add Playlist";
-      this.addItemSubmit.removeAllEventListeners();
+      this.addItemSubmit.removeAllListeners();
       this.addItemSubmit.addEventListener('click', () => {
         console.log(this.addItemInput.value);
           // add by playlist id
@@ -446,7 +444,7 @@ class VideoSystem {
       this.addItemTitle.innerHTML = "Add youtube video by the video ID";
       this.addItemInput.placeholder = "Video ID...";
       this.addItemSubmit.innerHTML = "Add To Playlist";
-      this.addItemSubmit.removeAllEventListeners();
+      this.addItemSubmit.removeAllListeners();
       this.addItemSubmit.addEventListener('click', () => {
         console.log(this.addItemInput.value);
           // add by video id
