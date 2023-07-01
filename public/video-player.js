@@ -64,7 +64,7 @@ class VideoSystem {
       }
     } 
     
-    this.instanceId = this.urlParams.get("instanceId") || thisScript.getAttribute("instance") || "666";
+    this.instanceId = this.urlParams.get("instanceId") || thisScript.getAttribute("instance") || window.instanceId || "666";
     
     console.log("Instance:", this.instanceId)
     
@@ -75,11 +75,17 @@ class VideoSystem {
     }else if(window.playlistId) {
       this.playlistId = window.playlistId;
     }
+    this.vidya = document.getElementById('youtube-video');
     if(!window.isPlaylist) {
-      this.vidya = document.getElementById('youtube-video');
-      var url = 'https://sq-synced-videoplayer.glitch.me/playlist.html?instanceId=' + this.instanceId + (this.playlistId ? '&playlistId=' + this.playlistId : '' ) + '&user=' + window.user.id + '-_-' + window.user.name;
-      console.log("opening url", url);
-      this.vidya.setAttribute('sq-browser','url: ' + url)
+      if(this.playlistId) {
+        var url = 'https://sq-synced-videoplayer.glitch.me/playlist.html?instanceId=' + this.instanceId + (this.playlistId ? '&playlistId=' + this.playlistId : '' ) + '&user=' + window.user.id + '-_-' + window.user.name;
+        console.log("opening url", url);
+        this.vidya.setAttribute('sq-browser','url: ' + url)
+      }else{
+        var url = 'https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent('https://www.youtube.com/watch?v=l6UXfInuDro') + '&start=0&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name;
+        console.log("opening url", url);
+        this.vidya.setAttribute('sq-browser','url: ' + url)
+      }
     }else{
       this.playPlaylist();
     }
