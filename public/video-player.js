@@ -64,7 +64,7 @@ class VideoSystem {
       }
     } 
     
-    this.instanceId = this.urlParams.get("instanceId") || thisScript.getAttribute("instance") || window.instanceId || "666";
+    this.instanceId = this.urlParams.get("instanceId") || window.instanceId || thisScript.getAttribute("instance") || "666";
     
     console.log("Instance:", this.instanceId)
     
@@ -82,7 +82,7 @@ class VideoSystem {
         console.log("opening url", url);
         this.vidya.setAttribute('sq-browser','url: ' + url)
       }else{
-        var url = 'https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent('https://www.youtube.com/watch?v=l6UXfInuDro') + '&start=0&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name;
+        var url = 'https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso') + '&start=0&instanceId=' + this.instanceId + '&user=' + window.user.id + '-_-' + window.user.name;
         console.log("opening url", url);
         this.vidya.setAttribute('sq-browser','url: ' + url)
       }
