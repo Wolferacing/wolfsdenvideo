@@ -13,7 +13,6 @@ class Karaoke{
     this.core.sendMessage({path: "instance", data: this.core.params.instance});
   }
   setupKaraokeUI() {
-      
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
 
@@ -202,21 +201,12 @@ class Karaoke{
       // this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       if(player.currentTrack === i) {
-        const videoThumbnail = this.core.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, this.videoPlayer);
+        const videoThumbnail = this.core.makeAndAddElement('img',{width: '100%', float: 'left'}, this.videoPlayer);
       
         videoThumbnail.src = v.thumbnail;
 
-
-        const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: '100%'}, this.videoPlayer);
-
-        const videoTitle = this.core.makeAndAddElement('div',{
-          padding: '7 10 0 7', 
-          textOverflow: 'ellipsis', 
-          overflow: 'hidden', 
-          whiteSpace: 'nowrap'
-        }, videoTitleAndAction);
-
-        videoTitle.innerText = v.title;
+        
+        this.core.makeAndAddElement('div',{clear: 'both'}, this.videoPlayer);
         
         const currentTime = this.core.makeAndAddElement('div', {
           height: '4px', 
@@ -225,12 +215,34 @@ class Karaoke{
         const currentTimeInner = this.core.makeAndAddElement('div', {
           height: '4px', 
           background: 'red',
-          transition: 'width 3s',
+          transition: 'width 1s',
           transitionTimingFunction: 'linear',
           width: ((player.currentTime / player.duration) * 100) + "%",
-        }, this.videoPlayer);
+        }, currentTime);
         
         currentTimeInner.className = "currentTime";
+        
+        
+        const videoTitle = this.core.makeAndAddElement('div',{
+          padding: '7 10 0 7', 
+          textOverflow: 'ellipsis', 
+          overflow: 'hidden', 
+          whiteSpace: 'nowrap',
+        }, this.videoPlayer);
+
+        videoTitle.innerText = v.title;
+        
+        const currentTimeText = this.core.makeAndAddElement('div',{
+          padding: '7 10 0 7', 
+          textOverflow: 'ellipsis', 
+          overflow: 'hidden', 
+          whiteSpace: 'nowrap'
+        }, this.videoPlayer);
+
+
+        currentTimeText.className = "currentTimeText";
+        currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
+        
       }
     })
   }
@@ -315,5 +327,10 @@ class Karaoke{
       this.addItemContainer.style.display = 'none';
       this.addItemBackDrop.style.display = 'none';
   }
+  setupYoutubePla
 }
-new Karaoke();
+const karaoke = new Karaoke();
+
+function onYouTubeIframeAPIReady() {
+  karaoke.setupYoutubePlayer();
+}

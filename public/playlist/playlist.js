@@ -163,7 +163,7 @@ class Playlist {
         const currentTimeInner = this.core.makeAndAddElement('div', {
           height: '4px', 
           background: 'red',
-          transition: 'width 3s',
+          transition: 'width 1s',
           transitionTimingFunction: 'linear',
           width: ((player.currentTime / player.duration) * 100) + "%",
         }, currentTime);

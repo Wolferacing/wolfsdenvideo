@@ -43,6 +43,9 @@ body{
 .videoPlayer{
   float: left;
   width: 40%;
+  font: 15px Roboto, sans-serif;
+  color: white;
+  background: #afafaf;
 }
 .videoPlaylistContainer{
   position: relative;
