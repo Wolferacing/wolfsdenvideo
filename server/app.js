@@ -126,10 +126,12 @@ class App{
         this.setVote(msg.data, false, ws);
         break;
       case Commands.ADD_TO_PLAYERS:
-        ws.p = true;
+        ws.p = new Date().getTime();
+        this.updateClients(ws.i);
         break;
       case Commands.REMOVE_FROM_PLAYERS:
         ws.p = false;
+        this.updateClients(ws.i);
         break;
       // case Commands.GET_PLAYERS:
       //   this.getPlayers(msg.data, ws);
@@ -329,7 +331,6 @@ class App{
               if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
                 this.videoPlayers[instanceId].currentTrack = 0;
               }
-              // track = this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack];
               this.videoPlayers[instanceId].currentTime = 0;
               this.videoPlayers[instanceId].lastStartTime = now;
               this.updateClients(instanceId, Commands.SET_TRACK);
@@ -360,7 +361,7 @@ class App{
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
-        players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => s.u.name),
+        players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => ({name: s.u.name, p: s.p})),
         canTakeOver: this.videoPlayers[instanceId].canTakeOver,
         host: this.videoPlayers[instanceId].host,
         hasNoHost: this.videoPlayers[instanceId].hasNoHost,
@@ -387,7 +388,6 @@ class App{
   updateClients(instanceId, type) {
     if(this.videoPlayers[instanceId]) {
       const video = this.getVideoObject(instanceId);
-      video.playlist.sort((a, b) => b.votes - a.votes);
       this.videoPlayers[instanceId].sockets.forEach(socket => {
         this.send(socket, Responses.PLAYBACK_UPDATE, {video, type});
       });

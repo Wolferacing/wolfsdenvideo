@@ -21,6 +21,7 @@ class Karaoke{
     
     this.joinList.addEventListener('click', () => {
         this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS });
+      console.log({ path: Commands.ADD_TO_PLAYERS });
     });
     
     this.leaveList = document.querySelector('#leaveList');
@@ -54,6 +55,7 @@ class Karaoke{
           this.core.sendMessage({ path: Commands.TAKE_OVER });
         }
     });
+    this.hostTitle = document.querySelector('.hostTitle');
   }
   parseMessage(msg) {
     const json = JSON.parse(msg);
@@ -103,19 +105,23 @@ class Karaoke{
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
-    player.players.forEach(p => {
+    console.log(player);
+    player.players.sort((a, b) => b.p - a.p);
+    player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
 
       const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '7 10 0 7', 
+        padding: '7 10 7 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap', 
+        fontSize: '1.2em'
       }, videoTitleAndAction);
       
-      videoTitle.innerText = p;
+      videoTitle.innerText = `${i}. ${p.name}`;
+      this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     });
     player.playlist.forEach((v, i) => {
 //       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);

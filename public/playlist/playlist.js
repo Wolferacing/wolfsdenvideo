@@ -69,6 +69,7 @@ class Playlist {
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
+    player.playlist.sort((a, b) => b.votes - a.votes);
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
       
