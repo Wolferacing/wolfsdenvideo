@@ -64,6 +64,7 @@ class Core{
     browser.setAttribute("scale", this.params.scale);
     browser.setAttribute("sq-browser", "mipMaps: 1; pixelsPerUnit: 1600; mode: local; url: about%3Ablank; afterLoadActions: [ { &quot;actionType&quot;: &quot;delayseconds&quot;, &quot;numParam1&quot;: 1}, {&quot;actionType&quot;: &quot;click2d&quot;, &quot;numParam1&quot;: 150, &quot;numParam2&quot;: 150}]");
     scene.appendChild(browser);
+      console.log('sq-browser','setup');
     this.browser = browser;
   }
   generateGuestUser() {
@@ -90,6 +91,7 @@ class Core{
   }
   playVidya(currentTrack, currentTime, force) {
     if(this.player) {
+      console.log('sq-browser','play', currentTrack, currentTime,this.lastUrl);
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         var url = 'https://' + this.hostUrl + '/player.html?youtube=' + 
             encodeURIComponent(this.player.playlist[currentTrack].link) + 
