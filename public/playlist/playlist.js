@@ -83,7 +83,7 @@ class Playlist {
       const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.makeAndAddElement('div',{
-        padding: '7 10', 
+        padding: '7 10 0 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
@@ -131,16 +131,27 @@ class Playlist {
         });
       }else{
         
-        const videoTitle = this.makeAndAddElement('div',{
-          padding: '7 10', 
+        const currentTimeText = this.makeAndAddElement('div',{
+          padding: '7 10 0 7', 
           textOverflow: 'ellipsis', 
           overflow: 'hidden', 
           whiteSpace: 'nowrap'
         }, videoTitleAndAction);
 
 
-        videoTitle.className = "currentTimeText";
-        videoTitle.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
+        currentTimeText.className = "currentTimeText";
+        currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
+        
+        
+        const videoAuthor = this.makeAndAddElement('div',{
+          padding: '7 10 0 7', 
+          textOverflow: 'ellipsis', 
+          overflow: 'hidden', 
+          whiteSpace: 'nowrap'
+        }, videoTitleAndAction);
+
+        videoAuthor.className = "currentTimeAuthor";
+        videoAuthor.innerText = player.user;
       }
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);

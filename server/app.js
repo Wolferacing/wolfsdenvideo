@@ -120,14 +120,14 @@ class App{
     }
   }
   getUserVideoPlayer(new_ws) {
-    this.webServer.wss.clients.forEach((ws) => {
+    this.wss.clients.forEach((ws) => {
       if(ws.is_video_player) {
         this.send(ws, Responses.LINK_ME, new_ws.u.id);
       }
     });
   }
   setUserVideoPlayer(data, user_video) {
-    this.webServer.wss.clients.forEach((ws) => {
+    this.wss.clients.forEach((ws) => {
       if(ws.u && ws.u.id === data.id) {
         console.log("set user video player", data.id);
         ws.user_video = user_video;
@@ -140,6 +140,9 @@ class App{
     }
   }
   async fromPlaylist(data, ws) {
+    if(!data.id) {
+      return;
+    }
     let playlist = await ytfps(data.id, { limit: 50 });
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
@@ -195,7 +198,6 @@ class App{
       }, this.videoPlayers[ws.i].locked);
     }
   }
-  
   removePlaylistItem(index, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
@@ -207,7 +209,6 @@ class App{
       }, this.videoPlayers[ws.i].locked);
     }
   }
-
   movePlaylistItem({url, index}, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
