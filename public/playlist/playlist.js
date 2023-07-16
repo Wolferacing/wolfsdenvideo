@@ -14,7 +14,7 @@ class Playlist {
     this.playPlaylist();
   }
   playPlaylist(shouldClear) {
-    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId, shouldClear}});
+    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
   }
   clearPlaylist() {
     this.core.sendMessage({path: Commands.CLEAR_PLAYLIST});

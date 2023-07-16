@@ -190,8 +190,8 @@ class App{
             link: v.url,
             votes: 0
           })  
-          this.updateClients(ws.i);
         });
+        this.updateClients(ws.i, "from-playlist");
       }
     }, this.videoPlayers[ws.i].locked);
   }
@@ -353,6 +353,7 @@ class App{
       }
     } 
     this.syncWsTime(ws, instanceId);
+    console.log("createVideoPlayer");
     this.send(ws, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId)});
   }
   getVideoObject(instanceId) {
@@ -389,6 +390,7 @@ class App{
   updateClients(instanceId, type) {
     if(this.videoPlayers[instanceId]) {
       const video = this.getVideoObject(instanceId);
+        console.log(type,this.videoPlayers[instanceId].sockets.length);
       this.videoPlayers[instanceId].sockets.forEach(socket => {
         this.send(socket, Responses.PLAYBACK_UPDATE, {video, type});
       });
