@@ -36,6 +36,14 @@ body{
   font-weight: normal;
   margin-bottom: 5px;
 }
+.playerContainer{
+  float: left; 
+  width: 60%;
+}
+.videoPlayer{
+  float: left;
+  width: 40%;
+}
 .videoPlaylistContainer{
   position: relative;
   background: #cfcfcf;

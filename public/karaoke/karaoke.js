@@ -30,6 +30,8 @@ class Karaoke{
         this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS });
     });
     
+    this.videoPlayer = document.querySelector('.videoPlayer');
+    
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
     this.searchBackDrop = document.querySelector('.searchBackDrop');
@@ -95,7 +97,7 @@ class Karaoke{
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
-    this.lockPlayer.style.display = (player.locked || !player.canTakeOver) && !isMe ? 'none' :  'inline-block';
+    this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
     this.joinList.style.display = (player.locked && !isMe) || amIAPlayer ? 'none' :  'inline-block';
@@ -109,7 +111,6 @@ class Karaoke{
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
-    console.log(player);
     player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
@@ -130,21 +131,7 @@ class Karaoke{
     player.playlist.forEach((v, i) => {
 //       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
       
-//       const videoThumbnail = this.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, videoItemContainer);
       
-//       videoThumbnail.src = v.thumbnail;
-      
-      
-//       const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
-      
-//       const videoTitle = this.makeAndAddElement('div',{
-//         padding: '7 10 0 7', 
-//         textOverflow: 'ellipsis', 
-//         overflow: 'hidden', 
-//         whiteSpace: 'nowrap'
-//       }, videoTitleAndAction);
-      
-//       videoTitle.innerText = v.title;
         
 //       const videoAuthor = this.makeAndAddElement('div',{
 //         padding: '0 10 5 7', 
@@ -212,21 +199,37 @@ class Karaoke{
       
       // this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
-//       if(player.currentTrack === i) {
-//         const currentTime = this.makeAndAddElement('div', {
-//           height: '4px', 
-//           width: '100%',
-//         }, videoItemContainer);
-//         const currentTimeInner = this.makeAndAddElement('div', {
-//           height: '4px', 
-//           background: 'red',
-//           transition: 'width 3s',
-//           transitionTimingFunction: 'linear',
-//           width: ((player.currentTime / player.duration) * 100) + "%",
-//         }, currentTime);
+      if(player.currentTrack === i) {
+        const videoThumbnail = this.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, this.videoPlayer);
+      
+        videoThumbnail.src = v.thumbnail;
+
+
+        const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: '100%'}, this.videoPlayer);
+
+        const videoTitle = this.makeAndAddElement('div',{
+          padding: '7 10 0 7', 
+          textOverflow: 'ellipsis', 
+          overflow: 'hidden', 
+          whiteSpace: 'nowrap'
+        }, videoTitleAndAction);
+
+        videoTitle.innerText = v.title;
         
-//         currentTimeInner.className = "currentTime";
-//       }
+        const currentTime = this.makeAndAddElement('div', {
+          height: '4px', 
+          width: '100%',
+        }, this.videoPlayer);
+        const currentTimeInner = this.makeAndAddElement('div', {
+          height: '4px', 
+          background: 'red',
+          transition: 'width 3s',
+          transitionTimingFunction: 'linear',
+          width: ((player.currentTime / player.duration) * 100) + "%",
+        }, this.videoPlayer);
+        
+        currentTimeInner.className = "currentTime";
+      }
     })
   }
   timeCode(seconds) {
@@ -249,14 +252,14 @@ class Karaoke{
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
       
-      const addToPlaylist = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+//       const addToPlaylist = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      addToPlaylist.className = 'button teal';
-      addToPlaylist.innerText = "Add To Playlist";
+//       addToPlaylist.className = 'button teal';
+//       addToPlaylist.innerText = "Add To Playlist";
       
-      addToPlaylist.addEventListener('click', async () => {
-        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-      }); 
+//       addToPlaylist.addEventListener('click', async () => {
+//         this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+//       }); 
       
       const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
@@ -269,15 +272,15 @@ class Karaoke{
         this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
       }); 
       
-      const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+//       const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      playNext.className = 'button teal';
-      playNext.innerText = "Play Next";
+//       playNext.className = 'button teal';
+//       playNext.innerText = "Play Next";
       
-      playNext.addEventListener('click', () => {
-        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-        this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
-      }); 
+//       playNext.addEventListener('click', () => {
+//         this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+//         this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
+//       }); 
       
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
