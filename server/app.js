@@ -51,6 +51,8 @@ class App{
     Object.keys(this.videoPlayers).forEach(key => {
       const videoPlayer = this.videoPlayers[key];
       videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
+      videoPlayer.votes = videoPlayer.votes.filter(v => v.u !== ws.u);
+      this.updateVotes();
       if(videoPlayer.host === ws.u) {
         console.log(ws.u ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
@@ -154,10 +156,18 @@ class App{
       }
     });
   }
+  updateVotes(ws) {
+    if(this.videoPlayers[ws.i]) {
+      this.videoPlayers[ws.i].playlist.forEach(v => {
+        v.votes = this.videoPlayers[ws.i].votes.filter(_v => _v.video === v).length;
+      });
+    }
+  }
   setVote(track, isDown, ws) {
-    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].votes.filter(d=>d.uid === ws.u.id)) {
-      this.videoPlayers[ws.i].votes.push({uid: ws.u.id, isDown, video: this.videoPlayers[ws.i].playlist[track]});
-      
+    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].votes.filter(d=>d.u === ws.u).length === 0) {
+      this.videoPlayers[ws.i].votes.push({u: ws.u, isDown, video: this.videoPlayers[ws.i].playlist[track]});
+      this.updateVotes();
+      this.updateClients(ws.i);
     }
   }
   setVolume(ws, isDown) {
@@ -178,7 +188,8 @@ class App{
             title: v.title,
             thumbnail: v.thumbnail_url,
             duration: v.milis_length ,
-            link: v.url
+            link: v.url,
+            votes: 0
           })  
           this.updateClients(ws.i);
         });
@@ -219,6 +230,7 @@ class App{
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
         v.user = ws.u.name;
+        v.votes = 0;
         this.videoPlayers[ws.i].playlist.push(v);
         this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
@@ -298,6 +310,7 @@ class App{
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
         playlist:[],
+        votes: [],
         currentTrack: 0,
         currentTime: 0,
         locked: false,
@@ -372,8 +385,10 @@ class App{
   }
   updateClients(instanceId, type) {
     if(this.videoPlayers[instanceId]) {
+      const video = this.getVideoObject(instanceId);
+      video.playlist.sort((a, b) => b.votes - a.votes);
       this.videoPlayers[instanceId].sockets.forEach(socket => {
-        this.send(socket, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type});
+        this.send(socket, Responses.PLAYBACK_UPDATE, {video, type});
       });
     }
   }
