@@ -263,14 +263,14 @@ class Playlist {
     this.lockPlayer = document.querySelector('#lockPlayer');
     
     this.lockPlayer.addEventListener('click', () => {
-        this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.player.locked });
+        this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.core.player.locked });
     });
     
     this.takeOver = document.querySelector('#takeOver');
     
     this.takeOver.addEventListener('click', () => {
-        if(this.player.host.id === window.user.id) {
-          this.core.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.player.canTakeOver });
+        if(this.core.player.host.id === window.user.id) {
+          this.core.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.core.player.canTakeOver });
         }else{
           this.core.sendMessage({ path: Commands.TAKE_OVER });
         }

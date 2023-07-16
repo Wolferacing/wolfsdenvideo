@@ -93,6 +93,7 @@ class Core{
             '&instanceId=' + this.instanceId + 
             '&user=' + window.user.id + '-_-' + window.user.name;
         this.browser.setAttribute('sq-browser','url: ' + url);
+        console.log("Playing video:", this.player.playlist[currentTrack].link);
       }
       this.lastUrl = this.player.playlist[currentTrack].link;
     }
