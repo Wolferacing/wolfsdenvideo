@@ -105,7 +105,6 @@ class Playlist {
 
         const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-      
         playTrack.className = 'button green';
         playTrack.innerText = "Play Now";
 
@@ -145,14 +144,11 @@ class Playlist {
           overflow: 'hidden', 
           whiteSpace: 'nowrap'
         }, videoTitleAndAction);
-
-
+        
         currentTimeText.className = "currentTimeText";
         currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
-        
       }
         
-      
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       if(player.currentTrack === i) {
@@ -227,7 +223,6 @@ class Playlist {
       videoThumbnail.src = v.thumbnail;
         
       videoTitle.innerText = v.title;
-      
     })
   }
   debounceSearch(searchVal) {
@@ -312,17 +307,6 @@ class Playlist {
       };
       this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
     });
-    
-//     this.volUp = document.querySelector('#volUp');
-    
-//     this.volUp.addEventListener('click', () => {
-//       this.core.sendMessage({path: Commands.UP_VOLUME });
-//     });
-    
-//     this.volDown = document.querySelector('#volDown');
-//     this.volDown.addEventListener('click', () => {
-//       this.core.sendMessage({path: Commands.DOWN_VOLUME });
-//     });
     
     this.hostTitle = document.querySelector('.hostTitle');
   }

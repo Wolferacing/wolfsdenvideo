@@ -146,8 +146,7 @@ class Core{
   playVidya(currentTrack, currentTime, force) {
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-        
-        const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
+        const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
         this.browser.setAttribute('sq-browser','url: ' + url);
         console.log("Playing video:", this.player.playlist[currentTrack].link);
       }
