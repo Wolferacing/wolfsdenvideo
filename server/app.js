@@ -13,26 +13,19 @@ class App{
   constructor() {
     this.videoPlayers = {};
     this.setupWebserver();
-    setInterval(() => {
-      this.syncTime();
-    }, 1000);
+    setInterval(() => this.syncTime(), 1000);
     this.syncTime();
   }
   setupWebserver() {
     this.app = express();
-    
-    this.server = http.createServer( this.app );
-    
-    this.wss = new WebSocket.Server({ noServer: true });
-    
+    this.server = http.createServer( this.app ); 
+    this.wss = new WebSocket.Server({ noServer: true }); 
     this.server.on('upgrade', (request, socket, head) => {
       this.wss.handleUpgrade(request, socket, head, (ws) => {
         this.wss.emit('connection', ws, request);
       });
     });
-    
     this.wss.startAutoPing(10000);
-    
     this.wss.on('connection', (ws, req) => {
       ws.t = new Date().getTime();
       ws.on('message', msg => {
@@ -48,9 +41,7 @@ class App{
         this.handleClose(ws);
       });
     });
-    
     this.app.use(express.static(path.join(__dirname, 'public')));
-    
     this.server.listen( 3000, function listening(){
         console.log("Video Player started."); 
     });
@@ -63,7 +54,7 @@ class App{
       if(videoPlayer.host === ws.u) {
         console.log(ws.u ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
-        this.updateClients(ws.i, 'host-lost');
+        this.updateClients(ws.i);
       }
     });
   }
@@ -160,7 +151,7 @@ class App{
             duration: v.milis_length ,
             link: v.url
           })  
-          this.updateClients(ws.i, 'from-playlist');
+          this.updateClients(ws.i);
         });
       }
     }, this.videoPlayers[ws.i].locked);
@@ -169,7 +160,7 @@ class App{
      if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         this.videoPlayers[ws.i].playlist.length = 0;
-        this.updateClients(ws.i, 'clear-playlist');
+        this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -199,7 +190,7 @@ class App{
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
         this.videoPlayers[ws.i].playlist.push(v);
-        this.updateClients(ws.i, 'add-playlist');
+        this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -211,7 +202,7 @@ class App{
         if(index <= this.videoPlayers[ws.i].currentTrack) {
           this.videoPlayers[ws.i].currentTrack--;
         }
-        this.updateClients(ws.i, 'remove-playlist');
+        this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -230,7 +221,7 @@ class App{
               this.videoPlayers[ws.i].currentTrack--;
             }
           }
-          this.updateClients(ws.i, 'move-playlist');
+          this.updateClients(ws.i);
         }else{
           this.send(ws, Responses.DOES_NOT_EXIST);
         }
@@ -240,13 +231,13 @@ class App{
   toggleCanTakeOver(canTakeOver, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].canTakeOver = canTakeOver;
-      this.updateClients(ws.i, 'toggle-take-over');
+      this.updateClients(ws.i);
     });
   }
   takeOver(ws) {
     if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canTakeOver) {
       this.videoPlayers[ws.i].host = ws.u;
-      this.updateClients(ws.i, 'take-over');
+      this.updateClients(ws.i);
     }else{
       this.send(ws, Responses.ERROR);
     }
@@ -254,7 +245,7 @@ class App{
   toggleLock(locked, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].locked = locked;
-      this.updateClients(ws.i, 'set-lock');
+      this.updateClients(ws.i);
     });
   }
   setVideoTrack(index, ws) {
@@ -319,7 +310,7 @@ class App{
       }
     } 
     this.syncWsTime(ws, instanceId);
-    this.send(ws, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
+    this.send(ws, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId)});
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
