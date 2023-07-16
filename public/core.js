@@ -13,8 +13,8 @@ const Commands = {
   DOWN_VOLUME: 'down-volume',
   UP_VOLUME: 'up-volume',
   ADD_TO_PLAYERS: 'add-to-players',
-  REMOVE_FROM_PLAYERS: 'remove-from-players',
-  GET_PLAYERS: 'get-players'
+  REMOVE_FROM_PLAYERS: 'remove-from-players'
+  // GET_PLAYERS: 'get-players'
 } 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',

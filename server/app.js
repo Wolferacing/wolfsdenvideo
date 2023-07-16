@@ -131,16 +131,16 @@ class App{
       case Commands.REMOVE_FROM_PLAYERS:
         ws.p = false;
         break;
-      case Commands.GET_PLAYERS:
-        this.getPlayers(msg.data, ws);
-        break;
+      // case Commands.GET_PLAYERS:
+      //   this.getPlayers(msg.data, ws);
+      //   break;
     }
   }
-  getPlayers(ws) {
-    if(this.videoPlayers[ws.i]) {
-      this.send(ws, Responses.PLAYERS, this.videoPlayers[ws.i].sockets.filter(d=>d.p).map(d=>d.u));
-    }
-  }
+  // getPlayers(ws) {
+  //   if(this.videoPlayers[ws.i]) {
+  //     this.send(ws, Responses.PLAYERS, this.videoPlayers[ws.i].sockets.filter(d=>d.p).map(d=>d.u));
+  //   }
+  // }
   getUserVideoPlayer(new_ws) {
     this.wss.clients.forEach((ws) => {
       if(ws.is_video_player) {
