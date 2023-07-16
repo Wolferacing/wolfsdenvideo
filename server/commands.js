@@ -14,5 +14,7 @@ module.exports = {
   USER_VIDEO_PLAYER: 'user-video-player',
   DOWN_VOLUME: 'down-volume',
   UP_VOLUME: 'up-volume',
-  ADD_TO_PLAYERS: 'up-volume'
+  ADD_TO_PLAYERS: 'add-to-players',
+  REMOVE_FROM_PLAYERS: 'remove-from-players',
+  GET_PLAYERS: 'get-players'
 }

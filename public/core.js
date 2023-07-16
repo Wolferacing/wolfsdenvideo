@@ -11,7 +11,10 @@ const Commands = {
   FROM_PLAYLIST: 'from-playlist',
   CLEAR_PLAYLIST: 'clear-playlist',
   DOWN_VOLUME: 'down-volume',
-  UP_VOLUME: 'up-volume'
+  UP_VOLUME: 'up-volume',
+  ADD_TO_PLAYERS: 'add-to-players',
+  REMOVE_FROM_PLAYERS: 'remove-from-players',
+  GET_PLAYERS: 'get-players'
 } 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
@@ -19,7 +22,8 @@ const Responses = {
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',
   SEARCH_RESULTS: 'search-results',
-  ERROR:'error'
+  ERROR:'error',
+  PLAYERS: 'players'
 }
 
 class Core{

@@ -5,5 +5,6 @@ module.exports = {
   SYNC_TIME: 'sync-time',
   SEARCH_RESULTS: 'search-results',
   ERROR:'error',
-  LINK_ME: 'link-me'
+  LINK_ME: 'link-me',
+  PLAYERS: 'players'
 }

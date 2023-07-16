@@ -117,6 +117,20 @@ class App{
       case Commands.UP_VOLUME:
         this.setVolume(ws);
         break;
+      case Commands.ADD_TO_PLAYERS:
+        ws.p = true;
+        break;
+      case Commands.REMOVE_FROM_PLAYERS:
+        ws.p = false;
+        break;
+      case Commands.GET_PLAYERS:
+        this.getPlayers(msg.data, ws);
+        break;
+    }
+  }
+  getPlayers(ws) {
+    if(this.videoPlayers[ws.i]) {
+      this.send(ws, Responses.PLAYERS, this.videoPlayers[ws.i].sockets.filter(d=>d.p).map(d=>d.u));
     }
   }
   getUserVideoPlayer(new_ws) {
@@ -272,7 +286,6 @@ class App{
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
         playlist:[],
-        players: [],
         currentTrack: 0,
         currentTime: 0,
         locked: false,
