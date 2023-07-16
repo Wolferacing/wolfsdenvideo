@@ -38,11 +38,11 @@ body{
 }
 .playerContainer{
   float: left; 
-  width: 60%;
+  width: calc(100% - 240px);
 }
 .videoPlayer{
   float: left;
-  width: 40%;
+  width: 240px;
   font: 15px Roboto, sans-serif;
   color: white;
   background: #afafaf;

@@ -11,6 +11,13 @@ class Karaoke{
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket(d => this.parseMessage(d));
     this.core.sendMessage({path: "instance", data: this.core.params.instance});
+    this.addYoutubeScript();
+  }
+  addYoutubeScript() {
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   }
   setupKaraokeUI() {
     this.searchInput = document.querySelector('.searchInput');
@@ -29,7 +36,7 @@ class Karaoke{
         this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS });
     });
     
-    this.videoPlayer = document.querySelector('.videoPlayer');
+    this.videoPlayer = document.querySelector('#videoPlayer');
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
@@ -327,7 +334,33 @@ class Karaoke{
       this.addItemContainer.style.display = 'none';
       this.addItemBackDrop.style.display = 'none';
   }
-  setupYoutubePla
+  setupYoutubePlayer() {
+    const youtubeUrl = this.core.urlParams.has('youtube') ? this.core.urlParams.get('youtube') : 'https://www.youtube.com/watch?v=L_LUpnjgPso';
+    new YT.Player('player', {
+      height: window.innerHeight,
+      width: window.innerWidth,
+      videoId: this.core.getYTId(decodeURIComponent(youtubeUrl)),
+      playerVars: {
+        'playsinline': 1,
+        'autoplay': 0,
+        'disablekb': 1,
+        'controls': 0,
+        'modestbranding': true,
+        'cc_load_policy': 1,
+        'cc_lang_pref': 'en',
+        'iv_load_policy': 3,
+        'origin': 'https://sq-synced-videoplayer.glitch.me',
+        'start': this.start ? Number(this.start) : 0
+      },
+      events: {
+        'onReady': (event) => {
+          this.Ytplayer = event.target;
+          event.target.setVolume(10);
+          event.target.seekTo(this.start ? Number(this.start) : 0)
+        }
+      }
+    });
+  }
 }
 const karaoke = new Karaoke();
 
