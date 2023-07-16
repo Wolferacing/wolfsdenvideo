@@ -1,0 +1,16 @@
+module.exports = {
+  SEARCH: 'search',
+  SET_TIME: 'set-time',
+  SET_TRACK: 'set-track',
+  TOGGLE_LOCK: 'toggle-lock',
+  TOGGLE_CAN_TAKE_OVER: 'toggle-can-take-over',
+  ADD_TO_PLAYLIST: 'add-to-playlist',
+  MOVE_PLAYLIST_ITEM: 'move-playlist-item',
+  REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
+  TAKE_OVER: 'take-over',
+  FROM_PLAYLIST: 'from-playlist',
+  CLEAR_PLAYLIST: 'clear-playlist',
+  USER_VIDEO_PLAYER: 'user-video-player',
+  DOWN_VOLUME: 'down-volume',
+  UP_VOLUME: 'up-volume'
+}
