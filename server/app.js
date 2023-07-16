@@ -52,7 +52,7 @@ class App{
       const videoPlayer = this.videoPlayers[key];
       videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
       videoPlayer.votes = videoPlayer.votes.filter(v => v.u !== ws.u);
-      this.updateVotes();
+      this.updateVotes(ws);
       if(videoPlayer.host === ws.u) {
         console.log(ws.u ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
@@ -92,7 +92,7 @@ class App{
         this.takeOver(ws);
         break;
       case Commands.ADD_TO_PLAYLIST:
-        this.addToPlaylist(msg.data, ws);
+        this.addToPlaylist(msg.data, msg.skipUpdate, ws);
         break;
       case Commands.MOVE_PLAYLIST_ITEM:
         this.movePlaylistItem(msg.data, ws);
@@ -107,7 +107,7 @@ class App{
         this.fromPlaylist(msg.data, ws);
         break;
       case Commands.CLEAR_PLAYLIST:
-        this.clearPlaylist(ws);
+        this.clearPlaylist(msg.skipUpdate, ws);
         break;
       case Commands.USER_VIDEO_PLAYER:
         ws.is_video_player = true;
@@ -165,7 +165,7 @@ class App{
   setVote(track, isDown, ws) {
     if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].votes.filter(d=>d.u === ws.u).length === 0) {
       this.videoPlayers[ws.i].votes.push({u: ws.u, isDown, video: this.videoPlayers[ws.i].playlist[track]});
-      this.updateVotes();
+      this.updateVotes(ws);
       this.updateClients(ws.i);
     }
   }
@@ -195,11 +195,13 @@ class App{
       }
     }, this.videoPlayers[ws.i].locked);
   }
-  async clearPlaylist(ws) {
+  async clearPlaylist(skipUpdate, ws) {
      if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         this.videoPlayers[ws.i].playlist.length = 0;
-        this.updateClients(ws.i);
+        if(!skipUpdate) {
+          this.updateClients(ws.i);
+        }
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -220,7 +222,7 @@ class App{
       }
     }
   }
-  addToPlaylist(v, ws) {
+  addToPlaylist(v, skipUpdate, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         if(!this.videoPlayers[ws.i].playlist.length) {
@@ -231,7 +233,9 @@ class App{
         v.user = ws.u.name;
         v.votes = 0;
         this.videoPlayers[ws.i].playlist.push(v);
-        this.updateClients(ws.i);
+        if(!skipUpdate) {
+          this.updateClients(ws.i);
+        }
       }, this.videoPlayers[ws.i].locked);
     }
   }

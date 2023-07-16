@@ -208,7 +208,7 @@ class Playlist {
       
       playNow.addEventListener('click', () => {
         this.hideSearch();
-        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
         this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
       }); 
       
@@ -218,7 +218,7 @@ class Playlist {
       playNext.innerText = "Play Next";
       
       playNext.addEventListener('click', () => {
-        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
         this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
       }); 
       

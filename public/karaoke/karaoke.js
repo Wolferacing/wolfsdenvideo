@@ -94,6 +94,7 @@ class Karaoke{
     this.core.sendMessage({path: Commands.SEARCH, data });
   }
   updatePlaylist(player) {
+    console.log(player);
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
@@ -128,6 +129,7 @@ class Karaoke{
       videoTitle.innerText = `${i}. ${p.name}`;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     });
+    this.videoPlayer.innerHTML = '';
     player.playlist.forEach((v, i) => {
 //       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
       
@@ -200,14 +202,14 @@ class Karaoke{
       // this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       if(player.currentTrack === i) {
-        const videoThumbnail = this.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, this.videoPlayer);
+        const videoThumbnail = this.core.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, this.videoPlayer);
       
         videoThumbnail.src = v.thumbnail;
 
 
-        const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: '100%'}, this.videoPlayer);
+        const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: '100%'}, this.videoPlayer);
 
-        const videoTitle = this.makeAndAddElement('div',{
+        const videoTitle = this.core.makeAndAddElement('div',{
           padding: '7 10 0 7', 
           textOverflow: 'ellipsis', 
           overflow: 'hidden', 
@@ -216,11 +218,11 @@ class Karaoke{
 
         videoTitle.innerText = v.title;
         
-        const currentTime = this.makeAndAddElement('div', {
+        const currentTime = this.core.makeAndAddElement('div', {
           height: '4px', 
           width: '100%',
         }, this.videoPlayer);
-        const currentTimeInner = this.makeAndAddElement('div', {
+        const currentTimeInner = this.core.makeAndAddElement('div', {
           height: '4px', 
           background: 'red',
           transition: 'width 3s',
@@ -267,9 +269,12 @@ class Karaoke{
       playNow.innerText = "Play Now";
       
       playNow.addEventListener('click', () => {
-        this.hideSearch();
-        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-        this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
+        if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id )) {
+          this.hideSearch();
+          this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
+          this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
+        }
       }); 
       
 //       const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
