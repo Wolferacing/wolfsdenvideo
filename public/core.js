@@ -73,52 +73,50 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
-    this.setupPlaylistButton(scene);
+    const playlistContainer = document.createElement('a-entity');
+    playlistContainer.setAttribute('position', this.params.position);
+    playlistContainer.setAttribute('rotation', this.params.rotation);
+    this.setupPlaylistButton(scene, playlistContainer);
+    this.setupVolButton(scene, true, playlistContainer);
+    this.setupVolButton(scene, false, playlistContainer);
+    scene.appendChild(playlistContainer);
   }
-  setupVolButton(scene, IsUp) {
+  setupVolButton(scene, isUp, playlistContainer) {
       const yScale = Number(this.params.scale.split(" ")[1]);
-      const playlistContainer = document.createElement('a-entity');
-      playlistContainer.setAttribute('position', this.params.position);
-      playlistContainer.setAttribute('rotation', this.params.rotation);
       const playlistButton = document.createElement('a-box');
       playlistButton.setAttribute('sq-collider', '');
       playlistButton.setAttribute('sq-interactable', '');
       playlistButton.setAttribute('color', '#f00075');
-      playlistButton.setAttribute('position', `0.8 ${-yScale*0.35} 0`);
+      playlistButton.setAttribute('position', `${isUp ? 0.8 : 1.35} ${-yScale*0.35} 0`);
       playlistButton.setAttribute('depth', '0.05');
       playlistButton.setAttribute('width', '0.5');
       playlistButton.setAttribute('height', '0.3');
       const playlistButtonText = document.createElement('a-text');
-      playlistButtonText.setAttribute('value', '+ vol');
+      playlistButtonText.setAttribute('value', isUp ? '+ vol' : '- vol');
       playlistButtonText.setAttribute('position', '0 0.03 0.06');
       playlistButtonText.setAttribute('align', 'center');
       playlistButton.appendChild(playlistButtonText);
       playlistContainer.appendChild(playlistButton);
-      scene.appendChild(playlistContainer);
       playlistButton.addEventListener('click', ()=>{
-        this.sendMessage({path: IsUp ? Commands.UP_VOLUME : Commands.DOWN_VOLUME});
+        this.sendMessage({path: isUp ? Commands.UP_VOLUME : Commands.DOWN_VOLUME});
       });
   }
-  setupPlaylistButton(scene) {
+  setupPlaylistButton(scene, playlistContainer) {
       const yScale = Number(this.params.scale.split(" ")[1]);
-      const playlistContainer = document.createElement('a-entity');
-      playlistContainer.setAttribute('position', this.params.position);
-      playlistContainer.setAttribute('rotation', this.params.rotation);
       const playlistButton = document.createElement('a-box');
       playlistButton.setAttribute('sq-collider', '');
       playlistButton.setAttribute('sq-interactable', '');
       playlistButton.setAttribute('color', '#f00075');
       playlistButton.setAttribute('position', `0 ${-yScale*0.35} 0`);
       playlistButton.setAttribute('depth', '0.05');
-      playlistButton.setAttribute('width', '1.6');
+      playlistButton.setAttribute('width', '1');
       playlistButton.setAttribute('height', '0.3');
       const playlistButtonText = document.createElement('a-text');
-      playlistButtonText.setAttribute('value', 'playlist & volume');
+      playlistButtonText.setAttribute('value', 'playlist');
       playlistButtonText.setAttribute('position', '0 0.03 0.06');
       playlistButtonText.setAttribute('align', 'center');
       playlistButton.appendChild(playlistButtonText);
       playlistContainer.appendChild(playlistButton);
-      scene.appendChild(playlistContainer);
       playlistButton.addEventListener('click', ()=>{
         window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
       });

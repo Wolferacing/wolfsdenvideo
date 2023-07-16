@@ -150,7 +150,6 @@ class App{
   setUserVideoPlayer(data, user_video) {
     this.wss.clients.forEach((ws) => {
       if(ws.u && ws.u.id === data.id) {
-        console.log("set user video player", data.id);
         ws.user_video = user_video;
       }
     });
@@ -175,9 +174,10 @@ class App{
     }
   }
   async fromPlaylist(data, ws) {
-    if(!data.id) {
+    if(!data.id || !data.id.startsWith("PL")) {
       return;
     }
+    console.log(data);
     let playlist = await ytfps(data.id, { limit: 50 });
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
