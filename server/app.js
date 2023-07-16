@@ -4,7 +4,7 @@ const path = require('path');
 
     console.log("here1");
 
-export class Server{
+class Server{
   constructor() {
     console.log("here2");
   }
