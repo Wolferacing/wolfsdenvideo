@@ -10,14 +10,14 @@ class Playlist {
     this.setupPlaylistUI();
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket(d => this.parseMessage(d));
-    this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+    this.core.sendMessage({path: "instance", data: this.core.params.instance});
     this.playPlaylist();
   }
   playPlaylist(shouldClear) {
-    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId, shouldClear}, u: window.user});
+    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId, shouldClear}});
   }
   clearPlaylist() {
-    this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, u: window.user});
+    this.core.sendMessage({path: Commands.CLEAR_PLAYLIST});
   }
   generateGuestUser() {
     const id = this.getUniquId();
@@ -39,7 +39,7 @@ class Playlist {
         break;
       case Responses.PLAYBACK_UPDATE:
         this.core.player = json.data.video;
-        this.updatePlaylist(this.player);
+        this.updatePlaylist(this.core.player);
         break;
       case Responses.SEARCH_RESULTS:
         this.loadVideos(json.data);
@@ -54,6 +54,9 @@ class Playlist {
     myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
     myScript.addEventListener ("load", callback, false);
     document.body.appendChild(myScript);  
+  }
+  search(data) {
+    this.core.sendMessage({path: Commands.SEARCH, data });
   }
   updatePlaylist(player) {
     const isMe = player.host.id === window.user.id;
@@ -97,7 +100,7 @@ class Playlist {
         playTrack.innerText = "Play Now";
 
         playTrack.addEventListener('click', () => {
-          this.sendMessage({path: Commands.SET_TRACK, data: i });
+          this.core.sendMessage({path: Commands.SET_TRACK, data: i });
         });
 
         const moveDown = this.makeAndAddElement('div',null, videoTitleAndAction);
@@ -106,7 +109,7 @@ class Playlist {
         moveDown.innerText = "Move Down";
 
         moveDown.addEventListener('click', () => {
-          this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
+          this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
         });
 
         const moveUp = this.makeAndAddElement('div',null, videoTitleAndAction);
@@ -114,7 +117,7 @@ class Playlist {
         moveUp.innerText = "Move Up";
 
         moveUp.addEventListener('click', () => {
-          this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
+          this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
         });
 
         const remove = this.makeAndAddElement('div',null, videoTitleAndAction);
@@ -123,7 +126,7 @@ class Playlist {
         remove.innerText = "Remove";
 
         remove.addEventListener('click', () => {
-          this.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
+          this.core.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
         });
       }else{
         
@@ -184,7 +187,7 @@ class Playlist {
       addToPlaylist.innerText = "Add To Playlist";
       
       addToPlaylist.addEventListener('click', async () => {
-        this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       }); 
       
       const playNow = this.makeAndAddElement('div',null, videoTitleAndAction);
@@ -194,8 +197,8 @@ class Playlist {
       
       playNow.addEventListener('click', () => {
         this.hideSearch();
-        this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-        this.sendMessage({path: Commands.SET_TRACK, data: this.player.playlist.length });
+        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
       }); 
       
       const playNext = this.makeAndAddElement('div',null, videoTitleAndAction);
@@ -204,8 +207,8 @@ class Playlist {
       playNext.innerText = "Play Next";
       
       playNext.addEventListener('click', () => {
-        this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-        this.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.player.currentTrack + 1} });
+        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
       }); 
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
@@ -236,6 +239,12 @@ class Playlist {
       this.addItemContainer.style.display = 'none';
       this.addItemBackDrop.style.display = 'none';
   }
+  makeAndAddElement(type, style, parent) {
+    const element = document.createElement(type);
+    Object.assign(element.style, style || {});
+    (parent ? parent : document.body).appendChild(element);
+    return element;
+  }
   setupPlaylistUI() {
     
     this.searchInput = document.querySelector('.searchInput');
@@ -254,16 +263,16 @@ class Playlist {
     this.lockPlayer = document.querySelector('#lockPlayer');
     
     this.lockPlayer.addEventListener('click', () => {
-        this.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.player.locked });
+        this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.player.locked });
     });
     
     this.takeOver = document.querySelector('#takeOver');
     
     this.takeOver.addEventListener('click', () => {
         if(this.player.host.id === window.user.id) {
-          this.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.player.canTakeOver });
+          this.core.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.player.canTakeOver });
         }else{
-          this.sendMessage({ path: Commands.TAKE_OVER });
+          this.core.sendMessage({ path: Commands.TAKE_OVER });
         }
     });
     
@@ -302,12 +311,12 @@ class Playlist {
     this.volUp = document.querySelector('#volUp');
     
     this.volUp.addEventListener('click', () => {
-      this.sendMessage({path: Commands.UP_VOLUME });
+      this.core.sendMessage({path: Commands.UP_VOLUME });
     });
     
     this.volDown = document.querySelector('#volDown');
     this.volDown.addEventListener('click', () => {
-      this.sendMessage({path: Commands.DOWN_VOLUME });
+      this.core.sendMessage({path: Commands.DOWN_VOLUME });
     });
     
     this.hostTitle = document.querySelector('.hostTitle');

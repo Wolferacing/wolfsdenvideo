@@ -12,12 +12,10 @@ class PlaylistPlayer {
     await this.core.setupWebsocket(d => this.parseMessage(d));
     this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
     if(this.core.params.playlist) {
-      const url = `https://${this.hostUrl}/playlist/?instanceId=${this.core.params.instanceId}&playlistId=${this.core.params.playlist}&user=${window.user.id}-_-${window.user.name}`;
-      // 'https://sq-synced-videoplayer.glitch.me/playlist.html?instanceId=' + this.core.params.instanceId + '&playlistId=' + this.core.params.playlist + '&user=' + window.user.id + '-_-' + window.user.name;
+      const url = `https://${this.hostUrl}/playlist/?instance=${this.core.params.instanceId}&playlist=${this.core.params.playlist}&user=${window.user.id}-_-${window.user.name}`;
       this.core.browser.setAttribute('sq-browser','url: ' + url)
     }else{
-      const url = `https://${this.hostUrl}/?instanceId=${this.core.params.instanceId}&playlistId=${this.core.params.playlist}&user=${window.user.id}-_-${window.user.name}&youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0`;
-      // var url = 'https://sq-synced-videoplayer.glitch.me/player.html?youtube=' + encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso') + '&start=0&instanceId=' + this.core.params.instanceId + '&user=' + window.user.id + '-_-' + window.user.name;
+      const url = `https://${this.hostUrl}/?user=${window.user.id}-_-${window.user.name}&youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0`;
       this.core.browser.setAttribute('sq-browser','url: ' + url);
     }
   }

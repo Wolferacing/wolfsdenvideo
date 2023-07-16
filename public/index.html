@@ -18,7 +18,7 @@
         init() {
           this.video = document.getElementById("videoFrame");
           this.urlParams = new URLSearchParams(window.location.search);      
-          this.start = this.urlParams.get('start');    
+          this.start = this.urlParams.get('start');
           var userStr = this.urlParams.get("user").split("-_-");
           window.user = {
             id: userStr[0],
@@ -110,26 +110,6 @@
       }
       const player = new Player();
       function onYouTubeIframeAPIReady() {
-        // player = new YT.Player('player', {
-        //   height: window.innerHeight,
-        //   width: window.innerWidth,
-        //   videoId: getId(decodeURIComponent(urlParams.get('youtube'))),
-        //   playerVars: {
-        //     'playsinline': 1,
-        //     'autoplay': 0,
-        //     'disablekb': 1,
-        //     'modestbranding': true,
-        //     'origin': 'https://sq-synced-videoplayer.glitch.me',
-        //     'start': start ? Number(start) : 0
-        //   },
-        //   events: {
-        //     'onReady': (event) => {
-        //       console.log('ready');
-        //       event.target.setVolume(10);
-        //       event.target.seekTo(start ? Number(start) : 0)
-        //     }
-        //   }
-        // });
         player.onYouTubeIframeAPIReady();
       }
     

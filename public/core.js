@@ -122,6 +122,7 @@ class Core{
     });
   }
   sendMessage(msg){
+    msg.u = window.user;
     this.ws.send(JSON.stringify(msg));
   }
 }
