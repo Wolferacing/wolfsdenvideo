@@ -13,9 +13,9 @@
     </style>
   </head>
   <body>
-<!--     <div id="status">
+    <div id="status">
       
-    </div> -->
+    </div>
     <div id="player"></div>
     <script>
       const Responses = {
@@ -87,12 +87,15 @@
               }
               break;
             case Responses.MUTE:
-              // document.getElementById('status').innerHTML = json.data;
               this.mute = json.data;
               this.setMute();
               break;
             case Responses.SYNC_TIME:
-              this.player.seekTo(json.data.currentTime);
+              const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime);
+              document.getElementById('status').innerHTML = timediff;
+              if(timediff > 0.08) {
+                this.player.seekTo(json.data.currentTime);
+              }
               break;
           }
         }
