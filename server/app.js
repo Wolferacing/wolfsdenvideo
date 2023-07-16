@@ -160,7 +160,7 @@ class App{
             duration: v.milis_length ,
             link: v.url
           })  
-          this.updateClients(ws.i, 'add-playlist');
+          this.updateClients(ws.i, 'from-playlist');
         });
       }
     }, this.videoPlayers[ws.i].locked);
@@ -169,7 +169,7 @@ class App{
      if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         this.videoPlayers[ws.i].playlist.length = 0;
-        this.updateClients(ws.i, 'add-playlist');
+        this.updateClients(ws.i, 'clear-playlist');
       }, this.videoPlayers[ws.i].locked);
     }
   }
