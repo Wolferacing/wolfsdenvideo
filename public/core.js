@@ -10,7 +10,7 @@ const Commands = {
   TAKE_OVER: 'take-over',
   FROM_PLAYLIST: 'from-playlist',
   CLEAR_PLAYLIST: 'clear-playlist',
-  DOWN_VOLUME: 'down-volume',
+  SET_VOLUME: 'set-volume',
   MUTE: 'mute',
   ADD_TO_PLAYERS: 'add-to-players',
   REMOVE_FROM_PLAYERS: 'remove-from-players'

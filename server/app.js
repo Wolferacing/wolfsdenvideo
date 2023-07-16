@@ -182,7 +182,6 @@ class App{
     if(!data.id || !data.id.startsWith("PL")) {
       return;
     }
-    console.log(data);
     let playlist = await ytfps(data.id, { limit: 50 });
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {

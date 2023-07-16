@@ -3,9 +3,19 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <style>
       html, body{margin: 0; padding: 0;}
+      #status{
+        position: absolute;
+        top: 50px;
+        left: 50px; 
+        background: white;
+        padding: 7 7;
+      }
     </style>
   </head>
   <body>
+    <div id="status">
+      
+    </div>
     <div id="player"></div>
     <script>
       const Responses = {
@@ -22,7 +32,9 @@
           this.video = document.getElementById("videoFrame");
           this.urlParams = new URLSearchParams(window.location.search);      
           this.start = this.urlParams.get('start') || 0; 
-          this.volume = this.urlParams.has('volume') ? this.urlParams.get('volume') : '10';
+          const volume = this.urlParams.get('volume');
+          this.volume = volume || volume == '0' ? volume : '10';
+          document.getElementById('status').innerText = this.volume;
           this.mute = this.urlParams.get('mute') || 'false';
           var userStr = (this.urlParams.get("user") || "").split("-_-");
           window.user = {
@@ -108,7 +120,8 @@
               },
               'onReady': (event) => {
                 this.player = event.target;
-                this.player.setVolume(Number(this.volume));
+                this.player.setVolume(0);
+                document.getElementById('status').innerText = "Here " + Number(this.volume);
                 this.player.seekTo(Number(this.start));
                 if(this.mute == 'true') {
                   this.player.mute();
