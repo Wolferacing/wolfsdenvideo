@@ -24,11 +24,10 @@ const Responses = {
 
 class Core{
   constructor() {
-    this.hostUrl = 'sq-video-player.glitch.me';
     this.urlParams = new URLSearchParams(window.location.search);
-    console.log(this.urlParams);
   }
-  async init() {
+  async init(hostUrl) {
+    this.hostUrl = hostUrl;
     if(window.isBanter) {
       await this.awaitExistance(window, 'user');
     }else{
@@ -48,7 +47,7 @@ class Core{
         this.generateGuestUser()
       }
     } 
-    this.setupBrowserElement();
+    this.browser = this.setupBrowserElement();
   }
   setupBrowserElement() {
     const scene = document.querySelector("a-scene");
@@ -85,6 +84,19 @@ class Core{
     const value = this.currentScript.getAttribute(attr);
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
+  }
+  playVidya(currentTrack, currentTime, force) {
+    if(this.player) {
+      if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
+        var url = 'https://' + this.hostUrl + '/player.html?youtube=' + 
+            encodeURIComponent(this.player.playlist[currentTrack].link) + 
+            '&start=' + currentTime  + 
+            '&instanceId=' + this.instanceId + 
+            '&user=' + window.user.id + '-_-' + window.user.name;
+        this.browser.setAttribute('sq-browser','url: ' + url);
+      }
+      this.lastUrl = this.player.playlist[currentTrack].link;
+    }
   }
   setupWebsocket(messageCallback){
     return new Promise(resolve => {
