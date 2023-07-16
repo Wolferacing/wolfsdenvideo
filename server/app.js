@@ -1,19 +1,59 @@
+const { WebSocket } = require('@encharm/cws');
+const express = require('express');
+const http = require('http');
+const path = require('path');
 const Youtube = require('./youtube/scraper.js');
 const youtube = new Youtube();
 const ytfps = require('ytfps');
 const fetch = require('node-fetch');
 const Commands = require('./commands.js');
 const Responses = require('./responses.js');
-const WebServer = require('./web-server.js');
 
-class Server{
+class App{
   constructor() {
     this.videoPlayers = {};
-    this.webServer = new WebServer();
+    this.setupWebserver();
     setInterval(() => {
       this.syncTime();
     }, 1000);
     this.syncTime();
+  }
+  setupWebserver() {
+    this.app = express();
+    
+    this.server = http.createServer( this.app );
+    
+    this.wss = new WebSocket.Server({ noServer: true });
+    
+    this.server.on('upgrade', (request, socket, head) => {
+      this.wss.handleUpgrade(request, socket, head, (ws) => {
+        this.wss.emit('connection', ws, request);
+      });
+    });
+    
+    this.wss.startAutoPing(10000);
+    
+    this.wss.on('connection', (ws, req) => {
+      ws.t = new Date().getTime();
+      ws.on('message', msg => {
+        try{
+          if(msg !== "keepalive") {
+            this.parseMessage(JSON.parse(msg), ws);
+          }
+        }catch(e) {
+          console.log("parse error: ", e, msg);
+        }
+      });
+      ws.on('close', (code, reason) => {
+        this.handleClose(ws);
+      });
+    });
+    
+    this.app.use(express.static(path.join(__dirname, 'public')));
+    
+    this.server.listen( 3000, function listening(){
+        console.log("Video Player started."); 
+    });
   }
   handleClose(ws) {
     console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.');
@@ -106,34 +146,6 @@ class Server{
   setVolume(ws, isDown) {
     if(ws.user_video) {
       this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME, {});
-    }
-  }
-  async getDirectUrl(youtubeId) {
-    const jsonBody = {
-      "context": {
-        "client": {
-          "clientName": "ANDROID",
-          "clientVersion": "17.31.35",
-          "hl": "en"
-        }
-      },
-      "videoId": youtubeId
-    }
-    const res = await fetch("https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", {
-        headers: {
-            "Content-Type": "application/json",
-            "Origin": "https://www.youtube.com",
-            "X-YouTube-Client-Name": "1",
-            "X-YouTube-Client-Version": "2.20220801.00.00"
-        },
-        method: 'post',
-        body: JSON.stringify(jsonBody)
-    });
-    try{
-      const json = await res.json();
-      return json.streamingData.formats;
-    }catch(e) {
-      return false;
     }
   }
   async fromPlaylist(data, ws) {
@@ -309,11 +321,6 @@ class Server{
     this.syncWsTime(ws, instanceId);
     this.send(ws, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
   }
-  async playNewTrack(instanceId, track) {
-      const id = this.parseYoutubeId(track.url);
-      const formatData = await this.getDirectUrl(id);
-      track.formats = formatData.formats;
-  }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
       return {
@@ -352,4 +359,4 @@ class Server{
     }
   }
 }
-module.exports = new Server();
+module.exports = new App();
