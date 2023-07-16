@@ -28,12 +28,6 @@ class Core{
     this.urlParams = new URLSearchParams(window.location.search);
     console.log(this.urlParams);
   }
-  setupScripts(callback) {
-    let myScript = document.createElement("script");
-    myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
-    myScript.addEventListener ("load", callback, false);
-    document.body.appendChild(myScript);  
-  }
   async init() {
     if(window.isBanter) {
       await this.awaitExistance(window, 'user');
@@ -76,6 +70,33 @@ class Core{
     const value = this.currentScript.getAttribute(attr);
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
+  }
+  setupWebsocket(messageCallback){
+    return new Promise(resolve => {
+      this.ws = new WebSocket('wss://' + this.hostUrl + '/');
+      this.ws.onopen = (event) => {
+        console.log("Websocket connected!");
+        resolve();
+      };
+      this.ws.onmessage = (event) => {
+        if(typeof event.data === 'string'){
+          messageCallback(event.data);
+        }
+      }
+      this.ws.onclose =  (event) => {
+        console.log("Websocket closed...");
+        setTimeout(() => {
+          if(window.isBanter) {
+            this.setupWebsocket();
+          }else{
+            window.location.reload();
+          } 
+        }, 1000);
+      };
+    });
+  }
+  sendMessage(msg){
+    this.ws.send(JSON.stringify(msg));
   }
 }
 window.videoPlayerCore = new Core();
