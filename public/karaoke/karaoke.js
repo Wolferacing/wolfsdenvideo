@@ -36,6 +36,12 @@ class Karaoke{
         this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS });
     });
     
+    this.fullscreenButton = document.querySelector('.fullscreenButton');
+    
+    this.fullscreenButton.addEventListener('click', () => {
+        this.toggleVideoFullscreen();
+    });
+    
     this.videoPlayer = document.querySelector('#videoPlayer');
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
@@ -137,10 +143,6 @@ class Karaoke{
     this.videoPlayer.innerHTML = '';
     player.playlist.forEach((v, i) => {
       if(player.currentTrack === i) {
-        const videoThumbnail = this.core.makeAndAddElement('img',{width: '100%', float: 'left'}, this.videoPlayer);
-      
-        videoThumbnail.src = v.thumbnail;
-
         
         this.core.makeAndAddElement('div',{clear: 'both'}, this.videoPlayer);
         
@@ -249,17 +251,42 @@ class Karaoke{
       this.addItemContainer.style.display = 'none';
       this.addItemBackDrop.style.display = 'none';
   }
+  toggleVideoFullscreen() {
+    const playerContainer = document.getElementById("playerContainer");
+    if(playerContainer != null) {
+      const player = document.getElementById("player");
+      const isFullscreen = player.getAttribute('width') === "240";
+      if(isFullscreen) {
+        playerContainer.style.position = "initial";
+        playerContainer.style.top = "initial";
+        playerContainer.style.bottom = "initial";
+        playerContainer.style.left = "initial";
+        playerContainer.style.right = "initial";
+        player.width = window.innerWidth;
+        player.height = window.innerHeight;
+      }else{
+        playerContainer.style.position = "fixed";
+        playerContainer.style.top = "0";
+        playerContainer.style.bottom = "0";
+        playerContainer.style.left = "0";
+        playerContainer.style.right = "0";
+        player.width = 240;
+        player.height = 180;
+      }
+    }
+  }
   setupYoutubePlayer() {
     const youtubeUrl = this.core.urlParams.has('youtube') ? this.core.urlParams.get('youtube') : 'https://www.youtube.com/watch?v=L_LUpnjgPso';
     new YT.Player('player', {
-      height: '240',
-      width: '',
+      height: '180',
+      width: '240',
       videoId: this.core.getYTId(decodeURIComponent(youtubeUrl)),
       playerVars: {
         'playsinline': 1,
-        'autoplay': 0,
+        'muted': 1,
+        'autoplay': 1,
         'disablekb': 1,
-        'controls': 0,
+        'controls': 1,
         'modestbranding': true,
         'cc_load_policy': 1,
         'cc_lang_pref': 'en',
@@ -270,10 +297,11 @@ class Karaoke{
       events: {
         'onReady': (event) => {
           this.YtPlayer = event.target;
-          this.YtPlayer.setVolume(10);
+          this.YtPlayer.setVolume(0);
           if(this.initialYoutube) {
             this.YtPlayer.loadVideoById(this.core.getYTId(this.initialYoutube.link), this.core.player ? this.core.player.currentTime || 0 : 0);
           }
+          this.YtPlayer.play();
         }
       }
     });

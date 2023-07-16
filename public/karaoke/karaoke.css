@@ -21,6 +21,15 @@ body{
   font: 15px Roboto, sans-serif;
   padding: 1 30;
 }
+.fullscreenButton{
+  position: absolute;
+  z-index: 999;
+  top: 50px;
+  right: 50px;
+  width: 20px;
+  height: 20px;
+  background: white;
+}
 .searchContainer{
   float: right;
 }
