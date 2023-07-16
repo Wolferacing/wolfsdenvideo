@@ -31,7 +31,7 @@ class Playlist {
         // }
         break;
       case Responses.PLAYBACK_UPDATE:
-        this.player = json.data.video;
+        // this.player = json.data.video;
         // if(window.isPlaylist) {
           // this.updatePlaylist(this.player);
         // }else{
@@ -40,11 +40,11 @@ class Playlist {
           }
         // }
         break;
-      case Responses.SEARCH_RESULTS:
-        if(window.isPlaylist) {
-          this.loadVideos(json.data);
-        }
-        break;
+      // case Responses.SEARCH_RESULTS:
+      //   if(window.isPlaylist) {
+      //     this.loadVideos(json.data);
+      //   }
+      //   break;
       case Responses.ERROR:
         alert("I cant let you do that...");
         break;

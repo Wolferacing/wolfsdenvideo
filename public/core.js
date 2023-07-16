@@ -48,6 +48,21 @@ class Core{
         this.generateGuestUser()
       }
     } 
+    this.setupBrowserElement();
+  }
+  setupBrowserElement() {
+    const scene = document.querySelector("a-scene");
+    if(!scene) {
+      console.log("No a-scene tag found, is this an AFRAME scene ?");
+      return;
+    }
+    const browser = document.createElement('a-entity');
+    browser.setAttribute("position", this.params.position);
+    browser.setAttribute("rotation", this.params.rotation);
+    browser.setAttribute("scale", this.params.scale);
+    browser.setAttribute("sq-browser", "mipMaps: 1; pixelsPerUnit: 1600; mode: local; url: about%3Ablank; afterLoadActions: [ { &quot;actionType&quot;: &quot;delayseconds&quot;, &quot;numParam1&quot;: 1}, {&quot;actionType&quot;: &quot;click2d&quot;, &quot;numParam1&quot;: 150, &quot;numParam2&quot;: 150}]");
+    scene.appendChild(browser);
+    return browser;
   }
   generateGuestUser() {
     const id = this.getUniquId();
