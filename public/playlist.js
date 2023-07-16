@@ -1,13 +1,21 @@
 class Playlist {
   constructor() {
-    this.hostUrl = location.host;
-    this.parseAttributes();
+    this.hostUrl = 'sq-video-player.glitch.me';
+    this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
+    this.setupScripts(() => this.parseAttributes());
+  }
+  setupScripts(callback) {
+    let myScript = document.createElement("script");
+    myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
+    myScript.addEventListener ("load", callback, false);
+    document.body.appendChild(myScript);  
   }
   parseAttributes() {
-    console.log(window.currentScript);
+    this.setOrDefault()
+    console.log(this.currentScript.getAttribute("position"));
   }
 }
-
-require(['polyfills', 'commands', 'responses' ], function(data) {
-    new Playlist();
-});
+new Playlist();
+// require(['polyfills', 'commands', 'responses' ], function(data) {
+//     new Playlist();
+// });

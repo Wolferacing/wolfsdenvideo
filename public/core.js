@@ -13,11 +13,11 @@ const Commands = {
   DOWN_VOLUME: 'down-volume',
   UP_VOLUME: 'up-volume'
 } 
-
-class Core() {
-  window.currentScript = document.currentScript || (function() {
-  var scripts = document.getElementsByTagName('script');
-  return scripts[scripts.length - 1];
-})();
-
+const Responses = {
+  OUT_OF_BOUNDS: 'out-of-bounds',
+  DOES_NOT_EXIST: 'does-not-exist',
+  PLAYBACK_UPDATE: 'playback-update',
+  SYNC_TIME: 'sync-time',
+  SEARCH_RESULTS: 'search-results',
+  ERROR:'error'
 }
