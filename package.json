@@ -5,7 +5,7 @@
   "main": "server.js",
   "repository": "-",
   "scripts": {
-    "start": "ts-node server.ts"
+    "start": "ts-node server/app.ts"
   },
   "engines": {
     "node": "14.x"
@@ -18,6 +18,7 @@
     "ytfps": "^1.1.0",
     "twitch-m3u8": "^1.1.5",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "@types/node": "^20.4.2"
   }
 }
