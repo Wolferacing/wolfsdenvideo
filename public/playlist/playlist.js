@@ -10,6 +10,7 @@ class Playlist {
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket(d => this.parseMessage(d));
     this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+    this.playPlaylist();
   }
   playPlaylist(shouldClear) {
     this.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId, shouldClear}, u: window.user});
