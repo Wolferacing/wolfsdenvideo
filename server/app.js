@@ -114,10 +114,13 @@ class App{
         this.setUserVideoPlayer(msg.data, ws);
         break;
       case Commands.DOWN_VOLUME:
-        this.setVolume(ws, true);
+        this.upDownVolume(ws, true);
         break;
       case Commands.UP_VOLUME:
-        this.setVolume(ws);
+        this.upDownVolume(ws);
+        break;
+      case Commands.SET_VOLUME:
+        this.setVolume(msg.data, ws)
         break;
       case Commands.DOWN_VOTE:
         this.setVote(msg.data, true, ws);
@@ -168,7 +171,12 @@ class App{
       this.updateClients(ws.i, "set-vote");
     }
   }
-  setVolume(ws, isDown) {
+  setVolume(vol, ws) {
+    if(ws.user_video) {
+      this.send(ws.user_video, Commands.SET_VOLUME, vol);
+    }
+  }
+  upDownVolume(ws, isDown) {
     if(ws.user_video) {
       this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME, {});
     }

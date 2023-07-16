@@ -98,8 +98,22 @@ class Core{
       playlistButton.appendChild(playlistButtonText);
       playlistContainer.appendChild(playlistButton);
       playlistButton.addEventListener('click', ()=>{
-        this.sendMessage({path: isUp ? Commands.UP_VOLUME : Commands.DOWN_VOLUME});
+        this.setVolume(isUp);
+        this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
       });
+  }
+  setVolume(isUp) {
+    if(isUp) {
+      this.params.volume += 5;
+      if(this.params.volume > 100) {
+        this.params.volume = 100;
+      }
+    }else{
+      this.params.volume -= 5;
+      if(this.params.volume < 0) {
+        this.params.volume = 0;
+      }
+    }
   }
   setupPlaylistButton(scene, playlistContainer) {
       const yScale = Number(this.params.scale.split(" ")[1]);
@@ -136,7 +150,7 @@ class Core{
     this.setOrDefault("scale", "1 1 1");
     this.setOrDefault("instance", "666");
     this.setOrDefault("playlist", "");
-    this.setOrDefault("volume", "0.2");
+    this.setOrDefault("volume", "20");
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
@@ -148,7 +162,7 @@ class Core{
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
         this.browser.setAttribute('sq-browser','url: ' + url);
-        console.log("Playing video:", this.player.playlist[currentTrack].link);
+        console.log("Playing video:", url);
       }
       this.lastUrl = this.player.playlist[currentTrack].link;
     }

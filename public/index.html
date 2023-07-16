@@ -67,7 +67,7 @@
               }
               break;
             case Responses.SET_VOLUME:
-              if(vol > 0) {
+              if(json.data >= 0 && json.data <= 100) {
                 this.player.setVolume(json.data);
               }
               break;
