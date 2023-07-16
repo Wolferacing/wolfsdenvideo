@@ -92,8 +92,21 @@ class Playlist {
       videoThumbnail.src = v.thumbnail;
       
       videoTitle.innerText = v.title;
-      if(player.currentTrack !== i) {
+        
+      const videoAuthor = this.makeAndAddElement('div',{
+        padding: '0 10 5 7', 
+        textOverflow: 'ellipsis', 
+        overflow: 'hidden', 
+        fontSize: '0.8rem',
+        color: '#cfcfcf',
+        whiteSpace: 'nowrap'
+      }, videoTitleAndAction);
+
+      videoAuthor.className = "currentTimeAuthor";
+      videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
       
+      if(player.currentTrack !== i) {
+
         const playTrack = this.makeAndAddElement('div',null, videoTitleAndAction);
 
       
@@ -103,7 +116,6 @@ class Playlist {
         playTrack.addEventListener('click', () => {
           this.core.sendMessage({path: Commands.SET_TRACK, data: i });
         });
-
         const moveDown = this.makeAndAddElement('div',null, videoTitleAndAction);
 
         moveDown.className = 'button teal';
@@ -144,17 +156,6 @@ class Playlist {
         
       }
         
-      const videoAuthor = this.makeAndAddElement('div',{
-        padding: '7 10 0 7', 
-        textOverflow: 'ellipsis', 
-        overflow: 'hidden', 
-        fontSize: '0.8rem',
-        color: '#cfcfcf',
-        whiteSpace: 'nowrap'
-      }, videoTitleAndAction);
-
-      videoAuthor.className = "currentTimeAuthor";
-      videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       

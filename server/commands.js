@@ -13,5 +13,6 @@ module.exports = {
   CLEAR_PLAYLIST: 'clear-playlist',
   USER_VIDEO_PLAYER: 'user-video-player',
   DOWN_VOLUME: 'down-volume',
-  UP_VOLUME: 'up-volume'
+  UP_VOLUME: 'up-volume',
+  ADD_TO_PLAYERS: 'up-volume'
 }

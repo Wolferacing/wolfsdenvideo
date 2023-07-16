@@ -272,6 +272,7 @@ class App{
     if(!this.videoPlayers[instanceId]) {
       this.videoPlayers[instanceId] = {
         playlist:[],
+        players: [],
         currentTrack: 0,
         currentTime: 0,
         locked: false,

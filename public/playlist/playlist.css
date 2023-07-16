@@ -136,6 +136,7 @@ body{
   border-radius: 3px;
   margin-left: 15px;
   user-select: none;
+  font-size: 0.9em;
 }
 .slim{
   padding: 5 5;
