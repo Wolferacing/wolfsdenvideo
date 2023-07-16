@@ -181,7 +181,9 @@ class App{
     }
   }
   setMute(ws, muted) {
-    
+    if(ws.user_video) {
+      this.send(ws.user_video, Commands.MUTE, muted);
+    }
   }
   upDownVolume(ws, isDown) {
     if(ws.user_video) {

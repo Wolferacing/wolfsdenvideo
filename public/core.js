@@ -62,7 +62,7 @@ class Core{
     browser.setAttribute("position", this.params.position);
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
-    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 1.5}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
+    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 2}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
     scene.appendChild(browser);
     this.browser = browser;
     this.setupBrowserUi();
@@ -82,27 +82,29 @@ class Core{
     scene.appendChild(playlistContainer);
   }
   setupVolButton(scene, isUp, playlistContainer) {
-      const yScale = Number(this.params.scale.split(" ")[1]);
-      const playlistButton = document.createElement('a-box');
-      playlistButton.setAttribute('sq-collider', '');
-      playlistButton.setAttribute('sq-interactable', '');
-      playlistButton.setAttribute('color', '#f00075');
-      playlistButton.setAttribute('position', `${isUp ? 0.8 : 1.35} ${-yScale*0.35} 0`);
-      playlistButton.setAttribute('depth', '0.05');
-      playlistButton.setAttribute('width', '0.5');
-      playlistButton.setAttribute('height', '0.3');
-      const playlistButtonText = document.createElement('a-text');
-      playlistButtonText.setAttribute('value', isUp ? '+ vol' : '- vol');
-      playlistButtonText.setAttribute('position', '0 0.03 0.06');
-      playlistButtonText.setAttribute('align', 'center');
-      playlistButton.appendChild(playlistButtonText);
-      playlistContainer.appendChild(playlistButton);
-      playlistButton.addEventListener('click', ()=>{
-        
+    this.setupButton(scene, playlistContainer, isUp ? 0.8 : 1.35, isUp ? '+ vol' : '- vol', '0.5',  ()=>{
         this.setVolume(isUp);
-        console.log({path: Commands.SET_VOLUME, data: this.params.volume});
         this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
-      });
+    })
+      // const yScale = Number(this.params.scale.split(" ")[1]);
+      // const playlistButton = document.createElement('a-box');
+      // playlistButton.setAttribute('sq-collider', '');
+      // playlistButton.setAttribute('sq-interactable', '');
+      // playlistButton.setAttribute('color', '#f00075');
+      // playlistButton.setAttribute('position', `${isUp ? 0.8 : 1.35} ${-yScale*0.35} 0`);
+      // playlistButton.setAttribute('depth', '0.05');
+      // playlistButton.setAttribute('width', '0.5');
+      // playlistButton.setAttribute('height', '0.3');
+      // const playlistButtonText = document.createElement('a-text');
+      // playlistButtonText.setAttribute('value', isUp ? '+ vol' : '- vol');
+      // playlistButtonText.setAttribute('position', '0 0.03 0.06');
+      // playlistButtonText.setAttribute('align', 'center');
+      // playlistButton.appendChild(playlistButtonText);
+      // playlistContainer.appendChild(playlistButton);
+      // playlistButton.addEventListener('click', ()=>{
+      //   this.setVolume(isUp);
+      //   this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
+      // });
   }
   setVolume(isUp) {
     if(isUp) {
@@ -117,25 +119,46 @@ class Core{
       }
     }
   }
+  setupButton(scene, playlistContainer, xOffset, title, width, callback) {
+    const yScale = Number(this.params.scale.split(" ")[1]);
+    const playlistButton = document.createElement('a-box');
+    playlistButton.setAttribute('sq-collider', '');
+    playlistButton.setAttribute('sq-interactable', '');
+    playlistButton.setAttribute('color', '#f00075');
+    playlistButton.setAttribute('position', `${xOffset} ${-yScale*0.35} 0`);
+    playlistButton.setAttribute('depth', '0.05');
+    playlistButton.setAttribute('width', width);
+    playlistButton.setAttribute('height', '0.3');
+    const playlistButtonText = document.createElement('a-text');
+    playlistButtonText.setAttribute('value', title);
+    playlistButtonText.setAttribute('position', '0 0.03 0.06');
+    playlistButtonText.setAttribute('align', 'center');
+    playlistButton.appendChild(playlistButtonText);
+    playlistContainer.appendChild(playlistButton);
+    playlistButton.addEventListener('click', callback);
+  }
   setupPlaylistButton(scene, playlistContainer) {
-      const yScale = Number(this.params.scale.split(" ")[1]);
-      const playlistButton = document.createElement('a-box');
-      playlistButton.setAttribute('sq-collider', '');
-      playlistButton.setAttribute('sq-interactable', '');
-      playlistButton.setAttribute('color', '#f00075');
-      playlistButton.setAttribute('position', `0 ${-yScale*0.35} 0`);
-      playlistButton.setAttribute('depth', '0.05');
-      playlistButton.setAttribute('width', '1');
-      playlistButton.setAttribute('height', '0.3');
-      const playlistButtonText = document.createElement('a-text');
-      playlistButtonText.setAttribute('value', 'playlist');
-      playlistButtonText.setAttribute('position', '0 0.03 0.06');
-      playlistButtonText.setAttribute('align', 'center');
-      playlistButton.appendChild(playlistButtonText);
-      playlistContainer.appendChild(playlistButton);
-      playlistButton.addEventListener('click', ()=>{
-        window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
-      });
+    this.setupButton(scene, playlistContainer, '0', 'playlist', '1',  ()=>{
+      window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
+    })
+      // const yScale = Number(this.params.scale.split(" ")[1]);
+      // const playlistButton = document.createElement('a-box');
+      // playlistButton.setAttribute('sq-collider', '');
+      // playlistButton.setAttribute('sq-interactable', '');
+      // playlistButton.setAttribute('color', '#f00075');
+      // playlistButton.setAttribute('position', `0 ${-yScale*0.35} 0`);
+      // playlistButton.setAttribute('depth', '0.05');
+      // playlistButton.setAttribute('width', '1');
+      // playlistButton.setAttribute('height', '0.3');
+      // const playlistButtonText = document.createElement('a-text');
+      // playlistButtonText.setAttribute('value', 'playlist');
+      // playlistButtonText.setAttribute('position', '0 0.03 0.06');
+      // playlistButtonText.setAttribute('align', 'center');
+      // playlistButton.appendChild(playlistButtonText);
+      // playlistContainer.appendChild(playlistButton);
+      // playlistButton.addEventListener('click', ()=>{
+      //   window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
+      // });
   }
   generateGuestUser() {
     const id = this.getUniquId();
@@ -153,9 +176,10 @@ class Core{
     this.setOrDefault("instance", "666");
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '20');
-    this.setOrDefault("mute", '0');
+    this.setOrDefault("mute", 'false');
     this.params.volume = Number(this.params.volume);
-    this.params.mute = !!this.params.mute;
+    console.log(this.urlParams.get("mute"), this.currentScript.getAttribute("mute"));
+    this.params.mute = this.params.mute === 'true';
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
