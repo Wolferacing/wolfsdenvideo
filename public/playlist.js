@@ -11,11 +11,13 @@ class PlaylistPlayer {
     await this.core.setupWebsocket(d => this.parseMessage(d));
     this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
     if(this.core.params.playlist) {
-      const url = `https://${this.hostUrl}/playlist/?instance=${this.core.params.instanceId}&playlist=${this.core.params.playlist}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}`;
+      const url = `https://${this.hostUrl}/playlist/?instance=${this.core.params.instance}&playlist=${this.core.params.playlist}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}`;
       this.core.setupBrowserElement(url);
+      console.log(url);
     }else{
       const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}`;
       this.core.setupBrowserElement(url);
+      console.log(url);
     }
   }
   parseMessage(msg) {

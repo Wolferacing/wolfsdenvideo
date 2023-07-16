@@ -92,9 +92,11 @@ class Core{
     if(this.player) {
       console.log('sq-browser','play', currentTrack, currentTime,this.lastUrl);
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
+        
+        const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
         var url = 'https://' + this.hostUrl + '/player.html?youtube=' + 
             encodeURIComponent(this.player.playlist[currentTrack].link) + 
-            '&start=' + currentTime  + 
+            '&start=' + currentTime + 
             '&instanceId=' + this.instanceId + 
             '&user=' + window.user.id + '-_-' + window.user.name;
         this.browser.setAttribute('sq-browser','url: ' + url);
