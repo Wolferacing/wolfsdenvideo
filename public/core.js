@@ -73,12 +73,17 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
+    const yScale = Number(this.params.scale.split(" ")[1]);
+    
+    const playlistContainer = document.createElement('a-entity');
+    playlistContainer.setAttribute('position', this.params.position);
+    playlistContainer.setAttribute('rotation', this.params.rotation);
+    
     const playlistButton = document.createElement('a-box');
     playlistButton.setAttribute('sq-collider', '');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('color', '#f00075');
-    playlistButton.setAttribute('position', this.params.position);
-    playlistButton.setAttribute('rotation', this.params.rotation);
+    playlistButton.setAttribute('position', `0 ${-yScale/2} 0`);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('width', '1.6');
     playlistButton.setAttribute('height', '0.3');
@@ -87,7 +92,8 @@ class Core{
     playlistButtonText.setAttribute('position', '0 0.03 0.06');
     playlistButtonText.setAttribute('align', 'center');
     playlistButton.appendChild(playlistButtonText);
-    scene.appendChild(playlistButton);
+    playlistContainer.appendChild(playlistButton);
+    scene.appendChild(playlistContainer);
     playlistButton.addEventListener('click', ()=>{
       window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
     });
@@ -119,11 +125,6 @@ class Core{
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         
         const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
-        // var url = 'https://' + this.hostUrl + '/player.html?youtube=' + 
-        //     encodeURIComponent(this.player.playlist[currentTrack].link) + 
-        //     '&start=' + currentTime + 
-        //     '&instanceId=' + this.instanceId + 
-        //     '&user=' + window.user.id + '-_-' + window.user.name;
         this.browser.setAttribute('sq-browser','url: ' + url);
         console.log("Playing video:", this.player.playlist[currentTrack].link);
       }
