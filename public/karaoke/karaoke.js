@@ -181,6 +181,7 @@ class Karaoke{
         currentTimeText.className = "currentTimeText";
         currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
         if(this.YtPlayer) {
+          console.log("load player!")
           this.YtPlayer.loadVideoById(this.core.getYTId(v.link), player.currentTime);
         }else{
           this.initialYoutube = v;
@@ -218,8 +219,7 @@ class Karaoke{
         if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id )) {
           this.hideSearch();
           this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-          this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
+          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
         }
       }); 
       
@@ -253,25 +253,28 @@ class Karaoke{
   }
   toggleVideoFullscreen() {
     const playerContainer = document.getElementById("playerContainer");
+    console.log('here');
     if(playerContainer != null) {
+    console.log('here2');
       const player = document.getElementById("player");
-      const isFullscreen = player.getAttribute('width') === "240";
+      console.log(player.width);
+      const isFullscreen = player.width != '240';
       if(isFullscreen) {
         playerContainer.style.position = "initial";
         playerContainer.style.top = "initial";
         playerContainer.style.bottom = "initial";
         playerContainer.style.left = "initial";
         playerContainer.style.right = "initial";
-        player.width = window.innerWidth;
-        player.height = window.innerHeight;
+        player.width = '240';
+        player.height = '180';
       }else{
         playerContainer.style.position = "fixed";
         playerContainer.style.top = "0";
         playerContainer.style.bottom = "0";
         playerContainer.style.left = "0";
         playerContainer.style.right = "0";
-        player.width = 240;
-        player.height = 180;
+        player.width = window.innerWidth;
+        player.height = window.innerHeight;
       }
     }
   }
@@ -283,7 +286,7 @@ class Karaoke{
       videoId: this.core.getYTId(decodeURIComponent(youtubeUrl)),
       playerVars: {
         'playsinline': 1,
-        'muted': 1,
+        'mute': 1,
         'autoplay': 1,
         'disablekb': 1,
         'controls': 1,
@@ -301,7 +304,6 @@ class Karaoke{
           if(this.initialYoutube) {
             this.YtPlayer.loadVideoById(this.core.getYTId(this.initialYoutube.link), this.core.player ? this.core.player.currentTime || 0 : 0);
           }
-          this.YtPlayer.play();
         }
       }
     });
