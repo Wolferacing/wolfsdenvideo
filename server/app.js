@@ -117,6 +117,12 @@ class App{
       case Commands.UP_VOLUME:
         this.setVolume(ws);
         break;
+      case Commands.DOWN_VOTE:
+        this.setVote(msg.data, true, ws);
+        break;
+      case Commands.UP_VOTE:
+        this.setVote(msg.data, false, ws);
+        break;
       case Commands.ADD_TO_PLAYERS:
         ws.p = true;
         break;
@@ -147,6 +153,12 @@ class App{
         ws.user_video = user_video;
       }
     });
+  }
+  setVote(track, isDown, ws) {
+    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].votes.filter(d=>d.uid === ws.u.id)) {
+      this.videoPlayers[ws.i].votes.push({uid: ws.u.id, isDown, video: this.videoPlayers[ws.i].playlist[track]});
+      
+    }
   }
   setVolume(ws, isDown) {
     if(ws.user_video) {
