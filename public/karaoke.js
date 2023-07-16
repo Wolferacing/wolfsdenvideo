@@ -6,6 +6,7 @@ class KaraokePlayer {
   }
   async init() {
     this.core = window.videoPlayerCore;
+    this.core.isKaraoke = true;
     this.core.parseParams(this.currentScript);
     this.core.setupBrowserElement();
     await this.core.init(this.hostUrl);

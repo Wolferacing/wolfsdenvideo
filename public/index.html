@@ -13,15 +13,16 @@
     </style>
   </head>
   <body>
-    <div id="status">
+<!--     <div id="status">
       
-    </div>
+    </div> -->
     <div id="player"></div>
     <script>
       const Responses = {
         LINK_ME: 'link-me',
         SET_VOLUME: 'set-volume',
-        MUTE: 'mute'
+        MUTE: 'mute',
+        SYNC_TIME: 'sync-time'
       }
       const hostUrl = 'sq-video-player.glitch.me';
       class Player {
@@ -34,7 +35,7 @@
           this.start = this.urlParams.get('start') || 0; 
           const volume = this.urlParams.get('volume');
           this.volume = volume || volume == '0' ? volume : '10';
-          document.getElementById('status').innerText = this.volume;
+          // document.getElementById('status').innerText = this.volume;
           this.mute = this.urlParams.get('mute') || 'false';
           var userStr = (this.urlParams.get("user") || "").split("-_-");
           window.user = {
@@ -86,9 +87,12 @@
               }
               break;
             case Responses.MUTE:
-              document.getElementById('status').innerHTML = json.data;
+              // document.getElementById('status').innerHTML = json.data;
               this.mute = json.data;
               this.setMute();
+              break;
+            case Responses.SYNC_TIME:
+              this.player.seekTo(json.data.currentTime);
               break;
           }
         }

@@ -61,7 +61,7 @@ class Core{
     browser.setAttribute("position", this.params.position);
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
-    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 2}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
+    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 1}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
     scene.appendChild(browser);
     this.browser = browser;
     this.setupBrowserUi();
@@ -95,8 +95,8 @@ class Core{
     }
   }
   setupPlaylistButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '-0.6', 'playlist', '1',  ()=>{
-      window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
+    this.setupButton(scene, playlistContainer, '-0.6', this.isKaraoke ? 'karaoke' : 'playlist', '1',  ()=>{
+      window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
     })
   }
   setupVolButton(scene, isUp, playlistContainer) {
