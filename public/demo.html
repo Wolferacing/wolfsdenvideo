@@ -4,7 +4,7 @@
     <meta property="og:description" content="This easy example shows how to attach objects to your avatar!">
     <meta property="og:image" content="https://user-images.githubusercontent.com/6830845/206165866-a5a1d387-61b3-4631-90e5-623d2fe19647.png">   -->
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script> 
-    <script>
+<!--     <script>
       const urlParams = new URLSearchParams(window.location.search);
       // A simple aframe component to handle the click
       AFRAME.registerComponent('handle-click', {
@@ -17,20 +17,20 @@
               })
           }
       });
-    </script>
+    </script> -->
   </head>
   <body>
     <a-scene>
       
       <a-box sq-collider color="olive" scale="30 0.1 30"></a-box>
-      <script type="module" src="https://sq-video-player.glitch.me/playlist.js" ></script>
+      <script type="module" src="https://sq-video-player.glitch.me/playlist.js" position="0 3 -12" rotation="0 180 0" scale="4 4 4" instance=""></script>
       
       <!-- A box to click to be able to open a page -->
-      <a-box sq-collider sq-interactable handle-click color="green" position="0 1 -4" depth="0.05" width="1.5" height="0.4">
+<!--       <a-box sq-collider sq-interactable handle-click color="green" position="0 1 -4" depth="0.05" width="1.5" height="0.4">
         <a-text value="playlist" position="0 0 0.06" align="center"></a-text>
-      </a-box>
+      </a-box> -->
       
-      <a-entity id="youtube-video" sq-browser="url: about: blank" position="0 3 -12" rotation="0 180 0" scale="4 4 4"></a-entity>
+<!--       <a-entity id="youtube-video" sq-browser="url: about: blank" position="0 3 -12" rotation="0 180 0" scale="4 4 4"></a-entity> -->
       
     </a-scene>
     

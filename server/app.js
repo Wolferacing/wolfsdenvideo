@@ -41,7 +41,7 @@ class App{
         this.handleClose(ws);
       });
     });
-    this.app.use(express.static(path.join(__dirname, 'public')));
+    this.app.use(express.static(path.join(__dirname, '..', 'public')));
     this.server.listen( 3000, function listening(){
         console.log("Video Player started."); 
     });
