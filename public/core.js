@@ -107,7 +107,7 @@ class Core{
   }
   setupMuteButton(scene, playlistContainer) {
     this.setupButton(scene, playlistContainer, '0.2', 'mute', '0.5',  () => {
-      this.params.mute = this.params.mute == 'true';
+      this.params.mute = this.params.mute == 'true' ? 'false' : 'true';
       this.sendMessage({path: Commands.MUTE, data: this.params.mute});
     })
   }

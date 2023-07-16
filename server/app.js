@@ -173,7 +173,7 @@ class App{
       this.send(ws.user_video, Commands.SET_VOLUME, vol);
     }
   }
-  setMute(ws, muted) {
+  setMute( muted, ws) {
     if(ws.user_video) {
       this.send(ws.user_video, Commands.MUTE, muted);
     }
