@@ -24,8 +24,15 @@ const Responses = {
 
 class Core{
   constructor() {
+    this.hostUrl = 'sq-video-player.glitch.me';
     this.urlParams = new URLSearchParams(window.location.search);
     console.log(this.urlParams);
+  }
+  setupScripts(callback) {
+    let myScript = document.createElement("script");
+    myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
+    myScript.addEventListener ("load", callback, false);
+    document.body.appendChild(myScript);  
   }
   async init() {
     if(window.isBanter) {
@@ -56,8 +63,7 @@ class Core{
   getUniquId() {
     return (Math.random() + 1).toString(36).substring(7);
   }
-  
-  parseAttributes(currentScript) {
+  parseParams(currentScript) {
     this.currentScript = currentScript;
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
@@ -69,7 +75,7 @@ class Core{
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
     this.params = this.params || {};
-    this.params[attr] = value || defaultValue;
+    this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
 }
 window.videoPlayerCore = new Core();
