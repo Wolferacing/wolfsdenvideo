@@ -29,7 +29,7 @@ class Core{
   async init(hostUrl) {
     this.hostUrl = hostUrl;
     if(window.isBanter) {
-      await this.awaitExistance(window, 'user');
+      await window.AframeInjection.awaitExistance(window, 'user');
     }else{
       try{
         if(!window.user) {
@@ -44,10 +44,9 @@ class Core{
           }
         }
       }catch{
-        this.generateGuestUser()
+        this.generateGuestUser();
       }
-    } 
-    this.browser = this.setupBrowserElement();
+    }
   }
   setupBrowserElement() {
     const scene = document.querySelector("a-scene");
@@ -61,7 +60,7 @@ class Core{
     browser.setAttribute("scale", this.params.scale);
     browser.setAttribute("sq-browser", "mipMaps: 1; pixelsPerUnit: 1600; mode: local; url: about%3Ablank; afterLoadActions: [ { &quot;actionType&quot;: &quot;delayseconds&quot;, &quot;numParam1&quot;: 1}, {&quot;actionType&quot;: &quot;click2d&quot;, &quot;numParam1&quot;: 150, &quot;numParam2&quot;: 150}]");
     scene.appendChild(browser);
-    return browser;
+    this.browser = browser;
   }
   generateGuestUser() {
     const id = this.getUniquId();

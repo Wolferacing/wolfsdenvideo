@@ -7,6 +7,7 @@ class PlaylistPlayer {
   async init() {
     this.core = window.videoPlayerCore;
     this.core.parseParams(this.currentScript);
+    this.core.setupBrowserElement();
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket(d => this.parseMessage(d));
     this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
