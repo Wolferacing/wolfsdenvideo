@@ -102,7 +102,7 @@
             videoId: this.getId(decodeURIComponent(this.urlParams.get('youtube'))),
             playerVars: {
               'playsinline': 1,
-              'autoplay': 1,
+              'autoplay': 0,
               'disablekb': 1,
               'controls': 0,
               'modestbranding': true,
@@ -113,11 +113,20 @@
               'start': this.start ? Number(this.start) : 0
             },
             events: {
+              'onStateChange': (event) => {
+                if(event.data == 2 && this.player) {
+                  this.player.playVideo();
+                }
+              },
               'onReady': (event) => {
                 this.player = event.target;
-                event.target.setVolume(this.volume ? Number(this.volume) : 10);
-                event.target.seekTo(this.start ? Number(this.start) : 0);
-                event.target.mute(this.mute == 'true' ? true : false);
+                this.player.setVolume(this.volume ? Number(this.volume) : 10);
+                this.player.seekTo(this.start ? Number(this.start) : 0);
+                if(this.mute == 'true') {
+                  this.player.mute();
+                }else{
+                  this.player.unMute();
+                }
               }
             }
           });

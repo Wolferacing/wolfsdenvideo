@@ -81,31 +81,6 @@ class Core{
     this.setupVolButton(scene, false, playlistContainer);
     scene.appendChild(playlistContainer);
   }
-  setupVolButton(scene, isUp, playlistContainer) {
-    this.setupButton(scene, playlistContainer, isUp ? 0.8 : 1.35, isUp ? '+ vol' : '- vol', '0.5',  ()=>{
-        this.setVolume(isUp);
-        this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
-    })
-      // const yScale = Number(this.params.scale.split(" ")[1]);
-      // const playlistButton = document.createElement('a-box');
-      // playlistButton.setAttribute('sq-collider', '');
-      // playlistButton.setAttribute('sq-interactable', '');
-      // playlistButton.setAttribute('color', '#f00075');
-      // playlistButton.setAttribute('position', `${isUp ? 0.8 : 1.35} ${-yScale*0.35} 0`);
-      // playlistButton.setAttribute('depth', '0.05');
-      // playlistButton.setAttribute('width', '0.5');
-      // playlistButton.setAttribute('height', '0.3');
-      // const playlistButtonText = document.createElement('a-text');
-      // playlistButtonText.setAttribute('value', isUp ? '+ vol' : '- vol');
-      // playlistButtonText.setAttribute('position', '0 0.03 0.06');
-      // playlistButtonText.setAttribute('align', 'center');
-      // playlistButton.appendChild(playlistButtonText);
-      // playlistContainer.appendChild(playlistButton);
-      // playlistButton.addEventListener('click', ()=>{
-      //   this.setVolume(isUp);
-      //   this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
-      // });
-  }
   setVolume(isUp) {
     if(isUp) {
       this.params.volume += 5;
@@ -118,6 +93,23 @@ class Core{
         this.params.volume = 0;
       }
     }
+  }
+  setupPlaylistButton(scene, playlistContainer) {
+    this.setupButton(scene, playlistContainer, '0', 'playlist', '1',  ()=>{
+      window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
+    })
+  }
+  setupVolButton(scene, isUp, playlistContainer) {
+    this.setupButton(scene, playlistContainer, isUp ? 0.8 : 1.35, isUp ? '+ vol' : '- vol', '0.5',  ()=>{
+        this.setVolume(isUp);
+        this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
+    })
+  }
+  setupVolButton(scene, isUp, playlistContainer) {
+    this.setupButton(scene, playlistContainer, isUp ? 0.8 : 1.35, 'mute', '0.5',  () => {
+        this.setVolume(isUp);
+        this.sendMessage({path: Commands.MUTE, data: this.params.mute == 'true' ? 'true' : 'false'});
+    })
   }
   setupButton(scene, playlistContainer, xOffset, title, width, callback) {
     const yScale = Number(this.params.scale.split(" ")[1]);
@@ -137,29 +129,6 @@ class Core{
     playlistContainer.appendChild(playlistButton);
     playlistButton.addEventListener('click', callback);
   }
-  setupPlaylistButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '0', 'playlist', '1',  ()=>{
-      window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
-    })
-      // const yScale = Number(this.params.scale.split(" ")[1]);
-      // const playlistButton = document.createElement('a-box');
-      // playlistButton.setAttribute('sq-collider', '');
-      // playlistButton.setAttribute('sq-interactable', '');
-      // playlistButton.setAttribute('color', '#f00075');
-      // playlistButton.setAttribute('position', `0 ${-yScale*0.35} 0`);
-      // playlistButton.setAttribute('depth', '0.05');
-      // playlistButton.setAttribute('width', '1');
-      // playlistButton.setAttribute('height', '0.3');
-      // const playlistButtonText = document.createElement('a-text');
-      // playlistButtonText.setAttribute('value', 'playlist');
-      // playlistButtonText.setAttribute('position', '0 0.03 0.06');
-      // playlistButtonText.setAttribute('align', 'center');
-      // playlistButton.appendChild(playlistButtonText);
-      // playlistContainer.appendChild(playlistButton);
-      // playlistButton.addEventListener('click', ()=>{
-      //   window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
-      // });
-  }
   generateGuestUser() {
     const id = this.getUniquId();
     window.user = {id, name: "Guest " + id};
@@ -178,8 +147,9 @@ class Core{
     this.setOrDefault("volume", '20');
     this.setOrDefault("mute", 'false');
     this.params.volume = Number(this.params.volume);
-    console.log(this.urlParams.get("mute"), this.currentScript.getAttribute("mute"));
+    console.log(this.currentScript.getAttribute('mute'), (this.urlParams.has('mute') ? this.urlParams.get('mute') : 'false'));
     this.params.mute = this.params.mute === 'true';
+    console.log(this.params.mute);
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
