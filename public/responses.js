@@ -1,4 +1,4 @@
-export default {
+const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
   DOES_NOT_EXIST: 'does-not-exist',
   PLAYBACK_UPDATE: 'playback-update',

@@ -1,4 +1,4 @@
-export default {
+const Commands = {
   SEARCH: 'search',
   SET_TIME: 'set-time',
   SET_TRACK: 'set-track',
