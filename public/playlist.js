@@ -3,7 +3,9 @@ class Playlist {
     this.hostUrl = location.host;
     this.parseAttributes();
   }
-  parseAttributes
+  parseAttributes() {
+    console.log(window.currentScript);
+  }
 }
 
 require(['polyfills', 'commands', 'responses' ], function(data) {
