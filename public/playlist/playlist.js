@@ -36,6 +36,7 @@ class Playlist {
             if(currentTimeText != null) {
               currentTimeText.innerText = this.timeCode(json.data.currentTime) + " / " + this.timeCode(json.data.duration);
             }
+            
         break;
       case Responses.PLAYBACK_UPDATE:
         this.core.player = json.data.video;

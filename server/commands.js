@@ -1,4 +1,5 @@
 module.exports = {
+  INSTANCE: 'instance',
   SEARCH: 'search',
   SET_TIME: 'set-time',
   SET_TRACK: 'set-track',

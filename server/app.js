@@ -63,7 +63,7 @@ class App{
   }
   parseMessage(msg, ws){
     switch(msg.path) {
-      case "instance":
+      case Commands.INSTANCE:
         if(msg.u) { 
           console.log(msg.u.name, 'connected', msg.data);
           ws.u = msg.u;
@@ -189,6 +189,7 @@ class App{
           this.videoPlayers[ws.i].currentTime = 0;
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
+        v.user = ws.u.name;
         this.videoPlayers[ws.i].playlist.push(v);
         this.updateClients(ws.i);
       }, this.videoPlayers[ws.i].locked);
