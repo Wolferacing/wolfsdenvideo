@@ -100,7 +100,6 @@ class Karaoke{
     this.core.sendMessage({path: Commands.SEARCH, data });
   }
   updatePlaylist(player) {
-    console.log(player);
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
@@ -137,76 +136,6 @@ class Karaoke{
     });
     this.videoPlayer.innerHTML = '';
     player.playlist.forEach((v, i) => {
-//       const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
-      
-      
-        
-//       const videoAuthor = this.makeAndAddElement('div',{
-//         padding: '0 10 5 7', 
-//         textOverflow: 'ellipsis', 
-//         overflow: 'hidden', 
-//         fontSize: '0.8rem',
-//         color: '#cfcfcf',
-//         whiteSpace: 'nowrap'
-//       }, videoTitleAndAction);
-
-//       videoAuthor.className = "currentTimeAuthor";
-//       videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
-      
-//       if(player.currentTrack !== i) {
-
-//         const playTrack = this.makeAndAddElement('div',null, videoTitleAndAction);
-
-      
-//         playTrack.className = 'button green';
-//         playTrack.innerText = "Play Now";
-
-//         playTrack.addEventListener('click', () => {
-//           this.core.sendMessage({path: Commands.SET_TRACK, data: i });
-//         });
-//         const moveDown = this.makeAndAddElement('div',null, videoTitleAndAction);
-
-//         moveDown.className = 'button teal';
-//         moveDown.innerText = "Move Down";
-
-//         moveDown.addEventListener('click', () => {
-//           this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
-//         });
-
-//         const moveUp = this.makeAndAddElement('div',null, videoTitleAndAction);
-//         moveUp.className = 'button teal';
-//         moveUp.innerText = "Move Up";
-
-//         moveUp.addEventListener('click', () => {
-//           this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
-//         });
-
-//         const remove = this.makeAndAddElement('div',null, videoTitleAndAction);
-
-//         remove.className = 'button red';
-//         remove.innerText = "Remove";
-
-//         remove.addEventListener('click', () => {
-//           this.core.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
-//         });
-//       }else{
-        
-//         const currentTimeText = this.makeAndAddElement('div',{
-//           padding: '7 10 0 7', 
-//           textOverflow: 'ellipsis', 
-//           overflow: 'hidden', 
-//           whiteSpace: 'nowrap'
-//         }, videoTitleAndAction);
-
-
-//         currentTimeText.className = "currentTimeText";
-//         currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
-        
-//       }
-        
-      
-      // this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
-      
       if(player.currentTrack === i) {
         const videoThumbnail = this.core.makeAndAddElement('img',{width: '100%', float: 'left'}, this.videoPlayer);
       
@@ -249,6 +178,11 @@ class Karaoke{
 
         currentTimeText.className = "currentTimeText";
         currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
+        if(this.YtPlayer) {
+          this.YtPlayer.loadVideoById(this.core.getYTId(v.link), player.currentTime);
+        }else{
+          this.initialYoutube = v;
+        }
         
       }
     })
@@ -273,15 +207,6 @@ class Karaoke{
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
       
-//       const addToPlaylist = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-      
-//       addToPlaylist.className = 'button teal';
-//       addToPlaylist.innerText = "Add To Playlist";
-      
-//       addToPlaylist.addEventListener('click', async () => {
-//         this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-//       }); 
-      
       const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
       playNow.className = 'button teal';
@@ -295,16 +220,6 @@ class Karaoke{
           this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
         }
       }); 
-      
-//       const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-      
-//       playNext.className = 'button teal';
-//       playNext.innerText = "Play Next";
-      
-//       playNext.addEventListener('click', () => {
-//         this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
-//         this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
-//       }); 
       
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
@@ -337,8 +252,8 @@ class Karaoke{
   setupYoutubePlayer() {
     const youtubeUrl = this.core.urlParams.has('youtube') ? this.core.urlParams.get('youtube') : 'https://www.youtube.com/watch?v=L_LUpnjgPso';
     new YT.Player('player', {
-      height: window.innerHeight,
-      width: window.innerWidth,
+      height: '240',
+      width: '',
       videoId: this.core.getYTId(decodeURIComponent(youtubeUrl)),
       playerVars: {
         'playsinline': 1,
@@ -354,9 +269,11 @@ class Karaoke{
       },
       events: {
         'onReady': (event) => {
-          this.Ytplayer = event.target;
-          event.target.setVolume(10);
-          event.target.seekTo(this.start ? Number(this.start) : 0)
+          this.YtPlayer = event.target;
+          this.YtPlayer.setVolume(10);
+          if(this.initialYoutube) {
+            this.YtPlayer.loadVideoById(this.core.getYTId(this.initialYoutube.link), this.core.player ? this.core.player.currentTime || 0 : 0);
+          }
         }
       }
     });
