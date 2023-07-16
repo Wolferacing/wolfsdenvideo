@@ -15,7 +15,7 @@ class PlaylistPlayer {
       const url = `https://${this.hostUrl}/playlist/?instance=${this.core.params.instanceId}&playlist=${this.core.params.playlist}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}`;
       this.core.browser.setAttribute('sq-browser','url: ' + url);
     }else{
-      const url = `https://${this.hostUrl}/?user=${window.user.id}-_-${encodeURIComponent(window.user.name)}&youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0`;
+      const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}`;
       this.core.browser.setAttribute('sq-browser','url: ' + url);
       console.log('sq-browser','url: ' + url, this.core.browser, this.core.browser.getAttribute('sq-browser'));
     }
