@@ -73,30 +73,55 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
-    const yScale = Number(this.params.scale.split(" ")[1]);
-    
-    const playlistContainer = document.createElement('a-entity');
-    playlistContainer.setAttribute('position', this.params.position);
-    playlistContainer.setAttribute('rotation', this.params.rotation);
-    
-    const playlistButton = document.createElement('a-box');
-    playlistButton.setAttribute('sq-collider', '');
-    playlistButton.setAttribute('sq-interactable', '');
-    playlistButton.setAttribute('color', '#f00075');
-    playlistButton.setAttribute('position', `0 ${-yScale/2} 0`);
-    playlistButton.setAttribute('depth', '0.05');
-    playlistButton.setAttribute('width', '1.6');
-    playlistButton.setAttribute('height', '0.3');
-    const playlistButtonText = document.createElement('a-text');
-    playlistButtonText.setAttribute('value', 'playlist & volume');
-    playlistButtonText.setAttribute('position', '0 0.03 0.06');
-    playlistButtonText.setAttribute('align', 'center');
-    playlistButton.appendChild(playlistButtonText);
-    playlistContainer.appendChild(playlistButton);
-    scene.appendChild(playlistContainer);
-    playlistButton.addEventListener('click', ()=>{
-      window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
-    });
+    this.setupPlaylistButton(scene);
+  }
+  setupVolButton(scene, IsUp) {
+      const yScale = Number(this.params.scale.split(" ")[1]);
+      const playlistContainer = document.createElement('a-entity');
+      playlistContainer.setAttribute('position', this.params.position);
+      playlistContainer.setAttribute('rotation', this.params.rotation);
+      const playlistButton = document.createElement('a-box');
+      playlistButton.setAttribute('sq-collider', '');
+      playlistButton.setAttribute('sq-interactable', '');
+      playlistButton.setAttribute('color', '#f00075');
+      playlistButton.setAttribute('position', `0.8 ${-yScale*0.35} 0`);
+      playlistButton.setAttribute('depth', '0.05');
+      playlistButton.setAttribute('width', '0.5');
+      playlistButton.setAttribute('height', '0.3');
+      const playlistButtonText = document.createElement('a-text');
+      playlistButtonText.setAttribute('value', '+ vol');
+      playlistButtonText.setAttribute('position', '0 0.03 0.06');
+      playlistButtonText.setAttribute('align', 'center');
+      playlistButton.appendChild(playlistButtonText);
+      playlistContainer.appendChild(playlistButton);
+      scene.appendChild(playlistContainer);
+      playlistButton.addEventListener('click', ()=>{
+        this.sendMessage({path: IsUp ? Commands.UP_VOLUME : Commands.DOWN_VOLUME});
+      });
+  }
+  setupPlaylistButton(scene) {
+      const yScale = Number(this.params.scale.split(" ")[1]);
+      const playlistContainer = document.createElement('a-entity');
+      playlistContainer.setAttribute('position', this.params.position);
+      playlistContainer.setAttribute('rotation', this.params.rotation);
+      const playlistButton = document.createElement('a-box');
+      playlistButton.setAttribute('sq-collider', '');
+      playlistButton.setAttribute('sq-interactable', '');
+      playlistButton.setAttribute('color', '#f00075');
+      playlistButton.setAttribute('position', `0 ${-yScale*0.35} 0`);
+      playlistButton.setAttribute('depth', '0.05');
+      playlistButton.setAttribute('width', '1.6');
+      playlistButton.setAttribute('height', '0.3');
+      const playlistButtonText = document.createElement('a-text');
+      playlistButtonText.setAttribute('value', 'playlist & volume');
+      playlistButtonText.setAttribute('position', '0 0.03 0.06');
+      playlistButtonText.setAttribute('align', 'center');
+      playlistButton.appendChild(playlistButtonText);
+      playlistContainer.appendChild(playlistButton);
+      scene.appendChild(playlistContainer);
+      playlistButton.addEventListener('click', ()=>{
+        window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
+      });
   }
   generateGuestUser() {
     const id = this.getUniquId();
