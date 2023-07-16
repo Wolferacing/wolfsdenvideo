@@ -130,5 +130,11 @@ class Core{
     msg.u = window.user;
     this.ws.send(JSON.stringify(msg));
   }
+  makeAndAddElement(type, style, parent) {
+    const element = document.createElement(type);
+    Object.assign(element.style, style || {});
+    (parent ? parent : document.body).appendChild(element);
+    return element;
+  }
 }
 window.videoPlayerCore = new Core();

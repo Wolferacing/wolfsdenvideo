@@ -360,6 +360,7 @@ class App{
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
+        players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => s.u.name),
         canTakeOver: this.videoPlayers[instanceId].canTakeOver,
         host: this.videoPlayers[instanceId].host,
         hasNoHost: this.videoPlayers[instanceId].hasNoHost,

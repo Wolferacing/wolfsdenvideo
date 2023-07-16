@@ -1,4 +1,4 @@
-class Playlist {
+class Karaoke{
   constructor() {
     this.hostUrl = 'sq-video-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
@@ -7,17 +7,41 @@ class Playlist {
   async init() {
     this.core = window.videoPlayerCore;
     this.core.parseParams(this.currentScript);
-    this.setupPlaylistUI();
+    this.setupKaraokeUI();
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket(d => this.parseMessage(d));
     this.core.sendMessage({path: "instance", data: this.core.params.instance});
-    this.playPlaylist();
   }
-  playPlaylist(shouldClear) {
-    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId, shouldClear}});
-  }
-  clearPlaylist() {
-    this.core.sendMessage({path: Commands.CLEAR_PLAYLIST});
+  setupKaraokeUI() {
+      
+    this.searchInput = document.querySelector('.searchInput');
+    this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value))
+    
+    this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
+    
+    this.searchBackDrop = document.querySelector('.searchBackDrop');
+      
+    this.searchBackDrop.addEventListener('click', () => this.hideSearch());
+    
+    this.videoSearchContainer = document.querySelector('.videoSearchContainer');
+    
+    this.loadingSpinner = document.querySelector('.loadingSpinner');
+    
+    this.lockPlayer = document.querySelector('#lockPlayer');
+    
+    this.lockPlayer.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.core.player.locked });
+    });
+    
+    this.takeOver = document.querySelector('#takeOver');
+    
+    this.takeOver.addEventListener('click', () => {
+        if(this.core.player.host.id === window.user.id) {
+          this.core.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.core.player.canTakeOver });
+        }else{
+          this.core.sendMessage({ path: Commands.TAKE_OVER });
+        }
+    });
   }
   parseMessage(msg) {
     const json = JSON.parse(msg);
@@ -69,25 +93,26 @@ class Playlist {
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
-    player.playlist.forEach((v, i) => {
-      const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
+    player.players.forEach((v, i) => {
+      const videoItemContainer = this.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
       
-      const videoThumbnail = this.core.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, videoItemContainer);
+      const videoThumbnail = this.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, videoItemContainer);
       
-      const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
+      videoThumbnail.src = v.thumbnail;
       
-      const videoTitle = this.core.makeAndAddElement('div',{
+      
+      const videoTitleAndAction = this.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
+      
+      const videoTitle = this.makeAndAddElement('div',{
         padding: '7 10 0 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
       
-      videoThumbnail.src = v.thumbnail;
-      
       videoTitle.innerText = v.title;
         
-      const videoAuthor = this.core.makeAndAddElement('div',{
+      const videoAuthor = this.makeAndAddElement('div',{
         padding: '0 10 5 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
@@ -101,7 +126,7 @@ class Playlist {
       
       if(player.currentTrack !== i) {
 
-        const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+        const playTrack = this.makeAndAddElement('div',null, videoTitleAndAction);
 
       
         playTrack.className = 'button green';
@@ -110,7 +135,7 @@ class Playlist {
         playTrack.addEventListener('click', () => {
           this.core.sendMessage({path: Commands.SET_TRACK, data: i });
         });
-        const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+        const moveDown = this.makeAndAddElement('div',null, videoTitleAndAction);
 
         moveDown.className = 'button teal';
         moveDown.innerText = "Move Down";
@@ -119,7 +144,7 @@ class Playlist {
           this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
         });
 
-        const moveUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+        const moveUp = this.makeAndAddElement('div',null, videoTitleAndAction);
         moveUp.className = 'button teal';
         moveUp.innerText = "Move Up";
 
@@ -127,7 +152,7 @@ class Playlist {
           this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
         });
 
-        const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+        const remove = this.makeAndAddElement('div',null, videoTitleAndAction);
 
         remove.className = 'button red';
         remove.innerText = "Remove";
@@ -137,7 +162,7 @@ class Playlist {
         });
       }else{
         
-        const currentTimeText = this.core.makeAndAddElement('div',{
+        const currentTimeText = this.makeAndAddElement('div',{
           padding: '7 10 0 7', 
           textOverflow: 'ellipsis', 
           overflow: 'hidden', 
@@ -151,14 +176,14 @@ class Playlist {
       }
         
       
-      this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
+      this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       if(player.currentTrack === i) {
-        const currentTime = this.core.makeAndAddElement('div', {
+        const currentTime = this.makeAndAddElement('div', {
           height: '4px', 
           width: '100%',
         }, videoItemContainer);
-        const currentTimeInner = this.core.makeAndAddElement('div', {
+        const currentTimeInner = this.makeAndAddElement('div', {
           height: '4px', 
           background: 'red',
           transition: 'width 3s',
@@ -248,81 +273,5 @@ class Playlist {
       this.addItemContainer.style.display = 'none';
       this.addItemBackDrop.style.display = 'none';
   }
-  setupPlaylistUI() {
-    
-    this.searchInput = document.querySelector('.searchInput');
-    this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value))
-    
-    this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
-    
-    this.searchBackDrop = document.querySelector('.searchBackDrop');
-      
-    this.searchBackDrop.addEventListener('click', () => this.hideSearch());
-    
-    this.videoSearchContainer = document.querySelector('.videoSearchContainer');
-    
-    this.loadingSpinner = document.querySelector('.loadingSpinner');
-    
-    this.lockPlayer = document.querySelector('#lockPlayer');
-    
-    this.lockPlayer.addEventListener('click', () => {
-        this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.core.player.locked });
-    });
-    
-    this.takeOver = document.querySelector('#takeOver');
-    
-    this.takeOver.addEventListener('click', () => {
-        if(this.core.player.host.id === window.user.id) {
-          this.core.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.core.player.canTakeOver });
-        }else{
-          this.core.sendMessage({ path: Commands.TAKE_OVER });
-        }
-    });
-    
-    this.clearPlaylistButton = document.querySelector('#clearPlaylist');
-    
-    this.clearPlaylistButton.addEventListener('click', () => this.clearPlaylist());
-    
-    this.addItemContainer = document.querySelector('.addItemContainer');
-    
-    this.addItemBackDrop = document.querySelector('.addItemBackDrop');
-      
-    this.addItemBackDrop.addEventListener('click', () => this.hideAddItem());
-    
-    this.addItemTitle = document.querySelector('.addItemTitle');
-    
-    this.addItemInput = document.querySelector('#addItemInput');
-    
-    this.addItemSubmit = document.querySelector('#addItemSubmit');
-    
-    this.addPlaylist = document.querySelector('#addPlaylist');
-    
-    this.addPlaylist.addEventListener('click', () => {
-      this.addItemContainer.style.display = 'block';
-      this.addItemBackDrop.style.display = 'block';
-      if(this.addPlaylistHandler) {
-        this.addItemSubmit.removeEventListener('click', this.addPlaylistHandler);
-      }
-      this.addPlaylistHandler = () => {
-        this.playlistId = this.addItemInput.value;
-        this.playPlaylist();
-        this.hideAddItem();
-      };
-      this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
-    });
-    
-//     this.volUp = document.querySelector('#volUp');
-    
-//     this.volUp.addEventListener('click', () => {
-//       this.core.sendMessage({path: Commands.UP_VOLUME });
-//     });
-    
-//     this.volDown = document.querySelector('#volDown');
-//     this.volDown.addEventListener('click', () => {
-//       this.core.sendMessage({path: Commands.DOWN_VOLUME });
-//     });
-    
-    this.hostTitle = document.querySelector('.hostTitle');
-  }
 }
-new Playlist();
+new Karaoke();
