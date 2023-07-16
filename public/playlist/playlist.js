@@ -142,17 +142,19 @@ class Playlist {
         currentTimeText.className = "currentTimeText";
         currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
         
-        
-        const videoAuthor = this.makeAndAddElement('div',{
-          padding: '7 10 0 7', 
-          textOverflow: 'ellipsis', 
-          overflow: 'hidden', 
-          whiteSpace: 'nowrap'
-        }, videoTitleAndAction);
-
-        videoAuthor.className = "currentTimeAuthor";
-        videoAuthor.innerText = player.user;
       }
+        
+      const videoAuthor = this.makeAndAddElement('div',{
+        padding: '7 10 0 7', 
+        textOverflow: 'ellipsis', 
+        overflow: 'hidden', 
+        fontSize: '0.8rem',
+        color: '#cfcfcf',
+        whiteSpace: 'nowrap'
+      }, videoTitleAndAction);
+
+      videoAuthor.className = "currentTimeAuthor";
+      videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
       
       this.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
