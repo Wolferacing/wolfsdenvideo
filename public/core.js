@@ -11,8 +11,7 @@ const Commands = {
   FROM_PLAYLIST: 'from-playlist',
   CLEAR_PLAYLIST: 'clear-playlist',
   DOWN_VOLUME: 'down-volume',
-  UP_VOLUME: 'up-volume',
-  SET_VOLUME: 'set-volume',
+  MUTE: 'mute',
   ADD_TO_PLAYERS: 'add-to-players',
   REMOVE_FROM_PLAYERS: 'remove-from-players'
 } 
@@ -79,6 +78,7 @@ class Core{
     this.setupPlaylistButton(scene, playlistContainer);
     this.setupVolButton(scene, true, playlistContainer);
     this.setupVolButton(scene, false, playlistContainer);
+    this.setupMuteButton(scene, playlistContainer);
     scene.appendChild(playlistContainer);
   }
   setVolume(isUp) {
@@ -95,7 +95,7 @@ class Core{
     }
   }
   setupPlaylistButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '0', 'playlist', '1',  ()=>{
+    this.setupButton(scene, playlistContainer, '-0.6', 'playlist', '1',  ()=>{
       window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
     })
   }
@@ -105,10 +105,10 @@ class Core{
         this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
-  setupVolButton(scene, isUp, playlistContainer) {
-    this.setupButton(scene, playlistContainer, isUp ? 0.8 : 1.35, 'mute', '0.5',  () => {
-        this.setVolume(isUp);
-        this.sendMessage({path: Commands.MUTE, data: this.params.mute == 'true' ? 'true' : 'false'});
+  setupMuteButton(scene, playlistContainer) {
+    this.setupButton(scene, playlistContainer, '0.2', 'mute', '0.5',  () => {
+      this.params.mute = this.params.mute == 'true' ? 'true' : 'false'
+      this.sendMessage({path: Commands.MUTE, data: this.params.mute});
     })
   }
   setupButton(scene, playlistContainer, xOffset, title, width, callback) {
@@ -147,9 +147,7 @@ class Core{
     this.setOrDefault("volume", '20');
     this.setOrDefault("mute", 'false');
     this.params.volume = Number(this.params.volume);
-    console.log(this.currentScript.getAttribute('mute'), (this.urlParams.has('mute') ? this.urlParams.get('mute') : 'false'));
-    this.params.mute = this.params.mute === 'true';
-    console.log(this.params.mute);
+    this.params.mute = this.params.mute === 'true' ? 'true' : 'false';
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);

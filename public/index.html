@@ -11,8 +11,6 @@
       const Responses = {
         LINK_ME: 'link-me',
         SET_VOLUME: 'set-volume',
-        DOWN_VOLUME: 'down-volume',
-        UP_VOLUME: 'up-volume',
         MUTE: 'mute'
       }
       const hostUrl = 'sq-video-player.glitch.me';
@@ -24,7 +22,7 @@
           this.video = document.getElementById("videoFrame");
           this.urlParams = new URLSearchParams(window.location.search);      
           this.start = this.urlParams.get('start') || 0; 
-          this.volume = this.urlParams.get('volume') || 10;
+          this.volume = this.urlParams.has('volume') ? this.urlParams.get('volume') : '10';
           this.mute = this.urlParams.get('mute') || 'false';
           var userStr = (this.urlParams.get("user") || "").split("-_-");
           window.user = {
@@ -80,16 +78,6 @@
                 this.player.unMute();
               }
               break;
-            case Responses.DOWN_VOLUME:
-              if(vol > 0) {
-                this.player.setVolume(this.player.getVolume()-10)
-              }
-              break;
-            case Responses.UP_VOLUME:
-              if(vol < 100) {
-                this.player.setVolume(this.player.getVolume()+10)
-              }
-              break;
           }
         }
         sendMessage(msg){
@@ -120,8 +108,8 @@
               },
               'onReady': (event) => {
                 this.player = event.target;
-                this.player.setVolume(this.volume ? Number(this.volume) : 10);
-                this.player.seekTo(this.start ? Number(this.start) : 0);
+                this.player.setVolume(Number(this.volume));
+                this.player.seekTo(Number(this.start));
                 if(this.mute == 'true') {
                   this.player.mute();
                 }else{

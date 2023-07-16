@@ -113,12 +113,6 @@ class App{
         ws.is_video_player = true;
         this.setUserVideoPlayer(msg.data, ws);
         break;
-      case Commands.DOWN_VOLUME:
-        this.upDownVolume(ws, true);
-        break;
-      case Commands.UP_VOLUME:
-        this.upDownVolume(ws);
-        break;
       case Commands.MUTE:
         this.setMute(msg.data, ws);
         break;
@@ -176,18 +170,12 @@ class App{
   }
   setVolume(vol, ws) {
     if(ws.user_video) {
-      console.log(vol);
       this.send(ws.user_video, Commands.SET_VOLUME, vol);
     }
   }
   setMute(ws, muted) {
     if(ws.user_video) {
       this.send(ws.user_video, Commands.MUTE, muted);
-    }
-  }
-  upDownVolume(ws, isDown) {
-    if(ws.user_video) {
-      this.send(ws.user_video, isDown ? Commands.DOWN_VOLUME : Commands.UP_VOLUME, {});
     }
   }
   async fromPlaylist(data, ws) {
