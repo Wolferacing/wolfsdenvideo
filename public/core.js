@@ -62,7 +62,7 @@ class Core{
     browser.setAttribute("position", this.params.position);
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
-    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 1}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
+    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 1.5}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
     scene.appendChild(browser);
     this.browser = browser;
   }
@@ -90,15 +90,14 @@ class Core{
   }
   playVidya(currentTrack, currentTime, force) {
     if(this.player) {
-      console.log('sq-browser','play', currentTrack, currentTime,this.lastUrl);
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         
         const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
-        var url = 'https://' + this.hostUrl + '/player.html?youtube=' + 
-            encodeURIComponent(this.player.playlist[currentTrack].link) + 
-            '&start=' + currentTime + 
-            '&instanceId=' + this.instanceId + 
-            '&user=' + window.user.id + '-_-' + window.user.name;
+        // var url = 'https://' + this.hostUrl + '/player.html?youtube=' + 
+        //     encodeURIComponent(this.player.playlist[currentTrack].link) + 
+        //     '&start=' + currentTime + 
+        //     '&instanceId=' + this.instanceId + 
+        //     '&user=' + window.user.id + '-_-' + window.user.name;
         this.browser.setAttribute('sq-browser','url: ' + url);
         console.log("Playing video:", this.player.playlist[currentTrack].link);
       }
