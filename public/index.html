@@ -80,15 +80,15 @@
               break;
             case Responses.SET_VOLUME:
               if(json.data >= 0 && json.data <= 100) {
-                this.player.setVolume(json.data);
+                this.volume = Number(json.data);
+                this.setVolume();
+                this.setMute();
               }
               break;
             case Responses.MUTE:
-              if(json.data == 'true') {
-                this.player.mute();
-              }else{
-                this.player.unMute();
-              }
+              document.getElementById('status').innerHTML = json.data;
+              this.mute = json.data;
+              this.setMute();
               break;
           }
         }
@@ -120,17 +120,24 @@
               },
               'onReady': (event) => {
                 this.player = event.target;
-                this.player.setVolume(0);
-                document.getElementById('status').innerText = "Here " + Number(this.volume);
+                this.setVolume();
+                this.setMute();
                 this.player.seekTo(Number(this.start));
-                if(this.mute == 'true') {
-                  this.player.mute();
-                }else{
-                  this.player.unMute();
-                }
+                
               }
             }
           });
+        }
+        setMute() {
+            if(this.mute == 'true' || this.volume == 0) {
+              this.player.mute();
+            }else{
+              this.player.unMute();
+            }
+        }
+        setVolume() {
+            this.volume = Number(this.volume);
+            this.player.setVolume(this.volume);
         }
         getId = (url) => {
           var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
