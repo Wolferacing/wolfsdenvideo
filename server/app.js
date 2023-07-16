@@ -119,6 +119,9 @@ class App{
       case Commands.UP_VOLUME:
         this.upDownVolume(ws);
         break;
+      case Commands.MUTE:
+        this.setMute(msg.data, ws);
+        break;
       case Commands.SET_VOLUME:
         this.setVolume(msg.data, ws)
         break;
@@ -173,8 +176,12 @@ class App{
   }
   setVolume(vol, ws) {
     if(ws.user_video) {
+      console.log(vol);
       this.send(ws.user_video, Commands.SET_VOLUME, vol);
     }
+  }
+  setMute(ws, muted) {
+    
   }
   upDownVolume(ws, isDown) {
     if(ws.user_video) {

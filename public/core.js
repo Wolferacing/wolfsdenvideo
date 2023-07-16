@@ -12,9 +12,9 @@ const Commands = {
   CLEAR_PLAYLIST: 'clear-playlist',
   DOWN_VOLUME: 'down-volume',
   UP_VOLUME: 'up-volume',
+  SET_VOLUME: 'set-volume',
   ADD_TO_PLAYERS: 'add-to-players',
   REMOVE_FROM_PLAYERS: 'remove-from-players'
-  // GET_PLAYERS: 'get-players'
 } 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
@@ -98,7 +98,9 @@ class Core{
       playlistButton.appendChild(playlistButtonText);
       playlistContainer.appendChild(playlistButton);
       playlistButton.addEventListener('click', ()=>{
+        
         this.setVolume(isUp);
+        console.log({path: Commands.SET_VOLUME, data: this.params.volume});
         this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
       });
   }
@@ -150,7 +152,10 @@ class Core{
     this.setOrDefault("scale", "1 1 1");
     this.setOrDefault("instance", "666");
     this.setOrDefault("playlist", "");
-    this.setOrDefault("volume", "20");
+    this.setOrDefault("volume", '20');
+    this.setOrDefault("mute", '0');
+    this.params.volume = Number(this.params.volume);
+    this.params.mute = !!this.params.mute;
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
@@ -160,7 +165,7 @@ class Core{
   playVidya(currentTrack, currentTime, force) {
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-        const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
+        const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
         this.browser.setAttribute('sq-browser','url: ' + url);
         console.log("Playing video:", url);
       }
