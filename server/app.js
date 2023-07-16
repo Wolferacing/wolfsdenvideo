@@ -126,23 +126,20 @@ class App{
         this.setVote(msg.data, false, ws);
         break;
       case Commands.ADD_TO_PLAYERS:
-        ws.p = new Date().getTime();
-        this.updateClients(ws.i);
+        this.addToPlayers(ws);
         break;
       case Commands.REMOVE_FROM_PLAYERS:
         ws.p = false;
         this.updateClients(ws.i);
         break;
-      // case Commands.GET_PLAYERS:
-      //   this.getPlayers(msg.data, ws);
-      //   break;
     }
   }
-  // getPlayers(ws) {
-  //   if(this.videoPlayers[ws.i]) {
-  //     this.send(ws, Responses.PLAYERS, this.videoPlayers[ws.i].sockets.filter(d=>d.p).map(d=>d.u));
-  //   }
-  // }
+  addToPlayers(ws){
+    this.onlyIfHost(ws, () => {
+      ws.p = new Date().getTime();
+      this.updateClients(ws.i);
+    }, this.videoPlayers[ws.i].locked);
+  }
   getUserVideoPlayer(new_ws) {
     this.wss.clients.forEach((ws) => {
       if(ws.is_video_player) {
@@ -361,7 +358,7 @@ class App{
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
-        players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => ({name: s.u.name, p: s.p})),
+        players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => ({name: s.u.name, p: s.p, id: s.u.id})),
         canTakeOver: this.videoPlayers[instanceId].canTakeOver,
         host: this.videoPlayers[instanceId].host,
         hasNoHost: this.videoPlayers[instanceId].hasNoHost,

@@ -57,6 +57,7 @@ class Playlist {
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
+    this.lockPlayer.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.clearPlaylistButton.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.addPlaylist.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';

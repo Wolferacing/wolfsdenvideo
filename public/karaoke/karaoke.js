@@ -95,7 +95,11 @@ class Karaoke{
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
+    this.lockPlayer.style.display = (player.locked || !player.canTakeOver) && !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
+    const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
+    this.joinList.style.display = (player.locked && !isMe) || amIAPlayer ? 'none' :  'inline-block';
+    this.leaveList.style.display = !amIAPlayer ? 'none' :  'inline-block';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button slim red' : 'button slim teal') : 'button slim teal';
     this.hostTitle.innerText = 
@@ -106,18 +110,18 @@ class Karaoke{
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
     this.videoPlaylistContainer.innerHTML = '';
     console.log(player);
-    player.players.sort((a, b) => b.p - a.p);
+    player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
 
       const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '7 10 7 7', 
+        padding: '10 10 10 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap', 
-        fontSize: '1.2em'
+        fontSize: '1.7em'
       }, videoTitleAndAction);
       
       videoTitle.innerText = `${i}. ${p.name}`;
