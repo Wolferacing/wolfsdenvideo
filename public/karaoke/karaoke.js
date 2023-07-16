@@ -267,6 +267,7 @@ class Karaoke{
         playerContainer.style.right = "initial";
         player.width = '240';
         player.height = '180';
+        this.fullscreenButton.innerText = "Full";
       }else{
         playerContainer.style.position = "fixed";
         playerContainer.style.top = "0";
@@ -275,6 +276,7 @@ class Karaoke{
         playerContainer.style.right = "0";
         player.width = window.innerWidth;
         player.height = window.innerHeight;
+        this.fullscreenButton.innerText = "Small";
       }
     }
   }

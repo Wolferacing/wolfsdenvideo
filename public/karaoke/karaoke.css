@@ -24,8 +24,8 @@ body{
 .fullscreenButton{
   position: absolute;
   z-index: 999;
-  top: 80px;
-  right: 50px;
+  top: 120px;
+  right: 20px;
 }
 .searchContainer{
   float: right;
