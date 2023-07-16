@@ -21,6 +21,11 @@ class KaraokePlayer {
     switch(json.path) {
       case Responses.SYNC_TIME:
           this.core.playVidya(json.data.currentTrack, json.data.currentTime);
+          const timediff = Math.abs(this.core.player.getCurrentTime() - json.data.currentTime);
+          document.getElementById('status').innerHTML = timediff;
+          if(timediff > 0.2) {
+            this.core.player.seekTo(json.data.currentTime);
+          }
         break;
       case Responses.PLAYBACK_UPDATE:
           this.core.player = json.data.video;
