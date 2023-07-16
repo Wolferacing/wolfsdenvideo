@@ -65,6 +65,32 @@ class Core{
     browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 1.5}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
     scene.appendChild(browser);
     this.browser = browser;
+    this.setupBrowserUi();
+  }
+  setupBrowserUi() {
+     const scene = document.querySelector("a-scene");
+    if(!scene) {
+      console.log("No a-scene tag found, is this an AFRAME scene ?");
+      return;
+    }
+    const playlistButton = document.createElement('a-box');
+    playlistButton.setAttribute('sq-collider', '');
+    playlistButton.setAttribute('sq-interactable', '');
+    playlistButton.setAttribute('color', '#f00075');
+    playlistButton.setAttribute('position', this.params.position);
+    playlistButton.setAttribute('rotation', this.params.rotation);
+    playlistButton.setAttribute('depth', '0.05');
+    playlistButton.setAttribute('width', '1.6');
+    playlistButton.setAttribute('height', '0.3');
+    const playlistButtonText = document.createElement('a-text');
+    playlistButtonText.setAttribute('value', 'playlist & volume');
+    playlistButtonText.setAttribute('position', '0 0.03 0.06');
+    playlistButtonText.setAttribute('align', 'center');
+    playlistButton.appendChild(playlistButtonText);
+    scene.appendChild(playlistButton);
+    playlistButton.addEventListener('click', ()=>{
+      window.openPage("https://" + this.hostUrl + "/playlist?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
+    });
   }
   generateGuestUser() {
     const id = this.getUniquId();
