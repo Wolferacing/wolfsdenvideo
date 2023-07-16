@@ -33,7 +33,7 @@ class Core{
   async init(hostUrl) {
     this.hostUrl = hostUrl;
     if(window.isBanter) {
-      await window.AframeInjection.awaitExistance(window, 'user');
+      await window.AframeInjection.waitFor(window, 'user');
     }else{
       try{
         if(!window.user) {
