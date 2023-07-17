@@ -40,7 +40,7 @@ class Core{
       await window.AframeInjection.waitFor(window, 'user');
       window.userJoinedCallback = async user => {
         if(this.shouldAnnounce) {
-          
+          console.log(user)
         }
       };
     }else{
@@ -134,7 +134,7 @@ class Core{
     // window.speechSynthesis.speak(utterThis);
       const welcome = await fetch('https://say-something.glitch.me/say/' + user.name + " has joined the space!");
       const url = await welcome.text();
-      const audio = new Audio(url);
+      const audio = new Audio("data:audio/mpeg;base64," + url);
       audio.play();
       console.log(user.name + " has joined the space!", audio);
   }
