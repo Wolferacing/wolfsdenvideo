@@ -33,7 +33,7 @@ class Core{
     this.urlParams = new URLSearchParams(window.location.search);
   }
   async init(hostUrl) {
-    this.shouldAnnounce = true;
+    // this.shouldAnnounce = true;
     this.hostUrl = hostUrl;
     if(window.isBanter) {
       await window.AframeInjection.waitFor(window, 'user');
