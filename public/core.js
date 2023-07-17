@@ -80,6 +80,8 @@ class Core{
     this.setupVolButton(scene, true, playlistContainer);
     this.setupVolButton(scene, false, playlistContainer);
     this.setupMuteButton(scene, playlistContainer);
+    this.setupSkipButton(scene, true, playlistContainer);
+    this.setupSkipButton(scene, false, playlistContainer);
     scene.appendChild(playlistContainer);
   }
   setVolume(isUp) {
@@ -96,7 +98,7 @@ class Core{
     }
   }
   setupPlaylistButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '-0.8', this.isKaraoke ? 'singers' : 'playlist', '1',  ()=>{
+    this.setupButton(scene, playlistContainer, '-1.5', this.isKaraoke ? 'singers' : 'playlist', '1',  ()=>{
       window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
     })
   }
@@ -104,6 +106,12 @@ class Core{
     this.setupButton(scene, playlistContainer, isUp ? 1.2 : 1.75, isUp ? '+ vol' : '- vol', '0.5',  ()=>{
         this.setVolume(isUp);
         this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
+    })
+  }
+  setupSkipButton(scene, isBack, playlistContainer) {
+    this.setupButton(scene, playlistContainer, isBack ? -0.575 : -0.025, isBack ? '<<' : '>>', '0.5',  () => {
+        // this.setVolume(isUp);
+        // this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
   setupMuteButton(scene, playlistContainer) {
