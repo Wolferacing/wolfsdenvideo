@@ -118,6 +118,9 @@ class App{
       case Commands.MUTE:
         this.setMute(msg.data, ws);
         break;
+      case Commands.AUTO_SYNC:
+        this.setAutoSync(msg.data, ws);
+        break;
       case Commands.SET_VOLUME:
         this.setVolume(msg.data, ws)
         break;
@@ -134,6 +137,11 @@ class App{
         ws.p = false;
         this.updateClients(ws.i, "remove-from-players");
         break;
+    }
+  }
+  setAutoSync(autoSync, ws) {
+    if(ws.user_video) {
+      this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
     }
   }
   addToPlayers(ws){

@@ -98,7 +98,7 @@
             case Responses.SYNC_TIME:
               const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime);
               document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + json.data.currentTime + " = " + timediff;
-              if(timediff > 1 && this.autoSync) {
+              if(timediff > 0.75 && this.autoSync) {
                  this.player.seekTo(json.data.currentTime);
               }
               break;

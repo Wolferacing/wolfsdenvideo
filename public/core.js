@@ -13,7 +13,8 @@ const Commands = {
   SET_VOLUME: 'set-volume',
   MUTE: 'mute',
   ADD_TO_PLAYERS: 'add-to-players',
-  REMOVE_FROM_PLAYERS: 'remove-from-players'
+  REMOVE_FROM_PLAYERS: 'remove-from-players',
+  AUTO_SYNC: 'auto-sync'
 } 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
@@ -95,18 +96,18 @@ class Core{
     }
   }
   setupPlaylistButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '-0.6', this.isKaraoke ? 'karaoke' : 'playlist', '1',  ()=>{
+    this.setupButton(scene, playlistContainer, '-0.8', this.isKaraoke ? 'singers' : 'playlist', '1',  ()=>{
       window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
     })
   }
   setupVolButton(scene, isUp, playlistContainer) {
-    this.setupButton(scene, playlistContainer, isUp ? 0.8 : 1.35, isUp ? '+ vol' : '- vol', '0.5',  ()=>{
+    this.setupButton(scene, playlistContainer, isUp ? 1.2 : 1.75, isUp ? '+ vol' : '- vol', '0.5',  ()=>{
         this.setVolume(isUp);
         this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
   setupMuteButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '0.2', 'mute', '0.5',  () => {
+    this.setupButton(scene, playlistContainer, '0.65', 'mute', '0.5',  () => {
       this.params.mute = this.params.mute == 'true' ? 'false' : 'true';
       this.sendMessage({path: Commands.MUTE, data: this.params.mute});
     })

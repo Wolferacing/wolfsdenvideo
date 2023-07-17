@@ -42,6 +42,17 @@ class Karaoke{
         this.toggleVideoFullscreen();
     });
     
+    
+    this.autoSync = document.querySelector('#autoSync');
+    
+    this.autoSyncEnabled = false;
+    
+    this.autoSync.addEventListener('click', () => {
+      this.autoSyncEnabled = !this.autoSyncEnabled;
+      this.autoSync.innerText = this.autoSyncEnabled ? "Disable Auto Sync" : "Enable Auto Sync";
+      this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
+    });
+    
     this.videoPlayer = document.querySelector('#videoPlayer');
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');

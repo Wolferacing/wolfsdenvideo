@@ -288,7 +288,13 @@ class Playlist {
     
     this.autoSync = document.querySelector('#autoSync');
     
-    this.autoSync.addEventListener('click', () => this.core.sendMessage({ path: Commands.AUTO_SYNC, data:  }););
+    this.autoSyncEnabled = false;
+    
+    this.autoSync.addEventListener('click', () => {
+      this.autoSyncEnabled = !this.autoSyncEnabled;
+      this.autoSync.innerText = this.autoSyncEnabled ? "Disable Auto Sync" : "Enable Auto Sync";
+      this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
+    });
     
     this.addItemContainer = document.querySelector('.addItemContainer');
     
