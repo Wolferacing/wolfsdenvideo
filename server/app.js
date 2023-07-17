@@ -32,6 +32,8 @@ class App{
         try{
           if(msg !== "keepalive") {
             this.parseMessage(JSON.parse(msg), ws);
+          }else{
+            console.log(msg)
           }
         }catch(e) {
           console.log("parse error: ", e, msg);
