@@ -23,7 +23,8 @@
         LINK_ME: 'link-me',
         SET_VOLUME: 'set-volume',
         MUTE: 'mute',
-        SYNC_TIME: 'sync-time'
+        SYNC_TIME: 'sync-time',
+        AUTO_SYNC: 'auto-sync'
       }
       const hostUrl = 'sq-video-player.glitch.me';
       class Player {
@@ -87,6 +88,9 @@
                 this.setMute();
               }
               break;
+            case Responses.AUTO_SYNC:
+              this.autoSync = json.data;
+              break;
             case Responses.MUTE:
               this.mute = json.data;
               this.setMute();
@@ -94,8 +98,8 @@
             case Responses.SYNC_TIME:
               const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime);
               document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + json.data.currentTime + " = " + timediff;
-              if(timediff > 1) {
-                this.player.seekTo(json.data.currentTime);
+              if(timediff > 1 && this.autoSync) {
+                 this.player.seekTo(json.data.currentTime);
               }
               break;
           }

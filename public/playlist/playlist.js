@@ -245,12 +245,17 @@ class Playlist {
       this.addItemContainer.style.display = 'none';
       this.addItemBackDrop.style.display = 'none';
   }
+  autoSync() {
+    
+  }
   setupPlaylistUI() {
     
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value))
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
+    
+    
     
     this.searchBackDrop = document.querySelector('.searchBackDrop');
       
@@ -279,6 +284,11 @@ class Playlist {
     this.clearPlaylistButton = document.querySelector('#clearPlaylist');
     
     this.clearPlaylistButton.addEventListener('click', () => this.clearPlaylist());
+    
+    
+    this.autoSync = document.querySelector('#autoSync');
+    
+    this.autoSync.addEventListener('click', () => this.core.sendMessage({ path: Commands.AUTO_SYNC, data:  }););
     
     this.addItemContainer = document.querySelector('.addItemContainer');
     

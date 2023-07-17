@@ -61,7 +61,7 @@ class Core{
     browser.setAttribute("position", this.params.position);
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
-    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 1}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
+    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 0.75}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
     scene.appendChild(browser);
     this.browser = browser;
     this.setupBrowserUi();
