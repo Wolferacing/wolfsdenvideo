@@ -157,7 +157,7 @@ class Core{
     playlistButton.setAttribute('sq-collider', '');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813');
-    playlistButton.setAttribute('position', `${xOffset} ${(-yScale*0.35)-(yOffset||0)} 0`);
+    playlistButton.setAttribute('position', `${xOffset} ${(-yScale*0.33)-(yOffset||0)} 0`);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
