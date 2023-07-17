@@ -272,7 +272,7 @@ class Karaoke{
         playerContainer.style.right = "initial";
         player.width = '240';
         player.height = '180';
-        this.fullscreenButton.innerText = "Fullscreen";
+        this.fullscreenButton.innerText = "Show Fullscreen";
         this.fullscreenButton.className = "button teal fullscreenButton";
       }else{
         playerContainer.style.position = "fixed";
