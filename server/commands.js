@@ -16,6 +16,8 @@ module.exports = {
   REMOVE_FROM_PLAYERS: 'remove-from-players',
   SET_VOLUME: 'set-volume',
   MUTE: 'mute',
-  AUTO_SYNC: 'auto-sync'
+  AUTO_SYNC: 'auto-sync',
+  SKIP_BACK: 'skip-back',
+  SKIP_FORWARD: 'skip-forward'
   // GET_PLAYERS: 'get-players'
 }

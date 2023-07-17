@@ -23,6 +23,8 @@
         LINK_ME: 'link-me',
         SET_VOLUME: 'set-volume',
         MUTE: 'mute',
+        SKIP_BACK: 'skip-back',
+        SKIP_FORWARD: 'skip-forward',
         SYNC_TIME: 'sync-time',
         AUTO_SYNC: 'auto-sync'
       }
@@ -87,6 +89,12 @@
                 this.setVolume();
                 this.setMute();
               }
+              break;
+            case Responses.SKIP_BACK:
+              this.player.seekTo(this.player.getCurrentTime() - 0.2);
+              break;
+            case Responses.SKIP_FORWARD:
+              this.player.seekTo(this.player.getCurrentTime() + 0.3);
               break;
             case Responses.AUTO_SYNC:
               this.autoSync = json.data;

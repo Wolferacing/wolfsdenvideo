@@ -14,7 +14,9 @@ const Commands = {
   MUTE: 'mute',
   ADD_TO_PLAYERS: 'add-to-players',
   REMOVE_FROM_PLAYERS: 'remove-from-players',
-  AUTO_SYNC: 'auto-sync'
+  AUTO_SYNC: 'auto-sync',
+  SKIP_BACK: 'skip-back',
+  SKIP_FORWARD: 'skip-forward'
 } 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
@@ -110,8 +112,8 @@ class Core{
   }
   setupSkipButton(scene, isBack, playlistContainer) {
     this.setupButton(scene, playlistContainer, isBack ? -0.575 : -0.025, isBack ? '<<' : '>>', '0.5',  () => {
-        // this.setVolume(isUp);
-        // this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
+        console.log({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
+        this.sendMessage({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
     })
   }
   setupMuteButton(scene, playlistContainer) {

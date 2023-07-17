@@ -118,6 +118,12 @@ class App{
       case Commands.MUTE:
         this.setMute(msg.data, ws);
         break;
+      case Commands.SKIP_BACK:
+        this.skip(true, ws);
+        break;
+      case Commands.SKIP_FORWARD:
+        this.skip(false, ws);
+        break;
       case Commands.AUTO_SYNC:
         this.setAutoSync(msg.data, ws);
         break;
@@ -137,6 +143,12 @@ class App{
         ws.p = false;
         this.updateClients(ws.i, "remove-from-players");
         break;
+    }
+  }
+  skip(isBack, ws) {
+    if(ws.user_video) {
+      console.log(isBack ? Commands.SKIP_BACK : Commands.SKIP_FORWARD);
+      this.send(ws.user_video, isBack ? Commands.SKIP_BACK : Commands.SKIP_FORWARD);
     }
   }
   setAutoSync(autoSync, ws) {
