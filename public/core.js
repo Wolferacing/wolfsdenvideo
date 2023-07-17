@@ -33,14 +33,14 @@ class Core{
     this.urlParams = new URLSearchParams(window.location.search);
   }
   async init(hostUrl) {
+    this.saySomething({name: "test boy"});
     // this.shouldAnnounce = true;
     this.hostUrl = hostUrl;
     if(window.isBanter) {
       await window.AframeInjection.waitFor(window, 'user');
-      window.userJoinedCallback = user => {
+      window.userJoinedCallback = async user => {
         if(this.shouldAnnounce) {
-          console.log(user.name + " has joined the space!");
-          this.saySomething(user.name + " has joined the space!");
+          
         }
       };
     }else{
@@ -129,9 +129,14 @@ class Core{
       this.sendMessage({path: Commands.MUTE, data: this.params.mute});
     })
   }
-  saySomething(anyText) {
-    let utterThis = new SpeechSynthesisUtterance(anyText);
-    window.speechSynthesis.speak(utterThis);
+  async saySomething(user) {
+    // let utterThis = new SpeechSynthesisUtterance(anyText);
+    // window.speechSynthesis.speak(utterThis);
+      const welcome = await fetch('https://say-something.glitch.me/say/' + user.name + " has joined the space!");
+      const url = await welcome.text();
+      const audio = new Audio(url);
+      audio.play();
+      console.log(user.name + " has joined the space!", audio);
   }
   setupButton(scene, playlistContainer, xOffset, title, width, callback) {
     const yScale = Number(this.params.scale.split(" ")[1]);
