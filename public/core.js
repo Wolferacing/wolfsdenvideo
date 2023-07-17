@@ -136,7 +136,7 @@ class Core{
       const url = await welcome.text();
       const audio = new Audio("data:audio/mpeg;base64," + url);
       audio.play();
-      audio.volume = 0.1;
+      audio.volume = 0.05;
       console.log(user.name + " has joined the space!", audio);
   }
   setupButton(scene, playlistContainer, xOffset, title, width, callback) {
