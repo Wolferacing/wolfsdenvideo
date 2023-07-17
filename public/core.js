@@ -33,9 +33,16 @@ class Core{
     this.urlParams = new URLSearchParams(window.location.search);
   }
   async init(hostUrl) {
+    this.shouldAnnounce = true;
     this.hostUrl = hostUrl;
     if(window.isBanter) {
       await window.AframeInjection.waitFor(window, 'user');
+      window.userJoinedCallback = user => {
+        if(this.shouldAnnounce) {
+          console.log(user.name + " has joined the space!");
+          this.saySomething(user.name + " has joined the space!");
+        }
+      };
     }else{
       try{
         if(!window.user) {
@@ -121,6 +128,10 @@ class Core{
       this.params.mute = this.params.mute == 'true' ? 'false' : 'true';
       this.sendMessage({path: Commands.MUTE, data: this.params.mute});
     })
+  }
+  saySomething(anyText) {
+    let utterThis = new SpeechSynthesisUtterance(anyText);
+    window.speechSynthesis.speak(utterThis);
   }
   setupButton(scene, playlistContainer, xOffset, title, width, callback) {
     const yScale = Number(this.params.scale.split(" ")[1]);
