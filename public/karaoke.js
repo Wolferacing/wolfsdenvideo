@@ -15,6 +15,7 @@ class KaraokePlayer {
     const youtubeUrl = this.core.urlParams.has('youtube') ? this.core.urlParams.get('youtube') : 'https://www.youtube.com/watch?v=L_LUpnjgPso';
     const url = `https://${this.hostUrl}/?user=${window.user.id}-_-${window.user.name}&youtube=${encodeURIComponent(youtubeUrl)}&start=0`;
     this.core.browser.setAttribute('sq-browser','url: ' + url);
+    this.core.setupJoinLeaveButton();
   }
   setupScripts(callback) {
     let myScript = document.createElement("script");

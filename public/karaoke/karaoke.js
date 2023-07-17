@@ -23,18 +23,17 @@ class Karaoke{
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
 
-    this.joinList = document.querySelector('#joinList');
+//     this.joinList = document.querySelector('#joinList');
     
-    this.joinList.addEventListener('click', () => {
-        this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS });
-      console.log({ path: Commands.ADD_TO_PLAYERS });
-    });
+//     this.joinList.addEventListener('click', () => {
+//         this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS });
+//     });
     
-    this.leaveList = document.querySelector('#leaveList');
+//     this.leaveList = document.querySelector('#leaveList');
     
-    this.leaveList.addEventListener('click', () => {
-        this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS });
-    });
+//     this.leaveList.addEventListener('click', () => {
+//         this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS });
+//     });
     
     this.fullscreenButton = document.querySelector('.fullscreenButton');
     
@@ -128,8 +127,8 @@ class Karaoke{
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
-    this.joinList.style.display = (player.locked && !isMe) || amIAPlayer ? 'none' :  'inline-block';
-    this.leaveList.style.display = !amIAPlayer ? 'none' :  'inline-block';
+    // this.joinList.style.display = (player.locked && !isMe) || amIAPlayer ? 'none' :  'inline-block';
+    // this.leaveList.style.display = !amIAPlayer ? 'none' :  'inline-block';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button slim red' : 'button slim teal') : 'button slim teal';
     this.hostTitle.innerText = 

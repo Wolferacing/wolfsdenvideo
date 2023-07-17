@@ -83,16 +83,16 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
-    const playlistContainer = document.createElement('a-entity');
-    playlistContainer.setAttribute('position', this.params.position);
-    playlistContainer.setAttribute('rotation', this.params.rotation);
-    this.setupPlaylistButton(scene, playlistContainer);
-    this.setupVolButton(scene, true, playlistContainer);
-    this.setupVolButton(scene, false, playlistContainer);
-    this.setupMuteButton(scene, playlistContainer);
-    this.setupSkipButton(scene, true, playlistContainer);
-    this.setupSkipButton(scene, false, playlistContainer);
-    scene.appendChild(playlistContainer);
+    this.playlistContainer = document.createElement('a-entity');
+    this.playlistContainer.setAttribute('position', this.params.position);
+    this.playlistContainer.setAttribute('rotation', this.params.rotation);
+    this.setupPlaylistButton(scene, this.playlistContainer);
+    this.setupVolButton(scene, true, this.playlistContainer);
+    this.setupVolButton(scene, false, this.playlistContainer);
+    this.setupMuteButton(scene, this.playlistContainer);
+    this.setupSkipButton(scene, true, this.playlistContainer);
+    this.setupSkipButton(scene, false, this.playlistContainer);
+    scene.appendChild(this.playlistContainer);
   }
   setVolume(isUp) {
     if(isUp) {
@@ -107,11 +107,18 @@ class Core{
       }
     }
   }
-  setupJoinLeaveButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '-1.5', 'Join In', '1',  () => {
+  setupJoinLeaveButton() {
+    const scene = document.querySelector("a-scene");
+    if(!scene) {
+      console.log("No a-scene tag found, is this an AFRAME scene ?");
+      return;
+    }
+    let button;
+    button = this.setupButton(scene, this.playlistContainer, '0', 'Join In', '1',  () => {
       this.imIn = !this.imIn;
-      
-    }, 1)
+      window.setText(button.object3D.id, this.imIn ? 'Skip It' : 'Join In');
+      this.sendMessage({ path: this.imIn ? Commands.ADD_TO_PLAYERS : Commands.REMOVE_FROM_PLAYERS });
+    }, 0.4)
   }
   setupPlaylistButton(scene, playlistContainer) {
     this.setupButton(scene, playlistContainer, '-1.5', this.isKaraoke ? 'singers' : 'playlist', '1',  ()=>{
@@ -137,8 +144,6 @@ class Core{
     })
   }
   async saySomething(user) {
-    // let utterThis = new SpeechSynthesisUtterance(anyText);
-    // window.speechSynthesis.speak(utterThis);
       const welcome = await fetch('https://say-something.glitch.me/say/' + user.name + " has joined the space!");
       const url = await welcome.text();
       const audio = new Audio("data:audio/mpeg;base64," + url);
@@ -163,6 +168,7 @@ class Core{
     playlistButton.appendChild(playlistButtonText);
     playlistContainer.appendChild(playlistButton);
     playlistButton.addEventListener('click', callback);
+    return playlistButtonText;
   }
   generateGuestUser() {
     const id = this.getUniquId();
