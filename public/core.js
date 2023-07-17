@@ -33,6 +33,7 @@ class Core{
     this.urlParams = new URLSearchParams(window.location.search);
   }
   async init(hostUrl) {
+    this.imIn = false;
     this.shouldAnnounce = true;
     this.hostUrl = hostUrl;
     if(window.isBanter) {
@@ -106,6 +107,12 @@ class Core{
       }
     }
   }
+  setupJoinLeaveButton(scene, playlistContainer) {
+    this.setupButton(scene, playlistContainer, '-1.5', 'Join In', '1',  () => {
+      this.imIn = !this.imIn;
+      
+    }, 1)
+  }
   setupPlaylistButton(scene, playlistContainer) {
     this.setupButton(scene, playlistContainer, '-1.5', this.isKaraoke ? 'singers' : 'playlist', '1',  ()=>{
       window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
@@ -139,13 +146,13 @@ class Core{
       audio.volume = 0.05;
       console.log(user.name + " has joined the space!", audio);
   }
-  setupButton(scene, playlistContainer, xOffset, title, width, callback) {
+  setupButton(scene, playlistContainer, xOffset, title, width, callback, yOffset) {
     const yScale = Number(this.params.scale.split(" ")[1]);
     const playlistButton = document.createElement('a-box');
     playlistButton.setAttribute('sq-collider', '');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('color', '#f00075');
-    playlistButton.setAttribute('position', `${xOffset} ${-yScale*0.35} 0`);
+    playlistButton.setAttribute('position', `${xOffset} ${(-yScale*0.35)-(yOffset||0)} 0`);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('width', width);
     playlistButton.setAttribute('height', '0.3');

@@ -58,8 +58,8 @@ class App{
       if(videoPlayer.host === ws.u) {
         console.log(ws.u ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
-        this.updateClients(ws.i, "remove-playlist-true");
       }
+      this.updateClients(ws.i, "remove-playlist-true");
     });
   }
   send(socket, path, data) {
