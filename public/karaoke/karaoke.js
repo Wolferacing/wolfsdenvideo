@@ -137,7 +137,7 @@ class Karaoke{
         fontSize: '1.7em'
       }, videoTitleAndAction);
       
-      videoTitle.innerText = `${i}. ${p.name}`;
+      videoTitle.innerText = `${i+1}. ${p.name}`;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     });
     this.videoPlayer.innerHTML = '';
