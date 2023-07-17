@@ -272,7 +272,8 @@ class Karaoke{
         playerContainer.style.right = "initial";
         player.width = '240';
         player.height = '180';
-        this.fullscreenButton.innerText = "Full";
+        this.fullscreenButton.innerText = "Fullscreen";
+        this.fullscreenButton.className = "button teal fullscreenButton";
       }else{
         playerContainer.style.position = "fixed";
         playerContainer.style.top = "0";
@@ -281,7 +282,8 @@ class Karaoke{
         playerContainer.style.right = "0";
         player.width = window.innerWidth;
         player.height = window.innerHeight;
-        this.fullscreenButton.innerText = "Small";
+        this.fullscreenButton.innerText = "Exit Fullscreen";
+        this.fullscreenButton.className = "button teal fullscreenButton fullscreenButtonOverlay";
       }
     }
   }

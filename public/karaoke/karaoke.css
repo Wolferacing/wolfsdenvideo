@@ -23,8 +23,12 @@ body{
 }
 .fullscreenButton{
   position: absolute;
-  z-index: 999;
-  top: 120px;
+  top: 320px;
+  right: 20px;
+}
+.fullscreenButtonOverlay{
+  position: absolute;
+  top: 80px;
   right: 20px;
 }
 .searchContainer{
