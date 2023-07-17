@@ -12,9 +12,7 @@
     </style>
   </head>
   <body>
-    <div id="status">
-      
-    </div>
+<!--     <div id="status"></div> -->
     <div id="player"></div>
     <script>
       var tag = document.createElement('script');
@@ -95,7 +93,7 @@
               break;
             case Responses.SYNC_TIME:
               const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime);
-              document.getElementById('status').innerHTML = timediff;
+              // document.getElementById('status').innerHTML = timediff;
               if(timediff > 0.2) {
                 this.player.seekTo(json.data.currentTime);
               }

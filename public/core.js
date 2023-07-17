@@ -173,7 +173,7 @@ class Core{
       };
       this.ws.onmessage = (event) => {
         if(typeof event.data === 'string'){
-          messageCallback(event.data);
+          messageCallback ? messageCallback(event.data) : this.parseMessage(event.data);
         }
       }
       this.ws.onclose =  (event) => {
@@ -202,6 +202,23 @@ class Core{
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     var match = url.match(regExp);
     return (match&&match[7].length==11)? match[7] : false;
+  }
+  parseMessage(msg) {
+    const json = JSON.parse(msg);
+    switch(json.path) {
+      case Responses.SYNC_TIME:
+          this.playVidya(json.data.currentTrack, json.data.currentTime);
+        break;
+      case Responses.PLAYBACK_UPDATE:
+          this.player = json.data.video;
+          if(json.data.type === "set-track") {
+            this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
+          }
+        break;
+      case Responses.ERROR:
+        alert("I cant let you do that...");
+        break;
+    }
   }
 }
 window.videoPlayerCore = new Core();
