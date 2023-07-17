@@ -122,7 +122,7 @@ class Core{
   }
   setupPlaylistButton(scene, playlistContainer) {
     this.setupButton(scene, playlistContainer, '-1.5', this.isKaraoke ? 'singers' : 'playlist', '1',  ()=>{
-      window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+window.user.name);
+      window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
     })
   }
   setupVolButton(scene, isUp, playlistContainer) {
@@ -201,7 +201,7 @@ class Core{
   playVidya(currentTrack, currentTime, force) {
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-        const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + window.user.name}`;
+        const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + encodeURIComponent(window.user.name)}`;
         this.browser.setAttribute('sq-browser','url: ' + url);
         console.log("Playing video:", url);
       }
