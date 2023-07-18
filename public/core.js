@@ -30,7 +30,7 @@ class Core{
           const now = Date.now();
           if(now - lastSendTime > 2000) {
             lastSendTime = now;
-            // this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
+            this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
           }
         }
       }
@@ -185,7 +185,7 @@ class Core{
     this.setOrDefault("mute", 'false');
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
-    this.setOrDefault("spatial", 'false');
+    this.setOrDefault("spatial", 'true');
     this.setOrDefault("youtube", 'https://www.youtube.com/watch?v=L_LUpnjgPso');
     
     this.params.volume = Number(this.params.volume);
