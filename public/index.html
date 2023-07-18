@@ -14,6 +14,7 @@
   <body>
     <div id="status"></div>
     <div id="player"></div>
+    <script src="./commands.js"></script>
     <script src="./core.js"></script>
     <script>
       var tag = document.createElement('script');
@@ -28,7 +29,8 @@
         SKIP_FORWARD: 'skip-forward',
         SYNC_TIME: 'sync-time',
         AUTO_SYNC: 'auto-sync',
-        MEASURE_LATENCY: 'measure-latency'
+        MEASURE_LATENCY: 'measure-latency',
+        PLAYBACK_UPDATE: 'playback-update'
       }
       
       
@@ -38,7 +40,7 @@
       const hostUrl = 'sq-video-player.glitch.me';
       class Player {
         constructor(){
-          this.init();
+          // this.init();
         }
         async init() {
           this.currentLatency = 0;
@@ -143,11 +145,11 @@
             if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
               const url = this.playerData.playlist[json.data.video.currentTrack].link;
               this.player.loadVideoById(this.getId(url), currentTime);
-              // const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + encodeURIComponent(window.user.name)}`;
-              // this.browser.setAttribute('sq-browser','url: ' + url);
               console.log("Playing video:", url);
             }
             this.lastUrl = this.playerData.playlist[currentTrack].link;
+          }else{
+            console.log("No player data!");
           }
         }
         sendMessage(msg){
@@ -196,7 +198,7 @@
         setupLatencyMeasure() {
           const measure = async () => {
             const time = Date.now();
-            await this.core.measureLatency();
+            await this.measureLatency();
             this.currentLatency = (Date.now()-time)/2;
           };
           setInterval(measure , 5000);

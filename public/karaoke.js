@@ -6,7 +6,6 @@ class KaraokePlayer {
   }
   async init() {
     await this.setupCoreScript();
-    console.log(window.videoPlayerCore);
     this.core = window.videoPlayerCore;
     this.core.isKaraoke = true;
     this.core.parseParams(this.currentScript);
@@ -17,6 +16,7 @@ class KaraokePlayer {
     const youtubeUrl = this.core.urlParams.has('youtube') ? this.core.urlParams.get('youtube') : 'https://www.youtube.com/watch?v=L_LUpnjgPso';
     const url = `https://${this.hostUrl}/?user=${window.user.id}-_-${window.user.name}&youtube=${encodeURIComponent(youtubeUrl)}&start=0`;
     this.core.browser.setAttribute('sq-browser','url: ' + url);
+    console.log('sq-browser','url: ' + url);
     this.core.setupJoinLeaveButton();
     this.core.setupLatencyMeasure();
   }
