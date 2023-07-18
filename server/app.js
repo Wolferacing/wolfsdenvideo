@@ -7,6 +7,7 @@ const youtube = new Youtube();
 const ytfps = require('ytfps');
 const fetch = require('node-fetch');
 const Commands = require('../public/commands.js');
+console.log(Commands);
 
 class App{
   constructor() {
@@ -65,6 +66,7 @@ class App{
      socket.send(JSON.stringify({path, data}));
   }
   parseMessage(msg, ws){
+    console.log(msg, Commands.SEARCH);
     switch(msg.path) {
       case Commands.INSTANCE:
         if(msg.u) { 
@@ -105,6 +107,7 @@ class App{
         this.removePlaylistItem(msg.data, ws);
         break;
       case Commands.SEARCH:
+        console.log(msg.data, ws.i);
         this.search(msg.data, ws);
         break;
       case Commands.FROM_PLAYLIST:
@@ -236,6 +239,7 @@ class App{
     }
   }
   async search(term, ws) {
+    console.log(term, ws.i);
     const results = await youtube.search(term, {
         language: 'en-US',
         searchType: 'video'

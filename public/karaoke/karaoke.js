@@ -22,18 +22,6 @@ class Karaoke{
   setupKaraokeUI() {
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
-
-//     this.joinList = document.querySelector('#joinList');
-    
-//     this.joinList.addEventListener('click', () => {
-//         this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS });
-//     });
-    
-//     this.leaveList = document.querySelector('#leaveList');
-    
-//     this.leaveList.addEventListener('click', () => {
-//         this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS });
-//     });
     
     this.fullscreenButton = document.querySelector('.fullscreenButton');
     
@@ -118,6 +106,7 @@ class Karaoke{
     document.body.appendChild(myScript);  
   }
   search(data) {
+    console.log("search", {path: Commands.SEARCH, data })
     this.core.sendMessage({path: Commands.SEARCH, data });
   }
   updatePlaylist(player) {

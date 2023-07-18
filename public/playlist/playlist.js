@@ -51,6 +51,7 @@ class Playlist {
     document.body.appendChild(myScript);  
   }
   search(data) {
+    console.log("search", {path: Commands.SEARCH, data })
     this.core.sendMessage({path: Commands.SEARCH, data });
   }
   updatePlaylist(player) {
