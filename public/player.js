@@ -15,6 +15,10 @@ class Player {
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
+     this.playPlaylist();
+  }
+  playPlaylist(shouldClear) {
+    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
   }
   onYouTubeIframeAPIReady() {
     new YT.Player('player', {

@@ -11,7 +11,6 @@ class Playlist {
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket(d => this.parseMessage(d));
     this.core.sendMessage({path: "instance", data: this.core.params.instance});
-    this.playPlaylist();
   }
   playPlaylist(shouldClear) {
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
@@ -316,7 +315,7 @@ class Playlist {
       }
       this.addPlaylistHandler = () => {
         this.playlistId = this.addItemInput.value;
-        this.playPlaylist();
+        this.playPlaylist(true);
         this.hideAddItem();
       };
       this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);

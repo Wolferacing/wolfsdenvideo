@@ -81,10 +81,9 @@ class Karaoke{
         if(currentTimeText != null) {
           currentTimeText.innerText = this.timeCode(json.data.currentTime) + " / " + this.timeCode(json.data.duration);
         }
-        const timediff = Math.abs(this.YtPlayer.getCurrentTime() - json.data.currentTime);
-        console.log(this.YtPlayer.getCurrentTime() + " - " + json.data.currentTime + " = " + timediff);
+        const timediff = Math.abs(this.YtPlayer.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
         if(timediff > 0.2) {
-          this.YtPlayer.seekTo(json.data.currentTime);
+          this.YtPlayer.seekTo(json.data.currentTime + this.core.currentLatency);
         }
         break;
       case Commands.PLAYBACK_UPDATE:
