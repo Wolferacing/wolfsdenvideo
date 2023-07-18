@@ -18,6 +18,7 @@ module.exports = {
   MUTE: 'mute',
   AUTO_SYNC: 'auto-sync',
   SKIP_BACK: 'skip-back',
-  SKIP_FORWARD: 'skip-forward'
+  SKIP_FORWARD: 'skip-forward',
+  MEASURE_LATENCY: 'measure-latency'
   // GET_PLAYERS: 'get-players'
 }

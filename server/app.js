@@ -78,6 +78,9 @@ class App{
           this.send(ws, 'error');
         }
         break;
+      case Commands.MEASURE_LATENCY:
+        this.measureLatency(ws);
+        break;
       case Commands.SET_TIME:
         this.setVideoTime(msg.data, ws);
         break;
@@ -144,6 +147,9 @@ class App{
         this.updateClients(ws.i, "remove-from-players");
         break;
     }
+  }
+  measureLatency() {
+    ws
   }
   skip(isBack, ws) {
     if(ws.user_video) {
@@ -379,7 +385,7 @@ class App{
       }
     } 
     this.syncWsTime(ws, instanceId);
-    this.send(ws, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId)});
+    this.send(ws, Responses.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {

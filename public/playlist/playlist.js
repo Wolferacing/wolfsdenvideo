@@ -255,8 +255,6 @@ class Playlist {
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
-    
-    
     this.searchBackDrop = document.querySelector('.searchBackDrop');
       
     this.searchBackDrop.addEventListener('click', () => this.hideSearch());
@@ -284,7 +282,6 @@ class Playlist {
     this.clearPlaylistButton = document.querySelector('#clearPlaylist');
     
     this.clearPlaylistButton.addEventListener('click', () => this.clearPlaylist());
-    
     
     this.autoSync = document.querySelector('#autoSync');
     
