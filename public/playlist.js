@@ -2,9 +2,10 @@ class PlaylistPlayer {
   constructor() {
     this.hostUrl = 'sq-video-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
-    this.setupScripts(() => this.init());
+    this.init();
   }
   async init() {
+    await this.setupCoreScript();
     this.core = window.videoPlayerCore;
     this.core.parseParams(this.currentScript);
     await this.core.init(this.hostUrl);
@@ -19,11 +20,13 @@ class PlaylistPlayer {
     // }
     this.core.setupLatencyMeasure();
   }
-  setupScripts(callback) {
-    let myScript = document.createElement("script");
-    myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
-    myScript.addEventListener ("load", callback, false);
-    document.body.appendChild(myScript);  
+  setupCoreScript(callback) {
+    return new Promise(resolve => {
+      let myScript = document.createElement("script");
+      myScript.setAttribute("src", `https://${this.hostUrl}/commands.js`);
+      myScript.addEventListener ("load", resolve, false);
+      document.body.appendChild(myScript);  
+    });
   }
 }
 new PlaylistPlayer();

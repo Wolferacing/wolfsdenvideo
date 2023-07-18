@@ -29,9 +29,10 @@ const commands = {
   LINK_ME: 'link-me',
   PLAYERS: 'players'
 };
-
-if(window) {
-  window.Commands = commands;
-}else{
-  module.exports = commands;
+// module.exports = commands;
+if ((typeof process !== 'undefined') && 
+(process.release.name.search(/node|io.js/) !== -1)) {
+    
+} else {
+    window.Commands = commands;
 }

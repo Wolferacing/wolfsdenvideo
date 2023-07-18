@@ -37,6 +37,7 @@ class Core{
     this.imIn = false;
     this.shouldAnnounce = true;
     this.hostUrl = hostUrl;
+    await this.setupCommandsScript();
     if(window.isBanter) {
       window.userJoinedCallback = async user => {
         if(this.shouldAnnounce) {
@@ -285,6 +286,14 @@ class Core{
         }
         break;
     }
+  }
+  setupCommandsScript(callback) {
+    return new Promise(resolve => {
+      let myScript = document.createElement("script");
+      myScript.setAttribute("src", `https://${this.hostUrl}/commands.js`);
+      myScript.addEventListener ("load", resolve, false);
+      document.body.appendChild(myScript);  
+    });
   }
 }
 window.videoPlayerCore = new Core();

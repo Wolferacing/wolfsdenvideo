@@ -6,7 +6,7 @@ const Youtube = require('./youtube/scraper.js');
 const youtube = new Youtube();
 const ytfps = require('ytfps');
 const fetch = require('node-fetch');
-const Commands = require('./public/commands.js');
+const Commands = require('../public/commands.js');
 
 class App{
   constructor() {
