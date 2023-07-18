@@ -226,6 +226,7 @@ class Core{
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
+    console.log(value);
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
