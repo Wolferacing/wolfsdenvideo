@@ -11,14 +11,8 @@ class PlaylistPlayer {
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket();
     this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-    // if(this.core.params.playlist) {
-    //   const url = `https://${this.hostUrl}/playlist/?instance=${this.core.params.instance}&playlist=${this.core.params.playlist}&user=${window.user.id}-_-${window.user.name}`;
-    //   this.core.setupBrowserElement(url);
-    // }else{
-      const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&playlist=${this.core.params.playlist}&instance=${this.core.params.instance}&user=${window.user.id}-_-${window.user.name}`;
-      this.core.setupBrowserElement(url);
-    // }
-    this.core.setupLatencyMeasure();
+    const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&playlist=${this.core.params.playlist}&instance=${this.core.params.instance}&user=${window.user.id}-_-${window.user.name}`;
+    this.core.setupBrowserElement(url);
   }
   setupCoreScript(callback) {
     return new Promise(resolve => {

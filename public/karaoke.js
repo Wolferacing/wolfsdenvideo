@@ -17,7 +17,7 @@ class KaraokePlayer {
     this.core.browser.setAttribute('sq-browser','url: ' + url);
     console.log('sq-browser','url: ' + url);
     this.core.setupJoinLeaveButton();
-    // this.core.setupLatencyMeasure();
+    this.core.setupLatencyMeasure();
   }
   setupCoreScript(callback) {
     return new Promise(resolve => {

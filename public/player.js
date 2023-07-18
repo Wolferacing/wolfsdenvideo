@@ -85,11 +85,10 @@ class Player {
         }
         break;
       case Commands.SYNC_TIME:
-        console.log(this.core.currentLatency);
         if(this.player) {
-          const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency);
+          const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
           document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
-          if(timediff > 0.75 && this.autoSync) {
+          if(timediff > 0.5 && this.autoSync) {
              this.player.seekTo(json.data.currentTime + this.core.currentLatency);
           }
           this.playVidya(json.data.currentTrack, json.data.currentTime);
@@ -102,6 +101,7 @@ class Player {
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
+        this.player.playVideo();
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
     }else{
