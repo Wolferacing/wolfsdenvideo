@@ -240,7 +240,7 @@ class Core{
     const measure = async () => {
       const time = Date.now();
       await this.measureLatency();
-      this.currentLatency = (Date.now()-time)/2;
+      this.currentLatency = (Date.now()-time)/2/1000;
     };
     setInterval(measure , 5000);
     measure();

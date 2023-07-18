@@ -9,11 +9,9 @@ class Player {
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
-    console.log(Commands);
     
      await this.setupYoutubeScript();
      await this.core.setupWebsocket(() => this.parseMessage(event.data));
-     console.log({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
@@ -81,15 +79,16 @@ class Player {
         this.setMute();
         break;
       case Commands.MEASURE_LATENCY:
-        if(this.measureLatencyResolve){
-          this.measureLatencyResolve();
-          this.measureLatencyResolve = null;
+        if(this.core.measureLatencyResolve){
+          this.core.measureLatencyResolve();
+          this.core.measureLatencyResolve = null;
         }
         break;
       case Commands.SYNC_TIME:
+        console.log(this.core.currentLatency);
         if(this.player) {
-          const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime + this.core.currentLatency);
-          document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + json.data.currentTime + " = " + timediff;
+          const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency);
+          document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
           if(timediff > 0.75 && this.autoSync) {
              this.player.seekTo(json.data.currentTime + this.core.currentLatency);
           }
@@ -103,7 +102,6 @@ class Player {
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
-        console.log("Playing video:", url);
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
     }else{
@@ -128,11 +126,6 @@ class Player {
   }
   setupYoutubeScript() {
     return this.setupScript("https://www.youtube.com/iframe_api");
-    // var tag = document.createElement('script');
-    // tag.src = "https://www.youtube.com/iframe_api";
-    // var firstScriptTag = document.getElementsByTagName('script')[0];
-    // firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    
   }
   setupCoreScript() {
     return this.setupScript(`https://${this.hostUrl}/core.js`);

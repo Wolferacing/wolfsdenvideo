@@ -22,7 +22,7 @@ class Playlist {
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
-      case Responses.SYNC_TIME:
+      case Commands.SYNC_TIME:
         const currentTime = document.querySelector('.currentTime');
         if(currentTime != null) {
           currentTime.style.width = ((json.data.currentTime / json.data.duration) * 100) + "%";
@@ -32,14 +32,14 @@ class Playlist {
           currentTimeText.innerText = this.timeCode(json.data.currentTime) + " / " + this.timeCode(json.data.duration);
         }
         break;
-      case Responses.PLAYBACK_UPDATE:
+      case Commands.PLAYBACK_UPDATE:
         this.core.player = json.data.video;
         this.updatePlaylist(this.core.player);
         break;
-      case Responses.SEARCH_RESULTS:
+      case Commands.SEARCH_RESULTS:
         this.loadVideos(json.data);
         break;
-      case Responses.ERROR:
+      case Commands.ERROR:
         alert("I cant let you do that...");
         break;
     }
