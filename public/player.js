@@ -54,12 +54,6 @@ class Player {
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
-      case Commands.LINK_ME:
-        if(json.data === window.user.id) {
-          console.log("Websocket connected.");
-          this.sendMessage({path: "user-video-player", data: window.user});
-        }
-        break;
       case Commands.SET_VOLUME:
         if(json.data >= 0 && json.data <= 100) {
           this.volume = Number(json.data);
@@ -93,19 +87,21 @@ class Player {
         }
         break;
       case Commands.SYNC_TIME:
-        const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime + this.currentLatency);
-        document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + json.data.currentTime + " = " + timediff;
-        if(timediff > 0.75 && this.autoSync) {
-           this.player.seekTo(json.data.currentTime + this.currentLatency);
+        if(this.player) {
+          const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime + this.core.currentLatency);
+          document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + json.data.currentTime + " = " + timediff;
+          if(timediff > 0.75 && this.autoSync) {
+             this.player.seekTo(json.data.currentTime + this.core.currentLatency);
+          }
+          this.playVidya(json.data.currentTrack, json.data.currentTime);
         }
-        this.playVidya(json.data.currentTrack, json.data.currentTime);
         break;
     }
   }
   playVidya(currentTrack, currentTime, force) {
     if(this.playerData) {
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
-        const url = this.playerData.playlist[json.data.video.currentTrack].link;
+        const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
         console.log("Playing video:", url);
       }

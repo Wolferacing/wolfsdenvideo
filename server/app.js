@@ -168,18 +168,23 @@ class App{
     }, this.videoPlayers[ws.i].locked);
   }
   getUserVideoPlayer(new_ws) {
-    this.wss.clients.forEach((ws) => {
-      if(ws.is_video_player) {
-        this.send(ws, Commands.LINK_ME, new_ws.u.id);
-      }
-    });
+    if(this.videoPlayers[new_ws.i]) {
+      this.videoPlayers[new_ws.i].sockets.forEach(ws => {
+        if(ws.is_video_player) {
+          this.setUserVideoPlayer(new_ws.u, ws);
+        }
+      });
+    }
   }
   setUserVideoPlayer(data, user_video) {
-    this.wss.clients.forEach((ws) => {
-      if(ws.u && ws.u.id === data.id) {
-        ws.user_video = user_video;
-      }
-    });
+    if(this.videoPlayers[user_video.i]) {
+      this.videoPlayers[user_video.i].sockets.forEach(ws => {
+        if(ws.u && ws.u.id === data.id) {
+          ws.user_video = user_video;
+          user_video.linked = true;
+        }
+      });
+    }
   }
   updateVotes(ws) {
     if(this.videoPlayers[ws.i]) {
