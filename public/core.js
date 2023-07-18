@@ -43,7 +43,6 @@ class Core{
     if(window.isBanter) {
       window.userJoinedCallback = async user => {
         if(this.shouldAnnounce) {
-          console.log(user)
           this.saySomething({name: user.id.substr(0, 6)});
         }
       };
@@ -64,7 +63,6 @@ class Core{
           const now = Date.now();
           if(now - lastSendTime > 2000) {
             lastSendTime = now;
-            console.log(this.params.volume * volume);
             this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
           }
         }
@@ -185,7 +183,7 @@ class Core{
     playlistButton.setAttribute('sq-collider', '');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813');
-    playlistButton.setAttribute('position', `${xOffset} ${(-yScale*0.33)-(yOffset||0)} 0`);
+    playlistButton.setAttribute('position', `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0`);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
@@ -219,6 +217,8 @@ class Core{
     this.setOrDefault("volume", '20');
     this.setOrDefault("mute", 'false');
     this.setOrDefault("is3d", 'false');
+    this.setOrDefault("announce", 'true');
+    this.setOrDefault("is3d", 'false');
     this.setOrDefault("youtube", 'https://www.youtube.com/watch?v=L_LUpnjgPso');
     
     this.params.volume = Number(this.params.volume);
@@ -226,7 +226,6 @@ class Core{
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
-    console.log(value);
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }

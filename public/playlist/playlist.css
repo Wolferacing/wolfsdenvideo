@@ -21,6 +21,9 @@ body{
   font: 15px Roboto, sans-serif;
   padding: 1 30;
 }
+#autoSync{
+   display: none; 
+}
 .searchContainer{
   float: right;
 }
