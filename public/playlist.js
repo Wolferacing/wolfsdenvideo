@@ -15,7 +15,7 @@ class PlaylistPlayer {
     //   const url = `https://${this.hostUrl}/playlist/?instance=${this.core.params.instance}&playlist=${this.core.params.playlist}&user=${window.user.id}-_-${window.user.name}`;
     //   this.core.setupBrowserElement(url);
     // }else{
-      const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&playlist=${this.core.params.playlist}&user=${window.user.id}-_-${window.user.name}`;
+      const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&playlist=${this.core.params.playlist}&instance=${this.core.params.instance}&user=${window.user.id}-_-${window.user.name}`;
       this.core.setupBrowserElement(url);
     // }
     this.core.setupLatencyMeasure();

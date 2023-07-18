@@ -21,6 +21,11 @@
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      const player = new Player();
+      function onYouTubeIframeAPIReady() {
+        player.onYouTubeIframeAPIReady();
+      }
+    
 //       const Responses = {
 //         LINK_ME: 'link-me',
 //         SET_VOLUME: 'set-volume',
@@ -235,11 +240,6 @@
 //           return (match&&match[7].length==11)? match[7] : false;
 //         }
 //       }
-      const player = new Player();
-      function onYouTubeIframeAPIReady() {
-        player.onYouTubeIframeAPIReady();
-      }
-    
     </script>
   </body>
 </html>
