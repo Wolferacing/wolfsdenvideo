@@ -33,5 +33,5 @@ if ((typeof process !== 'undefined') &&
 (process.release.name.search(/node|io.js/) !== -1)) {
   module.exports = commands;
 } else {
-    window.Commands = commands;
+  window.Commands = commands;
 }

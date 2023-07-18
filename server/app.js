@@ -7,7 +7,6 @@ const youtube = new Youtube();
 const ytfps = require('ytfps');
 const fetch = require('node-fetch');
 const Commands = require('../public/commands.js');
-console.log(Commands);
 
 class App{
   constructor() {
@@ -66,7 +65,6 @@ class App{
      socket.send(JSON.stringify({path, data}));
   }
   parseMessage(msg, ws){
-    console.log(msg, Commands.SEARCH);
     switch(msg.path) {
       case Commands.INSTANCE:
         if(msg.u) { 
@@ -170,11 +168,11 @@ class App{
     }, this.videoPlayers[ws.i].locked);
   }
   getUserVideoPlayer(new_ws) {
-    // this.wss.clients.forEach((ws) => {
-    //   if(ws.is_video_player) {
-    //     this.send(ws, Commands.LINK_ME, new_ws.u.id);
-    //   }
-    // });
+    this.wss.clients.forEach((ws) => {
+      if(ws.is_video_player) {
+        this.send(ws, Commands.LINK_ME, new_ws.u.id);
+      }
+    });
   }
   setUserVideoPlayer(data, user_video) {
     this.wss.clients.forEach((ws) => {

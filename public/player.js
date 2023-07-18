@@ -5,6 +5,8 @@ class Player {
     this.init();
   }
   async init() {
+    
+     await this.setupCoreScript();
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
@@ -77,6 +79,7 @@ class Player {
           if(json.data.type === "set-track") {
             this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
           }
+        console.log(json.data)
         break;
       case Commands.MUTE:
         this.mute = json.data;
@@ -126,4 +129,27 @@ class Player {
     var match = url.match(regExp);
     return (match&&match[7].length==11)? match[7] : false;
   }
+  setupCoreScript() {
+    return this.setupScript("https://www.youtube.com/iframe_api");
+    // var tag = document.createElement('script');
+    // tag.src = "https://www.youtube.com/iframe_api";
+    // var firstScriptTag = document.getElementsByTagName('script')[0];
+    // firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+  }
+  setupCoreScript() {
+    return this.setupScript(`https://${this.hostUrl}/core.js`);
+  }
+  setupScript(script) {
+    return new Promise(resolve => {
+      let myScript = document.createElement("script");
+      myScript.setAttribute("src", script);
+      myScript.addEventListener ("load", resolve, false);
+      document.body.appendChild(myScript);  
+    });
+  }
+}
+const player = new Player();
+function onYouTubeIframeAPIReady() {
+  player.onYouTubeIframeAPIReady();
 }
