@@ -30,7 +30,7 @@ class Core{
           const now = Date.now();
           if(now - lastSendTime > 2000) {
             lastSendTime = now;
-            this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
+            // this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
           }
         }
       }
