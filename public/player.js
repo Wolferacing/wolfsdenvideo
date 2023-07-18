@@ -59,9 +59,9 @@ class Player {
       case Commands.SET_VOLUME:
         if(json.data >= 0 && json.data <= 100) {
           this.volume = Number(json.data);
-          this.setVolume();
-          this.setMute();
-          console.log( this.volume);
+          //this.setVolume();
+          //this.setMute();
+          console.log(this.volume);
         }
         break;
       case Commands.SKIP_BACK:

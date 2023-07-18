@@ -30,6 +30,7 @@ class Core{
           const now = Date.now();
           if(now - lastSendTime > 2000) {
             lastSendTime = now;
+            // wtf mate???
             // this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
           }
         }
@@ -196,16 +197,6 @@ class Core{
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
-  // playVidya(currentTrack, currentTime, force) {
-  //   if(this.player) {
-  //     if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-  //       const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + encodeURIComponent(window.user.name)}`;
-  //       // this.browser.setAttribute('sq-browser','url: ' + url);
-  //       console.log("Playing video:", url);
-  //     }
-  //     this.lastUrl = this.player.playlist[currentTrack].link;
-  //   }
-  // }
   setupWebsocket(messageCallback){
     return new Promise(resolve => {
       this.ws = new WebSocket('wss://' + this.hostUrl + '/');

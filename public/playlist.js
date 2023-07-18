@@ -19,7 +19,7 @@ class PlaylistPlayer {
       let myScript = document.createElement("script");
       myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
       myScript.addEventListener ("load", resolve, false);
-      document.body.appendChild(myScript);  
+      document.body.appendChild(myScript);
     });
   }
 }
