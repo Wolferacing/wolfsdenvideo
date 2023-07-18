@@ -13,12 +13,13 @@ class PlaylistPlayer {
     if(this.core.params.playlist) {
       const url = `https://${this.hostUrl}/playlist/?instance=${this.core.params.instance}&playlist=${this.core.params.playlist}&user=${window.user.id}-_-${window.user.name}`;
       this.core.setupBrowserElement(url);
-      console.log(url);
     }else{
       const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&user=${window.user.id}-_-${window.user.name}`;
       this.core.setupBrowserElement(url);
-      console.log(url);
     }
+    const time = Date.valueOf();
+    await this.core.measureLatency();
+    console.log("latency", Date.valueOf()-time);
   }
   setupScripts(callback) {
     let myScript = document.createElement("script");

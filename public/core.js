@@ -16,7 +16,8 @@ const Commands = {
   REMOVE_FROM_PLAYERS: 'remove-from-players',
   AUTO_SYNC: 'auto-sync',
   SKIP_BACK: 'skip-back',
-  SKIP_FORWARD: 'skip-forward'
+  SKIP_FORWARD: 'skip-forward',
+  MEASURE_LATENCY: 'measure-latency'
 } 
 const Responses = {
   OUT_OF_BOUNDS: 'out-of-bounds',
@@ -232,6 +233,19 @@ class Core{
       };
     });
   }
+  setupLatencyMeasure() {
+    setInterval(async () => {
+      const time = Date.now();
+      await this.core.measureLatency();
+      this.currentLatency = (Date.now()-time)/2
+    }, 5000);
+  }
+  measureLatency() {
+    return new Promise(resolve=>{
+      this.sendMessage({path: Commands.MEASURE_LATENCY});
+      this.measureLatencyResolve = resolve;
+    })
+  }
   sendMessage(msg){
     msg.u = window.user;
     this.ws.send(JSON.stringify(msg));
@@ -261,6 +275,12 @@ class Core{
         break;
       case Responses.ERROR:
         alert("I cant let you do that...");
+        break;
+      case Commands.MEASURE_LATENCY:
+        if(this.measureLatencyResolve){
+          this.measureLatencyResolve();
+          this.measureLatencyResolve = null;
+        }
         break;
     }
   }

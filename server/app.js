@@ -148,8 +148,8 @@ class App{
         break;
     }
   }
-  measureLatency() {
-    ws
+  measureLatency(ws) {
+    this.send(ws, Commands.MEASURE_LATENCY);
   }
   skip(isBack, ws) {
     if(ws.user_video) {
