@@ -202,6 +202,7 @@ class App{
   }
   setVolume(vol, ws) {
     if(ws.user_video) {
+      console.log(Commands.SET_VOLUME);
       this.send(ws.user_video, Commands.SET_VOLUME, vol);
     }
   }

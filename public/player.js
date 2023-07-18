@@ -39,6 +39,13 @@ class Player {
       },
       events: {
         'onStateChange': (event) => {
+          console.log(event.data);
+          // -1 – unstarted
+          // 0 – ended
+          // 1 – playing
+          // 2 – paused
+          // 3 – buffering
+          // 5 – video cued
           // if(event.data == 2 && this.player) {
           //   this.player.playVideo();
           // }
@@ -59,8 +66,8 @@ class Player {
       case Commands.SET_VOLUME:
         if(json.data >= 0 && json.data <= 100) {
           this.volume = Number(json.data);
-          //this.setVolume();
-          //this.setMute();
+          this.setVolume();
+          this.setMute();
           console.log(this.volume);
         }
         break;

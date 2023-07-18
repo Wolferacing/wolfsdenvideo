@@ -123,6 +123,7 @@ class Core{
   setupVolButton(scene, isUp, playlistContainer) {
     this.setupButton(scene, playlistContainer, isUp ? 1.2 : 1.75, isUp ? '+ vol' : '- vol', '0.5',  ()=>{
         this.setVolume(isUp);
+      console.warn({path: Commands.SET_VOLUME, data: this.params.volume});
         this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
