@@ -203,7 +203,7 @@ class Core{
     if(this.player) {
       if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
         const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + encodeURIComponent(window.user.name)}`;
-        this.browser.setAttribute('sq-browser','url: ' + url);
+        // this.browser.setAttribute('sq-browser','url: ' + url);
         console.log("Playing video:", url);
       }
       this.lastUrl = this.player.playlist[currentTrack].link;

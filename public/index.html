@@ -102,6 +102,17 @@
             case Responses.AUTO_SYNC:
               this.autoSync = json.data;
               break;
+            // case Responses.SYNC_TIME:
+            //     
+            //   break;
+            case Responses.PLAYBACK_UPDATE:
+                this.playerData = json.data.video;
+                if(json.data.type === "set-track") {
+                  // const url = this.player.playlist[json.data.video.currentTrack].link;
+                  // this.player.loadVideoById(this.getId(url), 0);
+                  this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
+                }
+              break;
             case Responses.MUTE:
               this.mute = json.data;
               this.setMute();
@@ -117,7 +128,20 @@
               if(timediff > 0.75 && this.autoSync) {
                  this.player.seekTo(json.data.currentTime + this.currentLatency);
               }
+              this.playVidya(json.data.currentTrack, json.data.currentTime);
               break;
+          }
+        }
+        playVidya(currentTrack, currentTime, force) {
+          if(this.playerData) {
+            if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
+              const url = this.playerData.playlist[json.data.video.currentTrack].link;
+              this.player.loadVideoById(this.getId(url), currentTime);
+              // const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + encodeURIComponent(window.user.name)}`;
+              // this.browser.setAttribute('sq-browser','url: ' + url);
+              console.log("Playing video:", url);
+            }
+            this.lastUrl = this.playerData.playlist[currentTrack].link;
           }
         }
         sendMessage(msg){
