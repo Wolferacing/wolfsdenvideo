@@ -13,7 +13,7 @@ class Core{
           this.saySomething({name: user.id.substr(0, 6)});
         }
       };
-      let lastSendTime = Date.now() - 2000;
+      let lastSendTime = Date.now() + 10000;
       const positionOfBrowser = this.params.position.split(" ");
       window.userPoseCallback = async pose => {
         if(this.params.spatial === 'true') {
