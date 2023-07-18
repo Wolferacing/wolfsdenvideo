@@ -9,6 +9,7 @@ class Player {
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
      await this.core.setupWebsocket(() => this.parseMessage(event.data));
+    console.log({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();

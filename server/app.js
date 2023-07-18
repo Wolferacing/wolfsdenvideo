@@ -152,7 +152,6 @@ class App{
   }
   skip(isBack, ws) {
     if(ws.user_video) {
-      console.log(isBack ? Commands.SKIP_BACK : Commands.SKIP_FORWARD);
       this.send(ws.user_video, isBack ? Commands.SKIP_BACK : Commands.SKIP_FORWARD);
     }
   }
@@ -168,11 +167,11 @@ class App{
     }, this.videoPlayers[ws.i].locked);
   }
   getUserVideoPlayer(new_ws) {
-    this.wss.clients.forEach((ws) => {
-      if(ws.is_video_player) {
-        this.send(ws, Commands.LINK_ME, new_ws.u.id);
-      }
-    });
+    // this.wss.clients.forEach((ws) => {
+    //   if(ws.is_video_player) {
+    //     this.send(ws, Commands.LINK_ME, new_ws.u.id);
+    //   }
+    // });
   }
   setUserVideoPlayer(data, user_video) {
     this.wss.clients.forEach((ws) => {
@@ -423,7 +422,6 @@ class App{
   updateClients(instanceId, type) {
     if(this.videoPlayers[instanceId]) {
       const video = this.getVideoObject(instanceId);
-        console.log(type,this.videoPlayers[instanceId].sockets.length);
       this.videoPlayers[instanceId].sockets.forEach(socket => {
         this.send(socket, Commands.PLAYBACK_UPDATE, {video, type});
       });
