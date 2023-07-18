@@ -234,11 +234,13 @@ class Core{
     });
   }
   setupLatencyMeasure() {
-    setInterval(async () => {
+    const measure = async () => {
       const time = Date.now();
       await this.core.measureLatency();
-      this.currentLatency = (Date.now()-time)/2
-    }, 5000);
+      this.currentLatency = (Date.now()-time)/2;
+    };
+    setInterval(measure , 5000);
+    measure();
   }
   measureLatency() {
     return new Promise(resolve=>{

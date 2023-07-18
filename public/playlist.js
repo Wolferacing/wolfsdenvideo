@@ -17,9 +17,7 @@ class PlaylistPlayer {
       const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&user=${window.user.id}-_-${window.user.name}`;
       this.core.setupBrowserElement(url);
     }
-    const time = Date.valueOf();
-    await this.core.measureLatency();
-    console.log("latency", Date.valueOf()-time);
+    this.core.setupLatencyMeasure();
   }
   setupScripts(callback) {
     let myScript = document.createElement("script");

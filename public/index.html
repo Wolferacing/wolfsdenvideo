@@ -26,14 +26,16 @@
         SKIP_BACK: 'skip-back',
         SKIP_FORWARD: 'skip-forward',
         SYNC_TIME: 'sync-time',
-        AUTO_SYNC: 'auto-sync'
+        AUTO_SYNC: 'auto-sync',
+        MEASURE_LATENCY: 'measure-latency'
       }
       const hostUrl = 'sq-video-player.glitch.me';
       class Player {
         constructor(){
           this.init();
         }
-        init() {
+        async init() {
+          this.currentLatency = 0;
           this.video = document.getElementById("videoFrame");
           this.urlParams = new URLSearchParams(window.location.search);      
           this.start = this.urlParams.get('start') || 0; 
@@ -46,7 +48,8 @@
             id: userStr[0],
             name: userStr[1]
           }
-          this.setupWebsocket();
+          await this.setupWebsocket();
+          this.setupLatencyMeasure();
         }
         setupWebsocket(){
           return new Promise(resolve => {
@@ -103,11 +106,16 @@
               this.mute = json.data;
               this.setMute();
               break;
+            case Responses.MEASURE_LATENCY:
+              if(this.measureLatencyResolve){
+                this.measureLatencyResolve();
+                this.measureLatencyResolve = null;
+              }
             case Responses.SYNC_TIME:
-              const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime);
+              const timediff = Math.abs(this.player.getCurrentTime() - json.data.currentTime + this.currentLatency);
               document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + json.data.currentTime + " = " + timediff;
               if(timediff > 0.75 && this.autoSync) {
-                 this.player.seekTo(json.data.currentTime);
+                 this.player.seekTo(json.data.currentTime + this.currentLatency);
               }
               break;
           }
@@ -154,6 +162,21 @@
             }else{
               this.player.unMute();
             }
+        }
+        setupLatencyMeasure() {
+          const measure = async () => {
+            const time = Date.now();
+            await this.core.measureLatency();
+            this.currentLatency = (Date.now()-time)/2;
+          };
+          setInterval(measure , 5000);
+          measure();
+        }
+        measureLatency() {
+          return new Promise(resolve=>{
+            this.sendMessage({path: Commands.MEASURE_LATENCY});
+            this.measureLatencyResolve = resolve;
+          })
         }
         setVolume() {
             this.volume = Number(this.volume);

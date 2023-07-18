@@ -16,10 +16,7 @@ class KaraokePlayer {
     const url = `https://${this.hostUrl}/?user=${window.user.id}-_-${window.user.name}&youtube=${encodeURIComponent(youtubeUrl)}&start=0`;
     this.core.browser.setAttribute('sq-browser','url: ' + url);
     this.core.setupJoinLeaveButton();
-    const time = Date.now();
-    await this.core.measureLatency();
-    this.latency = Date.now()-time;
-    console.log("latency", );
+    this.core.setupLatencyMeasure();
   }
   setupScripts(callback) {
     let myScript = document.createElement("script");
