@@ -2,9 +2,10 @@ class Karaoke{
   constructor() {
     this.hostUrl = 'sq-video-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
-    this.setupScripts(() => this.init());
+    this.init();
   }
   async init() {
+    await this.setupCoreScript();
     this.core = window.videoPlayerCore;
     this.core.parseParams(this.currentScript);
     this.setupKaraokeUI();
@@ -69,6 +70,14 @@ class Karaoke{
     });
     this.hostTitle = document.querySelector('.hostTitle');
   }
+  setupCoreScript() {
+    return new Promise(resolve => {
+      let myScript = document.createElement("script");
+      myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
+      myScript.addEventListener ("load", resolve, false);
+      document.body.appendChild(myScript);
+    });
+  }
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
@@ -97,12 +106,6 @@ class Karaoke{
         alert("I cant let you do that...");
         break;
     }
-  }
-  setupScripts(callback) {
-    let myScript = document.createElement("script");
-    myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
-    myScript.addEventListener ("load", callback, false);
-    document.body.appendChild(myScript);  
   }
   search(data) {
     console.log("search", {path: Commands.SEARCH, data })

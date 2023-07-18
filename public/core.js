@@ -202,16 +202,16 @@ class Core{
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
-  playVidya(currentTrack, currentTime, force) {
-    if(this.player) {
-      if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
-        const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + encodeURIComponent(window.user.name)}`;
-        // this.browser.setAttribute('sq-browser','url: ' + url);
-        console.log("Playing video:", url);
-      }
-      this.lastUrl = this.player.playlist[currentTrack].link;
-    }
-  }
+  // playVidya(currentTrack, currentTime, force) {
+  //   if(this.player) {
+  //     if(this.lastUrl !== this.player.playlist[currentTrack].link || force) {
+  //       const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.player.playlist[currentTrack].link)}&mute=${this.params.mute}&volume=${this.params.volume}&start=${currentTime}&user=${window.user.id + '-_-' + encodeURIComponent(window.user.name)}`;
+  //       // this.browser.setAttribute('sq-browser','url: ' + url);
+  //       console.log("Playing video:", url);
+  //     }
+  //     this.lastUrl = this.player.playlist[currentTrack].link;
+  //   }
+  // }
   setupWebsocket(messageCallback){
     return new Promise(resolve => {
       this.ws = new WebSocket('wss://' + this.hostUrl + '/');
@@ -269,15 +269,15 @@ class Core{
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
-      case Commands.SYNC_TIME:
-          this.playVidya(json.data.currentTrack, json.data.currentTime);
-        break;
-      case Commands.PLAYBACK_UPDATE:
-          this.player = json.data.video;
-          if(json.data.type === "set-track") {
-            this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
-          }
-        break;
+      // case Commands.SYNC_TIME:
+          // this.playVidya(json.data.currentTrack, json.data.currentTime);
+        // break;
+      // case Commands.PLAYBACK_UPDATE:
+          // this.player = json.data.video;
+          // if(json.data.type === "set-track") {
+          //   this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
+          // }
+        // break;
       case Commands.ERROR:
         alert("I cant let you do that...");
         break;
