@@ -192,6 +192,8 @@ class Core{
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '20');
     this.setOrDefault("mute", 'false');
+    this.setOrDefault("youtube", 'https://www.youtube.com/watch?v=L_LUpnjgPso');
+    
     this.params.volume = Number(this.params.volume);
     this.params.mute = this.params.mute === 'true' ? 'true' : 'false';
   }
