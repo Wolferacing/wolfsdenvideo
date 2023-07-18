@@ -420,9 +420,6 @@ class App{
     Object.keys(this.videoPlayers).forEach(key => {
       this.videoPlayers[key].sockets.forEach(socket => {
         this.syncWsTime(socket, key);
-        if(socket.user_video) {
-          this.syncWsTime(socket.user_video, key);
-        }
       });
     });
   }
