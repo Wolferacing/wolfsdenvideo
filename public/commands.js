@@ -1,4 +1,4 @@
-const commands = {
+const Commands = {
   INSTANCE: 'instance',
   SEARCH: 'search',
   SET_TIME: 'set-time',
@@ -31,7 +31,5 @@ const commands = {
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {
-  module.exports = commands;
-} else {
-  window.Commands = commands;
+  module.exports = Commands;
 }

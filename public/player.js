@@ -5,13 +5,15 @@ class Player {
     this.init();
   }
   async init() {
-    
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
+    console.log(Commands);
+    
+     await this.setupYoutubeScript();
      await this.core.setupWebsocket(() => this.parseMessage(event.data));
-    console.log({path: "instance", data: this.core.params.instance, u: window.user});
+     console.log({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
@@ -79,7 +81,6 @@ class Player {
           if(json.data.type === "set-track") {
             this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
           }
-        console.log(json.data)
         break;
       case Commands.MUTE:
         this.mute = json.data;
@@ -129,7 +130,7 @@ class Player {
     var match = url.match(regExp);
     return (match&&match[7].length==11)? match[7] : false;
   }
-  setupCoreScript() {
+  setupYoutubeScript() {
     return this.setupScript("https://www.youtube.com/iframe_api");
     // var tag = document.createElement('script');
     // tag.src = "https://www.youtube.com/iframe_api";

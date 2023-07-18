@@ -291,7 +291,7 @@ class Core{
   setupCommandsScript(callback) {
     return new Promise(resolve => {
       let myScript = document.createElement("script");
-      myScript.setAttribute("src", `https://${this.hostUrl}/commands.js`);
+      myScript.setAttribute("src", `https://${this.hostUrl}/commands.js?1`);
       myScript.addEventListener ("load", resolve, false);
       document.body.appendChild(myScript);  
     });
