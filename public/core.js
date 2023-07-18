@@ -185,7 +185,7 @@ class Core{
     this.setOrDefault("mute", 'false');
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
-    this.setOrDefault("spatial", 'true');
+    this.setOrDefault("spatial", 'false');
     this.setOrDefault("youtube", 'https://www.youtube.com/watch?v=L_LUpnjgPso');
     
     this.params.volume = Number(this.params.volume);
