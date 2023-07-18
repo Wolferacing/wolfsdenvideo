@@ -37,6 +37,7 @@ class Core{
     this.currentLatency = 0;
     this.imIn = false;
     this.shouldAnnounce = true;
+    this.shouldBeSpatial = true;
     this.hostUrl = hostUrl;
     await this.setupCommandsScript();
     if(window.isBanter) {
@@ -46,6 +47,16 @@ class Core{
           this.saySomething({name: user.id.substr(0, 6)});
         }
       };
+      const positionOfBrowser = this.params.position.split(" ");
+      window.userPoseCallback = async pose => {
+        if(this.shouldBeSpatial) {
+          var a = userinputs.head.position.x - positionOfBrowser[0];
+          var b = userinputs.head.position.y - positionOfBrowser[1];
+          var c = userinputs.head.position.z - positionOfBrowser[2];
+          var distance = Math.sqrt(a * a + b * b + c * c);
+          console.log(distance);
+        }
+      }
       await window.AframeInjection.waitFor(window, 'user');
     }else{
       try{
