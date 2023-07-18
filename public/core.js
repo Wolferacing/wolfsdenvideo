@@ -75,6 +75,9 @@ class Core{
     browser.setAttribute("position", this.params.position);
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
+    if(this.params.is3d === 'true') {
+      browser.setAttribute("scale", this.params.scale);
+    }
     browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 0.75}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
     scene.appendChild(browser);
     this.browser = browser;
@@ -192,6 +195,7 @@ class Core{
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '20');
     this.setOrDefault("mute", 'false');
+    this.setOrDefault("is3d", 'false');
     this.setOrDefault("youtube", 'https://www.youtube.com/watch?v=L_LUpnjgPso');
     
     this.params.volume = Number(this.params.volume);
@@ -269,15 +273,6 @@ class Core{
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
-      // case Commands.SYNC_TIME:
-          // this.playVidya(json.data.currentTrack, json.data.currentTime);
-        // break;
-      // case Commands.PLAYBACK_UPDATE:
-          // this.player = json.data.video;
-          // if(json.data.type === "set-track") {
-          //   this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
-          // }
-        // break;
       case Commands.ERROR:
         alert("I cant let you do that...");
         break;
