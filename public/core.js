@@ -1,34 +1,3 @@
-// const Commands = {
-//   SEARCH: 'search',
-//   SET_TIME: 'set-time',
-//   SET_TRACK: 'set-track',
-//   TOGGLE_LOCK: 'toggle-lock',
-//   TOGGLE_CAN_TAKE_OVER: 'toggle-can-take-over',
-//   ADD_TO_PLAYLIST: 'add-to-playlist',
-//   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
-//   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
-//   TAKE_OVER: 'take-over',
-//   FROM_PLAYLIST: 'from-playlist',
-//   CLEAR_PLAYLIST: 'clear-playlist',
-//   SET_VOLUME: 'set-volume',
-//   MUTE: 'mute',
-//   ADD_TO_PLAYERS: 'add-to-players',
-//   REMOVE_FROM_PLAYERS: 'remove-from-players',
-//   AUTO_SYNC: 'auto-sync',
-//   SKIP_BACK: 'skip-back',
-//   SKIP_FORWARD: 'skip-forward',
-//   MEASURE_LATENCY: 'measure-latency'
-// } 
-// const Responses = {
-//   OUT_OF_BOUNDS: 'out-of-bounds',
-//   DOES_NOT_EXIST: 'does-not-exist',
-//   PLAYBACK_UPDATE: 'playback-update',
-//   SYNC_TIME: 'sync-time',
-//   SEARCH_RESULTS: 'search-results',
-//   ERROR:'error',
-//   PLAYERS: 'players'
-// }
-
 class Core{
   constructor() {
     this.urlParams = new URLSearchParams(window.location.search);
@@ -36,20 +5,18 @@ class Core{
   async init(hostUrl) {
     this.currentLatency = 0;
     this.imIn = false;
-    this.shouldAnnounce = true;
-    this.shouldBeSpatial = true;
     this.hostUrl = hostUrl;
     await this.setupCommandsScript();
     if(window.isBanter) {
       window.userJoinedCallback = async user => {
-        if(this.shouldAnnounce) {
+        if(this.params.announce === 'true') {
           this.saySomething({name: user.id.substr(0, 6)});
         }
       };
       let lastSendTime = Date.now() - 2000;
       const positionOfBrowser = this.params.position.split(" ");
       window.userPoseCallback = async pose => {
-        if(this.shouldBeSpatial) {
+        if(this.params.spatial === 'true') {
           const a = userinputs.head.position.x - positionOfBrowser[0];
           const b = userinputs.head.position.y - positionOfBrowser[1];
           const c = userinputs.head.position.z - positionOfBrowser[2];
@@ -97,7 +64,7 @@ class Core{
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
     if(this.params.is3d === 'true') {
-      browser.setAttribute("scale", this.params.scale);
+      browser.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
     }
     browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 0.75}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
     scene.appendChild(browser);
@@ -214,11 +181,11 @@ class Core{
     this.setOrDefault("scale", "1 1 1");
     this.setOrDefault("instance", "666");
     this.setOrDefault("playlist", "");
-    this.setOrDefault("volume", '20');
+    this.setOrDefault("volume", '40');
     this.setOrDefault("mute", 'false');
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
-    this.setOrDefault("is3d", 'false');
+    this.setOrDefault("spatial", 'true');
     this.setOrDefault("youtube", 'https://www.youtube.com/watch?v=L_LUpnjgPso');
     
     this.params.volume = Number(this.params.volume);
@@ -280,7 +247,9 @@ class Core{
   }
   sendMessage(msg){
     msg.u = window.user;
-    this.ws.send(JSON.stringify(msg));
+    if(this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(msg));
+    }
   }
   makeAndAddElement(type, style, parent) {
     const element = document.createElement(type);
