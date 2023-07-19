@@ -198,7 +198,7 @@ class App{
   setUserVideoPlayer(data, user_video) {
     if(this.videoPlayers[user_video.i]) {
       this.videoPlayers[user_video.i].sockets.forEach(ws => {
-        if(ws.u && ws.u.id === data.id) {
+        if(ws.u && ws.u.id === user_video.u.id) {
           ws.user_video = user_video;
         }
       });

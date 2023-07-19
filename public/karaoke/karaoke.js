@@ -304,7 +304,7 @@ class Karaoke{
         'mute': 1,
         'autoplay': 1,
         'disablekb': 1,
-        'controls': 1,
+        'controls': 0,
         'modestbranding': true,
         'cc_load_policy': 1,
         'cc_lang_pref': 'en',
