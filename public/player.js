@@ -75,21 +75,40 @@ class Player {
       console.log(this.player, this.isPlayerStarted, this.core.connected());
     }
   }
+  showToast(text) {
+    Toastify({
+      text: text,
+      duration: 100,
+      close: true,
+      gravity: "bottom", // `top` or `bottom`
+      position: "right", // `left`, `center` or `right`
+      stopOnFocus: true, // Prevents dismissing of toast on hover
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+      },
+      // onClick: function(){} // Callback after click
+    }).showToast();
+  }
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
       case Commands.SET_VOLUME:
         if(json.data >= 0 && json.data <= 100) {
-          this.volume = Number(json.data);
+          this.core.params.volume = Number(json.data);
           this.setVolume();
           this.setMute();
+          this.showToast("Volume: " + (json.data) + "%");
         }
         break;
       case Commands.SKIP_BACK:
-        this.player.seekTo(this.player.getCurrentTime() - 0.3);
+        const time = this.player.getCurrentTime() - 0.5;
+        this.player.seekTo(time);
+        this.showToast("Time: " + (time) + "s");
         break;
       case Commands.SKIP_FORWARD:
-        this.player.seekTo(this.player.getCurrentTime() + 0.3);
+        const timeForward = this.player.getCurrentTime() + 0.5;
+        this.player.seekTo(timeForward);
+        this.showToast("Time: " + (timeForward) + "s");
         break;
       case Commands.AUTO_SYNC:
         this.autoSync = json.data;
@@ -102,7 +121,8 @@ class Player {
         }
         break;
       case Commands.MUTE:
-        this.mute = json.data;
+        this.core.params.mute = json.data;
+        this.showToast(this.core.params.mute === true || this.core.params.mute === 'true' ? "MUTE" : "Unmuting!");
         this.setMute();
         break;
       case Commands.MEASURE_LATENCY:

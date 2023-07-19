@@ -133,7 +133,6 @@ class Core{
   }
   setupSkipButton(scene, isBack, playlistContainer) {
     this.setupButton(scene, playlistContainer, isBack ? -0.575 : -0.025, isBack ? '<<' : '>>', '0.5',  () => {
-        console.log({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
         this.sendMessage({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
     })
   }
