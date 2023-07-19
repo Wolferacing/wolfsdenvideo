@@ -21,17 +21,21 @@ class Core{
           const b = userinputs.head.position.y - positionOfBrowser[1];
           const c = userinputs.head.position.z - positionOfBrowser[2];
           const distance = Math.sqrt(a * a + b * b + c * c);
-          let volume = ((20 - distance) / 20);
+          let volume =  ((40 - distance) / 40);
           if(volume > 1) {
             volume = 1;
           }else if(volume < 0) {
             volume = 0;
           }
           const now = Date.now();
-          if(now - lastSendTime > 2000) {
+          if(now - lastSendTime > 1000) {
             // console.log({path: Commands.SET_VOLUME, data: this.params.volume}, this.params.spatial)
             lastSendTime = now;
-            this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
+            const roundedVolume = Math.round((this.params.volume * volume) / 5) * 5;
+            if(this.tempVolume != roundedVolume) {
+              this.sendMessage({path: Commands.SET_VOLUME, data: roundedVolume});
+            }
+            this.tempVolume = roundedVolume; 
           }
         }
       }
