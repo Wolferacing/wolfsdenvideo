@@ -266,15 +266,15 @@ class Karaoke{
     console.log('here2');
       const player = document.getElementById("player");
       console.log(player.width);
-      const isFullscreen = player.width != '240';
+      const isFullscreen = player.width != '420';
       if(isFullscreen) {
         playerContainer.style.position = "initial";
         playerContainer.style.top = "initial";
         playerContainer.style.bottom = "initial";
         playerContainer.style.left = "initial";
         playerContainer.style.right = "initial";
-        player.width = '240';
-        player.height = '180';
+        player.width = '420';
+        player.height = '280';
         this.fullscreenButton.innerText = "Show Fullscreen";
         this.fullscreenButton.className = "button teal fullscreenButton";
         this.autoSync.className = "button teal fullscreenButton lower";
@@ -284,6 +284,7 @@ class Karaoke{
         playerContainer.style.bottom = "0";
         playerContainer.style.left = "0";
         playerContainer.style.right = "0";
+        playerContainer.style.zIndex = "5";
         player.width = window.innerWidth;
         player.height = window.innerHeight;
         this.fullscreenButton.innerText = "Exit Fullscreen";
@@ -295,8 +296,8 @@ class Karaoke{
   setupYoutubePlayer() {
     const youtubeUrl = this.core.urlParams.has('youtube') ? this.core.urlParams.get('youtube') : 'https://www.youtube.com/watch?v=L_LUpnjgPso';
     new YT.Player('player', {
-      height: '180',
-      width: '240',
+      height: '280',
+      width: '420',
       videoId: this.core.getYTId(decodeURIComponent(youtubeUrl)),
       playerVars: {
         'playsinline': 1,

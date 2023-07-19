@@ -4,6 +4,7 @@ html{
   position: fixed;
   right: 0;
   top: 0;
+  background: #cfcfcf;
 }
 body{
   height: 100%;
@@ -11,6 +12,7 @@ body{
   overflow: hidden;
   padding: 0;
   width: 100%;
+  background: #7f7f7f;
 }
 .playlistContainer{
   position: relative;
@@ -23,13 +25,14 @@ body{
 }
 .fullscreenButton{
   position: absolute;
-  top: 320px;
-  right: 20px;
+  top: 420px;
+  left: 20px;
 }
 .fullscreenButtonOverlay{
-  position: absolute;
+  position: fixed;
   top: 80px;
-  right: 20px;
+  left: 20px;
+  z-index: 6;
 }
 .lower{
   margin-top: 45px!important;
@@ -51,14 +54,15 @@ body{
 }
 .playerContainer{
   float: left; 
-  width: calc(100% - 240px);
+  width: calc(100% - 420px);
 }
 .videoPlayer{
   float: left;
-  width: 240px;
+  width: 420px;
   font: 15px Roboto, sans-serif;
   color: white;
-  background: #afafaf;
+  background: #3f3f3f;
+  padding-bottom: 5px;
 }
 .videoPlaylistContainer{
   position: relative;
