@@ -177,6 +177,7 @@ class Core{
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813');
     playlistButton.setAttribute('position', `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0`);
+    // playlistButton.setAttribute('gltf-model', `https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonL.glb?v=1689782699922`);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
