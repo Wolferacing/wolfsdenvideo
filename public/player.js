@@ -13,7 +13,9 @@ class Player {
      await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+     console.log("start wait");
      await this.waitFor(10);
+     console.log("stop wait");
      this.startPlayerOrNot();
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
@@ -28,6 +30,7 @@ class Player {
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
   }
   onYouTubeIframeAPIReady() {
+    console.log(this.getId(decodeURIComponent(this.core.params.youtube)), this.core.params.youtube);
     new YT.Player('player', {
       height: window.innerHeight,
       width: window.innerWidth,
@@ -49,20 +52,9 @@ class Player {
           if(event.data == 1) {
             this.readyToPlay = true;
           }
-          // console.log(event.data, Date.now());
-          // if(event.data == 2 && this.player) {
-          //   console.log("state paused")
-          //   // this.player.playVideo();
-          // }
         },
         'onReady': (event) => {
           this.player = event.target;
-          if(this.core.params.youtube == this.core.defaultVideo) {
-            this.player.playVideo();
-          }else{
-            
-          }
-          // this.player.pauseVideo();
           this.startPlayerOrNot();
         }
       }
@@ -74,6 +66,7 @@ class Player {
       this.setMute();
       this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
       this.player.pauseVideo();
+      console.log("click browser");
       this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
       this.isPlayerStarted = true;
     }
@@ -157,8 +150,6 @@ class Player {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
         this.player.playVideo();
-        // this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
-        // console.log({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
     }else{

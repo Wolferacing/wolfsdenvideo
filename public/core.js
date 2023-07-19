@@ -3,10 +3,10 @@ class Core{
     this.urlParams = new URLSearchParams(window.location.search);
   }
   async init(hostUrl) {
-    this.defaultVideo = "https://www.youtube.com/watch?v=L_LUpnjgPso";
     this.currentLatency = 0;
     this.imIn = false;
     this.hostUrl = hostUrl;
+    this.defaultVideo = "https://www.youtube.com/watch?v=L_LUpnjgPso";
     await this.setupCommandsScript();
     if(window.isBanter) {
       window.userJoinedCallback = async user => {
@@ -201,7 +201,6 @@ class Core{
     buttonContainer.appendChild(playlistButton);
     playlistContainer.appendChild(buttonContainer);
     playlistButton.addEventListener('click', ()=>{
-      console.log("click");
       callback();
     });
     return playlistButtonText;
@@ -226,7 +225,7 @@ class Core{
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
     this.setOrDefault("spatial", 'true');
-    this.setOrDefault("youtube", this.defaultVideo);
+    this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
     
     this.params.volume = Number(this.params.volume);
     this.params.mute = this.params.mute === 'true' ? 'true' : 'false';
