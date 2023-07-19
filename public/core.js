@@ -3,6 +3,7 @@ class Core{
     this.urlParams = new URLSearchParams(window.location.search);
   }
   async init(hostUrl) {
+    this.defaultVideo = "https://www.youtube.com/watch?v=L_LUpnjgPso";
     this.currentLatency = 0;
     this.imIn = false;
     this.hostUrl = hostUrl;
@@ -77,6 +78,7 @@ class Core{
     this.setupBrowserUi();
   }
   clickBrowser(x,y) {
+    console.warn(x,y);
     this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
   }
   setupBrowserUi() {
@@ -224,7 +226,7 @@ class Core{
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
     this.setOrDefault("spatial", 'true');
-    this.setOrDefault("youtube", 'https://www.youtube.com/watch?v=L_LUpnjgPso');
+    this.setOrDefault("youtube", this.defaultVideo);
     
     this.params.volume = Number(this.params.volume);
     this.params.mute = this.params.mute === 'true' ? 'true' : 'false';
