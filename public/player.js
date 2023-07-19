@@ -15,7 +15,6 @@ class Player {
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      await this.waitFor(1);
      this.startPlayerOrNot();
-     // await this.waitFor(1);
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
