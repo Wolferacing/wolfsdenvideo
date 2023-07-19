@@ -13,10 +13,10 @@ class Player {
      await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-     console.log("start wait");
-     await this.waitFor(10);
-     console.log("stop wait");
-     this.startPlayerOrNot();
+     // console.log("start wait");
+     // await this.waitFor(10);
+     // console.log("stop wait");
+     // this.startPlayerOrNot();
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
@@ -53,8 +53,9 @@ class Player {
             this.readyToPlay = true;
           }
         },
-        'onReady': (event) => {
-          this.player = event.target;
+        'onReady': async (event) => {
+          this.player = event.target; 
+           await this.waitFor(1);
           this.startPlayerOrNot();
         }
       }
