@@ -72,9 +72,8 @@ class Core{
     this.browser = browser;
     this.setupBrowserUi();
   }
-  
-  clickBrowser() {
-    this.browser.components['sq-browser'].runActions([{actionType: this.data.action, numParam1: this.data.numParam1, numParam2: this.data.numParam2,numParam3: this.data.numParam3,strParam1: this.data.strParam1, strParam2: this.data.strParam2, strParam3: this.data.strParam3}])
+  clickBrowser(x,y) {
+    this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
   }
   setupBrowserUi() {
      const scene = document.querySelector("a-scene");
@@ -268,6 +267,11 @@ class Core{
         if(this.measureLatencyResolve){
           this.measureLatencyResolve();
           this.measureLatencyResolve = null;
+        }
+        break;
+      case Commands.CLICK_BROWSER:
+        if(window.isBanter) {
+          this.clickBrowser(json.data.x,json.data.y);
         }
         break;
     }

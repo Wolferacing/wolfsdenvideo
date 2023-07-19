@@ -27,7 +27,8 @@ const Commands = {
   SEARCH_RESULTS: 'search-results',
   ERROR:'error',
   LINK_ME: 'link-me',
-  PLAYERS: 'players'
+  PLAYERS: 'players',
+  CLICK_BROWSER: 'click-browser'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

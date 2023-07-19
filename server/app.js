@@ -167,6 +167,15 @@ class App{
       this.updateClients(ws.i, "add-to-players");
     }, this.videoPlayers[ws.i].locked);
   }
+  sendBrowserClick(video_ws) {
+    if(this.videoPlayers[video_ws.i]) {
+      this.videoPlayers[video_ws.i].sockets.forEach(ws => {
+        if(video_ws.u.id === ws.u.id && !ws === video_ws){
+          this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
+        }
+      });
+    }
+  }
   getUserVideoPlayer(new_ws) {
     if(this.videoPlayers[new_ws.i]) {
       this.videoPlayers[new_ws.i].sockets.forEach(ws => {
@@ -181,7 +190,6 @@ class App{
       this.videoPlayers[user_video.i].sockets.forEach(ws => {
         if(ws.u && ws.u.id === data.id) {
           ws.user_video = user_video;
-          user_video.linked = true;
         }
       });
     }
