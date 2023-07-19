@@ -86,10 +86,9 @@ class Player {
       style: {
         background: "url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813) center center no-repeat",
         backgroundSize: "cover",
-        opacity: 0.6,
-        fontSize: "1.8em",
-        fontWeight: "bold",
-        fontFamily: "ariel"
+        opacity: 0.7,
+        fontSize: "2em",
+        fontFamily: "'Roboto', sans-serif"
       },
       // onClick: function(){} // Callback after click
     }).showToast();
@@ -142,6 +141,7 @@ class Player {
           const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
           document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
           if(timediff > 0.5 && this.autoSync) {
+             this.showToast("AutoSync: " + Math.round(timediff*100)/100 + "s");
              this.player.seekTo(json.data.currentTime + this.core.currentLatency);
           }
           this.playVidya(json.data.currentTrack, json.data.currentTime);

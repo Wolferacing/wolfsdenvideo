@@ -117,12 +117,35 @@ class Core{
       this.imIn = !this.imIn;
       window.setText(button.object3D.id, this.imIn ? 'Skip It' : 'Join In');
       this.sendMessage({ path: this.imIn ? Commands.ADD_TO_PLAYERS : Commands.REMOVE_FROM_PLAYERS });
-    }, 0.4)
+    }, 0.4);
+    
+     const playlistButton = document.createElement('a-plane');
+    playlistButton.setAttribute('sq-collider', '');
+    playlistButton.setAttribute('sq-interactable', '');
+    playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813');
+    playlistButton.setAttribute('position', `0 -1.5 2`);
+    playlistButton.setAttribute('position', `0 180 0`);
+    playlistButton.setAttribute('depth', '0.05');
+    playlistButton.setAttribute('opacity', '0.3');
+    playlistButton.setAttribute('transparent', 'true');
+    playlistButton.setAttribute('width', '1');
+    playlistButton.setAttribute('height', '0.3');
+    const playlistButtonText = document.createElement('a-text');
+    playlistButtonText.setAttribute('value', );
+    playlistButtonText.setAttribute('position', '0 0.01 0.03');
+    playlistButtonText.setAttribute('align', 'center');
+    playlistButtonText.setAttribute('scale', '0.8 0.8 0.8');
+    playlistButton.appendChild(playlistButtonText);
+    this.playlistContainer.appendChild(playlistButton);
+    playlistButton.addEventListener('click', () => this.openPlaylist());
   }
   setupPlaylistButton(scene, playlistContainer) {
     this.setupButton(scene, playlistContainer, '-1.5', this.isKaraoke ? 'singers' : 'playlist', '1',  ()=>{
-      window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
+      this.openPlaylist();
     })
+  }
+  openPlaylist() {
+    window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
   }
   setupVolButton(scene, isUp, playlistContainer) {
     this.setupButton(scene, playlistContainer, isUp ? 1.2 : 1.75, isUp ? '+ vol' : '- vol', '0.5',  ()=>{
