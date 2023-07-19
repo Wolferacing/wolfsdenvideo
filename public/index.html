@@ -10,16 +10,25 @@
         padding: 7 7;
         display: none;
       }
-      #player{
+/*       #player{
         margin-top: 1px;
+      } */
+      #getLoadClick{
+        position: absolute;
+        background: white;
+        z-inex: 2;
+        height: 2px;
+        width: 2px;
       }
     </style>
   </head>
   <body>
+    <div id="getLoadClick"></div>
     <div id="status"></div>
     <div id="player"></div>
     <script src="./player.js"></script>
     <script>
+      document.getElementById('getLoadClick').addEventListener('click', () => console.log("clicked!"));
       // var tag = document.createElement('script');
       // tag.src = "https://www.youtube.com/iframe_api";
       // var firstScriptTag = document.getElementsByTagName('script')[0];

@@ -50,6 +50,7 @@ class Player {
           this.setVolume();
           this.setMute();
           this.player.seekTo(Number(this.start));
+          this.player.playVideo();
 
         }
       }
