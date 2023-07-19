@@ -277,6 +277,7 @@ class Karaoke{
         player.height = '180';
         this.fullscreenButton.innerText = "Show Fullscreen";
         this.fullscreenButton.className = "button teal fullscreenButton";
+        this.autoSync.className = "button teal fullscreenButton lower";
       }else{
         playerContainer.style.position = "fixed";
         playerContainer.style.top = "0";
@@ -287,6 +288,7 @@ class Karaoke{
         player.height = window.innerHeight;
         this.fullscreenButton.innerText = "Exit Fullscreen";
         this.fullscreenButton.className = "button teal fullscreenButton fullscreenButtonOverlay";
+        this.autoSync.className = "button teal fullscreenButton fullscreenButtonOverlay lower";
       }
     }
   }

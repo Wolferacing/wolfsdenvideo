@@ -73,7 +73,6 @@ class Core{
     this.setupBrowserUi();
   }
   clickBrowser(x,y) {
-    console.log('sq-browser', x,y);
     this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
   }
   setupBrowserUi() {
@@ -119,23 +118,18 @@ class Core{
       this.sendMessage({ path: this.imIn ? Commands.ADD_TO_PLAYERS : Commands.REMOVE_FROM_PLAYERS });
     }, 0.4);
     
+    const yScale = Number(this.params.scale.split(" ")[1]);
      const playlistButton = document.createElement('a-plane');
     playlistButton.setAttribute('sq-collider', '');
     playlistButton.setAttribute('sq-interactable', '');
-    playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813');
-    playlistButton.setAttribute('position', `0 -1.5 2`);
-    playlistButton.setAttribute('position', `0 180 0`);
+    playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/image.png?v=1689772204522');
+    playlistButton.setAttribute('position', `0 ${-yScale*0.335-0.7} 2`);
+    playlistButton.setAttribute('rotation', `-60 180 0`);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
     playlistButton.setAttribute('width', '1');
     playlistButton.setAttribute('height', '0.3');
-    const playlistButtonText = document.createElement('a-text');
-    playlistButtonText.setAttribute('value', );
-    playlistButtonText.setAttribute('position', '0 0.01 0.03');
-    playlistButtonText.setAttribute('align', 'center');
-    playlistButtonText.setAttribute('scale', '0.8 0.8 0.8');
-    playlistButton.appendChild(playlistButtonText);
     this.playlistContainer.appendChild(playlistButton);
     playlistButton.addEventListener('click', () => this.openPlaylist());
   }

@@ -31,6 +31,9 @@ body{
   top: 80px;
   right: 20px;
 }
+.lower{
+  margin-top: 45px!important;
+}
 .searchContainer{
   float: right;
 }
