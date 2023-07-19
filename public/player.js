@@ -107,7 +107,7 @@ class Player {
         break;
       case Commands.SYNC_TIME:
         this.currentTime = json.data.currentTime;
-        if(this.player && this.player.playlist.length) {
+        if(this.player) {
           const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
           document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
           if(timediff > 0.5 && this.autoSync) {
@@ -120,7 +120,7 @@ class Player {
   }
   playVidya(currentTrack, currentTime, force) {
     if(this.playerData) {
-      console.log(this.playerData.playlist[0]);
+      // console.log(this.playerData.playlist[]);
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
