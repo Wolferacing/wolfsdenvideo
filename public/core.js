@@ -67,7 +67,7 @@ class Core{
     if(this.params.is3d === 'true') {
       browser.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
     }
-    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 5}, {"actionType": "click2d", "numParam1": 1, "numParam2": 1}]});
+    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url});// , "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 5}, {"actionType": "click2d", "numParam1": 1, "numParam2": 1}]
     scene.appendChild(browser);
     this.browser = browser;
     this.setupBrowserUi();

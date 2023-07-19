@@ -130,6 +130,9 @@ class App{
       case Commands.AUTO_SYNC:
         this.setAutoSync(msg.data, ws);
         break;
+      case Commands.CLICK_BROWSER:
+        this.sendBrowserClick(msg.data, ws)
+        break;
       case Commands.SET_VOLUME:
         this.setVolume(msg.data, ws)
         break;
@@ -167,11 +170,11 @@ class App{
       this.updateClients(ws.i, "add-to-players");
     }, this.videoPlayers[ws.i].locked);
   }
-  sendBrowserClick(video_ws) {
+  sendBrowserClick(click, video_ws) {
     if(this.videoPlayers[video_ws.i]) {
       this.videoPlayers[video_ws.i].sockets.forEach(ws => {
         if(video_ws.u.id === ws.u.id && !ws === video_ws){
-          this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
+          this.send(ws, Commands.CLICK_BROWSER, click);
         }
       });
     }

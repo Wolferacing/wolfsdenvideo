@@ -2,7 +2,7 @@ class Player {
   constructor(){
     this.hostUrl = 'sq-video-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
-    // this.init();
+    this.init();
   }
   async init() {
      await this.setupCoreScript();
@@ -50,9 +50,9 @@ class Player {
           this.setVolume();
           this.setMute();
           this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
-          this.player.playVideo();
+          this.player.pauseVideo();
+          this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
           console.log("playing");
-
         }
       }
     });
@@ -112,7 +112,8 @@ class Player {
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
-        this.player.playVideo();
+        this.player.pauseVideo();
+        this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
           console.log("playing playVidya");
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
