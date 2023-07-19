@@ -13,7 +13,7 @@ class Core{
           this.saySomething({name: user.id.substr(0, 6)});
         }
       };
-      let lastSendTime = Date.now() + 10000;
+      let lastSendTime = Date.now();
       const positionOfBrowser = this.params.position.split(" ");
       window.userPoseCallback = async pose => {
         if(this.params.spatial === 'true') {
@@ -21,7 +21,7 @@ class Core{
           const b = userinputs.head.position.y - positionOfBrowser[1];
           const c = userinputs.head.position.z - positionOfBrowser[2];
           const distance = Math.sqrt(a * a + b * b + c * c);
-          let volume = ((20 - distance + 5) / 25);
+          let volume = ((20 - distance) / 20);
           if(volume > 1) {
             volume = 1;
           }else if(volume < 0) {
@@ -29,9 +29,9 @@ class Core{
           }
           const now = Date.now();
           if(now - lastSendTime > 2000) {
+            // console.log({path: Commands.SET_VOLUME, data: this.params.volume}, this.params.spatial)
             lastSendTime = now;
-            // wtf mate???
-            // this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
+            this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume * volume});
           }
         }
       }

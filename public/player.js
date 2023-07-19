@@ -100,7 +100,6 @@ class Player {
           this.core.params.volume = Number(json.data);
           this.setVolume();
           this.setMute();
-          this.showToast("vol: " + (json.data) + "%");
         }
         break;
       case Commands.SKIP_BACK:
@@ -171,8 +170,11 @@ class Player {
       }
   }
   setVolume() {
-      this.core.params.volume = Number(this.core.params.volume);
+    this.core.params.volume = Number(this.core.params.volume);
+    if(this.player.getVolume() != this.core.params.volume) {
       this.player.setVolume(this.core.params.volume);
+      this.showToast("vol: " + (this.core.params.volume) + "%");
+    }
   }
   getId(url){
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
