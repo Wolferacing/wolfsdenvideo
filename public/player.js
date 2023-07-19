@@ -13,9 +13,10 @@ class Player {
      await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-     await this.waitFor(0.15);
+     await this.waitFor(0.5);
      this.startPlayerOrNot();
-     await this.waitFor(0.35);
+     await this.waitFor(1);
+     this.readyToPlay = true;
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
@@ -68,6 +69,8 @@ class Player {
       this.player.pauseVideo();
       this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
       this.isPlayerStarted = true;
+    }else{
+      console.log(this.player, this.isPlayerStarted, this.core.connected());
     }
   }
   parseMessage(msg) {
@@ -92,7 +95,7 @@ class Player {
       case Commands.PLAYBACK_UPDATE:
         console.log(json.data.type, json.data.video);
         this.playerData = json.data.video;
-        if(json.data.type === "set-track") {
+        if(json.data.type === "set-track" && this.readyToPlay) {
           this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
         }
         break;
@@ -108,7 +111,7 @@ class Player {
         break;
       case Commands.SYNC_TIME:
         this.currentTime = json.data.currentTime;
-        if(this.player) {
+        if(this.player && this.readyToPlay) {
           const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
           document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
           if(timediff > 0.5 && this.autoSync) {
