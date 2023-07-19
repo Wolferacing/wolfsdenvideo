@@ -52,7 +52,7 @@ class Player {
         },
         'onReady': async (event) => {
           this.player = event.target; 
-           await this.waitFor(1);
+           await this.waitFor(2);
           this.startPlayerOrNot();
         }
       }
