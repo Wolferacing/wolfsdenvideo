@@ -12,8 +12,9 @@ class Player {
      await this.core.init(this.hostUrl);
      await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
-     await this.waitFor(2);
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+     await this.waitFor(0.1);
+     this.startPlayerOrNot();
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
@@ -28,7 +29,7 @@ class Player {
   }
   onYouTubeIframeAPIReady() {
     new YT.Player('player', {
-      height: window.innerHeight - 1,
+      height: window.innerHeight,
       width: window.innerWidth,
       videoId: this.getId(decodeURIComponent(this.core.params.youtube)),
       playerVars: {
@@ -53,14 +54,20 @@ class Player {
         },
         'onReady': (event) => {
           this.player = event.target;
-          this.setVolume();
-          this.setMute();
-          this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
-          this.player.pauseVideo();
-          this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
+          this.startPlayerOrNot();
         }
       }
     });
+  }
+  startPlayerOrNot() {
+    if(this.player && !this.isPlayerStarted && this.core.connected()) {
+      this.setVolume();
+      this.setMute();
+      this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
+      this.player.pauseVideo();
+      this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
+      this.isPlayerStarted = true;
+    }
   }
   parseMessage(msg) {
     const json = JSON.parse(msg);

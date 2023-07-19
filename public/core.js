@@ -242,9 +242,12 @@ class Core{
       this.measureLatencyResolve = resolve;
     })
   }
+  connected() {
+    return this.ws && this.ws.readyState === WebSocket.OPEN;
+  }
   sendMessage(msg){
     msg.u = window.user;
-    if(this.ws && this.ws.readyState === WebSocket.OPEN) {
+    if(this.connected()) {
       this.ws.send(JSON.stringify(msg));
     }
   }
