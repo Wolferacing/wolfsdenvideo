@@ -180,6 +180,8 @@ class App{
         if(video_ws.u.id === ws.u.id && !ws.is_video_player){
           console.log(Commands.CLICK_BROWSER, "here", ws.type, ws.u.id);
           this.send(ws, Commands.CLICK_BROWSER, click);
+        }else{
+          console.log(Commands.CLICK_BROWSER, "not here", ws.type, ws.u.id);
         }
       });
     }

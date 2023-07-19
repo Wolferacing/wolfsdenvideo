@@ -5,17 +5,23 @@ class Player {
     this.init();
   }
   async init() {
+    this.currentTime = 0;
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
-    
      await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
+     await this.waitFor(2);
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
+  }
+  waitFor(seconds) {
+    return new Promise(resolve => {
+      setTimeout(() => resolve(), seconds * 1000);
+    })
   }
   playPlaylist(shouldClear) {
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
@@ -52,7 +58,6 @@ class Player {
           this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
           this.player.pauseVideo();
           this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
-        console.log({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
         }
       }
     });
@@ -65,7 +70,6 @@ class Player {
           this.volume = Number(json.data);
           this.setVolume();
           this.setMute();
-          console.log(this.volume);
         }
         break;
       case Commands.SKIP_BACK:
@@ -79,10 +83,10 @@ class Player {
         break;
       case Commands.PLAYBACK_UPDATE:
         console.log(json.data.type, json.data.video);
-          this.playerData = json.data.video;
-          if(json.data.type === "set-track") {
-            this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
-          }
+        this.playerData = json.data.video;
+        if(json.data.type === "set-track") {
+          this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
+        }
         break;
       case Commands.MUTE:
         this.mute = json.data;
@@ -96,7 +100,7 @@ class Player {
         break;
       case Commands.SYNC_TIME:
         this.currentTime = json.data.currentTime;
-        if(this.player) {
+        if(this.player && this.player.playlist.length) {
           const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
           document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
           if(timediff > 0.5 && this.autoSync) {
@@ -113,7 +117,7 @@ class Player {
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
-        this.player.pauseVideo();
+        this.player.playVideo();
         this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
         console.log({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
       }
@@ -123,15 +127,15 @@ class Player {
     }
   }
   setMute() {
-      if(this.mute == 'true' || this.volume == 0) {
+      if(this.core.params.mute == 'true' || this.core.params.volume == 0) {
         this.player.mute();
       }else{
         this.player.unMute();
       }
   }
   setVolume() {
-      this.volume = Number(this.volume);
-      this.player.setVolume(this.volume);
+      this.core.params.volume = Number(this.core.params.volume);
+      this.player.setVolume(this.core.params.volume);
   }
   getId(url){
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
