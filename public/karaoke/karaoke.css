@@ -27,6 +27,7 @@ body{
   position: absolute;
   top: 420px;
   left: 20px;
+  margin-left: 0!important;
 }
 .fullscreenButtonOverlay{
   position: fixed;
