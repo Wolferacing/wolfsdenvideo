@@ -116,7 +116,7 @@ class Core{
       return;
     }
     let button;
-    button = this.setupButton(scene, this.playlistContainer, '0', 'Join In', '1',  false,  () => {
+    button = this.setupButton(scene, this.playlistContainer, '0', 'Join In', '1',  'large',  () => {
       this.imIn = !this.imIn;
       window.setText(button.object3D.id, this.imIn ? 'Skip It' : 'Join In');
       this.sendMessage({ path: this.imIn ? Commands.ADD_TO_PLAYERS : Commands.REMOVE_FROM_PLAYERS });
@@ -124,7 +124,7 @@ class Core{
     
     const yScale = Number(this.params.scale.split(" ")[1]);
      const playlistButton = document.createElement('a-plane');
-    playlistButton.setAttribute('sq-collider', '');
+    playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/image.png?v=1689772204522');
     playlistButton.setAttribute('position', `0 ${-yScale*0.335-0.7} 2`);
@@ -138,7 +138,7 @@ class Core{
     playlistButton.addEventListener('click', () => this.openPlaylist());
   }
   setupPlaylistButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '-1.5', this.isKaraoke ? 'singers' : 'playlist', '1',  false,  ()=>{
+    this.setupButton(scene, playlistContainer, '-1.5', this.isKaraoke ? 'singers' : 'playlist', '1',  'large',  ()=>{
       this.openPlaylist();
     })
   }
@@ -146,19 +146,19 @@ class Core{
     window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
   }
   setupVolButton(scene, isUp, playlistContainer) {
-    this.setupButton(scene, playlistContainer, isUp ? 1.2 : 1.75, isUp ? '+ vol' : '- vol', '0.5', true, ()=>{
+    this.setupButton(scene, playlistContainer, isUp ? 1.2 : 1.75, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>{
         this.setVolume(isUp);
       console.warn({path: Commands.SET_VOLUME, data: this.params.volume});
         this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
   setupSkipButton(scene, isBack, playlistContainer) {
-    this.setupButton(scene, playlistContainer, isBack ? -0.575 : -0.025, isBack ? '<<' : '>>', '0.5',  true, () => {
+    this.setupButton(scene, playlistContainer, isBack ? -0.5 : -0.1, isBack ? '<<' : '>>', '0.5',  'small', () => {
         this.sendMessage({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
     })
   }
   setupMuteButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '0.65', 'mute', '0.5',  true, () => {
+    this.setupButton(scene, playlistContainer, '0.65', 'mute', '0.5',  'medium', () => {
       this.params.mute = this.params.mute == 'true' ? 'false' : 'true';
       this.sendMessage({path: Commands.MUTE, data: this.params.mute});
     })
@@ -170,17 +170,21 @@ class Core{
       audio.play();
       audio.volume = 0.05;
   }
-  setupButton(scene, playlistContainer, xOffset, title, width, isSmall, callback, yOffset) {
+  setupButton(scene, playlistContainer, xOffset, title, width, size, callback, yOffset) {
     const yScale = Number(this.params.scale.split(" ")[1]);
     const buttonContainer = document.createElement('a-entity');
     
     buttonContainer.setAttribute('position', `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0`);
-    const playlistButton = document.createElement('a-box');
-    playlistButton.setAttribute('sq-collider', '');
+    const playlistButton = document.createElement('a-entity');
+    playlistButton.setAttribute('sq-boxcollider', `size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813');
     
-    playlistButton.setAttribute('gltf-model',isSmall ? 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonS.glb?v=1689782700343' : 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonL.glb?v=1689782699922');
+    const glb = size == 'small' ? 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonS.glb?v=1689782700343' 
+    : size == 'medium' ? 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonM.glb?v=1689785121891'
+    : 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonL.glb?v=1689782699922';
+    
+    playlistButton.setAttribute('gltf-model',glb);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
@@ -194,7 +198,10 @@ class Core{
     buttonContainer.appendChild(playlistButtonText);
     buttonContainer.appendChild(playlistButton);
     playlistContainer.appendChild(buttonContainer);
-    playlistButton.addEventListener('click', callback);
+    playlistButton.addEventListener('click', ()=>{
+      console.log("click");
+      callback();
+    });
     return playlistButtonText;
   }
   generateGuestUser() {
