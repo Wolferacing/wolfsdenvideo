@@ -78,13 +78,18 @@ class Player {
   showToast(text) {
     Toastify({
       text: text,
-      duration: 100,
-      close: true,
+      duration: 1000,
+      // close: true,
       gravity: "bottom", // `top` or `bottom`
       position: "right", // `left`, `center` or `right`
-      stopOnFocus: true, // Prevents dismissing of toast on hover
+      // stopOnFocus: true, // Prevents dismissing of toast on hover
       style: {
-        background: "linear-gradient(to right, #00b09b, #96c93d)",
+        background: "url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813) center center no-repeat",
+        backgroundSize: "cover",
+        opacity: 0.6,
+        fontSize: "1.8em",
+        fontWeight: "bold",
+        fontFamily: "ariel"
       },
       // onClick: function(){} // Callback after click
     }).showToast();
@@ -97,18 +102,18 @@ class Player {
           this.core.params.volume = Number(json.data);
           this.setVolume();
           this.setMute();
-          this.showToast("Volume: " + (json.data) + "%");
+          this.showToast("vol: " + (json.data) + "%");
         }
         break;
       case Commands.SKIP_BACK:
         const time = this.player.getCurrentTime() - 0.5;
         this.player.seekTo(time);
-        this.showToast("Time: " + (time) + "s");
+        this.showToast("-0.5s");
         break;
       case Commands.SKIP_FORWARD:
         const timeForward = this.player.getCurrentTime() + 0.5;
         this.player.seekTo(timeForward);
-        this.showToast("Time: " + (timeForward) + "s");
+        this.showToast("+0.5s");
         break;
       case Commands.AUTO_SYNC:
         this.autoSync = json.data;
@@ -122,7 +127,7 @@ class Player {
         break;
       case Commands.MUTE:
         this.core.params.mute = json.data;
-        this.showToast(this.core.params.mute === true || this.core.params.mute === 'true' ? "MUTE" : "Unmuting!");
+        this.showToast(this.core.params.mute === true || this.core.params.mute === 'true' ? "mute" : "unmute");
         this.setMute();
         break;
       case Commands.MEASURE_LATENCY:
@@ -160,7 +165,7 @@ class Player {
     }
   }
   setMute() {
-      if(this.core.params.mute == 'true' || this.core.params.volume == 0) {
+      if(this.core.params.mute === 'true' || this.core.params.volume === 0) {
         this.player.mute();
       }else{
         this.player.unMute();
