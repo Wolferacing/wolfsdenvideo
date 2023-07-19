@@ -80,7 +80,7 @@ class Player {
       case Commands.PLAYBACK_UPDATE:
         console.log(json.data.type, json.data.video);
           this.playerData = json.data.video;
-          if(json.data.type === "set-track") {
+          if(json.data.type === "set-track" || json.data.type === "initial-sync") {
             this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
           }
         break;
@@ -113,6 +113,7 @@ class Player {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
         this.player.playVideo();
+          console.log("playing playVidya");
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
     }else{

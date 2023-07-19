@@ -72,6 +72,10 @@ class Core{
     this.browser = browser;
     this.setupBrowserUi();
   }
+  
+  clickBrowser() {
+    this.browser.components['sq-browser'].runActions([{actionType: this.data.action, numParam1: this.data.numParam1, numParam2: this.data.numParam2,numParam3: this.data.numParam3,strParam1: this.data.strParam1, strParam2: this.data.strParam2, strParam3: this.data.strParam3}])
+  }
   setupBrowserUi() {
      const scene = document.querySelector("a-scene");
     if(!scene) {
