@@ -22,7 +22,7 @@ class Player {
   }
   onYouTubeIframeAPIReady() {
     new YT.Player('player', {
-      height: window.innerHeight,
+      height: window.innerHeight - 1,
       width: window.innerWidth,
       videoId: this.getId(decodeURIComponent(this.core.params.youtube)),
       playerVars: {
@@ -40,15 +40,10 @@ class Player {
       events: {
         'onStateChange': (event) => {
           console.log(event.data);
-          // -1 – unstarted
-          // 0 – ended
-          // 1 – playing
-          // 2 – paused
-          // 3 – buffering
-          // 5 – video cued
-          // if(event.data == 2 && this.player) {
-          //   this.player.playVideo();
-          // }
+          if(event.data == 2 && this.player) {
+            console.log("state paused")
+            // this.player.playVideo();
+          }
         },
         'onReady': (event) => {
           this.player = event.target;
