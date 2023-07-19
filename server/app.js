@@ -152,7 +152,7 @@ class App{
       case Commands.REMOVE_FROM_PLAYERS:
         ws.p = false;
         this.updateClients(ws.i, "remove-from-players");
-        break;
+        break; 
     }
   }
   measureLatency(ws) {

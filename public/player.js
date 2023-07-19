@@ -13,8 +13,9 @@ class Player {
      await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-     await this.waitFor(0.1);
+     await this.waitFor(0.15);
      this.startPlayerOrNot();
+     await this.waitFor(0.35);
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
@@ -125,8 +126,8 @@ class Player {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
         this.player.playVideo();
-        this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
-        console.log({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
+        // this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
+        // console.log({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
     }else{
