@@ -80,6 +80,9 @@ class App{
       case Commands.MEASURE_LATENCY:
         this.measureLatency(ws);
         break;
+      case Commands.SET_WS_TYPE:
+        ws.type = msg.data;
+        break;
       case Commands.SET_TIME:
         this.setVideoTime(msg.data, ws);
         break;
@@ -175,7 +178,7 @@ class App{
     if(this.videoPlayers[video_ws.i]) {
       this.videoPlayers[video_ws.i].sockets.forEach(ws => {
         if(video_ws.u.id === ws.u.id && !ws.is_video_player){
-          console.log(Commands.CLICK_BROWSER);
+          console.log(Commands.CLICK_BROWSER, "here", ws.type, ws.u.id);
           this.send(ws, Commands.CLICK_BROWSER, click);
         }
       });

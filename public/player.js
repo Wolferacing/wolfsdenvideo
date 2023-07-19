@@ -11,7 +11,7 @@ class Player {
      await this.core.init(this.hostUrl);
     
      await this.setupYoutubeScript();
-     await this.core.setupWebsocket(() => this.parseMessage(event.data));
+     await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
@@ -103,12 +103,6 @@ class Player {
              this.player.seekTo(json.data.currentTime + this.core.currentLatency);
           }
           this.playVidya(json.data.currentTrack, json.data.currentTime);
-        }
-        break;
-      case Commands.CLICK_BROWSER:
-        console.log(json);
-        if(window.isBanter) {
-          this.core.clickBrowser(json.data.x,json.data.y);
         }
         break;
     }

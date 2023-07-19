@@ -28,7 +28,8 @@ const Commands = {
   ERROR:'error',
   LINK_ME: 'link-me',
   PLAYERS: 'players',
-  CLICK_BROWSER: 'click-browser'
+  CLICK_BROWSER: 'click-browser',
+  SET_WS_TYPE: 'set-ws-type'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

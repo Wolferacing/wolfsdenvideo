@@ -202,12 +202,13 @@ class Core{
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
-  setupWebsocket(messageCallback){
+  setupWebsocket(type, messageCallback){
     return new Promise(resolve => {
       this.ws = new WebSocket('wss://' + this.hostUrl + '/');
       this.ws.onopen = (event) => {
         console.log("Websocket connected!");
         resolve();
+        this.sendMessage({path: Commands.SET_WS_TYPE, data: type})
       };
       this.ws.onmessage = (event) => {
         if(typeof event.data === 'string'){
@@ -218,7 +219,7 @@ class Core{
         console.log("Websocket closed...");
         setTimeout(() => {
           if(window.isBanter) {
-            this.setupWebsocket();
+            this.setupWebsocket(type, messageCallback);
           }else{
             window.location.reload();
           } 
@@ -260,6 +261,7 @@ class Core{
   }
   parseMessage(msg) {
     const json = JSON.parse(msg);
+    console.log(json)
     switch(json.path) {
       case Commands.ERROR:
         alert("I cant let you do that...");
@@ -268,6 +270,11 @@ class Core{
         if(this.measureLatencyResolve){
           this.measureLatencyResolve();
           this.measureLatencyResolve = null;
+        }
+        break;
+      case Commands.CLICK_BROWSER:
+        if(window.isBanter) {
+          this.clickBrowser(json.data.x,json.data.y);
         }
         break;
     }
