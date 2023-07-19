@@ -78,6 +78,7 @@ class Player {
         this.autoSync = json.data;
         break;
       case Commands.PLAYBACK_UPDATE:
+        console.log(json.data.type, json.data.video);
           this.playerData = json.data.video;
           if(json.data.type === "set-track") {
             this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
