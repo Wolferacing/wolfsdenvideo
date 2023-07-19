@@ -94,9 +94,9 @@ class Player {
     const json = JSON.parse(msg);
     switch(json.path) {
       case Commands.SET_VOLUME:
-        if(json.data >= 0 && json.data <= 100) {
-          this.core.params.volume = Number(json.data);
-          this.setVolume();
+        if(json.data.vol >= 0 && json.data.vol <= 100) {
+          this.core.params.volume = Number(json.data.vol);
+          this.setVolume(json.data.type);
           this.setMute();
         }
         break;
@@ -166,11 +166,11 @@ class Player {
         this.player.unMute();
       }
   }
-  setVolume() {
+  setVolume(type) {
     this.core.params.volume = Number(this.core.params.volume);
     if(this.player.getVolume() != this.core.params.volume) {
       this.player.setVolume(this.core.params.volume);
-      this.showToast("vol: " + (this.core.params.volume) + "%");
+      this.showToast((type === "spatial" ? "(spatial) " : "") + "vol: " + (this.core.params.volume) + "%");
     }
   }
   getId(url){

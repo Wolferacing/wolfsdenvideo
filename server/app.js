@@ -138,7 +138,7 @@ class App{
         this.sendBrowserClick(msg.data, ws)
         break;
       case Commands.SET_VOLUME:
-        this.setVolume(msg.data, ws)
+        this.setVolume(msg.data, msg.type, ws)
         break;
       case Commands.DOWN_VOTE:
         this.setVote(msg.data, true, ws);
@@ -218,10 +218,10 @@ class App{
       this.updateClients(ws.i, "set-vote");
     }
   }
-  setVolume(vol, ws) {
+  setVolume(vol, type, ws) {
     if(ws.user_video) {
       console.log(Commands.SET_VOLUME);
-      this.send(ws.user_video, Commands.SET_VOLUME, vol);
+      this.send(ws.user_video, Commands.SET_VOLUME, {vol, type});
     }
   }
   setMute( muted, ws) {

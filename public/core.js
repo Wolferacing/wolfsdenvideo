@@ -33,7 +33,7 @@ class Core{
             lastSendTime = now;
             const roundedVolume = Math.round((this.params.volume * volume) / 5) * 5;
             if(this.tempVolume != roundedVolume) {
-              this.sendMessage({path: Commands.SET_VOLUME, data: roundedVolume});
+              this.sendMessage({path: Commands.SET_VOLUME, data: roundedVolume, type: 'spatial'});
             }
             this.tempVolume = roundedVolume; 
           }
