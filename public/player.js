@@ -13,7 +13,7 @@ class Player {
      await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-     await this.waitFor(1);
+     await this.waitFor(5);
      this.startPlayerOrNot();
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
