@@ -235,12 +235,13 @@ class Core{
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
-  setupWebsocket(type, messageCallback){
+  setupWebsocket(type, messageCallback, connectedCallback){
     return new Promise(resolve => {
       this.ws = new WebSocket('wss://' + this.hostUrl + '/');
       this.ws.onopen = (event) => {
         console.log("Websocket connected!");
         resolve();
+        connectedCallback();
         this.sendMessage({path: Commands.SET_WS_TYPE, data: type})
       };
       this.ws.onmessage = (event) => {
@@ -252,7 +253,7 @@ class Core{
         console.log("Websocket closed...");
         setTimeout(() => {
           if(window.isBanter) {
-            this.setupWebsocket(type, messageCallback);
+            this.setupWebsocket(type, messageCallback, connectedCallback);
           }else{
             window.location.reload();
           } 

@@ -10,7 +10,9 @@ class KaraokePlayer {
     this.core.isKaraoke = true;
     this.core.parseParams(this.currentScript);
     await this.core.init(this.hostUrl);
-    await this.core.setupWebsocket("space");
+    await this.core.setupWebsocket("space", null, () => {
+      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+    });
     this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
     const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.core.params.youtube)}&start=0&playlist=${this.core.params.playlist}&mute=${this.core.params.mute}&volume=${this.core.params.volume}&instance=${this.core.params.instance}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}`;
     // this.core.browser.setAttribute('sq-browser','url: ' + url);
