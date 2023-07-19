@@ -131,6 +131,7 @@ class App{
         this.setAutoSync(msg.data, ws);
         break;
       case Commands.CLICK_BROWSER:
+        console.log(Commands.CLICK_BROWSER, ws.u, msg.data);
         this.sendBrowserClick(msg.data, ws)
         break;
       case Commands.SET_VOLUME:
@@ -173,7 +174,8 @@ class App{
   sendBrowserClick(click, video_ws) {
     if(this.videoPlayers[video_ws.i]) {
       this.videoPlayers[video_ws.i].sockets.forEach(ws => {
-        if(video_ws.u.id === ws.u.id && !ws === video_ws){
+        if(video_ws.u.id === ws.u.id && !ws.is_video_player){
+          console.log(Commands.CLICK_BROWSER);
           this.send(ws, Commands.CLICK_BROWSER, click);
         }
       });

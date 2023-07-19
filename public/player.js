@@ -52,7 +52,7 @@ class Player {
           this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
           this.player.pauseVideo();
           this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
-          console.log("playing");
+        console.log({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
         }
       }
     });
@@ -80,7 +80,7 @@ class Player {
       case Commands.PLAYBACK_UPDATE:
         console.log(json.data.type, json.data.video);
           this.playerData = json.data.video;
-          if(json.data.type === "set-track" || json.data.type === "initial-sync") {
+          if(json.data.type === "set-track") {
             this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
           }
         break;
@@ -105,16 +105,23 @@ class Player {
           this.playVidya(json.data.currentTrack, json.data.currentTime);
         }
         break;
+      case Commands.CLICK_BROWSER:
+        console.log(json);
+        if(window.isBanter) {
+          this.core.clickBrowser(json.data.x,json.data.y);
+        }
+        break;
     }
   }
   playVidya(currentTrack, currentTime, force) {
     if(this.playerData) {
+      console.log(this.playerData.playlist[0]);
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
         this.player.pauseVideo();
         this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
-          console.log("playing playVidya");
+        console.log({path: Commands.CLICK_BROWSER, data: {x: 150, y:150}});
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
     }else{

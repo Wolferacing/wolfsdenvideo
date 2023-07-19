@@ -73,6 +73,7 @@ class Core{
     this.setupBrowserUi();
   }
   clickBrowser(x,y) {
+    console.log('sq-browser', x,y);
     this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
   }
   setupBrowserUi() {
@@ -267,11 +268,6 @@ class Core{
         if(this.measureLatencyResolve){
           this.measureLatencyResolve();
           this.measureLatencyResolve = null;
-        }
-        break;
-      case Commands.CLICK_BROWSER:
-        if(window.isBanter) {
-          this.clickBrowser(json.data.x,json.data.y);
         }
         break;
     }
