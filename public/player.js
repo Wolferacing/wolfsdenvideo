@@ -70,8 +70,6 @@ class Player {
       this.player.pauseVideo();
       this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
       this.isPlayerStarted = true;
-    }else{
-      console.log(this.player, this.isPlayerStarted, this.core.connected());
     }
   }
   showToast(text) {
@@ -116,7 +114,6 @@ class Player {
         this.autoSync = json.data;
         break;
       case Commands.PLAYBACK_UPDATE:
-        console.log(json.data.type, json.data.video);
         this.playerData = json.data.video;
         if(json.data.type === "set-track" && this.readyToPlay) {
           this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
