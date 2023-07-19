@@ -16,9 +16,11 @@
       #getLoadClick{
         position: absolute;
         background: white;
-        z-inex: 2;
-        height: 2px;
-        width: 2px;
+        z-inex: 20;
+        height: 50px;
+        width: 50px;
+        top: 0;
+        left: 0;
       }
     </style>
   </head>
@@ -31,8 +33,7 @@
       console.log("before clicked!", Date.now());
   document.getElementById('getLoadClick').addEventListener('click', () => {
     console.log("clicked!", Date.now());
-    player.init();
-  
+    // player.init();
   });
       // var tag = document.createElement('script');
       // tag.src = "https://www.youtube.com/iframe_api";

@@ -2,8 +2,7 @@ class Player {
   constructor(){
     this.hostUrl = 'sq-video-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
-    
-    // document.getElementById('getLoadClick').addEventListener('click', () => this.init());
+    this.init();
   }
   async init() {
      // console.log("before clicked!", Date.now());
@@ -14,12 +13,17 @@ class Player {
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
     
-     await this.setupYoutubeScript();
+     // await this.setupYoutubeScript();
      await this.core.setupWebsocket(() => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
+  }
+  getClick() {
+    return new Promise(resolve => {
+      document.getElementById('getLoadClick').addEventListener('click', () => resolve());
+    })
   }
   playPlaylist(shouldClear) {
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
