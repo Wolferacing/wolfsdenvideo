@@ -2,7 +2,7 @@ class Player {
   constructor(){
     this.hostUrl = 'sq-video-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
-    this.init();
+    // this.init();
   }
   async init() {
      await this.setupCoreScript();
@@ -51,6 +51,7 @@ class Player {
           this.setMute();
           this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
           this.player.playVideo();
+          console.log("playing");
 
         }
       }
