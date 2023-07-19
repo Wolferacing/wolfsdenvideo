@@ -5,25 +5,17 @@ class Player {
     this.init();
   }
   async init() {
-     // console.log("before clicked!", Date.now());
-     // await this.getClick();
-     // console.log("clicked!", Date.now());
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
     
-     // await this.setupYoutubeScript();
+     await this.setupYoutubeScript();
      await this.core.setupWebsocket(() => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
-  }
-  getClick() {
-    return new Promise(resolve => {
-      document.getElementById('getLoadClick').addEventListener('click', () => resolve());
-    })
   }
   playPlaylist(shouldClear) {
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
@@ -57,7 +49,7 @@ class Player {
           this.player = event.target;
           this.setVolume();
           this.setMute();
-          this.player.seekTo(Number(this.start));
+          this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
           this.player.playVideo();
 
         }
@@ -101,6 +93,7 @@ class Player {
         }
         break;
       case Commands.SYNC_TIME:
+        this.currentTime = json.data.currentTime;
         if(this.player) {
           const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
           document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
