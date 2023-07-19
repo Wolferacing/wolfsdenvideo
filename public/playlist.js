@@ -11,7 +11,7 @@ class PlaylistPlayer {
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket("space");
     this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-    const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent('https://www.youtube.com/watch?v=L_LUpnjgPso')}&start=0&playlist=${this.core.params.playlist}&mute=${this.core.params.mute}&volume=${this.core.params.volume}&instance=${this.core.params.instance}&user=${window.user.id}-_-${window.user.name}`;
+    const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.core.params.youtube)}&start=0&playlist=${this.core.params.playlist}&mute=${this.core.params.mute}&volume=${this.core.params.volume}&instance=${this.core.params.instance}&user=${window.user.id}-_-${window.user.name}`;
     this.core.setupBrowserElement(url);
   }
   setupCoreScript() {

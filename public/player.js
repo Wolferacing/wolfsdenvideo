@@ -13,10 +13,9 @@ class Player {
      await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data));
      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-     await this.waitFor(0.5);
-     this.startPlayerOrNot();
      await this.waitFor(1);
-     this.readyToPlay = true;
+     this.startPlayerOrNot();
+     // await this.waitFor(1);
      this.core.sendMessage({path: "user-video-player", data: window.user});
      this.core.setupLatencyMeasure();
      this.playPlaylist();
@@ -48,6 +47,9 @@ class Player {
       },
       events: {
         'onStateChange': (event) => {
+          if(event.data == 1) {
+            this.readyToPlay = true;
+          }
           // console.log(event.data, Date.now());
           // if(event.data == 2 && this.player) {
           //   console.log("state paused")
