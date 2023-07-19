@@ -23,12 +23,17 @@
     </style>
   </head>
   <body>
-    <div id="getLoadClick"></div>
     <div id="status"></div>
     <div id="player"></div>
+    <div id="getLoadClick"></div>
     <script src="./player.js"></script>
     <script>
-      document.getElementById('getLoadClick').addEventListener('click', () => console.log("clicked!"));
+      console.log("before clicked!", Date.now());
+  document.getElementById('getLoadClick').addEventListener('click', () => {
+    console.log("clicked!", Date.now());
+    player.init();
+  
+  });
       // var tag = document.createElement('script');
       // tag.src = "https://www.youtube.com/iframe_api";
       // var firstScriptTag = document.getElementsByTagName('script')[0];

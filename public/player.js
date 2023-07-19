@@ -2,9 +2,13 @@ class Player {
   constructor(){
     this.hostUrl = 'sq-video-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
-    this.init();
+    
+    // document.getElementById('getLoadClick').addEventListener('click', () => this.init());
   }
   async init() {
+     // console.log("before clicked!", Date.now());
+     // await this.getClick();
+     // console.log("clicked!", Date.now());
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
@@ -39,11 +43,11 @@ class Player {
       },
       events: {
         'onStateChange': (event) => {
-          console.log(event.data);
-          if(event.data == 2 && this.player) {
-            console.log("state paused")
-            // this.player.playVideo();
-          }
+          // console.log(event.data, Date.now());
+          // if(event.data == 2 && this.player) {
+          //   console.log("state paused")
+          //   // this.player.playVideo();
+          // }
         },
         'onReady': (event) => {
           this.player = event.target;
