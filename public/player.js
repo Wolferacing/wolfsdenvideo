@@ -14,6 +14,8 @@ class Player {
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
        this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
        this.core.sendMessage({path: "user-video-player", data: window.user});
+     }, ()=>{
+        this.showToast("Reconnecting...");
      });
      this.core.setupLatencyMeasure();
      this.playPlaylist();
@@ -41,7 +43,7 @@ class Player {
         'cc_load_policy': 1,
         'cc_lang_pref': 'en',
         'iv_load_policy': 3,
-        'origin': 'https://sq-video-player.glitch.me',
+        'origin': 'https://www.youtube.com',
         'start': this.start ? Number(this.start) : 0
       },
       events: {
