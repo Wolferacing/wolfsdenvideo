@@ -153,9 +153,6 @@ class App{
         ws.p = false;
         this.updateClients(ws.i, "remove-from-players");
         break; 
-      // case Commands.SET_PLAYER_URL:
-      //   this.setPlayerUrl(msg.data, ws);
-      //   break;
     }
   }
   measureLatency(ws) {
@@ -171,15 +168,6 @@ class App{
       this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
     }
   }
-  // setPlayerUrl(url, ws) {
-  //   if(this.videoPlayers[ws.i]) {
-  //     this.videoPlayers[ws.i].sockets.forEach(ws => {
-  //       if(ws.u && ws.u.id === ws.u.id && ws.is_video_player) {
-  //         ws.current_url = url;
-  //       }
-  //     });
-  //   }
-  // }
   addToPlayers(ws){
     this.onlyIfHost(ws, () => {
       ws.p = new Date().getTime();
