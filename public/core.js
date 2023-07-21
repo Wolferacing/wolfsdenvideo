@@ -69,7 +69,7 @@ class Core{
     browser.setAttribute("position", this.params.position);
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
-    if(this.params.is3d === 'true') {
+    if(this.params.is3d === true || this.params.is3d === 'true') {
       browser.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
     }
     browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url});// , "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 5}, {"actionType": "click2d", "numParam1": 1, "numParam2": 1}]
