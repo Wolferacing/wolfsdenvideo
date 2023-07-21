@@ -259,7 +259,7 @@ class Karaoke{
         if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id)) {
           this.hideSearch();
           this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true });
+          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true, skipUpdate: true });
         }
       }); 
       

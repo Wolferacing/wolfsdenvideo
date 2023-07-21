@@ -314,6 +314,11 @@ class Core{
           this.browser.setAttribute("sq-browser", {"url": this.initialUrl});
         }
         break;
+      case Commands.SET_BROWSER_URL:
+        if(window.isBanter && this.browser) {
+          this.browser.setAttribute("sq-browser", {"url": json.data.link});
+        }
+        break;
       case Commands.CLICK_BROWSER:
         if(window.isBanter) {
           this.clickBrowser(json.data.x,json.data.y);

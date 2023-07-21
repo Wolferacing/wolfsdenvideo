@@ -406,8 +406,8 @@ class App{
               }
               this.videoPlayers[instanceId].currentTime = 0;
               this.videoPlayers[instanceId].lastStartTime = now;
-              this.updateClients(instanceId, Commands.SET_TRACK);
               this.resetBrowserIfNeedBe(this.videoPlayers[instanceId], this.videoPlayers[instanceId].currentTrack);
+              this.updateClients(instanceId, Commands.SET_TRACK);
             }
           }else{
              this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;
