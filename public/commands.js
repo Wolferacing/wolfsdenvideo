@@ -29,7 +29,8 @@ const Commands = {
   LINK_ME: 'link-me',
   PLAYERS: 'players',
   CLICK_BROWSER: 'click-browser',
-  SET_WS_TYPE: 'set-ws-type'
+  SET_WS_TYPE: 'set-ws-type',
+  SET_PLAYER_URL: 'set-player-url'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

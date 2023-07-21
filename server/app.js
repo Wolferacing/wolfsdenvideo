@@ -154,7 +154,7 @@ class App{
         this.updateClients(ws.i, "remove-from-players");
         break; 
       case Commands.SET_PLAYER_URL:
-        this.setPlayerUrl(ws);
+        this.setPlayerUrl(msg.data, ws);
         break;
     }
   }
@@ -171,11 +171,11 @@ class App{
       this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
     }
   }
-  setPlayerUrl(ws) {
+  setPlayerUrl(url, ws) {
     if(this.videoPlayers[ws.i]) {
       this.videoPlayers[ws.i].sockets.forEach(ws => {
         if(ws.u && ws.u.id === ws.u.id && ws.is_video_player) {
-          // ws.user_video = ws;
+          ws.current_url = url;
         }
       });
     }
