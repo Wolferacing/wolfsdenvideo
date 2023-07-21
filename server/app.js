@@ -215,7 +215,6 @@ class App{
   }
   setVolume(vol, type, ws) {
     if(ws.user_video) {
-      console.log(Commands.SET_VOLUME);
       this.send(ws.user_video, Commands.SET_VOLUME, {vol, type});
     }
   }
@@ -343,7 +342,6 @@ class App{
     });
   }
   setVideoTrack(index, ws) {
-    console.log("SET_TRACK");
     this.onlyIfHost(ws, () => {
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         this.videoPlayers[ws.i].currentTrack = index;
@@ -362,17 +360,12 @@ class App{
       const userSockets = player.sockets.filter(ws => ws.u.id === uid);
         userSockets.forEach(socket => {
           if(socket.type === "space") {
-            console.log("BROWSER_URL", player.playlist[index].is_youtube_website);
             if(player.playlist[index].is_youtube_website) {
               this.send(socket, Commands.SET_BROWSER_URL, player.playlist[index]);
-              console.log("SET_BROWSER_URL");
             }else{
               const videoPlayer = userSockets.filter(ws => ws.type === "player");
               if(!videoPlayer.length) {
                   this.send(socket, Commands.RESET_BROWSER, {});
-                  console.log("RESET_BROWSER");
-              }else{
-                console.log("VIDEO_PLAYER HERE???");
               }
             }
           }
