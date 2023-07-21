@@ -47,12 +47,16 @@ class Player {
         'start': this.start ? Number(this.start) : 0
       },
       events: {
-        'onStateChange': (event) => {
+        onStateChange: event => {
           if(event.data == 1) {
             this.readyToPlay = true;
           }
+          console.log(event.data);
         },
-        'onReady': async (event) => {
+        onError: event => {
+          console.log(event.data);
+        },
+        onReady: async event => {
           this.player = event.target; 
            await this.waitFor(2);
           this.startPlayerOrNot();
