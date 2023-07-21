@@ -349,28 +349,30 @@ class App{
         this.videoPlayers[ws.i].currentTrack = index;
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
-        this.resetBrowserIfNeedBe(ws, index);
+        this.resetBrowserIfNeedBe(this.videoPlayers[ws.i], index);
         this.updateClients(ws.i, Commands.SET_TRACK);
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
       }
     }, this.videoPlayers[ws.i].locked);
   }
-  resetBrowserIfNeedBe(ws, index) {
-    if(!this.videoPlayers[ws.i].playlist[index].is_youtube_website) {
-      const users = [...new Set(this.videoPlayers[ws.i].sockets.map(ws => ws.u.id))];
+  resetBrowserIfNeedBe(player, index) {
+      const users = [...new Set(player.sockets.map(ws => ws.u.id))];
       users.forEach(uid => {
-        const userSockets = this.videoPlayers[ws.i].sockets.filter(ws => ws.u.id === uid);
+        const userSockets = player.sockets.filter(ws => ws.u.id === uid);
         const videoPlayer = userSockets.filter(ws => ws.is_video_player);
-        if(!videoPlayer.length) {
           userSockets.forEach(socket => {
             if(socket.type === "space") {
-              this.send(socket, Commands.RESET_BROWSER, {});
+              if(!player.playlist[index].is_youtube_website) {
+                if(!videoPlayer.length) {
+                    this.send(socket, Commands.RESET_BROWSER, {});
+                }
+              }else{
+                this.send(socket, Commands.SET_BROWSER_URL, player.playlist[index]);
+              }
             }
-          });
-        }
+        });
       });
-    }
   }
   setVideoTime(time, ws) {
     this.onlyIfHost(ws, () => {
@@ -405,7 +407,7 @@ class App{
               this.videoPlayers[instanceId].currentTime = 0;
               this.videoPlayers[instanceId].lastStartTime = now;
               this.updateClients(instanceId, Commands.SET_TRACK);
-              this.resetBrowserIfNeedBe(ws, this.videoPlayers[instanceId].currentTrack);
+              this.resetBrowserIfNeedBe(this.videoPlayers[instanceId], this.videoPlayers[instanceId].currentTrack);
             }
           }else{
              this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;
