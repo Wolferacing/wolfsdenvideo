@@ -294,11 +294,8 @@ class Karaoke{
   }
   toggleVideoFullscreen() {
     const playerContainer = document.getElementById("playerContainer");
-    console.log('here');
     if(playerContainer != null) {
-    console.log('here2');
       const player = document.getElementById("player");
-      console.log(player.width);
       const isFullscreen = player.width != '420';
       if(isFullscreen) {
         playerContainer.style.position = "initial";

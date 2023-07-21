@@ -344,6 +344,7 @@ class App{
     });
   }
   setVideoTrack(index, ws) {
+    console.log("SET_TRACK");
     this.onlyIfHost(ws, () => {
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         this.videoPlayers[ws.i].currentTrack = index;
@@ -357,21 +358,22 @@ class App{
     }, this.videoPlayers[ws.i].locked);
   }
   resetBrowserIfNeedBe(player, index) {
-    console.log("resetBrowserIfNeedBe");
     const users = [...new Set(player.sockets.map(ws => ws.u.id))];
     users.forEach(uid => {
       const userSockets = player.sockets.filter(ws => ws.u.id === uid);
-      console.log(uid, userSockets);
         userSockets.forEach(socket => {
+          console.log("BROWSER_URL", socket.type, player.playlist[index].is_youtube_website);
           if(socket.type === "space") {
             if(player.playlist[index].is_youtube_website) {
               this.send(socket, Commands.SET_BROWSER_URL, player.playlist[index]);
               console.log("SET_BROWSER_URL");
             }else{
-              const videoPlayer = userSockets.filter(ws => ws.is_video_player);
+              const videoPlayer = userSockets.filter(ws => ws.type === "player");
               if(!videoPlayer.length) {
                   this.send(socket, Commands.RESET_BROWSER, {});
                   console.log("RESET_BROWSER");
+              }else{
+                console.log("VIDEO_PLAYER HERE???");
               }
             }
           }
