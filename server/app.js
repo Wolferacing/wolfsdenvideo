@@ -348,13 +348,21 @@ class App{
         this.videoPlayers[ws.i].currentTrack = index;
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
-        this.updateClients(ws.i, Commands.SET_TRACK);
         if(!this.videoPlayers[ws.i].playlist[index].is_youtube_website) {
           const users = [...new Set(this.videoPlayers[ws.i].sockets.map(ws => ws.u.id))];
-          users.forEach(socket => {
-            const video player = 
+          users.forEach(uid => {
+            const userSockets = this.videoPlayers[ws.i].sockets.filter(ws => ws.u.id === uid);
+            const videoPlayer = userSockets.filter(ws => ws.is_video_player);
+            if(!videoPlayer.length) {
+              userSockets.forEach(socket => {
+                if(socket.type === "space") {
+                  this.send(socket, Commands.RESET_BROWSER, {});
+                }
+              });
+            }
           });
         }
+        this.updateClients(ws.i, Commands.SET_TRACK);
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
       }

@@ -30,7 +30,7 @@ const Commands = {
   PLAYERS: 'players',
   CLICK_BROWSER: 'click-browser',
   SET_WS_TYPE: 'set-ws-type',
-  // SET_PLAYER_URL: 'set-player-url'
+  RESET_BROWSER: 'reset-browser'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {
