@@ -256,7 +256,6 @@ class App{
     }
   }
   async search(term, ws) {
-    console.log(term, ws.i);
     const results = await youtube.search(term, {
         language: 'en-US',
         searchType: 'video'
@@ -362,8 +361,8 @@ class App{
     users.forEach(uid => {
       const userSockets = player.sockets.filter(ws => ws.u.id === uid);
         userSockets.forEach(socket => {
-          console.log("BROWSER_URL", socket.type, player.playlist[index].is_youtube_website);
           if(socket.type === "space") {
+            console.log("BROWSER_URL", player.playlist[index].is_youtube_website);
             if(player.playlist[index].is_youtube_website) {
               this.send(socket, Commands.SET_BROWSER_URL, player.playlist[index]);
               console.log("SET_BROWSER_URL");
