@@ -256,12 +256,7 @@ class Core{
           if(closeCallback) {
             closeCallback();
           }
-          this.setupWebsocket(type, messageCallback, connectedCallback);
-//           if(window.isBanter) {
-            
-//           }else{
-//             window.location.reload();
-//           } 
+          this.setupWebsocket(type, messageCallback, connectedCallback, closeCallback);
         }, 1000);
       };
     });
@@ -311,6 +306,12 @@ class Core{
         if(this.measureLatencyResolve){
           this.measureLatencyResolve();
           this.measureLatencyResolve = null;
+        }
+        break;
+        
+      case Commands.RESET_BROWSER:
+        if(window.isBanter && this.browser) {
+          this.browser.setAttribute("sq-browser", {"url": this.initialUrl});
         }
         break;
       case Commands.CLICK_BROWSER:

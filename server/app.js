@@ -99,7 +99,7 @@ class App{
         this.takeOver(ws);
         break;
       case Commands.ADD_TO_PLAYLIST:
-        this.addToPlaylist(msg.data, msg.skipUpdate, ws);
+        this.addToPlaylist(msg.data, msg.skipUpdate, msg.isYoutubeWebsite, ws);
         break;
       case Commands.MOVE_PLAYLIST_ITEM:
         this.movePlaylistItem(msg.data, ws);
@@ -273,7 +273,7 @@ class App{
       }
     }
   }
-  addToPlaylist(v, skipUpdate, ws) {
+  addToPlaylist(v, skipUpdate, isYoutubeWebsite, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         if(!this.videoPlayers[ws.i].playlist.length) {
@@ -283,6 +283,7 @@ class App{
         }
         v.user = ws.u.name;
         v.votes = 0;
+        v.is_youtube_website = isYoutubeWebsite;
         this.videoPlayers[ws.i].playlist.push(v);
         if(!skipUpdate) {
           this.updateClients(ws.i);
@@ -348,25 +349,28 @@ class App{
         this.videoPlayers[ws.i].currentTrack = index;
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
-        if(!this.videoPlayers[ws.i].playlist[index].is_youtube_website) {
-          const users = [...new Set(this.videoPlayers[ws.i].sockets.map(ws => ws.u.id))];
-          users.forEach(uid => {
-            const userSockets = this.videoPlayers[ws.i].sockets.filter(ws => ws.u.id === uid);
-            const videoPlayer = userSockets.filter(ws => ws.is_video_player);
-            if(!videoPlayer.length) {
-              userSockets.forEach(socket => {
-                if(socket.type === "space") {
-                  this.send(socket, Commands.RESET_BROWSER, {});
-                }
-              });
-            }
-          });
-        }
+        this.resetBrowserIfNeedBe(ws, index);
         this.updateClients(ws.i, Commands.SET_TRACK);
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
       }
     }, this.videoPlayers[ws.i].locked);
+  }
+  resetBrowserIfNeedBe(ws, index) {
+    if(!this.videoPlayers[ws.i].playlist[index].is_youtube_website) {
+      const users = [...new Set(this.videoPlayers[ws.i].sockets.map(ws => ws.u.id))];
+      users.forEach(uid => {
+        const userSockets = this.videoPlayers[ws.i].sockets.filter(ws => ws.u.id === uid);
+        const videoPlayer = userSockets.filter(ws => ws.is_video_player);
+        if(!videoPlayer.length) {
+          userSockets.forEach(socket => {
+            if(socket.type === "space") {
+              this.send(socket, Commands.RESET_BROWSER, {});
+            }
+          });
+        }
+      });
+    }
   }
   setVideoTime(time, ws) {
     this.onlyIfHost(ws, () => {
@@ -401,6 +405,7 @@ class App{
               this.videoPlayers[instanceId].currentTime = 0;
               this.videoPlayers[instanceId].lastStartTime = now;
               this.updateClients(instanceId, Commands.SET_TRACK);
+              this.resetBrowserIfNeedBe(ws, this.videoPlayers[instanceId].currentTrack);
             }
           }else{
              this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;

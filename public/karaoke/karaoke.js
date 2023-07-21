@@ -250,6 +250,19 @@ class Karaoke{
         }
       }); 
       
+      const playNowYT = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+      
+      playNowYT.className = 'button teal';
+      playNowYT.innerText = "Play Now (YouTube)";
+      
+      playNowYT.addEventListener('click', () => {
+        if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id)) {
+          this.hideSearch();
+          this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true });
+        }
+      }); 
+      
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       videoThumbnail.src = v.thumbnail;
