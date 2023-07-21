@@ -260,6 +260,7 @@ class Karaoke{
           this.hideSearch();
           this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
           this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true, skipUpdate: true });
+          this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
         }
       }); 
       
