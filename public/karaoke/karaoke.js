@@ -113,7 +113,7 @@ class Karaoke{
         }
         if(this.YtPlayer) {
           const timediff = Math.abs(this.YtPlayer.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
-          if(timediff > 0.2) {
+          if(timediff > 0.5) {
             this.YtPlayer.seekTo(json.data.currentTime + this.core.currentLatency);
           }
         }
@@ -141,8 +141,6 @@ class Karaoke{
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
-    // this.joinList.style.display = (player.locked && !isMe) || amIAPlayer ? 'none' :  'inline-block';
-    // this.leaveList.style.display = !amIAPlayer ? 'none' :  'inline-block';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button slim red' : 'button slim teal') : 'button slim teal';
     this.hostTitle.innerText = 

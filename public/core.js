@@ -60,6 +60,7 @@ class Core{
     }
   }
   setupBrowserElement(url) {
+    this.initialUrl = url;
     const scene = document.querySelector("a-scene");
     if(!scene) {
       console.log("No a-scene tag found, is this an AFRAME scene ?");

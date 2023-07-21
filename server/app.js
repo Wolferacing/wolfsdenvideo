@@ -108,7 +108,6 @@ class App{
         this.removePlaylistItem(msg.data, ws);
         break;
       case Commands.SEARCH:
-        console.log(msg.data, ws.i);
         this.search(msg.data, ws);
         break;
       case Commands.FROM_PLAYLIST:
@@ -134,7 +133,6 @@ class App{
         this.setAutoSync(msg.data, ws);
         break;
       case Commands.CLICK_BROWSER:
-        console.log(Commands.CLICK_BROWSER, ws.u, msg.data);
         this.sendBrowserClick(msg.data, ws)
         break;
       case Commands.SET_VOLUME:
@@ -351,6 +349,12 @@ class App{
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         this.updateClients(ws.i, Commands.SET_TRACK);
+        if(!this.videoPlayers[ws.i].playlist[index].is_youtube_website) {
+          const users = [...new Set(this.videoPlayers[ws.i].sockets.map(ws => ws.u.id))];
+          users.forEach(socket => {
+            const video player = 
+          });
+        }
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
       }
