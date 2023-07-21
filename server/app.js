@@ -153,6 +153,9 @@ class App{
         ws.p = false;
         this.updateClients(ws.i, "remove-from-players");
         break; 
+      case Commands.SET_PLAYER_URL:
+        this.setPlayerUrl(ws);
+        break;
     }
   }
   measureLatency(ws) {
@@ -168,6 +171,15 @@ class App{
       this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
     }
   }
+  setPlayerUrl(ws) {
+    if(this.videoPlayers[ws.i]) {
+      this.videoPlayers[ws.i].sockets.forEach(ws => {
+        if(ws.u && ws.u.id === ws.u.id && ws.is_video_player) {
+          // ws.user_video = ws;
+        }
+      });
+    }
+  }
   addToPlayers(ws){
     this.onlyIfHost(ws, () => {
       ws.p = new Date().getTime();
@@ -178,10 +190,7 @@ class App{
     if(this.videoPlayers[video_ws.i]) {
       this.videoPlayers[video_ws.i].sockets.forEach(ws => {
         if(video_ws.u.id === ws.u.id && !ws.is_video_player){
-          console.log(Commands.CLICK_BROWSER, "here", ws.type, ws.u.id);
           this.send(ws, Commands.CLICK_BROWSER, click);
-        }else{
-          console.log(Commands.CLICK_BROWSER, "not here", ws.type, ws.u.id);
         }
       });
     }
@@ -377,6 +386,7 @@ class App{
         sockets: [ws],
         hasNoHost: false,
         canTakeOver: true,
+        currentPlayerUrl: "",
         lastStartTime: new Date().getTime() / 1000,
         tick: setInterval(() => {
           if(this.videoPlayers[instanceId].playlist.length) {
