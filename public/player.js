@@ -51,20 +51,21 @@ class Player {
           if(event.data == 1) {
             this.readyToPlay = true;
           }
-          console.log(event.data);
+          // console.log(event.data);
         },
         onError: event => {
           console.log(event.data);
         },
-        onApiChange: event => {
-          console.log("onApiChange", event);
+        onApiChange: async event => {
+          // console.log("onApiChange", event);
+          await this.waitFor(1);
           this.startPlayerOrNot();
         },
         onReady: async event => {
           this.player = event.target; 
+          console.log("ready", this.player.getPlayerState(), this.player.getVideoLoadedFraction())
           this.setVolume();
           this.setMute();
-          this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
         }
       }
     });
@@ -73,6 +74,7 @@ class Player {
     if(this.player && !this.isPlayerStarted && this.core.connected()) {
       this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
       this.isPlayerStarted = true;
+      this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
     }
   }
   showToast(text) {
