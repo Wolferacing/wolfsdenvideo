@@ -19,10 +19,6 @@ class Player {
      });
      this.core.setupLatencyMeasure();
      this.playPlaylist();
-     await this.waitFor(10);
-     if(!this.readyToPlay) {
-       window.location.reload();
-     }
   }
   waitFor(seconds) {
     return new Promise(resolve => {
@@ -67,6 +63,10 @@ class Player {
           this.setMute();
           await this.waitFor(1);
           this.startPlayerOrNot();
+          await this.waitFor(5);
+          if(!this.readyToPlay) {
+            window.location.reload();
+          }
         }
       }
     });
