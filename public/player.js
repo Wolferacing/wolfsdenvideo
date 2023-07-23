@@ -19,6 +19,10 @@ class Player {
      });
      this.core.setupLatencyMeasure();
      this.playPlaylist();
+     await this.waitFor(15);
+     if(!this.readyToPlay) {
+       window.location.reload();
+     }
   }
   waitFor(seconds) {
     return new Promise(resolve => {
