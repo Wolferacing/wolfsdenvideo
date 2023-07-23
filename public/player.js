@@ -19,7 +19,7 @@ class Player {
      });
      this.core.setupLatencyMeasure();
      this.playPlaylist();
-     await this.waitFor(15);
+     await this.waitFor(10);
      if(!this.readyToPlay) {
        window.location.reload();
      }
@@ -63,7 +63,6 @@ class Player {
         },
         onReady: async event => {
           this.player = event.target; 
-          console.log("ready", this.player.getPlayerState(), this.player.getVideoLoadedFraction())
           this.setVolume();
           this.setMute();
           await this.waitFor(1);
