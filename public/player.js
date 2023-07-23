@@ -56,21 +56,21 @@ class Player {
         onError: event => {
           console.log(event.data);
         },
+        onApiChange: event => {
+          console.log("onApiChange", event);
+          this.startPlayerOrNot();
+        },
         onReady: async event => {
           this.player = event.target; 
-          console.log("ready", this.player.getPlayerState())
-           // await this.waitFor(10);
-          this.startPlayerOrNot();
+          this.setVolume();
+          this.setMute();
+          this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
         }
       }
     });
   }
   startPlayerOrNot() {
     if(this.player && !this.isPlayerStarted && this.core.connected()) {
-      this.setVolume();
-      this.setMute();
-      this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
-      this.player.pauseVideo();
       this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
       this.isPlayerStarted = true;
     }
