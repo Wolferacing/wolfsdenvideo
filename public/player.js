@@ -10,8 +10,8 @@ class Player {
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
-     await this.setupYoutubeScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
+       this.setupYoutubeScript();
        this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
        this.core.sendMessage({path: "user-video-player", data: window.user});
      }, ()=>{
@@ -58,7 +58,8 @@ class Player {
         },
         onReady: async event => {
           this.player = event.target; 
-           await this.waitFor(2);
+          console.log("ready", this.player.getPlayerState())
+           // await this.waitFor(10);
           this.startPlayerOrNot();
         }
       }
@@ -70,7 +71,6 @@ class Player {
       this.setMute();
       this.player.seekTo(this.currentTime ? (this.currentTime + this.core.currentLatency) : Number(this.start));
       this.player.pauseVideo();
-      console.log("click browser");
       this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
       this.isPlayerStarted = true;
     }
