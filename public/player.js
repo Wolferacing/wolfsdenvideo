@@ -62,6 +62,7 @@ class Player {
           console.log("ready", this.player.getPlayerState(), this.player.getVideoLoadedFraction())
           this.setVolume();
           this.setMute();
+          await this.waitFor(1);
           this.startPlayerOrNot();
         }
       }
