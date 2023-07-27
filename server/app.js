@@ -266,7 +266,9 @@ class App{
             thumbnail: v.thumbnail_url,
             duration: v.milis_length ,
             link: v.url,
-            votes: 0
+            votes: 0,
+            user: ws.u.name,
+            is_youtube_website: false
           })  
         });
         this.updateClients(ws.i);

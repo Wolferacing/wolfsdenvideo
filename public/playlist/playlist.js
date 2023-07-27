@@ -107,6 +107,7 @@ class Playlist {
         padding: '7 10 10 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
+        float: 'left',
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
       
@@ -114,20 +115,30 @@ class Playlist {
       
       videoTitle.innerText = (player.canVote ? "(" + player.playlist[i].votes + ") " : "") + v.title;
         
-//       const videoAuthor = this.core.makeAndAddElement('div',{
-//         padding: '0 10 5 7', 
-//         textOverflow: 'ellipsis', 
-//         overflow: 'hidden', 
-//         fontSize: '0.8rem',
-//         color: '#cfcfcf',
-//         whiteSpace: 'nowrap'
-//       }, videoTitleAndAction);
+      const videoAuthor = this.core.makeAndAddElement('div',{
+        padding: '0 10 5 7', 
+        textOverflow: 'ellipsis', 
+        overflow: 'hidden', 
+        fontSize: '0.8rem',
+        color: '#cfcfcf',
+        float: 'left',
+        whiteSpace: 'nowrap'
+      }, videoTitleAndAction);
 
-//       videoAuthor.className = "currentTimeAuthor";
-//       videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
+      videoAuthor.className = "currentTimeAuthor";
+      videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
       
       if(player.currentTrack !== i) {
+        if(isMe || (!player.locked && !player.canVote)) {
+          const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
+          playTrack.className = 'button slim green';
+          playTrack.innerText = "Play Now";
+
+          playTrack.addEventListener('click', () => {
+            this.core.sendMessage({path: Commands.SET_TRACK, data: i });
+          });          
+        }
         if(player.canVote) {
           const voteDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
@@ -146,14 +157,6 @@ class Playlist {
             this.core.sendMessage({path: Commands.UP_VOTE, data: i });
           });
         }else{
-          const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-
-          playTrack.className = 'button slim green';
-          playTrack.innerText = "Play Now";
-
-          playTrack.addEventListener('click', () => {
-            this.core.sendMessage({path: Commands.SET_TRACK, data: i });
-          });
           const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
           moveDown.className = 'button slim teal';
@@ -170,7 +173,8 @@ class Playlist {
           moveUp.addEventListener('click', () => {
             this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
           });
-
+        }
+        if(isMe || (!player.locked && !player.canVote)) {
           const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
           remove.className = 'button slim red';
@@ -178,7 +182,7 @@ class Playlist {
 
           remove.addEventListener('click', () => {
             this.core.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
-          });
+          });         
         }
       }else{
         
