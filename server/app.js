@@ -142,9 +142,12 @@ class App{
         this.toggleVote(ws)
         break; 
       case Commands.DOWN_VOTE:
+        console.log("voting", Commands.DOWN_VOTE);
         this.setVote(msg.data, true, ws);
         break;
       case Commands.UP_VOTE:
+        console.log("voting", Commands.UP_VOTE);
+      
         this.setVote(msg.data, false, ws);
         break;
       case Commands.ADD_TO_PLAYERS:
@@ -222,9 +225,13 @@ class App{
     }
   }
   setVote(track, isDown, ws) {
-    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].votes.filter(d=>d.u === ws.u && this.videoPlayers[ws.i].playlist[track] === d.video).length === 0) {
-      console.log("voting", {u: ws.u, isDown});
-      this.videoPlayers[ws.i].votes.push({u: ws.u, isDown, video: this.videoPlayers[ws.i].playlist[track]});
+    const player = this.videoPlayers[ws.i];
+    const votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video);
+    const downVotes = votes.filter(d => d.isDown === isDown).length;
+    const upVotes = votes.filter(d => d.isDown === isDown).length;
+    if(player && this.videoPlayers[ws.i].playlist.length > track && (downVotes.length === 0 && !isDown || upVotes.length === 0 && isDown)) {
+      // player.votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video && ((d.isDown && downVotes.length) || (!d.isDown && upVotes.length)));
+      player.votes.push({u: ws.u, isDown, video: player.playlist[track]});
       this.updateVotes(ws);
       this.updateClients(ws.i, "set-vote");
     }
