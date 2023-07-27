@@ -120,24 +120,15 @@ class App{
         ws.is_video_player = true;
         this.setUserVideoPlayer(msg.data, ws);
         break;
-      // case Commands.MUTE:
-      //   this.setMute(msg.data, ws);
-      //   break;
-      // case Commands.SKIP_BACK:
-      //   this.skip(true, ws);
-      //   break;
-      // case Commands.SKIP_FORWARD:
-      //   this.skip(false, ws);
-      //   break;
+      case Commands.STOP:
+        this.stop(ws);
+        break;
       case Commands.AUTO_SYNC:
         this.setAutoSync(msg.data, ws);
         break;
       case Commands.CLICK_BROWSER:
         this.sendBrowserClick(msg.data, ws)
         break;
-      // case Commands.SET_VOLUME:
-      //   this.setVolume(msg.data, msg.type, ws)
-      //   break;
       case Commands.TOGGLE_VOTE:
         this.toggleVote(ws)
         break; 
@@ -147,7 +138,6 @@ class App{
         break;
       case Commands.UP_VOTE:
         console.log("voting", Commands.UP_VOTE);
-      
         this.setVote(msg.data, false, ws);
         break;
       case Commands.ADD_TO_PLAYERS:
@@ -162,11 +152,11 @@ class App{
   measureLatency(ws) {
     this.send(ws, Commands.MEASURE_LATENCY);
   }
-  // skip(isBack, ws) {
-  //   if(ws.user_video) {
-  //     this.send(ws.user_video, isBack ? Commands.SKIP_BACK : Commands.SKIP_FORWARD);
-  //   }
-  // }
+  stop(ws) {
+    this.onlyIfHost(ws, () => {
+      this.updateClients(ws.i, "stop");
+    }, this.videoPlayers[ws.i].locked);
+  }
   setAutoSync(autoSync, ws) {
     if(ws.user_video) {
       this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
@@ -242,16 +232,6 @@ class App{
       this.updateClients(ws.i, "set-vote");
     }
   }
-  // setVolume(vol, type, ws) {
-  //   if(ws.user_video) {
-  //     this.send(ws.user_video, Commands.SET_VOLUME, {vol, type});
-  //   }
-  // }
-  // setMute( muted, ws) {
-  //   if(ws.user_video) {
-  //     this.send(ws.user_video, Commands.MUTE, muted);
-  //   }
-  // }
   async fromPlaylist(data, ws) {
     if(!data.id || !data.id.startsWith("PL")) {
       return;
@@ -379,10 +359,10 @@ class App{
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         this.resetBrowserIfNeedBe(this.videoPlayers[ws.i], index);
+        this.updateClients(ws.i, Commands.SET_TRACK);
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
       }
-        this.updateClients(ws.i, Commands.SET_TRACK);
     }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
   }
   resetBrowserIfNeedBe(player, index) {

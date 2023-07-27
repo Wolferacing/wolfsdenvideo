@@ -142,7 +142,7 @@ class Karaoke{
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
-    this.stopVideo.style.display = player.locked ? 'none' : 'inline-block';
+    this.stopVideo.style.display = !isMe && player.locked ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
@@ -216,7 +216,6 @@ class Karaoke{
         }else{
           this.initialYoutube = v;
         }
-        
       }
     })
   }

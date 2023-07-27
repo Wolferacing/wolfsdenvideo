@@ -34,7 +34,8 @@ const Commands = {
   SET_BROWSER_URL: 'set-browser-url',
   TOGGLE_VOTE: 'toggle-vote',
   DOWN_VOTE: 'down-vote',
-  UP_VOTE: 'up-vote'
+  UP_VOTE: 'up-vote',
+  STOP: 'stop'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

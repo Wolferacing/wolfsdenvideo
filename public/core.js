@@ -341,6 +341,7 @@ class Core{
           this.browser.setAttribute("sq-browser", {"url": this.initialUrl});
         }
         break;
+      case Commands.STOP:
       case Commands.PLAYBACK_UPDATE:
       case Commands.SYNC_TIME:
         json.volume = this.tempVolume;

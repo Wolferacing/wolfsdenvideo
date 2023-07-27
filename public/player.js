@@ -136,6 +136,10 @@ class Player {
           this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
         }
         break;
+      case Commands.STOP:
+        this.player.loadVideoById(this.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
+        this.showToast("stopped!");
+        break;
       case Commands.MUTE:
         this.core.params.mute = json.data;
         this.showToast(this.core.params.mute === true || this.core.params.mute === 'true' ? "mute" : "unmute");
