@@ -13,13 +13,12 @@ body{
   padding: 0;
   width: 100%;
   background: #7f7f7f;
-  background: linear-gradient(45deg , #FFC371, #FF5F6D);
+  background: linear-gradient(to bottom, #6a6e83, #332834);
 }
 .playlistContainer{
   position: relative;
   margin: auto;
   background: #3f3f3f;
-  background: linear-gradient(45deg , #FFC371, #FF5F6D);
   color: white;
   height: 64px;
   font: 15px Roboto, sans-serif;
@@ -28,7 +27,8 @@ body{
 .fullscreenButton{
   position: absolute;
   top: 420px;
-  left: 20px;
+  left: 200px;
+  transform: translateX(-50%);
   margin-left: 0!important;
 }
 .fullscreenButtonOverlay{
@@ -38,7 +38,11 @@ body{
   z-index: 6;
 }
 .lower{
-  margin-top: 45px!important;
+  margin-top: 85px!important;
+}
+.singerListTitle{
+  padding: 10 10 10 7;
+  background: #2f2f2f;
 }
 .searchContainer{
   float: right;
@@ -69,7 +73,7 @@ body{
 }
 .videoPlaylistContainer{
   position: relative;
-  background: #cfcfcf;
+  background: linear-gradient(to right, #1e181f, #2b313e);
   color: white;
   overflow: auto;
   height: calc(100% - 64px);
