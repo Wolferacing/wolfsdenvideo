@@ -1,11 +1,12 @@
 class Player {
   constructor(){
-    this.hostUrl = 'sq-video-player.glitch.me';
+    this.hostUrl = 'vidya-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.init();
   }
   async init() {
-    this.currentTime = 0;
+     await this.setupBrowserMessaging();
+     this.currentTime = 0;
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
@@ -19,6 +20,16 @@ class Player {
      });
      this.core.setupLatencyMeasure();
      this.playPlaylist();
+  }
+  setupBrowserMessaging() {
+     window.addEventListener("bantermessage", (e) => this.parseMessage(e.detail.message));
+  }
+  sendBrowserMessage(msg) {
+    if (!window.bantermessage) {
+      console.log("No banter message, is this banter?");
+    } else {
+      window.bantermessage(JSON.stringify(msg));
+    }
   }
   waitFor(seconds) {
     return new Promise(resolve => {
@@ -103,6 +114,7 @@ class Player {
           this.core.params.volume = Number(json.data.vol);
           this.setVolume(json.data.type);
           this.setMute();
+          this.sendBrowserMessage(json);
         }
         break;
       case Commands.SKIP_BACK:

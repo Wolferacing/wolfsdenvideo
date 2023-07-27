@@ -156,18 +156,18 @@ class Core{
     this.setupButton(scene, playlistContainer, isUp ? 1.25 : 1.78, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>{
         this.setVolume(isUp);
         console.warn({path: Commands.SET_VOLUME, data: this.params.volume});
-        this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
+        this.sendBrowserMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
   setupSkipButton(scene, isBack, playlistContainer) {
     this.setupButton(scene, playlistContainer, isBack ? -0.475 : -0.125, isBack ? '<<' : '>>', '0.5',  'small', () => {
-        this.sendMessage({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
+        this.sendBrowserMessage({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
     })
   }
   setupMuteButton(scene, playlistContainer) {
     this.setupButton(scene, playlistContainer, '0.73', 'mute', '0.5',  'medium', () => {
       this.params.mute = this.params.mute == 'true' ? 'false' : 'true';
-      this.sendMessage({path: Commands.MUTE, data: this.params.mute});
+      this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
     })
   }
   async saySomething(user) {
@@ -343,6 +343,9 @@ class Core{
           this.browser.setAttribute("sq-browser", {"url": this.initialUrl});
         }
         break;
+      case Commands.PLAYBACK_UPDATE:
+      case Commands.SYNC_TIME:
+        this.sendBrowserMessage(json);
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {
           console.log("SET_BROWSER_URL");
