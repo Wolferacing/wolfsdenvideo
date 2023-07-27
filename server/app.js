@@ -229,12 +229,9 @@ class App{
   }
   setVote(track, isDown, ws) {
     const player = this.videoPlayers[ws.i];
-    const votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video);
-    const downVotes = votes.filter(d => d.isDown).length;
-    const upVotes = votes.filter(d => !d.isDown).length;
-    console.log((isDown && downVotes > 0),(!isDown && upVotes > 0));
-    if(player && this.videoPlayers[ws.i].playlist.length > track && (downVotes === 0 && !isDown || upVotes === 0 && isDown)) {
-      player.votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video && ((d.isDown && downVotes > 0) || (!d.isDown && upVotes > 0)));
+    if(player && this.videoPlayers[ws.i].playlist.length > track) {
+      // const votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video);
+      player.votes = player.votes.filter(d=>d.u === !ws.u && player.playlist[track] === d.video);
       player.votes.push({u: ws.u, isDown, video: player.playlist[track]});
       this.updateVotes(ws);
       this.updateClients(ws.i, "set-vote");
