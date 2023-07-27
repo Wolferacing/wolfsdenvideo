@@ -107,6 +107,7 @@ class Player {
     }).showToast();
   }
   parseMessage(msg) {
+    console.warn(msg);
     const json = JSON.parse(msg);
     switch(json.path) {
       case Commands.SET_VOLUME:

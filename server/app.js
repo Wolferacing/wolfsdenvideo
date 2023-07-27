@@ -442,7 +442,7 @@ class App{
     }
   }
   syncWsTime(socket, key) {
-    if(this.videoPlayers[key].playlist.length) {
+    if(this.videoPlayers[key].playlist.length && socket.type !== "player") {
       this.send(socket, Commands.SYNC_TIME, {
         currentTrack: this.videoPlayers[key].currentTrack,
         currentTime: this.videoPlayers[key].currentTime,
