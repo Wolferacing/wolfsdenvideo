@@ -32,7 +32,9 @@ const Commands = {
   SET_WS_TYPE: 'set-ws-type',
   RESET_BROWSER: 'reset-browser',
   SET_BROWSER_URL: 'set-browser-url',
-  TOGGLE_VOTE: 'toggle-vote'
+  TOGGLE_VOTE: 'toggle-vote',
+  DOWN_VOTE: 'down-vote',
+  UP_VOTE: 'up-vote'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

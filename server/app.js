@@ -140,7 +140,7 @@ class App{
       //   break;
       case Commands.TOGGLE_VOTE:
         this.toggleVote(ws)
-        break;
+        break; 
       case Commands.DOWN_VOTE:
         this.setVote(msg.data, true, ws);
         break;
@@ -212,13 +212,18 @@ class App{
   }
   updateVotes(ws) {
     if(this.videoPlayers[ws.i]) {
-      this.videoPlayers[ws.i].playlist.forEach(v => {
-        v.votes = this.videoPlayers[ws.i].votes.filter(_v => _v.video === v).length;
+      this.videoPlayers[ws.i].playlist.forEach(d => {
+          const downVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && v.isDown).length;
+          const upVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && !v.isDown).length;
+          d.votes = upVotes - downVotes; 
+          console.log(d.link, d.votes, downVotes, upVotes);
       });
+      this.videoPlayers[ws.i].playlist.sort((a, b) => a.votes - b.votes);
     }
   }
   setVote(track, isDown, ws) {
-    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].votes.filter(d=>d.u === ws.u).length === 0) {
+    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].votes.filter(d=>d.u === ws.u && this.videoPlayers[ws.i].playlist[track] === d.video).length === 0) {
+      console.log("voting", {u: ws.u, isDown});
       this.videoPlayers[ws.i].votes.push({u: ws.u, isDown, video: this.videoPlayers[ws.i].playlist[track]});
       this.updateVotes(ws);
       this.updateClients(ws.i, "set-vote");
@@ -442,15 +447,6 @@ class App{
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
-      if(this.videoPlayers[instanceId].canVote) {
-        this.videoPlayers[instanceId].playlist.forEach(d => {
-          const downVotes = this.videoPlayers[instanceId].votes.filter(v => v.video === d && v.isDown).length;
-          const upVotes = this.videoPlayers[instanceId].votes.filter(v => v.video === d && !v.isDown).length;
-          d.votes = upVotes - downVotes; 
-          return d;
-        });
-        this.videoPlayers[instanceId].playlist.sort((a, b) => a.votes - b.votes);
-      }
       return {
         playlist: this.videoPlayers[instanceId].playlist,
         currentTime: this.videoPlayers[instanceId].currentTime,
