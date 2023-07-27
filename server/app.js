@@ -442,11 +442,17 @@ class App{
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
-      return {
-        playlist: this.videoPlayers[instanceId].playlist.map(d=>{
-          d.votes = this.videoPlayers[instanceId].votes.filter(v => v.video === d).length; 
+      if(this.videoPlayers[instanceId].canVote) {
+        this.videoPlayers[instanceId].playlist.forEach(d => {
+          const downVotes = this.videoPlayers[instanceId].votes.filter(v => v.video === d && v.isDown).length;
+          const upVotes = this.videoPlayers[instanceId].votes.filter(v => v.video === d && !v.isDown).length;
+          d.votes = upVotes - downVotes; 
           return d;
-        }),
+        });
+        this.videoPlayers[instanceId].playlist.sort((a, b) => a.votes - b.votes);
+      }
+      return {
+        playlist: this.videoPlayers[instanceId].playlist,
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,

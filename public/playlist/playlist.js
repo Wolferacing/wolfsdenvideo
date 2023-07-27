@@ -112,7 +112,7 @@ class Playlist {
       
       videoThumbnail.src = v.thumbnail;
       
-      videoTitle.innerText = v.title;
+      videoTitle.innerText = v.title + (player.canVote ? "(" + player.playlist[i].votes + ")" : "");
         
 //       const videoAuthor = this.core.makeAndAddElement('div',{
 //         padding: '0 10 5 7', 
@@ -137,7 +137,22 @@ class Playlist {
           this.core.sendMessage({path: Commands.SET_TRACK, data: i });
         });
         if(player.canVote) {
-          
+          const voteDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+
+          voteDown.className = 'button slim teal';
+          voteDown.innerText = "Down Vote";
+
+          voteDown.addEventListener('click', () => {
+            this.core.sendMessage({path: Commands.DOWN_VOTE, data: i  });
+          });
+
+          const voteUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+          voteUp.className = 'button slim teal';
+          voteUp.innerText = "Up Vote";
+
+          voteUp.addEventListener('click', () => {
+            this.core.sendMessage({path: Commands.UP_VOTE, data: i });
+          });
         }else{
           const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
