@@ -110,7 +110,6 @@ class Player {
     const json = JSON.parse(msg);
     switch(json.path) {
       case Commands.SET_VOLUME:
-        console.warn(msg);
         if(json.data >= 0 && json.data <= 100) {
           this.core.params.volume = Number(json.data);
           this.setVolume(json.type);
@@ -157,19 +156,20 @@ class Player {
              this.showToast("AutoSync: " + Math.round(timediff*100)/100 + "s");
              this.player.seekTo(json.data.currentTime + this.core.currentLatency);
           }
-          this.playVidya(json.data.currentTrack, json.data.currentTime);
+          this.core.params.volume = json.volume;
+          this.playVidya(json.data.currentTrack, json.data.currentTime, false);
         }
         break;
     }
   }
-  playVidya(currentTrack, currentTime, force) {
+  playVidya(currentTrack, currentTime, force, volume) {
     if(this.playerData) {
-      // console.log(this.playerData.playlist[]);
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.getId(url), currentTime);
         this.player.playVideo();
         this.showToast("Playing: " + this.playerData.playlist[currentTrack].title);
+        this.setVolume("spatial");
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
     }else{

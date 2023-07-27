@@ -232,6 +232,7 @@ class Core{
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
     
     this.params.volume = Number(this.params.volume);
+    this.tempVolume = this.params.volume;
     this.params.mute = this.params.mute === 'true' ? 'true' : 'false';
   }
   setOrDefault(attr, defaultValue) {
@@ -342,6 +343,7 @@ class Core{
         break;
       case Commands.PLAYBACK_UPDATE:
       case Commands.SYNC_TIME:
+        json.volume = this.tempVolume;
         this.sendBrowserMessage(json);
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {
@@ -358,7 +360,7 @@ class Core{
   setupCommandsScript(callback) {
     return new Promise(resolve => {
       let myScript = document.createElement("script");
-      myScript.setAttribute("src", `https://${this.hostUrl}/commands.js?1`);
+      myScript.setAttribute("src", `https://${this.hostUrl}/commands.js`);
       myScript.addEventListener ("load", resolve, false);
       document.body.appendChild(myScript);  
     });
