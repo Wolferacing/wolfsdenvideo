@@ -112,7 +112,7 @@ class Playlist {
       
       videoThumbnail.src = v.thumbnail;
       
-      videoTitle.innerText = v.title + (player.canVote ? "(" + player.playlist[i].votes + ")" : "");
+      videoTitle.innerText = (player.canVote ? "(" + player.playlist[i].votes + ") " : "") + v.title;
         
 //       const videoAuthor = this.core.makeAndAddElement('div',{
 //         padding: '0 10 5 7', 
@@ -128,14 +128,6 @@ class Playlist {
       
       if(player.currentTrack !== i) {
 
-        const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-
-        playTrack.className = 'button slim green';
-        playTrack.innerText = "Play Now";
-
-        playTrack.addEventListener('click', () => {
-          this.core.sendMessage({path: Commands.SET_TRACK, data: i });
-        });
         if(player.canVote) {
           const voteDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
@@ -154,6 +146,14 @@ class Playlist {
             this.core.sendMessage({path: Commands.UP_VOTE, data: i });
           });
         }else{
+          const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+
+          playTrack.className = 'button slim green';
+          playTrack.innerText = "Play Now";
+
+          playTrack.addEventListener('click', () => {
+            this.core.sendMessage({path: Commands.SET_TRACK, data: i });
+          });
           const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
           moveDown.className = 'button slim teal';
@@ -170,16 +170,16 @@ class Playlist {
           moveUp.addEventListener('click', () => {
             this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
           });
+
+          const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+
+          remove.className = 'button slim red';
+          remove.innerText = "Remove";
+
+          remove.addEventListener('click', () => {
+            this.core.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
+          });
         }
-
-        const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-
-        remove.className = 'button slim red';
-        remove.innerText = "Remove";
-
-        remove.addEventListener('click', () => {
-          this.core.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
-        });
       }else{
         
         const currentTimeText = this.core.makeAndAddElement('div',{

@@ -219,19 +219,24 @@ class App{
           const downVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && v.isDown).length;
           const upVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && !v.isDown).length;
           d.votes = upVotes - downVotes; 
-          console.log(d.link, d.votes, downVotes, upVotes);
       });
+      const current = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
       this.videoPlayers[ws.i].playlist.sort((a, b) => b.votes - a.votes);
-      this.videoPlayers[ws.i].playlist.forEach(d => {
-          console.log(d.link, d.votes);
+      this.videoPlayers[ws.i].playlist.forEach((d,i) => {
+        if(d === current) {
+          this.videoPlayers[ws.i].currentTrack = i;
+        }
       });
+      const newCurrent = this.videoPlayers[ws.i].playlist[this.videoPlayers.currentTrack];
+      if(current != newCurrent) {
+        this.videoPlayers[ws.i].currentTime = 0;
+      }
     }
   }
   setVote(track, isDown, ws) {
     const player = this.videoPlayers[ws.i];
-    if(player && this.videoPlayers[ws.i].playlist.length > track) {
-      // const votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video);
-      player.votes = player.votes.filter(d=>d.u === !ws.u && player.playlist[track] === d.video);
+    if(player && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].canVote) {
+      player.votes = player.votes.filter(d => !(d.u === ws.u && player.playlist[track] === d.video));
       player.votes.push({u: ws.u, isDown, video: player.playlist[track]});
       this.updateVotes(ws);
       this.updateClients(ws.i, "set-vote");
@@ -321,7 +326,7 @@ class App{
           this.videoPlayers[ws.i].currentTrack--;
         }
         this.updateClients(ws.i);
-      }, this.videoPlayers[ws.i].locked);
+      }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
     }
   }
   movePlaylistItem({url, index}, ws) {
@@ -342,7 +347,7 @@ class App{
         }else{
           this.send(ws, Commands.DOES_NOT_EXIST);
         }
-      }, this.videoPlayers[ws.i].locked);
+      }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
     }
   }
   toggleCanTakeOver(canTakeOver, ws) {
@@ -376,7 +381,7 @@ class App{
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
       }
-    }, this.videoPlayers[ws.i].locked);
+    }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
   }
   resetBrowserIfNeedBe(player, index) {
     const users = [...new Set(player.sockets.map(ws => ws.u.id))];
