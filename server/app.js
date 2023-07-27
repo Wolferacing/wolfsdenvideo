@@ -379,10 +379,10 @@ class App{
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         this.resetBrowserIfNeedBe(this.videoPlayers[ws.i], index);
-        this.updateClients(ws.i, Commands.SET_TRACK);
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
       }
+        this.updateClients(ws.i, Commands.SET_TRACK);
     }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
   }
   resetBrowserIfNeedBe(player, index) {

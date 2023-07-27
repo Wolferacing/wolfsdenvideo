@@ -107,7 +107,6 @@ class Playlist {
         padding: '7 10 10 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
-        float: 'left',
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
       
@@ -121,9 +120,9 @@ class Playlist {
         overflow: 'hidden', 
         fontSize: '0.8rem',
         color: '#cfcfcf',
-        float: 'left',
+        float: 'right',
         whiteSpace: 'nowrap'
-      }, videoTitleAndAction);
+      }, videoTitle);
 
       videoAuthor.className = "currentTimeAuthor";
       videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
