@@ -187,7 +187,14 @@ class Player {
     this.core.params.volume = Number(this.core.params.volume);
     if(this.player.getVolume() != this.core.params.volume) {
       this.player.setVolume(this.core.params.volume);
-      this.showToast((type === "spatial" ? "(spatial) " : "") + "vol: " + (this.core.params.volume) + "%");
+      const isSpatial = type === "spatial";
+      const showToast = () => this.showToast((isSpatial ? "(spatial) " : "") + "vol: " + (this.core.params.volume) + "%");
+      if(isSpatial) {
+        clearTimeout(this.spatialUpdateTimeout);
+        this.spatialUpdateTimeout = setTimeout(() => showToast(), 600);
+      }else{
+        showToast();
+      }
     }
   }
   getId(url){

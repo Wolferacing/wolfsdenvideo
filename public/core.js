@@ -29,7 +29,7 @@ class Core{
             volume = 0;
           }
           const now = Date.now();
-          if(now - lastSendTime > 1000) {
+          if(now - lastSendTime > 500) {
             lastSendTime = now;
             const roundedVolume = Math.round((this.params.volume * volume) / 2) * 2;
             if(this.tempVolume != roundedVolume) {
