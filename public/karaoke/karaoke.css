@@ -28,7 +28,7 @@ body{
   position: absolute;
   top: 420px;
   left: 200px;
-  transform: translate(-50%, -50px);
+  transform: translate(-50%, -80px);
   margin-left: 0px!important;
 }
 .fullscreenButtonOverlay{
@@ -39,10 +39,12 @@ body{
   transform: translate(-50%, -50px);
 }
 .lower{
-  transform: translate(-50%, 50px);
+  transform: translate(-50%, -20px);
 }
 .singerListTitle{
-  padding: 10 30 10 7;
+  padding-left: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   background: #2f2f2f;
   font-weight: bold;
   color: white;
@@ -57,6 +59,7 @@ body{
   border: 1px solid white;
   font-size: 20px;
   color: white;
+  width: 130px;
 }
 .playlistTitle{
   font-weight: normal;
@@ -168,18 +171,18 @@ body{
   font-size: 2em;
 }
 .button{
-  padding: 13 10;
+  padding: 15 12;
   display: inline-block;
   color: white;
   cursor: pointer;
   border-radius: 3px;
   margin-left: 5px;
   user-select: none;
-  font-size: 1.6em;
+  font-size: 1.4em;
 }
 .slim{
-  padding: 5 5;
-  font-size: 0.8em;
+  padding: 10 10;
+  font-size: 1em;
   margin-top: -3px;
 }
 .teal{

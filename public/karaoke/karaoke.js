@@ -149,7 +149,7 @@ class Karaoke{
       " the host" + 
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
-    this.videoPlaylistContainer.innerHTML = '';
+    this.videoPlaylistContainer.innerHTML = player.players.length ? '' : '<h2 style="color: grey; margin-top: 100px; text-align: center;">Click "join list" to add yourself to the list!</h2>';
     player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
@@ -239,7 +239,7 @@ class Karaoke{
       
       const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      playNow.className = 'button teal';
+      playNow.className = 'button slim teal';
       playNow.innerText = "Play Now";
       
       playNow.addEventListener('click', () => {
@@ -253,7 +253,7 @@ class Karaoke{
       
       const playNowYT = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      playNowYT.className = 'button teal';
+      playNowYT.className = 'button slim teal';
       playNowYT.innerText = "Play Now (YouTube)";
       
       playNowYT.addEventListener('click', () => {
