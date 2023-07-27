@@ -443,12 +443,16 @@ class App{
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
       return {
-        playlist: this.videoPlayers[instanceId].playlist,
+        playlist: this.videoPlayers[instanceId].playlist.map(d=>{
+          d.votes = this.videoPlayers[instanceId].votes.filter(v => v.video === d).length; 
+          return d;
+        }),
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
         players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => ({name: s.u.name, p: s.p, id: s.u.id})),
         canTakeOver: this.videoPlayers[instanceId].canTakeOver,
+        canVote: this.videoPlayers[instanceId].canVote,
         host: this.videoPlayers[instanceId].host,
         hasNoHost: this.videoPlayers[instanceId].hasNoHost,
         duration: this.videoPlayers[instanceId].playlist.length ? this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000 : 0

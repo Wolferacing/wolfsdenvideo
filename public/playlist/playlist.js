@@ -74,7 +74,6 @@ class Playlist {
     });
   }
   search(data) {
-    console.log("search", {path: Commands.SEARCH, data })
     this.core.sendMessage({path: Commands.SEARCH, data });
   }
   updatePlaylist(player) {
@@ -137,22 +136,26 @@ class Playlist {
         playTrack.addEventListener('click', () => {
           this.core.sendMessage({path: Commands.SET_TRACK, data: i });
         });
-        const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+        if(player.canVote) {
+          
+        }else{
+          const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-        moveDown.className = 'button slim teal';
-        moveDown.innerText = "Move Down";
+          moveDown.className = 'button slim teal';
+          moveDown.innerText = "Move Down";
 
-        moveDown.addEventListener('click', () => {
-          this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
-        });
+          moveDown.addEventListener('click', () => {
+            this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
+          });
 
-        const moveUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-        moveUp.className = 'button slim teal';
-        moveUp.innerText = "Move Up";
+          const moveUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+          moveUp.className = 'button slim teal';
+          moveUp.innerText = "Move Up";
 
-        moveUp.addEventListener('click', () => {
-          this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
-        });
+          moveUp.addEventListener('click', () => {
+            this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
+          });
+        }
 
         const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
@@ -279,7 +282,9 @@ class Playlist {
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value))
     
-    this.voting = document.querySelector('.voting');
+    this.voting = document.querySelector('#voting');
+    
+    this.voting.addEventListener('click', () => this.core.sendMessage({path: Commands.TOGGLE_VOTE }));
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     

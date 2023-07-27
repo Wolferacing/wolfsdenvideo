@@ -31,7 +31,8 @@ const Commands = {
   CLICK_BROWSER: 'click-browser',
   SET_WS_TYPE: 'set-ws-type',
   RESET_BROWSER: 'reset-browser',
-  SET_BROWSER_URL: 'set-browser-url'
+  SET_BROWSER_URL: 'set-browser-url',
+  TOGGLE_VOTE: 'toggle-vote'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {
