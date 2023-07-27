@@ -221,16 +221,20 @@ class App{
           d.votes = upVotes - downVotes; 
           console.log(d.link, d.votes, downVotes, upVotes);
       });
-      this.videoPlayers[ws.i].playlist.sort((a, b) => a.votes - b.votes);
+      this.videoPlayers[ws.i].playlist.sort((a, b) => b.votes - a.votes);
+      this.videoPlayers[ws.i].playlist.forEach(d => {
+          console.log(d.link, d.votes);
+      });
     }
   }
   setVote(track, isDown, ws) {
     const player = this.videoPlayers[ws.i];
     const votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video);
-    const downVotes = votes.filter(d => d.isDown === isDown).length;
-    const upVotes = votes.filter(d => d.isDown === isDown).length;
-    if(player && this.videoPlayers[ws.i].playlist.length > track && (downVotes.length === 0 && !isDown || upVotes.length === 0 && isDown)) {
-      // player.votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video && ((d.isDown && downVotes.length) || (!d.isDown && upVotes.length)));
+    const downVotes = votes.filter(d => d.isDown).length;
+    const upVotes = votes.filter(d => !d.isDown).length;
+    console.log((isDown && downVotes > 0),(!isDown && upVotes > 0));
+    if(player && this.videoPlayers[ws.i].playlist.length > track && (downVotes === 0 && !isDown || upVotes === 0 && isDown)) {
+      player.votes = player.votes.filter(d=>d.u === ws.u && player.playlist[track] === d.video && ((d.isDown && downVotes > 0) || (!d.isDown && upVotes > 0)));
       player.votes.push({u: ws.u, isDown, video: player.playlist[track]});
       this.updateVotes(ws);
       this.updateClients(ws.i, "set-vote");
