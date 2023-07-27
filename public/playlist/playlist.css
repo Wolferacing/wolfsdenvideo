@@ -4,6 +4,7 @@ html{
   position: fixed;
   right: 0;
   top: 0;
+  font: 15px Roboto, sans-serif;
 }
 body{
   height: 100%;
@@ -17,9 +18,8 @@ body{
   margin: auto;
   background: #3f3f3f;
   color: white;
-  height: 64px;
-  font: 15px Roboto, sans-serif;
-  padding: 1 30;
+  height: 45px;
+  padding: 1px 15px;
 }
 #autoSync{
    display: none; 
@@ -29,11 +29,13 @@ body{
 }
 .searchInput, #addItemInput{
   background: rgba(0,0,0,0.2);
-  margin: 15px;
+  margin: 12px;
   height: 32px;
   border: 1px solid white;
   font-size: 20px;
   color: white;
+  width: 130px;
+  margin: 5px;
 }
 .playlistTitle{
   font-weight: normal;
@@ -41,9 +43,8 @@ body{
 }
 .videoPlaylistContainer{
   position: relative;
-  background: #cfcfcf;
+  background: linear-gradient(to right, #1e181f, #2b313e);
   color: white;
-  font: 15px Roboto, sans-serif;
   overflow: auto;
   height: calc(100% - 64px);
   width: 100%;
@@ -86,8 +87,13 @@ body{
 }
 .hostTitle{
   font-style: italic;
-  font-size: 0.8em;
+  font-size: 1em;
   display: inline-block;
+  width: 100%;
+  height: 20px;
+  padding: 10px 15px;
+  background: #16181f;
+  color: white;
 }
 .addItemTitle{
   font-style: italic;
@@ -132,22 +138,23 @@ body{
   font-size: 2em;
 }
 .button{
-  padding: 7 7;
+  padding: 10 10;
   display: inline-block;
   color: white;
   cursor: pointer;
   border-radius: 3px;
-  margin-left: 15px;
+  margin-left: 5px;
   user-select: none;
-  font-size: 0.9em;
+  font-size: 1.4em;
 }
 .slim{
-  padding: 5 5;
-  font-size: 0.8em;
+  padding: 10 10;
+  font-size: 1em;
   margin-top: -3px;
 }
 .teal{
-  background: teal;
+  background: url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813);
+  background-size: 100% 100%;
 }
 .red{
   background: red;

@@ -21,26 +21,8 @@ body{
   background: #3f3f3f;
   color: white;
   height: 45px;
-  font: 15px Roboto, sans-serif;
   padding: 1px 15px;
 }
-/* .fullscreenButton{
-  position: absolute;
-  top: 420px;
-  left: 200px;
-  transform: translate(-50%, -80px);
-  margin-left: 0px!important;
-}
-.fullscreenButtonOverlay{
-  position: fixed;
-  top: 120px;
-  left: 200px;
-  z-index: 6;
-  transform: translate(-50%, -80px);
-}
-.lower{
-  transform: translate(-50%, -20px);
-} */
 .singerListTitle{
   padding-left: 15px;
   padding-top: 10px;
