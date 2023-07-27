@@ -58,11 +58,11 @@ class Karaoke{
     
     this.autoSync.addEventListener('click', () => {
       this.autoSyncEnabled = !this.autoSyncEnabled;
-      this.autoSync.innerText = this.autoSyncEnabled ? "Disable Auto Sync" : "Enable Auto Sync";
+      this.autoSync.innerText = this.autoSyncEnabled ? "Auto Sync: On" : "Auto Sync: Off";
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
     });
     
-    this.videoPlayer = document.querySelector('#singerList');
+    this.videoPlayer = document.querySelector('#videoPlayer');
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
@@ -157,7 +157,7 @@ class Karaoke{
       const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '10 10 10 7', 
+        padding: '10 15 10 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap', 
@@ -170,7 +170,6 @@ class Karaoke{
     this.videoPlayer.innerHTML = '';
     player.playlist.forEach((v, i) => {
       if(player.currentTrack === i) {
-        
         this.core.makeAndAddElement('div',{clear: 'both'}, this.videoPlayer);
         
         const currentTime = this.core.makeAndAddElement('div', {
@@ -302,7 +301,8 @@ class Karaoke{
         playerContainer.style.right = "initial";
         player.width = '420';
         player.height = '280';
-        this.fullscreenButton.innerText = "Show Fullscreen";
+        this.fullscreenButton.innerText = "Fullscreen: Off";
+        this.videoPlayer.style.display = 'block';
       }else{
         playerContainer.style.position = "fixed";
         playerContainer.style.top = "55px";
@@ -312,7 +312,8 @@ class Karaoke{
         playerContainer.style.zIndex = "5";
         player.width = window.innerWidth;
         player.height = window.innerHeight;
-        this.fullscreenButton.innerText = "Exit Fullscreen";
+        this.fullscreenButton.innerText = "Fullscreen: On";
+        this.videoPlayer.style.display = 'none';
       }
     }
   }
