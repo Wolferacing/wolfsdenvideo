@@ -285,11 +285,17 @@ class Core{
       this.ws.send(JSON.stringify(msg));
     }
   }
+  recieveBrowserMessage(msg) {
+    if(msg.id && this.browserAcks[msg.id]) {
+      this.browserAcks[msg.id]
+    }
+  }
   sendBrowserMessage(msg){
     msg.u = window.user;
     msg.i = this.params.instance;
+    this.browserAcks = 
     if(this.browser) {
-      this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
+      this.browser.components['sq-browser'].runActions([{actionType: "postmessage", strParam1: JSON.stringify(msg)}])
     }
   }
   makeAndAddElement(type, style, parent) {
