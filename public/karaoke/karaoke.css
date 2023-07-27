@@ -64,6 +64,7 @@ body{
   color: white;
   background: #3f3f3f;
   padding-bottom: 5px;
+  position: relative;
 }
 .videoPlaylistContainer{
   position: relative;
@@ -162,14 +163,14 @@ body{
   font-size: 2em;
 }
 .button{
-  padding: 7 7;
+  padding: 15 10;
   display: inline-block;
   color: white;
   cursor: pointer;
   border-radius: 3px;
   margin-left: 15px;
   user-select: none;
-  font-size: 0.9em;
+  font-size: 1.5em;
 }
 .slim{
   padding: 5 5;
@@ -177,7 +178,9 @@ body{
   margin-top: -3px;
 }
 .teal{
-  background: teal;
+  background: url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813);
+  background-size: 100% 100%;
+  
 }
 .red{
   background: red;

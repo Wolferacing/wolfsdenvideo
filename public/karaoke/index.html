@@ -13,11 +13,13 @@
       <div class="searchContainer">
         <input class="searchInput" placeholder="Search..."/>
       </div>
-      <h4 class="playlistTitle">
-        Karaoke Players<div class="button slim teal " id="lockPlayer">Unlock</div><div class="button slim teal " id="takeOver">Allow Takeover</div>
-<!--         <div class="button slim teal " id="joinList">Join List</div><div class="button slim teal " id="leaveList">Leave List</div> -->
-<!--         <div class="button slim teal" id="clearPlaylist">Clear Playlist</div><div class="button slim teal" id="addPlaylist">Add Playlist Id</div><div class="button slim teal" id="volDown">Vol Down</div><div class="button slim teal " id="volUp">Vol Up</div> -->
-      </h4>
+      <div class="playlistTitle">
+        <div class="button">
+          <h4>
+          Karaoke Players
+        </h4>
+        </div><div class="button teal " id="lockPlayer">Unlock</div><div class="button teal " id="takeOver">Allow Takeover</div>
+      </div>
     </div>
     <div class="hostTitle">
 
@@ -47,18 +49,6 @@
     </div>
     <div class="videoSearchContainer">
       
-    </div>
-    <div class="addItemBackDrop">
-      <span class="material-icons pointer closeSearch">close</span>
-    </div>
-    <div class="addItemContainer">
-      <div class="addItemTitle">
-        Add youtube playlist by the playlist ID (will clear the existing playlist!)
-      </div>
-      <div class="addItemContent">
-        <input id="addItemInput" placeholder="Playlist ID..."/>
-      </div>
-      <div class="button slim teal" id="addItemSubmit">Load Playlist</div>
     </div>
     <img src="https://cdn.glitch.global/e1a76c0e-a722-4204-9089-a5f3e4fe12f9/3-dots-move.svg?v=1678747444591" class="loadingSpinner"/>
     <script src="./karaoke.js"></script>

@@ -137,12 +137,12 @@ class Karaoke{
   updatePlaylist(player) {
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
-    this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
+    this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
-    this.takeOver.className = player.canTakeOver ? (isMe ? 'button slim red' : 'button slim teal') : 'button slim teal';
+    this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
     this.hostTitle.innerText = 
       'Welcome ' + window.user.name + '.' +
       (isMe ? 'You are' : player.host.name + ' is') +
@@ -288,10 +288,6 @@ class Karaoke{
     this.videoSearchContainer.style.display = 'none';
     this.videoSearchContainer.innerHTML = '';
     this.searchBackDrop.style.display = 'none';
-  }
-  hideAddItem() {
-      this.addItemContainer.style.display = 'none';
-      this.addItemBackDrop.style.display = 'none';
   }
   toggleVideoFullscreen() {
     const playerContainer = document.getElementById("playerContainer");
