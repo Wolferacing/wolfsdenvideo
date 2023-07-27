@@ -85,8 +85,10 @@ class Playlist {
     this.clearPlaylistButton.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.addPlaylist.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
-    this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
+    this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
+    this.voting.style.display = !isMe ? 'none' : 'inline-block';
+    this.voting.innerText = player.canVote ? 'Voting: On' : 'Voting: Off';
     this.hostTitle.innerText = 
       'Welcome ' + window.user.name + '.' +
       (isMe ? 'You are' : player.host.name + ' is') +
@@ -277,6 +279,8 @@ class Playlist {
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value))
     
+    this.voting = document.querySelector('.voting');
+    
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
     this.searchBackDrop = document.querySelector('.searchBackDrop');
@@ -313,7 +317,7 @@ class Playlist {
     
     this.autoSync.addEventListener('click', () => {
       this.autoSyncEnabled = !this.autoSyncEnabled;
-      this.autoSync.innerText = this.autoSyncEnabled ? "Disable Auto Sync" : "Enable Auto Sync";
+      this.autoSync.innerText = this.autoSyncEnabled ? "Auto Sync: On" : "Auto Sync: Off";
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
     });
     

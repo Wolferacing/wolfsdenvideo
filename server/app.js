@@ -138,6 +138,9 @@ class App{
       // case Commands.SET_VOLUME:
       //   this.setVolume(msg.data, msg.type, ws)
       //   break;
+      case Commands.TOGGLE_VOTE:
+        this.toggleVote(ws)
+        break;
       case Commands.DOWN_VOTE:
         this.setVote(msg.data, true, ws);
         break;
@@ -171,6 +174,14 @@ class App{
       ws.p = new Date().getTime();
       this.updateClients(ws.i, "add-to-players");
     }, this.videoPlayers[ws.i].locked);
+  }
+  toggleVote(ws) {
+    if(this.videoPlayers[ws.i]) {
+      this.onlyIfHost(ws, () => {
+        this.videoPlayers[ws.i].canVote = !this.videoPlayers[ws.i].canVote;
+        this.updateClients(ws.i);
+      });
+    }
   }
   sendBrowserClick(click, video_ws) {
     if(this.videoPlayers[video_ws.i]) {
@@ -390,6 +401,7 @@ class App{
         sockets: [ws],
         hasNoHost: false,
         canTakeOver: true,
+        canVote: true,
         currentPlayerUrl: "",
         lastStartTime: new Date().getTime() / 1000,
         tick: setInterval(() => {

@@ -129,7 +129,7 @@ class Core{
     }, 0);
     
     const yScale = Number(this.params.scale.split(" ")[1]);
-     const playlistButton = document.createElement('a-plane');
+    const playlistButton = document.createElement('a-plane');
     playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/image.png?v=1689772204522');

@@ -141,7 +141,7 @@ class Karaoke{
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
-    this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
+    this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
     this.hostTitle.innerText = 
       'Welcome ' + window.user.name + '.' +
