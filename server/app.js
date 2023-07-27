@@ -120,24 +120,24 @@ class App{
         ws.is_video_player = true;
         this.setUserVideoPlayer(msg.data, ws);
         break;
-      case Commands.MUTE:
-        this.setMute(msg.data, ws);
-        break;
-      case Commands.SKIP_BACK:
-        this.skip(true, ws);
-        break;
-      case Commands.SKIP_FORWARD:
-        this.skip(false, ws);
-        break;
+      // case Commands.MUTE:
+      //   this.setMute(msg.data, ws);
+      //   break;
+      // case Commands.SKIP_BACK:
+      //   this.skip(true, ws);
+      //   break;
+      // case Commands.SKIP_FORWARD:
+      //   this.skip(false, ws);
+      //   break;
       case Commands.AUTO_SYNC:
         this.setAutoSync(msg.data, ws);
         break;
       case Commands.CLICK_BROWSER:
         this.sendBrowserClick(msg.data, ws)
         break;
-      case Commands.SET_VOLUME:
-        this.setVolume(msg.data, msg.type, ws)
-        break;
+      // case Commands.SET_VOLUME:
+      //   this.setVolume(msg.data, msg.type, ws)
+      //   break;
       case Commands.DOWN_VOTE:
         this.setVote(msg.data, true, ws);
         break;
@@ -156,11 +156,11 @@ class App{
   measureLatency(ws) {
     this.send(ws, Commands.MEASURE_LATENCY);
   }
-  skip(isBack, ws) {
-    if(ws.user_video) {
-      this.send(ws.user_video, isBack ? Commands.SKIP_BACK : Commands.SKIP_FORWARD);
-    }
-  }
+  // skip(isBack, ws) {
+  //   if(ws.user_video) {
+  //     this.send(ws.user_video, isBack ? Commands.SKIP_BACK : Commands.SKIP_FORWARD);
+  //   }
+  // }
   setAutoSync(autoSync, ws) {
     if(ws.user_video) {
       this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
@@ -213,16 +213,16 @@ class App{
       this.updateClients(ws.i, "set-vote");
     }
   }
-  setVolume(vol, type, ws) {
-    if(ws.user_video) {
-      this.send(ws.user_video, Commands.SET_VOLUME, {vol, type});
-    }
-  }
-  setMute( muted, ws) {
-    if(ws.user_video) {
-      this.send(ws.user_video, Commands.MUTE, muted);
-    }
-  }
+  // setVolume(vol, type, ws) {
+  //   if(ws.user_video) {
+  //     this.send(ws.user_video, Commands.SET_VOLUME, {vol, type});
+  //   }
+  // }
+  // setMute( muted, ws) {
+  //   if(ws.user_video) {
+  //     this.send(ws.user_video, Commands.MUTE, muted);
+  //   }
+  // }
   async fromPlaylist(data, ws) {
     if(!data.id || !data.id.startsWith("PL")) {
       return;
@@ -424,7 +424,9 @@ class App{
       }
     } 
     this.syncWsTime(ws, instanceId);
-    this.send(ws, Commands.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
+    if(ws.type !== "player") {
+      this.send(ws, Commands.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
+    }
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
@@ -461,7 +463,9 @@ class App{
     if(this.videoPlayers[instanceId]) {
       const video = this.getVideoObject(instanceId);
       this.videoPlayers[instanceId].sockets.forEach(socket => {
-        this.send(socket, Commands.PLAYBACK_UPDATE, {video, type});
+        if(socket.type !== "player") {
+          this.send(socket, Commands.PLAYBACK_UPDATE, {video, type});
+        }
       });
     }
   }

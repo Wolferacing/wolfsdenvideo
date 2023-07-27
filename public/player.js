@@ -107,13 +107,13 @@ class Player {
     }).showToast();
   }
   parseMessage(msg) {
-    console.warn(msg);
     const json = JSON.parse(msg);
     switch(json.path) {
       case Commands.SET_VOLUME:
-        if(json.data.vol >= 0 && json.data.vol <= 100) {
-          this.core.params.volume = Number(json.data.vol);
-          this.setVolume(json.data.type);
+        console.warn(msg);
+        if(json.data >= 0 && json.data <= 100) {
+          this.core.params.volume = Number(json.data);
+          this.setVolume(json.type);
           this.setMute();
           this.sendBrowserMessage(json);
         }

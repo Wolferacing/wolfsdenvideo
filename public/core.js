@@ -30,11 +30,10 @@ class Core{
           }
           const now = Date.now();
           if(now - lastSendTime > 1000) {
-            // console.log({path: Commands.SET_VOLUME, data: this.params.volume}, this.params.spatial)
             lastSendTime = now;
-            const roundedVolume = Math.round((this.params.volume * volume) / 5) * 5;
+            const roundedVolume = Math.round((this.params.volume * volume) / 2) * 2;
             if(this.tempVolume != roundedVolume) {
-              this.sendMessage({path: Commands.SET_VOLUME, data: roundedVolume, type: 'spatial'});
+              this.sendBrowserMessage({path: Commands.SET_VOLUME, data: roundedVolume, type: 'spatial'});
             }
             this.tempVolume = roundedVolume; 
           }
@@ -336,9 +335,7 @@ class Core{
           this.measureLatencyResolve = null;
         }
         break;
-        
       case Commands.RESET_BROWSER:
-          console.log("RESET_BROWSER");
         if(window.isBanter && this.browser) {
           this.browser.setAttribute("sq-browser", {"url": this.initialUrl});
         }
@@ -348,7 +345,6 @@ class Core{
         this.sendBrowserMessage(json);
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {
-          console.log("SET_BROWSER_URL");
           this.browser.setAttribute("sq-browser", {"url": json.data.link, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 0.75}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
         }
         break;
