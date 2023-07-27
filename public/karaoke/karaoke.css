@@ -28,21 +28,22 @@ body{
   position: absolute;
   top: 420px;
   left: 200px;
-  transform: translateX(-50%);
-  margin-left: 0!important;
+  margin-left: 0px!important;
+  transform: translate(-50%, -50px);
 }
 .fullscreenButtonOverlay{
   position: fixed;
   top: 80px;
-  left: 20px;
+  left: 200px;
   z-index: 6;
 }
 .lower{
-  margin-top: 85px!important;
+  margin-bottom: -85px!important;
 }
 .singerListTitle{
   padding: 10 10 10 7;
   background: #2f2f2f;
+  font-weight: bold;
 }
 .searchContainer{
   float: right;

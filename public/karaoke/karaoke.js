@@ -149,7 +149,7 @@ class Karaoke{
       " the host" + 
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
-    this.videoPlaylistContainer.innerHTML = '';
+    this.videoPlaylistContainer.innerHTML = '<div class="singerListTitle">Singer List</div>';
     player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
@@ -164,7 +164,7 @@ class Karaoke{
         fontSize: '1.7em'
       }, videoTitleAndAction);
       
-      videoTitle.innerText = `${i+1}. ${p.name}`;
+      videoTitle.innerText = `${i == 0 ? "Currently Singing:" : (i+1)+"."} ${p.name}`;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     });
     this.videoPlayer.innerHTML = '';
