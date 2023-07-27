@@ -42,16 +42,17 @@ body{
   transform: translate(-50%, 50px);
 }
 .singerListTitle{
-  padding: 10 10 10 7;
+  padding: 10 30 10 7;
   background: #2f2f2f;
   font-weight: bold;
+  color: white;
 }
 .searchContainer{
   float: right;
 }
 .searchInput, #addItemInput{
   background: rgba(0,0,0,0.2);
-  margin: 15px;
+  margin: 12px;
   height: 32px;
   border: 1px solid white;
   font-size: 20px;
@@ -118,10 +119,10 @@ body{
 }
 .hostTitle{
   font-style: italic;
-  font-size: 1.5em;
+  font-size: 1.2em;
   display: inline-block;
   width: 100%;
-  height: 36px;
+  height: 24px;
   padding: 15px 30px;
   background: #16181f;
   color: white;

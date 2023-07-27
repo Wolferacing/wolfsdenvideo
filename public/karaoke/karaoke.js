@@ -62,7 +62,7 @@ class Karaoke{
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
     });
     
-    this.videoPlayer = document.querySelector('#videoPlayer');
+    this.videoPlayer = document.querySelector('#singerList');
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
@@ -149,7 +149,7 @@ class Karaoke{
       " the host" + 
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
-    this.videoPlaylistContainer.innerHTML = '<div class="singerListTitle">Singer List</div>';
+    this.videoPlaylistContainer.innerHTML = '';
     player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
