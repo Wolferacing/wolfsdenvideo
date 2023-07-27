@@ -161,7 +161,7 @@ class Karaoke{
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap', 
-        fontSize: '1.7em'
+        fontSize: '1.4em'
       }, videoTitleAndAction);
       
       videoTitle.innerText = `${i == 0 ? "Currently Singing:" : (i+1)+"."} ${p.name}`;
@@ -303,11 +303,9 @@ class Karaoke{
         player.width = '420';
         player.height = '280';
         this.fullscreenButton.innerText = "Show Fullscreen";
-        this.fullscreenButton.className = "button teal fullscreenButton";
-        this.autoSync.className = "button teal fullscreenButton lower";
       }else{
         playerContainer.style.position = "fixed";
-        playerContainer.style.top = "0";
+        playerContainer.style.top = "55px";
         playerContainer.style.bottom = "0";
         playerContainer.style.left = "0";
         playerContainer.style.right = "0";
@@ -315,8 +313,6 @@ class Karaoke{
         player.width = window.innerWidth;
         player.height = window.innerHeight;
         this.fullscreenButton.innerText = "Exit Fullscreen";
-        this.fullscreenButton.className = "button teal fullscreenButton fullscreenButtonOverlay";
-        this.autoSync.className = "button teal fullscreenButton fullscreenButtonOverlay lower";
       }
     }
   }

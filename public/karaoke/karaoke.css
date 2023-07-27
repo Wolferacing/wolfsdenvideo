@@ -20,11 +20,11 @@ body{
   margin: auto;
   background: #3f3f3f;
   color: white;
-  height: 55px;
+  height: 45px;
   font: 15px Roboto, sans-serif;
-  padding: 1px 30px;
+  padding: 1px 15px;
 }
-.fullscreenButton{
+/* .fullscreenButton{
   position: absolute;
   top: 420px;
   left: 200px;
@@ -36,13 +36,13 @@ body{
   top: 120px;
   left: 200px;
   z-index: 6;
-  transform: translate(-50%, -50px);
+  transform: translate(-50%, -80px);
 }
 .lower{
   transform: translate(-50%, -20px);
-}
+} */
 .singerListTitle{
-  padding-left: 30px;
+  padding-left: 20px;
   padding-top: 10px;
   padding-bottom: 10px;
   background: #2f2f2f;
@@ -60,6 +60,7 @@ body{
   font-size: 20px;
   color: white;
   width: 130px;
+  margin: 5px;
 }
 .playlistTitle{
   font-weight: normal;
@@ -126,7 +127,7 @@ body{
   display: inline-block;
   width: 100%;
   height: 24px;
-  padding: 15px 30px;
+  padding: 15px 20px;
   background: #16181f;
   color: white;
 }
@@ -158,9 +159,9 @@ body{
   display: none;
 }
 .title{
-  font-size: 1.8em;
+  font-size: 1.4em;
   display: inline-block;
-  margin-right: 20px;
+  margin-right: 15px;
 }
 .closeSearch{
   position:absolute;
@@ -171,7 +172,7 @@ body{
   font-size: 2em;
 }
 .button{
-  padding: 15 12;
+  padding: 10 10;
   display: inline-block;
   color: white;
   cursor: pointer;
