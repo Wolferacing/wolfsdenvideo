@@ -40,11 +40,10 @@ class Player {
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
   }
   onYouTubeIframeAPIReady() {
-    console.log(this.getId(decodeURIComponent(this.core.params.youtube)), this.core.params.youtube);
     new YT.Player('player', {
       height: window.innerHeight,
       width: window.innerWidth,
-      videoId: this.getId(decodeURIComponent(this.core.params.youtube)),
+      videoId: this.core.getId(decodeURIComponent(this.core.params.youtube)),
       playerVars: {
         'playsinline': 1,
         'autoplay': 0,
@@ -135,7 +134,7 @@ class Player {
         if(json.data.type === "set-track" && this.readyToPlay) {
           this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
         }else if(json.data.type === "stop" && this.readyToPlay) {
-          this.player.loadVideoById(this.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
+          this.player.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
         }
         break;
       case Commands.MUTE:
@@ -168,7 +167,7 @@ class Player {
     if(this.playerData) {
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
         const url = this.playerData.playlist[currentTrack].link;
-        this.player.loadVideoById(this.getId(url), currentTime);
+        this.player.loadVideoById(this.core.getId(url), currentTime);
         this.player.playVideo();
         this.showToast("Playing: " + this.playerData.playlist[currentTrack].title);
         this.setVolume("spatial");
@@ -198,11 +197,6 @@ class Player {
         showToast();
       }
     }
-  }
-  getId(url){
-    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    var match = url.match(regExp);
-    return (match&&match[7].length==11)? match[7] : false;
   }
   setupYoutubeScript() {
     return this.setupScript("https://www.youtube.com/iframe_api");

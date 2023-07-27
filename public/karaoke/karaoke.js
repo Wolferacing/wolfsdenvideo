@@ -126,7 +126,7 @@ class Karaoke{
         this.core.player = json.data.video;
         this.updatePlaylist(this.core.player);
         if(json.data.type === "stop" && this.YtPlayer) {
-          this.YtPlayer.loadVideoById(this.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
+          this.YtPlayer.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
         }
         break;
         break;
@@ -221,7 +221,10 @@ class Karaoke{
           this.initialYoutube = v;
         }
       }
-    })
+    });
+    if(this.videoPlayer.innerHTML === '') {
+      
+    }
   }
   timeCode(seconds) {
     return new Date(seconds * 1000).toISOString().substring(11, 19);
