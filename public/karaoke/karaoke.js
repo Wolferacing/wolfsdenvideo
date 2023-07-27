@@ -54,7 +54,7 @@ class Karaoke{
     this.stopVideo = document.querySelector('#stopVideo');
     this.stopVideo.addEventListener('click', () => {
       this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-      this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
+      this.core.sendMessage({path: Commands.STOP});
     });
     this.autoSync = document.querySelector('#autoSync');
     
@@ -125,6 +125,10 @@ class Karaoke{
       case Commands.PLAYBACK_UPDATE:
         this.core.player = json.data.video;
         this.updatePlaylist(this.core.player);
+        if(json.data.type === "stop" && this.YtPlayer) {
+          this.YtPlayer.loadVideoById(this.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
+        }
+        break;
         break;
       case Commands.SEARCH_RESULTS:
         this.loadVideos(json.data);
@@ -305,7 +309,7 @@ class Karaoke{
         player.width = '420';
         player.height = '280';
         this.fullscreenButton.innerText = "Fullscreen: Off";
-        this.videoPlayer.style.display = 'block';
+        this.videoPlayer.style.display = 'inlin-block';
       }else{
         playerContainer.style.position = "fixed";
         playerContainer.style.top = "55px";

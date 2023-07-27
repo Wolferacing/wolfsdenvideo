@@ -134,11 +134,9 @@ class Player {
         this.playerData = json.data.video;
         if(json.data.type === "set-track" && this.readyToPlay) {
           this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
+        }else if(json.data.type === "stop" && this.readyToPlay) {
+          this.player.loadVideoById(this.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
         }
-        break;
-      case Commands.STOP:
-        this.player.loadVideoById(this.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
-        this.showToast("stopped!");
         break;
       case Commands.MUTE:
         this.core.params.mute = json.data;
