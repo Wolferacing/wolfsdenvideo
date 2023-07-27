@@ -151,7 +151,7 @@ class Core{
   setupVolButton(scene, isUp, playlistContainer) {
     this.setupButton(scene, playlistContainer, isUp ? 1.25 : 1.78, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>{
         this.setVolume(isUp);
-      console.warn({path: Commands.SET_VOLUME, data: this.params.volume});
+        console.warn({path: Commands.SET_VOLUME, data: this.params.volume});
         this.sendMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
@@ -283,6 +283,13 @@ class Core{
     msg.u = window.user;
     if(this.connected()) {
       this.ws.send(JSON.stringify(msg));
+    }
+  }
+  sendBrowserMessage(msg){
+    msg.u = window.user;
+    msg.i = this.params.instance;
+    if(this.browser) {
+      this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
     }
   }
   makeAndAddElement(type, style, parent) {
