@@ -80,13 +80,13 @@ class Playlist {
   updatePlaylist(player) {
     const isMe = player.host.id === window.user.id;
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
-    this.lockPlayer.className = player.locked ? 'button slim teal' : 'button slim red';
+    this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.clearPlaylistButton.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.addPlaylist.style.display = player.locked && !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Disable Take Over' : 'Take Over') : 'Allow Take Over';
-    this.takeOver.className = player.canTakeOver ? (isMe ? 'button slim red' : 'button slim teal') : 'button slim teal';
+    this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
     this.hostTitle.innerText = 
       'Welcome ' + window.user.name + '.' +
       (isMe ? 'You are' : player.host.name + ' is') +
@@ -103,7 +103,7 @@ class Playlist {
       const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '7 10 0 7', 
+        padding: '7 10 10 7', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
@@ -113,23 +113,23 @@ class Playlist {
       
       videoTitle.innerText = v.title;
         
-      const videoAuthor = this.core.makeAndAddElement('div',{
-        padding: '0 10 5 7', 
-        textOverflow: 'ellipsis', 
-        overflow: 'hidden', 
-        fontSize: '0.8rem',
-        color: '#cfcfcf',
-        whiteSpace: 'nowrap'
-      }, videoTitleAndAction);
+//       const videoAuthor = this.core.makeAndAddElement('div',{
+//         padding: '0 10 5 7', 
+//         textOverflow: 'ellipsis', 
+//         overflow: 'hidden', 
+//         fontSize: '0.8rem',
+//         color: '#cfcfcf',
+//         whiteSpace: 'nowrap'
+//       }, videoTitleAndAction);
 
-      videoAuthor.className = "currentTimeAuthor";
-      videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
+//       videoAuthor.className = "currentTimeAuthor";
+//       videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
       
       if(player.currentTrack !== i) {
 
         const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-        playTrack.className = 'button green';
+        playTrack.className = 'button slim green';
         playTrack.innerText = "Play Now";
 
         playTrack.addEventListener('click', () => {
@@ -137,7 +137,7 @@ class Playlist {
         });
         const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-        moveDown.className = 'button teal';
+        moveDown.className = 'button slim teal';
         moveDown.innerText = "Move Down";
 
         moveDown.addEventListener('click', () => {
@@ -145,7 +145,7 @@ class Playlist {
         });
 
         const moveUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-        moveUp.className = 'button teal';
+        moveUp.className = 'button slim teal';
         moveUp.innerText = "Move Up";
 
         moveUp.addEventListener('click', () => {
@@ -154,7 +154,7 @@ class Playlist {
 
         const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-        remove.className = 'button red';
+        remove.className = 'button slim red';
         remove.innerText = "Remove";
 
         remove.addEventListener('click', () => {
@@ -223,7 +223,7 @@ class Playlist {
       
       const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      playNow.className = 'button teal';
+      playNow.className = 'button slim teal';
       playNow.innerText = "Play Now";
       
       playNow.addEventListener('click', () => {
@@ -234,7 +234,7 @@ class Playlist {
       
       const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      playNext.className = 'button teal';
+      playNext.className = 'button slim teal';
       playNext.innerText = "Play Next";
       
       playNext.addEventListener('click', () => {

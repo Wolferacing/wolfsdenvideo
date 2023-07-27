@@ -12,6 +12,8 @@ body{
   overflow: hidden;
   padding: 0;
   width: 100%;
+  background: #7f7f7f;
+  background: linear-gradient(to bottom, #6a6e83, #332834);
 }
 .playlistContainer{
   position: relative;
@@ -36,6 +38,11 @@ body{
   color: white;
   width: 130px;
   margin: 5px;
+}
+.title{
+  font-size: 1.4em;
+  display: inline-block;
+  margin-right: 15px;
 }
 .playlistTitle{
   font-weight: normal;
