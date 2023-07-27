@@ -20,7 +20,7 @@ body{
   margin: auto;
   background: #3f3f3f;
   color: white;
-  height: 64px;
+  height: 55px;
   font: 15px Roboto, sans-serif;
   padding: 1px 30px;
 }
@@ -28,17 +28,18 @@ body{
   position: absolute;
   top: 420px;
   left: 200px;
-  margin-left: 0px!important;
   transform: translate(-50%, -50px);
+  margin-left: 0px!important;
 }
 .fullscreenButtonOverlay{
   position: fixed;
-  top: 80px;
+  top: 120px;
   left: 200px;
   z-index: 6;
+  transform: translate(-50%, -50px);
 }
 .lower{
-  margin-bottom: -85px!important;
+  transform: translate(-50%, 50px);
 }
 .singerListTitle{
   padding: 10 10 10 7;
@@ -144,16 +145,9 @@ body{
   word-wrap: normal;
   white-space: nowrap;
   direction: ltr;
-
-  /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
   font-feature-settings: 'liga';
 }  
 #takeOver{
@@ -173,7 +167,7 @@ body{
   font-size: 2em;
 }
 .button{
-  padding: 18 14;
+  padding: 13 10;
   display: inline-block;
   color: white;
   cursor: pointer;
@@ -190,7 +184,6 @@ body{
 .teal{
   background: url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813);
   background-size: 100% 100%;
-  
 }
 .red{
   background: red;
