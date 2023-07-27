@@ -76,6 +76,10 @@ class Core{
     browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url});// , "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 5}, {"actionType": "click2d", "numParam1": 1, "numParam2": 1}]
     scene.appendChild(browser);
     this.browser = browser;
+    this.browser.addEventListener('browsermessage', (e) => {
+      console.log("got a browser message");
+      console.log(e);
+    });
     this.setupBrowserUi();
   }
   clickBrowser(x,y) {
@@ -287,16 +291,27 @@ class Core{
   }
   recieveBrowserMessage(msg) {
     if(msg.id && this.browserAcks[msg.id]) {
-      this.browserAcks[msg.id]
+      this.browserAcks[msg.id]();
+      this.browserAcks[msg.id] = null;
+    }else{
+      switch(msg.path) {
+          // handle other direct messages from the browser
+      }
     }
   }
   sendBrowserMessage(msg){
+    this.browserAcks = this.browserAcks || {};
     msg.u = window.user;
     msg.i = this.params.instance;
-    this.browserAcks = 
-    if(this.browser) {
-      this.browser.components['sq-browser'].runActions([{actionType: "postmessage", strParam1: JSON.stringify(msg)}])
-    }
+    msg.id = this.getUniquId();
+    return new Promise((resolve, reject) => {
+      if(this.browser) {
+        this.browserAcks[msg.id] = resolve;
+        this.browser.components['sq-browser'].runActions([{actionType: "postmessage", strParam1: JSON.stringify(msg)}]);
+      }else{
+        reject();
+      }
+    });
   }
   makeAndAddElement(type, style, parent) {
     const element = document.createElement(type);
