@@ -163,10 +163,10 @@ class App{
     }
   }
   addToPlayers(ws){
-    this.onlyIfHost(ws, () => {
-      ws.p = new Date().getTime();
-      this.updateClients(ws.i, "add-to-players");
-    }, this.videoPlayers[ws.i].locked);
+    // this.onlyIfHost(ws, () => {
+    // }, this.videoPlayers[ws.i].locked);
+    ws.p = new Date().getTime();
+    this.updateClients(ws.i, "add-to-players");
   }
   toggleVote(ws) {
     if(this.videoPlayers[ws.i]) {
