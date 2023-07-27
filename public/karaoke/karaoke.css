@@ -5,6 +5,7 @@ html{
   right: 0;
   top: 0;
   background: #cfcfcf;
+  font: 15px Roboto, sans-serif;
 }
 body{
   height: 100%;
@@ -21,7 +22,7 @@ body{
   color: white;
   height: 64px;
   font: 15px Roboto, sans-serif;
-  padding: 1 30;
+  padding: 1px 30px;
 }
 .fullscreenButton{
   position: absolute;
@@ -60,7 +61,6 @@ body{
 .videoPlayer{
   float: left;
   width: 420px;
-  font: 15px Roboto, sans-serif;
   color: white;
   background: #3f3f3f;
   padding-bottom: 5px;
@@ -70,7 +70,6 @@ body{
   position: relative;
   background: #cfcfcf;
   color: white;
-  font: 15px Roboto, sans-serif;
   overflow: auto;
   height: calc(100% - 64px);
   width: 100%;
@@ -92,7 +91,6 @@ body{
   margin-right: 80px;
   background: #8f8f8f;
   color: white;
-  font: 15px Roboto, sans-serif;
   overflow: auto;
   height: calc(100% - 66px);
   width: calc(100% - 160px); 
@@ -113,11 +111,12 @@ body{
 }
 .hostTitle{
   font-style: italic;
-  font-size: 0.8em;
+  font-size: 1.5em;
   display: inline-block;
   width: 100%;
-  padding: 5px;
-  background: #cfcfcf;
+  height: 26px;
+  padding: 5px 30px;
+  background: #16181f;
   color: white;
 }
 .addItemTitle{
@@ -154,6 +153,11 @@ body{
 #takeOver{
   display: none;
 }
+.title{
+  font-size: 1.8em;
+  display: inline-block;
+  margin-right: 20px;
+}
 .closeSearch{
   position:absolute;
   top: 10px;
@@ -163,14 +167,14 @@ body{
   font-size: 2em;
 }
 .button{
-  padding: 15 10;
+  padding: 18 14;
   display: inline-block;
   color: white;
   cursor: pointer;
   border-radius: 3px;
-  margin-left: 15px;
+  margin-left: 5px;
   user-select: none;
-  font-size: 1.5em;
+  font-size: 1.6em;
 }
 .slim{
   padding: 5 5;
