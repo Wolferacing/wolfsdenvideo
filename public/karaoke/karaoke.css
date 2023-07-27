@@ -114,6 +114,10 @@ body{
   font-style: italic;
   font-size: 0.8em;
   display: inline-block;
+  width: 100%;
+  padding: 5px;
+  background: #cfcfcf;
+  color: white;
 }
 .addItemTitle{
   font-style: italic;

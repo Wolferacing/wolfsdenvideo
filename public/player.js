@@ -91,7 +91,7 @@ class Player {
   showToast(text) {
     Toastify({
       text: text,
-      duration: 1000,
+      duration: 500,
       // close: true,
       gravity: "bottom", // `top` or `bottom`
       position: "right", // `left`, `center` or `right`
