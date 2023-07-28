@@ -237,7 +237,7 @@ class Playlist {
       
       const addToPlaylist = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      addToPlaylist.className = 'button teal';
+      addToPlaylist.className = 'button slim teal';
       addToPlaylist.innerText = "Add To Playlist";
       
       addToPlaylist.addEventListener('click', async () => {
