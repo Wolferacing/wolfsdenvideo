@@ -133,7 +133,7 @@ class Core{
     playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/image.png?v=1689772204522');
-    playlistButton.setAttribute('position', `0 ${-yScale*0.335-0.7} 2`);
+    playlistButton.setAttribute('position', `0 ${-yScale*0.335} 2`);
     playlistButton.setAttribute('rotation', `-30 180 0`);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
