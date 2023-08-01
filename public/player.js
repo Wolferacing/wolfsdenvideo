@@ -46,7 +46,7 @@ class Player {
       videoId: this.core.getId(decodeURIComponent(this.core.params.youtube)),
       playerVars: {
         'playsinline': 1,
-        'autoplay': 0,
+        'autoplay': 1,
         'disablekb': 1,
         'controls': 0,
         'modestbranding': true,
@@ -71,12 +71,12 @@ class Player {
           this.player = event.target; 
           this.setVolume();
           this.setMute();
-          await this.waitFor(1);
-          this.startPlayerOrNot();
-          await this.waitFor(5);
-          if(!this.readyToPlay) {
-            window.location.reload();
-          }
+          // await this.waitFor(1);
+          // this.startPlayerOrNot();
+          // await this.waitFor(5);
+          // if(!this.readyToPlay) {
+          //   window.location.reload();
+          // }
         }
       }
     });
