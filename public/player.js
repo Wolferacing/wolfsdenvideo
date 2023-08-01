@@ -71,7 +71,7 @@ class Player {
           this.player = event.target; 
           this.setVolume();
           this.setMute();
-          await this.waitFor(1);
+          await this.waitFor(15);
           this.startPlayerOrNot();
           await this.waitFor(5);
           if(!this.readyToPlay) {

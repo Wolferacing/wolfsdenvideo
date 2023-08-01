@@ -74,8 +74,8 @@ class Core{
     scene.appendChild(browser);
     this.browser = browser;
     this.browser.addEventListener('browsermessage', (e) => {
-      console.log("got a browser message");
-      console.log(e);
+      // console.log("got a browser message");
+      // console.log(e);
     });
     this.setupBrowserUi();
   }
