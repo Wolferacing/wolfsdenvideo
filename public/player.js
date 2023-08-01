@@ -71,12 +71,6 @@ class Player {
           this.player = event.target; 
           this.setVolume();
           this.setMute();
-          // await this.waitFor(1);
-          // this.startPlayerOrNot();
-          // await this.waitFor(5);
-          // if(!this.readyToPlay) {
-          //   window.location.reload();
-          // }
         }
       }
     });
@@ -91,10 +85,8 @@ class Player {
     Toastify({
       text: text,
       duration: 500,
-      // close: true,
       gravity: "bottom", // `top` or `bottom`
       position: "right", // `left`, `center` or `right`
-      // stopOnFocus: true, // Prevents dismissing of toast on hover
       style: {
         background: "url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813) center center no-repeat",
         backgroundSize: "cover",
@@ -102,7 +94,6 @@ class Player {
         fontSize: "2em",
         fontFamily: "'Roboto', sans-serif"
       },
-      // onClick: function(){} // Callback after click
     }).showToast();
   }
   parseMessage(msg) {
