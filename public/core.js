@@ -166,13 +166,6 @@ class Core{
       this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
     })
   }
-  // async saySomething(user) {
-  //     const welcome = await fetch('https://say-something.glitch.me/say/' + user.name + " has joined the space!");
-  //     const url = await welcome.text();
-  //     const audio = new Audio("data:audio/mpeg;base64," + url);
-  //     audio.play();
-  //     audio.volume = 1;
-  // }
   setupButton(scene, playlistContainer, xOffset, title, width, size, callback, yOffset) {
     const yScale = Number(this.params.scale.split(" ")[1]);
     const buttonContainer = document.createElement('a-entity');
@@ -383,3 +376,23 @@ class Core{
   }
 }
 window.videoPlayerCore = new Core();
+
+/*
+ <script>
+        setTimeout(() => {
+          window.openPage("https://spotc.glitch.me/menu.html");
+
+        }, 6000);
+                setTimeout(() => {
+          window.banter.sendMenuBrowserMessage("here r message");
+
+        }, 10000);
+        window.addEventListener("menubrowsermessage", (e) => {
+          console.log("got thing");
+          window.banter.sendMenuBrowserMessage("ok did get: " + e.detail.message);
+          console.log(e);
+        });
+        
+
+      </script>
+*/
