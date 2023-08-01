@@ -8,14 +8,10 @@ class Core{
     this.hostUrl = hostUrl;
     this.defaultVideo = "https://www.youtube.com/watch?v=L_LUpnjgPso";
     await this.setupCommandsScript();
-    const now = new Date().getTime();
+    if(this.params.announce === 'true') { 
+      await this.setupSayNamesScript();
+    }
     if(window.isBanter) {
-      window.userJoinedCallback = async user => {
-        if(this.params.announce === 'true') { //  && new Date().getTime() - now > 10000
-          console.log(user);
-          this.saySomething({name: user.id.substr(0, 6)});
-        }
-      };
       let lastSendTime = Date.now();
       const positionOfBrowser = this.params.position.split(" ");
       window.userPoseCallback = async pose => {
@@ -171,13 +167,13 @@ class Core{
       this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
     })
   }
-  async saySomething(user) {
-      const welcome = await fetch('https://say-something.glitch.me/say/' + user.name + " has joined the space!");
-      const url = await welcome.text();
-      const audio = new Audio("data:audio/mpeg;base64," + url);
-      audio.play();
-      audio.volume = 1;
-  }
+  // async saySomething(user) {
+  //     const welcome = await fetch('https://say-something.glitch.me/say/' + user.name + " has joined the space!");
+  //     const url = await welcome.text();
+  //     const audio = new Audio("data:audio/mpeg;base64," + url);
+  //     audio.play();
+  //     audio.volume = 1;
+  // }
   setupButton(scene, playlistContainer, xOffset, title, width, size, callback, yOffset) {
     const yScale = Number(this.params.scale.split(" ")[1]);
     const buttonContainer = document.createElement('a-entity');
@@ -365,10 +361,23 @@ class Core{
     var match = url.match(regExp);
     return (match&&match[7].length==11)? match[7] : false;
   }
+  setupSayNamesScript(callback) {
+    return this.setupScript(callback, "say-names");
+  }
   setupCommandsScript(callback) {
+    return this.setupScript(callback, "commands");
+    
+    // new Promise(resolve => {
+    //   let myScript = document.createElement("script");
+    //   myScript.setAttribute("src", `https://${this.hostUrl}/commands.js`);
+    //   myScript.addEventListener ("load", resolve, false);
+    //   document.body.appendChild(myScript);  
+    // });
+  }
+  setupScript(callback, name) {
     return new Promise(resolve => {
       let myScript = document.createElement("script");
-      myScript.setAttribute("src", `https://${this.hostUrl}/commands.js`);
+      myScript.setAttribute("src", `https://${this.hostUrl}/${name}.js`);
       myScript.addEventListener ("load", resolve, false);
       document.body.appendChild(myScript);  
     });
