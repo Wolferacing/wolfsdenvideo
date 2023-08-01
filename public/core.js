@@ -8,9 +8,11 @@ class Core{
     this.hostUrl = hostUrl;
     this.defaultVideo = "https://www.youtube.com/watch?v=L_LUpnjgPso";
     await this.setupCommandsScript();
+    const now = new Date().getTime();
     if(window.isBanter) {
       window.userJoinedCallback = async user => {
-        if(this.params.announce === 'true') {
+        if(this.params.announce === 'true') { //  && new Date().getTime() - now > 10000
+          console.log(user);
           this.saySomething({name: user.id.substr(0, 6)});
         }
       };
@@ -174,7 +176,7 @@ class Core{
       const url = await welcome.text();
       const audio = new Audio("data:audio/mpeg;base64," + url);
       audio.play();
-      audio.volume = 0.05;
+      audio.volume = 1;
   }
   setupButton(scene, playlistContainer, xOffset, title, width, size, callback, yOffset) {
     const yScale = Number(this.params.scale.split(" ")[1]);
