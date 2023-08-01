@@ -7,6 +7,7 @@ if(window.isBanter) {
       const audio = new Audio("data:audio/mpeg;base64," + url);
       audio.play();
       audio.volume = 1;
+      console.log("playing", audio);
     // }
   }
 }
