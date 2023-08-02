@@ -14,7 +14,7 @@ class App{
     this.setupWebserver();
     setInterval(() => this.syncTime(), 1000);
     this.syncTime();
-  }
+  } 
   setupWebserver() {
     this.app = express();
     this.server = http.createServer( this.app ); 
