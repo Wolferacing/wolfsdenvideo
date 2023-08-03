@@ -75,6 +75,13 @@ class Karaoke{
       this.videoPreviewContainer.style.display = "none";
       this.hideSearch();
     });
+    const searchButtons = document.querySelectorAll(".searchButtons > .button");
+    for (let i = 0; i < searchButtons.length; i++) {
+       searchButtons[i].addEventListener("click", () => {
+         this.searchInput.value += " " + searchButtons[i].innerText;
+         this.debounceSearch(this.searchInput.value)
+       });
+    }
     
     this.videoPlayer = document.querySelector('#videoPlayer');
     

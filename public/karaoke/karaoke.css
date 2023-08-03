@@ -61,6 +61,14 @@ body{
 .center{
   text-align: center;
 }
+.searchButtons{
+  position: absolute;
+  top: 10px;
+  right: 300px;
+}
+.searchButtons > .button{
+  padding: 7 7;
+}
 .large-text{
   font-size: 1.5em;
   padding-left: 10%;
