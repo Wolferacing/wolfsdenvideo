@@ -63,8 +63,17 @@ class Karaoke{
     this.closePreview = document.querySelector('.closePreview');
     
     this.closePreview.addEventListener('click', () => {
-        this.videoPreviewContainer.style.display = "none";
-        this.YtPlayer.pause();
+      this.videoPreviewContainer.style.display = "none";
+      this.YtPlayer.pauseVideo();
+    });
+    
+    this.singIt = document.querySelector('#singIt');
+    
+    this.singIt.addEventListener('click', () => {
+      this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS }); // : Commands.REMOVE_FROM_PLAYERS 
+      this.YtPlayer.pauseVideo();
+      this.videoPreviewContainer.style.display = "none";
+      this.hideSearch
     });
     
     this.videoPlayer = document.querySelector('#videoPlayer');
@@ -140,7 +149,7 @@ class Karaoke{
       " the host" + 
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
-    this.videoPlaylistContainer.innerHTML = player.players.length ? '' : '<h2 style="color: grey; margin-top: 100px; text-align: center;">Search for a song to add yourself to the list!</h2>';
+    this.videoPlaylistContainer.innerHTML = player.players.length ? '' : '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!</h2>';
     player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
@@ -176,19 +185,19 @@ class Karaoke{
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
       
-      const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+//       const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      playNow.className = 'button slim teal';
-      playNow.innerText = "Play Now";
+//       playNow.className = 'button slim teal';
+//       playNow.innerText = "Play Now";
       
-      playNow.addEventListener('click', () => {
-        if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id )) {
-          this.hideSearch();
-          this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-          this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
-        }
-      }); 
+//       playNow.addEventListener('click', () => {
+//         if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id )) {
+//           this.hideSearch();
+//           this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+//           this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
+//           this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
+//         }
+//       }); 
       
 //       const playNowYT = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
@@ -207,7 +216,7 @@ class Karaoke{
       const preview = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
       preview.className = 'button slim teal';
-      preview.innerText = "Preview";
+      preview.innerText = "Preview & Sing It";
       
       preview.addEventListener('click', () => {
         this.videoPreviewContainer.style.display = "block";
