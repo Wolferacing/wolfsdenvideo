@@ -45,11 +45,11 @@ class Karaoke{
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
     
-    this.fullscreenButton = document.querySelector('.fullscreenButton');
+//     this.fullscreenButton = document.querySelector('.fullscreenButton');
     
-    this.fullscreenButton.addEventListener('click', () => {
-        this.toggleVideoFullscreen();
-    });
+//     this.fullscreenButton.addEventListener('click', () => {
+//         this.toggleVideoFullscreen();
+//     });
     
     this.stopVideo = document.querySelector('#stopVideo');
     this.stopVideo.addEventListener('click', () => {
@@ -115,18 +115,18 @@ class Karaoke{
         if(currentTimeText != null) {
           currentTimeText.innerText = this.timeCode(json.data.currentTime) + " / " + this.timeCode(json.data.duration);
         }
-        if(this.YtPlayer) {
-          const timediff = Math.abs(this.YtPlayer.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
-          if(timediff > 0.5) {
-            this.YtPlayer.seekTo(json.data.currentTime + this.core.currentLatency);
-          }
-        }
+        // if(this.YtPlayer) {
+        //   const timediff = Math.abs(this.YtPlayer.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
+        //   if(timediff > 0.5) {
+        //     this.YtPlayer.seekTo(json.data.currentTime + this.core.currentLatency);
+        //   }
+        // }
         break;
       case Commands.PLAYBACK_UPDATE:
         this.core.player = json.data.video;
         this.updatePlaylist(this.core.player);
         if(json.data.type === "stop" && this.YtPlayer) {
-          this.YtPlayer.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
+          // this.YtPlayer.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
         }
         break;
         break;
@@ -214,12 +214,12 @@ class Karaoke{
 
         currentTimeText.className = "currentTimeText";
         currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
-        if(this.YtPlayer) {
-          console.log("load player!")
-          this.YtPlayer.loadVideoById(this.core.getYTId(v.link), player.currentTime);
-        }else{
-          this.initialYoutube = v;
-        }
+        // if(this.YtPlayer) {
+        //   console.log("load player!")
+        //   this.YtPlayer.loadVideoById(this.core.getYTId(v.link), player.currentTime);
+        // }else{
+        //   this.initialYoutube = v;
+        // }
       }
     });
     if(this.videoPlayer.innerHTML === '') {
@@ -298,37 +298,8 @@ class Karaoke{
     this.videoSearchContainer.innerHTML = '';
     this.searchBackDrop.style.display = 'none';
   }
-  toggleVideoFullscreen() {
-    const playerContainer = document.getElementById("playerContainer");
-    if(playerContainer != null) {
-      const player = document.getElementById("player");
-      const isFullscreen = player.width != '420';
-      if(isFullscreen) {
-        playerContainer.style.position = "initial";
-        playerContainer.style.top = "initial";
-        playerContainer.style.bottom = "initial";
-        playerContainer.style.left = "initial";
-        playerContainer.style.right = "initial";
-        player.width = '420';
-        player.height = '280';
-        this.fullscreenButton.innerText = "Fullscreen: Off";
-        this.videoPlayer.style.display = 'inlin-block';
-      }else{
-        playerContainer.style.position = "fixed";
-        playerContainer.style.top = "55px";
-        playerContainer.style.bottom = "0";
-        playerContainer.style.left = "0";
-        playerContainer.style.right = "0";
-        playerContainer.style.zIndex = "5";
-        player.width = window.innerWidth;
-        player.height = window.innerHeight;
-        this.fullscreenButton.innerText = "Fullscreen: On";
-        this.videoPlayer.style.display = 'none';
-      }
-    }
-  }
   setupYoutubePlayer() {
-    const youtubeUrl = this.core.urlParams.has('youtube') ? this.core.urlParams.get('youtube') : 'https://www.youtube.com/watch?v=L_LUpnjgPso';
+    const youtubeUrl = 'https://www.youtube.com/watch?v=L_LUpnjgPso';
     new YT.Player('player', {
       height: '280',
       width: '420',
@@ -350,9 +321,6 @@ class Karaoke{
         'onReady': (event) => {
           this.YtPlayer = event.target;
           this.YtPlayer.setVolume(0);
-          if(this.initialYoutube) {
-            this.YtPlayer.loadVideoById(this.core.getYTId(this.initialYoutube.link), this.core.player ? this.core.player.currentTime || 0 : 0);
-          }
         }
       }
     });
