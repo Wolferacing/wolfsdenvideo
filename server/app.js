@@ -360,10 +360,13 @@ class App{
   setVideoTrack(index, ws) {
     this.onlyIfHost(ws, () => {
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
+        const track = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
+        this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video === track);
         this.videoPlayers[ws.i].currentTrack = index;
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         this.resetBrowserIfNeedBe(this.videoPlayers[ws.i], index);
+        this.updateVotes(ws);
         this.updateClients(ws.i, Commands.SET_TRACK);
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
@@ -415,6 +418,7 @@ class App{
             const now = new Date().getTime() / 1000;
             this.videoPlayers[instanceId].currentTime = now - this.videoPlayers[instanceId].lastStartTime;
             if(this.videoPlayers[instanceId].currentTime > (track ? track.duration : 0) / 1000) {
+              this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video === track);
               this.videoPlayers[instanceId].currentTrack++;
               if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
                 this.videoPlayers[instanceId].currentTrack = 0;

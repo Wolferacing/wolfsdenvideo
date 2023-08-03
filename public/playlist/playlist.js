@@ -112,7 +112,7 @@ class Playlist {
       
       videoThumbnail.src = v.thumbnail;
       
-      videoTitle.innerText = (player.canVote ? "(" + player.playlist[i].votes + ") " : "") + v.title;
+      videoTitle.innerHTML = (player.canVote && player.currentTrack !== i ? "<b>(" + player.playlist[i].votes + ")</b> " : "") + v.title;
         
       const videoAuthor = this.core.makeAndAddElement('div',{
         padding: '0 10 5 7', 
