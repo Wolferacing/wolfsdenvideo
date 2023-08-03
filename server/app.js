@@ -208,11 +208,11 @@ class App{
           const upVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && !v.isDown).length;
           d.votes = upVotes - downVotes; 
       });
+      
       const current = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
+      current.votes = 9999999;
+      
       this.videoPlayers[ws.i].playlist.sort((a, b) => {
-        if(b === current){
-          b.votes = 9999999;
-        }
         return b.votes - a.votes;
       });
       // if(this.videoPlayers[ws.i].playlist.length) {
