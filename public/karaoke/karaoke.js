@@ -165,6 +165,28 @@ class Karaoke{
       
       videoTitle.innerHTML = `${(i+1)+"."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
+      if(p.id === window.user.id) {
+        if(i == 0) {
+          const preview = this.core.makeAndAddElement('div',null, videoTitle);
+
+          preview.className = 'button slim teal';
+          preview.innerText = "Play & Sing";
+
+          preview.addEventListener('click', () => {
+            this.videoPreviewContainer.style.display = "block";
+            this.YtPlayer.loadVideoById(this.core.getId(p.v.link), 0);
+          });
+        }
+         const preview = this.core.makeAndAddElement('div',null, videoTitle);
+
+          preview.className = 'button slim teal';
+          preview.innerText = "Play & Sing";
+
+          preview.addEventListener('click', () => {
+            this.videoPreviewContainer.style.display = "block";
+            this.YtPlayer.loadVideoById(this.core.getId(p.v.link), 0);
+          });
+      }
     });
   }
   loadVideos(videos) {
