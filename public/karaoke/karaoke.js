@@ -167,6 +167,7 @@ class Karaoke{
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       if(p.id === window.user.id) {
         
+       const buttons = this.core.makeAndAddElement('div',{marginTop: "10px"}, videoTitle);
         if(i == 0) {
           const preview = this.core.makeAndAddElement('div',null, buttons);
           preview.className = 'button slim teal';
@@ -177,6 +178,12 @@ class Karaoke{
             this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
           });
         }
+       const remove = this.core.makeAndAddElement('div',null, buttons);
+        remove.className = 'button slim red extra-margin-left';
+        remove.innerText = "Remove Me";
+        remove.addEventListener('click', () => {
+          this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS }); 
+        });
       }
     });
   }
