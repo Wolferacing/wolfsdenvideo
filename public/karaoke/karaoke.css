@@ -52,11 +52,16 @@ body{
   float: left; 
   width: 100%;
 }
+.center{
+  text-align: center;
+}
+.large-text{
+  font-size: 1.5em;
+}
 .videoPlayer{
-  float: left;
-  width: 90%;
-  height: 90%;
-  left: 5%;
+  width: 80%;
+  height: 80%;
+  left: 10%;
   color: white;
   background: #3f3f3f;
   padding-bottom: 5px;
@@ -97,7 +102,7 @@ body{
   z-index: 2;
   margin-left: 10px;
   margin-right: 10px;
-  width: calc(100% - 40px); 
+  width: calc(100% - 20px); 
 }
 .loadingSpinner{
   height: 80px;

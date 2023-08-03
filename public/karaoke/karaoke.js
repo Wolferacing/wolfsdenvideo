@@ -60,6 +60,13 @@ class Karaoke{
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
     });
     
+    this.closePreview = document.querySelector('.closePreview');
+    
+    this.closePreview.addEventListener('click', () => {
+        this.videoPreviewContainer.style.display = "none";
+        this.YtPlayer.pause();
+    });
+    
     this.videoPlayer = document.querySelector('#videoPlayer');
     
     this.videoPreviewContainer = document.querySelector('.videoPreviewContainer');
@@ -133,7 +140,7 @@ class Karaoke{
       " the host" + 
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "to take over") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
-    this.videoPlaylistContainer.innerHTML = player.players.length ? '' : '<h2 style="color: grey; margin-top: 100px; text-align: center;">Click "join list" to add yourself to the list!</h2>';
+    this.videoPlaylistContainer.innerHTML = player.players.length ? '' : '<h2 style="color: grey; margin-top: 100px; text-align: center;">Search for a song to add yourself to the list!</h2>';
     player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
@@ -206,6 +213,9 @@ class Karaoke{
         this.videoPreviewContainer.style.display = "block";
         this.YtPlayer.loadVideoById(this.core.getId(v.link), 0);
       });
+      
+      
+      
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       videoThumbnail.src = v.thumbnail;
@@ -241,7 +251,7 @@ class Karaoke{
         'mute': 1,
         'autoplay': 1,
         'disablekb': 1,
-        'controls': 0,
+        'controls': 1,
         'modestbranding': true,
         'cc_load_policy': 1,
         'cc_lang_pref': 'en',
