@@ -167,15 +167,8 @@ class Karaoke{
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       if(p.id === window.user.id) {
         
-       const buttons = this.core.makeAndAddElement('div',null, videoTitle);
-       const remove = this.core.makeAndAddElement('div',null, buttons);
-        remove.className = 'button slim red';
-        remove.innerText = "Remove Me";
-        remove.addEventListener('click', () => {
-          this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS }); 
-        });
         if(i == 0) {
-          const preview = this.core.makeAndAddElement('div',{paddingTop: "10px"}, buttons);
+          const preview = this.core.makeAndAddElement('div',null, buttons);
           preview.className = 'button slim teal';
           preview.innerText = "Play & Sing";
           preview.addEventListener('click', () => {
