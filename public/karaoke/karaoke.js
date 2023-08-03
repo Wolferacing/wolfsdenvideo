@@ -177,15 +177,15 @@ class Karaoke{
             this.YtPlayer.loadVideoById(this.core.getId(p.v.link), 0);
           });
         }
-         const preview = this.core.makeAndAddElement('div',null, videoTitle);
+       const remove = this.core.makeAndAddElement('div',null, videoTitle);
 
-          preview.className = 'button slim teal';
-          preview.innerText = "Play & Sing";
+        remove.className = 'button slim teal';
+        remove.innerText = "Play & Sing";
 
-          preview.addEventListener('click', () => {
-            this.videoPreviewContainer.style.display = "block";
-            this.YtPlayer.loadVideoById(this.core.getId(p.v.link), 0);
-          });
+        preview.addEventListener('click', () => {
+          this.videoPreviewContainer.style.display = "block";
+          this.YtPlayer.loadVideoById(this.core.getId(p.v.link), 0);
+        });
       }
     });
   }
