@@ -423,7 +423,7 @@ class App{
             if(this.videoPlayers[instanceId].currentTime > (track ? track.duration : 0) / 1000) {
               this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video !== track);
               this.videoPlayers[instanceId].currentTrack ++;
-              if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length || this.videoPlayers[instanceId].canVote) {
+              if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
                 this.videoPlayers[instanceId].currentTrack = 0;
               }
               this.videoPlayers[instanceId].currentTime = 0;
