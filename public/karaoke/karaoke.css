@@ -54,7 +54,9 @@ body{
 }
 .videoPlayer{
   float: left;
-  width: 420px;
+  width: 90%;
+  heigth: 90%;
+  left: 5%;
   color: white;
   background: #3f3f3f;
   padding-bottom: 5px;
@@ -90,6 +92,9 @@ body{
   width: calc(100% - 160px); 
   display: none;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+.videoPreviewContainer{
+  z-index: 2;
 }
 .loadingSpinner{
   height: 80px;

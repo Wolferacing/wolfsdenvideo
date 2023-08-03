@@ -45,12 +45,6 @@ class Karaoke{
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
     
-//     this.fullscreenButton = document.querySelector('.fullscreenButton');
-    
-//     this.fullscreenButton.addEventListener('click', () => {
-//         this.toggleVideoFullscreen();
-//     });
-    
     this.stopVideo = document.querySelector('#stopVideo');
     this.stopVideo.addEventListener('click', () => {
       this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
@@ -67,6 +61,8 @@ class Karaoke{
     });
     
     this.videoPlayer = document.querySelector('#videoPlayer');
+    
+    this.videoPreviewContainer = document.querySelector('.videoPreviewContainer');
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
@@ -106,29 +102,9 @@ class Karaoke{
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
-      case Commands.SYNC_TIME:
-        const currentTime = document.querySelector('.currentTime');
-        if(currentTime != null) {
-          currentTime.style.width = ((json.data.currentTime / json.data.duration) * 100) + "%";
-        }
-        const currentTimeText = document.querySelector('.currentTimeText');
-        if(currentTimeText != null) {
-          currentTimeText.innerText = this.timeCode(json.data.currentTime) + " / " + this.timeCode(json.data.duration);
-        }
-        // if(this.YtPlayer) {
-        //   const timediff = Math.abs(this.YtPlayer.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
-        //   if(timediff > 0.5) {
-        //     this.YtPlayer.seekTo(json.data.currentTime + this.core.currentLatency);
-        //   }
-        // }
-        break;
       case Commands.PLAYBACK_UPDATE:
         this.core.player = json.data.video;
         this.updatePlaylist(this.core.player);
-        if(json.data.type === "stop" && this.YtPlayer) {
-          // this.YtPlayer.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
-        }
-        break;
         break;
       case Commands.SEARCH_RESULTS:
         this.loadVideos(json.data);
@@ -175,59 +151,6 @@ class Karaoke{
       videoTitle.innerText = `${i == 0 ? "Currently Singing:" : (i+1)+"."} ${p.name}`;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     });
-    this.videoPlayer.innerHTML = '';
-    player.playlist.forEach((v, i) => {
-      if(player.currentTrack === i) {
-        this.core.makeAndAddElement('div',{clear: 'both'}, this.videoPlayer);
-        
-        const currentTime = this.core.makeAndAddElement('div', {
-          height: '4px', 
-          width: '100%',
-        }, this.videoPlayer);
-        const currentTimeInner = this.core.makeAndAddElement('div', {
-          height: '4px', 
-          background: 'red',
-          transition: 'width 1s',
-          transitionTimingFunction: 'linear',
-          width: ((player.currentTime / player.duration) * 100) + "%",
-        }, currentTime);
-        
-        currentTimeInner.className = "currentTime";
-        
-        
-        const videoTitle = this.core.makeAndAddElement('div',{
-          padding: '7 10 0 7', 
-          textOverflow: 'ellipsis', 
-          overflow: 'hidden', 
-          whiteSpace: 'nowrap',
-        }, this.videoPlayer);
-
-        videoTitle.innerText = v.title;
-        
-        const currentTimeText = this.core.makeAndAddElement('div',{
-          padding: '7 10 0 7', 
-          textOverflow: 'ellipsis', 
-          overflow: 'hidden', 
-          whiteSpace: 'nowrap'
-        }, this.videoPlayer);
-
-
-        currentTimeText.className = "currentTimeText";
-        currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
-        // if(this.YtPlayer) {
-        //   console.log("load player!")
-        //   this.YtPlayer.loadVideoById(this.core.getYTId(v.link), player.currentTime);
-        // }else{
-        //   this.initialYoutube = v;
-        // }
-      }
-    });
-    if(this.videoPlayer.innerHTML === '') {
-      
-    }
-  }
-  timeCode(seconds) {
-    return new Date(seconds * 1000).toISOString().substring(11, 19);
   }
   loadVideos(videos) {
     this.videoSearchContainer.innerHTML = '';
@@ -260,20 +183,28 @@ class Karaoke{
         }
       }); 
       
-      const playNowYT = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+//       const playNowYT = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
-      playNowYT.className = 'button slim teal';
-      playNowYT.innerText = "Play Now (YouTube)";
+//       playNowYT.className = 'button slim teal';
+//       playNowYT.innerText = "Play Now (YouTube)";
       
-      playNowYT.addEventListener('click', () => {
-        if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id)) {
-          this.hideSearch();
-          this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true, skipUpdate: true });
-          this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
-        }
-      }); 
+//       playNowYT.addEventListener('click', () => {
+//         if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id)) {
+//           this.hideSearch();
+//           this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+//           this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true, skipUpdate: true });
+//           this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
+//         }
+//       }); 
       
+      const preview = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+      
+      preview.className = 'button slim teal';
+      preview.innerText = "Preview";
+      
+      preview.addEventListener('click', () => {
+        this.videoPreviewContainer.style.display = "block";
+      });
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       videoThumbnail.src = v.thumbnail;
@@ -302,7 +233,7 @@ class Karaoke{
     const youtubeUrl = 'https://www.youtube.com/watch?v=L_LUpnjgPso';
     new YT.Player('player', {
       height: '280',
-      width: '420',
+      width: '100%',
       videoId: this.core.getYTId(decodeURIComponent(youtubeUrl)),
       playerVars: {
         'playsinline': 1,
