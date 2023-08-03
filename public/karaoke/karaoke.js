@@ -70,7 +70,7 @@ class Karaoke{
     this.singIt = document.querySelector('#singIt');
     
     this.singIt.addEventListener('click', () => {
-      this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS }); // : Commands.REMOVE_FROM_PLAYERS 
+      this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS, data: this.selectedVideo }); // : Commands.REMOVE_FROM_PLAYERS 
       this.YtPlayer.pauseVideo();
       this.videoPreviewContainer.style.display = "none";
       this.hideSearch();
@@ -163,7 +163,7 @@ class Karaoke{
         fontSize: '1.4em'
       }, videoTitleAndAction);
       
-      videoTitle.innerHTML = `${(i+1)+"."} ${p.id === window.user.id ? "<b>" + p.name + " </b>will sing<b> " + this.selectedVideo.title + "</b>" : p.name} `;
+      videoTitle.innerHTML = `${(i+1)+"."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     });
   }
