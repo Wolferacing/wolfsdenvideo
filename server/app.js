@@ -51,11 +51,11 @@ class App{
     console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.');
     Object.keys(this.videoPlayers).forEach(key => {
       const videoPlayer = this.videoPlayers[key];
-      videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws.u !== ws.u);
-      videoPlayer.votes = videoPlayer.votes.filter(v => v.u !== ws.u);
+      videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
+      videoPlayer.votes = videoPlayer.votes.filter(v => v !== ws);
       this.updateVotes(ws);
-      if(videoPlayer.host === ws.u && ws.type === "space") {
-        console.log(ws.u ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
+      if(videoPlayer.host === ws.u.id && ws.type === "space") {
+        console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
       }
       this.updateClients(ws.i);
@@ -133,11 +133,9 @@ class App{
         this.toggleVote(ws)
         break; 
       case Commands.DOWN_VOTE:
-        console.log("voting", Commands.DOWN_VOTE);
         this.setVote(msg.data, true, ws);
         break;
       case Commands.UP_VOTE:
-        console.log("voting", Commands.UP_VOTE);
         this.setVote(msg.data, false, ws);
         break;
       case Commands.ADD_TO_PLAYERS:
@@ -210,26 +208,26 @@ class App{
           const upVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && !v.isDown).length;
           d.votes = upVotes - downVotes; 
       });
-      // const current = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
+      const current = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
       this.videoPlayers[ws.i].playlist.sort((a, b) => {
-        // if(b === current){
-        //   b.votes = 9999999;
-        // }
+        if(b === current){
+          b.votes = 9999999;
+        }
         return b.votes - a.votes;
       });
-      if(this.videoPlayers[ws.i].playlist.length) {
-        this.videoPlayers[ws.i].playlist[0].votes = 999999;
-      }
+      // if(this.videoPlayers[ws.i].playlist.length) {
+      //   this.videoPlayers[ws.i].playlist[0].votes = 999999;
+      // }
       this.videoPlayers[ws.i].currentTrack = 0;
       // this.videoPlayers[ws.i].playlist.forEach((d,i) => {
       //   if(d === current) {
       //     this.videoPlayers[ws.i].currentTrack = i;
       //   }
       // });
-      const newCurrent = this.videoPlayers[ws.i].playlist[this.videoPlayers.currentTrack];
-      if(current != newCurrent) {
-        this.videoPlayers[ws.i].currentTime = 0;
-      }
+      // const newCurrent = this.videoPlayers[ws.i].playlist[this.videoPlayers.currentTrack];
+      // if(current != newCurrent) {
+      //   this.videoPlayers[ws.i].currentTime = 0;
+      // }
     }
   }
   setVote(track, isDown, ws) {
