@@ -422,14 +422,14 @@ class App{
             this.videoPlayers[instanceId].currentTime = now - this.videoPlayers[instanceId].lastStartTime;
             if(this.videoPlayers[instanceId].currentTime > (track ? track.duration : 0) / 1000) {
               this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video !== track);
-              this.videoPlayers[instanceId].currentTrack += this.videoPlayers[instanceId].canVote ? 0 : 1;
-              if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
+              this.videoPlayers[instanceId].currentTrack ++;
+              if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length || this.videoPlayers[instanceId].canVote) {
                 this.videoPlayers[instanceId].currentTrack = 0;
               }
               this.videoPlayers[instanceId].currentTime = 0;
+              this.updateVotes(ws);
               this.videoPlayers[instanceId].lastStartTime = now;
               this.resetBrowserIfNeedBe(this.videoPlayers[instanceId], this.videoPlayers[instanceId].currentTrack);
-              this.updateVotes(ws);
               this.updateClients(instanceId, Commands.SET_TRACK);
             }
           }else{
