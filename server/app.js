@@ -211,7 +211,12 @@ class App{
           d.votes = upVotes - downVotes; 
       });
       const current = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
-      this.videoPlayers[ws.i].playlist.sort((a, b) => b.votes - a.votes);
+      this.videoPlayers[ws.i].playlist.sort((a, b) => {
+        if(b === current){
+          b.votes = 9999999;
+        }
+        return b.votes - a.votes;
+      });
       this.videoPlayers[ws.i].playlist.forEach((d,i) => {
         if(d === current) {
           this.videoPlayers[ws.i].currentTrack = i;
@@ -401,7 +406,7 @@ class App{
         sockets: [ws],
         hasNoHost: false,
         canTakeOver: true,
-        canVote: true,
+        canVote: false,
         currentPlayerUrl: "",
         lastStartTime: new Date().getTime() / 1000,
         tick: setInterval(() => {
@@ -417,6 +422,7 @@ class App{
               this.videoPlayers[instanceId].currentTime = 0;
               this.videoPlayers[instanceId].lastStartTime = now;
               this.resetBrowserIfNeedBe(this.videoPlayers[instanceId], this.videoPlayers[instanceId].currentTrack);
+              this.updateVotes(ws);
               this.updateClients(instanceId, Commands.SET_TRACK);
             }
           }else{
