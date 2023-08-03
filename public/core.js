@@ -118,12 +118,12 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
-    let button;
-    button = this.setupButton(scene, this.playlistContainer, '-1.030', 'join in', '1',  'large',  () => {
-      this.imIn = !this.imIn;
-      window.setText(button.object3D.id, this.imIn ? 'skip it' : 'join in');
-      this.sendMessage({ path: this.imIn ? Commands.ADD_TO_PLAYERS : Commands.REMOVE_FROM_PLAYERS });
-    }, 0);
+    // let button;
+    // button = this.setupButton(scene, this.playlistContainer, '-1.030', 'join in', '1',  'large',  () => {
+    //   this.imIn = !this.imIn;
+    //   window.setText(button.object3D.id, this.imIn ? 'skip it' : 'join in');
+    //   this.sendMessage({ path: this.imIn ? Commands.ADD_TO_PLAYERS : Commands.REMOVE_FROM_PLAYERS });
+    // }, 0);
     
     const yScale = Number(this.params.scale.split(" ")[1]);
     const playlistButton = document.createElement('a-plane');

@@ -166,19 +166,21 @@ class Karaoke{
       videoTitle.innerHTML = `${(i+1)+"."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       if(p.id === window.user.id) {
-       const remove = this.core.makeAndAddElement('div',null, videoTitle);
-        remove.className = 'button slim red right';
+        
+       const buttons = this.core.makeAndAddElement('div',null, videoTitle);
+       const remove = this.core.makeAndAddElement('div',null, buttons);
+        remove.className = 'button slim red';
         remove.innerText = "Remove Me";
         remove.addEventListener('click', () => {
           this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS }); 
         });
         if(i == 0) {
-          const preview = this.core.makeAndAddElement('div',null, videoTitle);
-          preview.className = 'button slim teal right extra-margin-right';
+          const preview = this.core.makeAndAddElement('div',{paddingTop: "10px"}, buttons);
+          preview.className = 'button slim teal';
           preview.innerText = "Play & Sing";
           preview.addEventListener('click', () => {
             this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-            this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true, skipUpdate: true });
+            this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: p.v, isYoutubeWebsite: false, skipUpdate: true });
             this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
           });
         }
@@ -201,34 +203,6 @@ class Karaoke{
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
       }, videoTitleAndAction);
-      
-//       const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-      
-//       playNow.className = 'button slim teal';
-//       playNow.innerText = "Play Now";
-      
-//       playNow.addEventListener('click', () => {
-//         if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id )) {
-//           this.hideSearch();
-//           this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-//           this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-//           this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
-//         }
-//       }); 
-      
-//       const playNowYT = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-      
-//       playNowYT.className = 'button slim teal';
-//       playNowYT.innerText = "Play Now (YouTube)";
-      
-//       playNowYT.addEventListener('click', () => {
-//         if(this.core.player && !(this.core.player.locked || this.core.player.host === window.user.id)) {
-//           this.hideSearch();
-//           this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-//           this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true, skipUpdate: true });
-//           this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
-//         }
-//       }); 
       
       const preview = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
