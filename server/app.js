@@ -54,7 +54,7 @@ class App{
       videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
       videoPlayer.votes = videoPlayer.votes.filter(v => v !== ws);
       this.updateVotes(ws);
-      if(videoPlayer.host === ws.u.id && ws.type === "space") {
+      if(videoPlayer.host === ws.u && videoPlayer.sockets.filter(_ws => _ws.u === ws.u).length === 0) {
         console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
       }
