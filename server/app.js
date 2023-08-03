@@ -139,7 +139,7 @@ class App{
         this.setVote(msg.data, false, ws);
         break;
       case Commands.ADD_TO_PLAYERS:
-        this.addToPlayers(ws);
+        this.addToPlayers(msg.data, ws);
         break;
       case Commands.REMOVE_FROM_PLAYERS:
         ws.p = false;
@@ -160,10 +160,9 @@ class App{
       this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
     }
   }
-  addToPlayers(ws){
-    // this.onlyIfHost(ws, () => {
-    // }, this.videoPlayers[ws.i].locked);
+  addToPlayers(video, ws){
     ws.p = new Date().getTime();
+    ws.p_v = video;
     this.updateClients(ws.i, "add-to-players");
   }
   toggleVote(ws) {
@@ -448,7 +447,7 @@ class App{
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
-        players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => ({name: s.u.name, p: s.p, id: s.u.id})),
+        players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => ({name: s.u.name, p: s.p, id: s.u.id, v: s.p_v})),
         canTakeOver: this.videoPlayers[instanceId].canTakeOver,
         canVote: this.videoPlayers[instanceId].canVote,
         host: this.videoPlayers[instanceId].host,

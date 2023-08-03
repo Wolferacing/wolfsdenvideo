@@ -12,7 +12,7 @@ class Karaoke{
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance});
-    }, ()=>{
+    }, () => {
         this.showToast("Reconnecting...");
     });
     this.addYoutubeScript();
@@ -73,7 +73,7 @@ class Karaoke{
       this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS }); // : Commands.REMOVE_FROM_PLAYERS 
       this.YtPlayer.pauseVideo();
       this.videoPreviewContainer.style.display = "none";
-      this.hideSearch
+      this.hideSearch();
     });
     
     this.videoPlayer = document.querySelector('#videoPlayer');
@@ -153,7 +153,6 @@ class Karaoke{
     player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
-
       const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.core.makeAndAddElement('div',{
@@ -164,7 +163,7 @@ class Karaoke{
         fontSize: '1.4em'
       }, videoTitleAndAction);
       
-      videoTitle.innerText = `${i == 0 ? "Currently Singing:" : (i+1)+"."} ${p.name}`;
+      videoTitle.innerHTML = `${(i+1)+"."} ${p.id === window.user.id ? "<b>" + p.name + " </b>will sing<b> " + this.selectedVideo.title + "</b>" : p.name} `;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
     });
   }
@@ -219,6 +218,7 @@ class Karaoke{
       preview.innerText = "Preview & Sing It";
       
       preview.addEventListener('click', () => {
+        this.selectedVideo = v;
         this.videoPreviewContainer.style.display = "block";
         this.YtPlayer.loadVideoById(this.core.getId(v.link), 0);
       });
