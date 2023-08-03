@@ -47,7 +47,7 @@ body{
   border: 1px solid white;
   font-size: 20px;
   color: white;
-  width: 260px;
+  width: 185px;
   margin: 5px;
 }
 .playlistTitle{
@@ -63,8 +63,8 @@ body{
 }
 .searchButtons{
   position: absolute;
-  top: 10px;
-  right: 300px;
+  top: 54px;
+  right: 20px;
 }
 .searchButtons > .button{
   padding: 7 7;
@@ -115,8 +115,8 @@ body{
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 .videoSearchContainer{
-  margin-top: 80px;
-  height: calc(100% - 80px);
+  margin-top: 87px;
+  height: calc(100% - 87px);
 }
 .videoPreviewContainer{
   z-index: 2;
@@ -145,6 +145,9 @@ body{
   padding: 10px 15px;
   background: #16181f;
   color: white;
+  overflow: hidden;
+  text-overflow: elipses;
+  white-space: nowrap;
 }
 .addItemTitle{
   font-style: italic;
@@ -180,8 +183,8 @@ body{
 }
 .closeSearch{
   position:absolute;
-  top: 10px;
-  right: 10px;
+  top: 50px;
+  right: 20px;
   cursor: pointer;    
   color: white;
   font-size: 2em;
