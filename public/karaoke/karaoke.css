@@ -55,7 +55,7 @@ body{
 .videoPlayer{
   float: left;
   width: 90%;
-  heigth: 90%;
+  height: 90%;
   left: 5%;
   color: white;
   background: #3f3f3f;
@@ -67,34 +67,37 @@ body{
   background: linear-gradient(to right, #1e181f, #2b313e);
   color: white;
   overflow: auto;
-  height: calc(100% - 64px);
+  height: calc(100% - 50px);
   width: 100%;
 }
 .searchBackDrop,.addItemBackDrop{
   background: rgba(0,0,0,0.8);
   position: absolute;
-  top: 66px;
+  top: 50px;
   left: 0;
-  height: calc(100% - 64px);
+  height: calc(100% - 50px);
   width: 100%;
   display: none;
 }
 .videoSearchContainer, .addItemContainer, .videoPreviewContainer{
   position: absolute;
   top: 0;
-  margin-top: 66px;
+  margin-top: 50px;
   margin-left: 80px;
   margin-right: 80px;
   background: #8f8f8f;
   color: white;
   overflow: auto;
-  height: calc(100% - 66px);
+  height: calc(100% - 50px);
   width: calc(100% - 160px); 
   display: none;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 .videoPreviewContainer{
   z-index: 2;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: calc(100% - 40px); 
 }
 .loadingSpinner{
   height: 80px;
@@ -150,7 +153,7 @@ body{
   display: inline-block;
   margin-right: 15px;
 }
-.closeSearch{
+.closeSearch,.closePreview{
   position:absolute;
   top: 10px;
   right: 10px;

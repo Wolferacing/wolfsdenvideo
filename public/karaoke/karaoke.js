@@ -204,6 +204,7 @@ class Karaoke{
       
       preview.addEventListener('click', () => {
         this.videoPreviewContainer.style.display = "block";
+        this.YtPlayer.loadVideoById(this.core.getId(v.link), 0);
       });
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
@@ -232,7 +233,7 @@ class Karaoke{
   setupYoutubePlayer() {
     const youtubeUrl = 'https://www.youtube.com/watch?v=L_LUpnjgPso';
     new YT.Player('player', {
-      height: '280',
+      height: '100%',
       width: '100%',
       videoId: this.core.getYTId(decodeURIComponent(youtubeUrl)),
       playerVars: {
