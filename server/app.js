@@ -204,24 +204,28 @@ class App{
     }
   }
   updateVotes(ws) {
-    if(this.videoPlayers[ws.i]) {
+    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canVote ) {
       this.videoPlayers[ws.i].playlist.forEach(d => {
           const downVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && v.isDown).length;
           const upVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && !v.isDown).length;
           d.votes = upVotes - downVotes; 
       });
-      const current = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
+      // const current = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
       this.videoPlayers[ws.i].playlist.sort((a, b) => {
-        if(b === current){
-          b.votes = 9999999;
-        }
+        // if(b === current){
+        //   b.votes = 9999999;
+        // }
         return b.votes - a.votes;
       });
-      this.videoPlayers[ws.i].playlist.forEach((d,i) => {
-        if(d === current) {
-          this.videoPlayers[ws.i].currentTrack = i;
-        }
-      });
+      if(this.videoPlayers[ws.i].playlist.length) {
+        this.videoPlayers[ws.i].playlist[0].votes = 999999;
+      }
+      this.videoPlayers[ws.i].currentTrack = 0;
+      // this.videoPlayers[ws.i].playlist.forEach((d,i) => {
+      //   if(d === current) {
+      //     this.videoPlayers[ws.i].currentTrack = i;
+      //   }
+      // });
       const newCurrent = this.videoPlayers[ws.i].playlist[this.videoPlayers.currentTrack];
       if(current != newCurrent) {
         this.videoPlayers[ws.i].currentTime = 0;
@@ -362,6 +366,7 @@ class App{
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         const track = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
         this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video !== track);
+        this.videoPlayers[ws.i].playlist[index].votes = 999999;
         this.videoPlayers[ws.i].currentTrack = index;
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
