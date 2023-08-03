@@ -166,26 +166,22 @@ class Karaoke{
       videoTitle.innerHTML = `${(i+1)+"."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       if(p.id === window.user.id) {
+       const remove = this.core.makeAndAddElement('div',null, videoTitle);
+        remove.className = 'button slim red right';
+        remove.innerText = "Remove Me";
+        remove.addEventListener('click', () => {
+          this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS }); 
+        });
         if(i == 0) {
           const preview = this.core.makeAndAddElement('div',null, videoTitle);
-
-          preview.className = 'button slim teal';
+          preview.className = 'button slim teal right extra-margin-right';
           preview.innerText = "Play & Sing";
-
           preview.addEventListener('click', () => {
-            this.videoPreviewContainer.style.display = "block";
-            this.YtPlayer.loadVideoById(this.core.getId(p.v.link), 0);
+            this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+            this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, isYoutubeWebsite: true, skipUpdate: true });
+            this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
           });
         }
-       const remove = this.core.makeAndAddElement('div',null, videoTitle);
-
-        remove.className = 'button slim teal';
-        remove.innerText = "Play & Sing";
-
-        preview.addEventListener('click', () => {
-          this.videoPreviewContainer.style.display = "block";
-          this.YtPlayer.loadVideoById(this.core.getId(p.v.link), 0);
-        });
       }
     });
   }
