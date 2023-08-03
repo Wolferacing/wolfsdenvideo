@@ -215,19 +215,7 @@ class App{
       this.videoPlayers[ws.i].playlist.sort((a, b) => {
         return b.votes - a.votes;
       });
-      // if(this.videoPlayers[ws.i].playlist.length) {
-      //   this.videoPlayers[ws.i].playlist[0].votes = 999999;
-      // }
       this.videoPlayers[ws.i].currentTrack = 0;
-      // this.videoPlayers[ws.i].playlist.forEach((d,i) => {
-      //   if(d === current) {
-      //     this.videoPlayers[ws.i].currentTrack = i;
-      //   }
-      // });
-      // const newCurrent = this.videoPlayers[ws.i].playlist[this.videoPlayers.currentTrack];
-      // if(current != newCurrent) {
-      //   this.videoPlayers[ws.i].currentTime = 0;
-      // }
     }
   }
   setVote(track, isDown, ws) {
