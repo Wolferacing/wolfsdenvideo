@@ -169,6 +169,10 @@ class App{
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, () => {
         this.videoPlayers[ws.i].canVote = !this.videoPlayers[ws.i].canVote;
+        if(this.videoPlayers[ws.i].canVote && this.videoPlayers[ws.i].playlist.length) {
+          this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack].votes = 9999999;
+          this.updateVotes(ws);
+        }
         this.updateClients(ws.i);
       });
     }
@@ -201,7 +205,7 @@ class App{
     }
   }
   updateVotes(ws) {
-    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canVote ) {
+    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canVote) {
       this.videoPlayers[ws.i].playlist.forEach(d => {
           const downVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && v.isDown).length;
           const upVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && !v.isDown).length;
@@ -350,8 +354,10 @@ class App{
     this.onlyIfHost(ws, () => {
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         const track = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
-        this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video !== track);
-        this.videoPlayers[ws.i].playlist[index].votes = 999999;
+        if(this.videoPlayers[ws.i].canVote) {
+          this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video !== track);
+          this.videoPlayers[ws.i].playlist[index].votes = 9999999;
+        }
         this.videoPlayers[ws.i].currentTrack = index;
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
