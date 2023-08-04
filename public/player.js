@@ -58,8 +58,10 @@ class Player {
       },
       events: {
         onStateChange: event => {
-          if(event.data == 1) {
+          if(event.data === YT.PlayerState.PLAYING) {
             this.readyToPlay = true;
+          }else if(this.readyToPlay && event.data === YT.PlayerState.PAUSED && event.data === YT.PlayerState.ENDED) {
+            this.player.playVideo();
           }
         },
         onError: event => {
