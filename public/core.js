@@ -118,18 +118,29 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
-    const playlistButton = document.createElement('a-plane');
+    
+   
+    const playlistButton = document.createElement('a-entity');
     playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
-    playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/image.png?v=1689772204522');
+    const buttonGlb = document.createElement('a-entity');
+    buttonGlb.setAttribute('gltf-model','https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonL.glb?v=1689782699922');
+    playlistButton.appendChild(buttonGlb);
+    // playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/image.png?v=1689772204522');
     playlistButton.setAttribute('position', this.params["singer-button-position"]);
     playlistButton.setAttribute('rotation', this.params["singer-button-rotation"]);
-    playlistButton.setAttribute('depth', '0.05');
+    // playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
-    playlistButton.setAttribute('width', '1');
-    playlistButton.setAttribute('height', '0.3');
+    // playlistButton.setAttribute('width', '1');
+    // playlistButton.setAttribute('height', '0.3');
     this.playlistContainer.appendChild(playlistButton);
+    const playlistButtonText = document.createElement('a-text');
+    playlistButtonText.setAttribute('value', "singers");
+    playlistButtonText.setAttribute('position', '0 0.01 0.03');
+    playlistButtonText.setAttribute('align', 'center');
+    playlistButtonText.setAttribute('scale', '0.8 0.8 0.8');
+    playlistButton.appendChild(playlistButtonText);
     playlistButton.addEventListener('click', () => this.openPlaylist());
   }
   setupPlaylistButton(scene, playlistContainer) {
@@ -173,11 +184,11 @@ class Core{
     : 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonL.glb?v=1689782699922';
     
     playlistButton.setAttribute('gltf-model',glb);
-    playlistButton.setAttribute('depth', '0.05');
+    // playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
-    playlistButton.setAttribute('width', width);
-    playlistButton.setAttribute('height', '0.3');
+    // playlistButton.setAttribute('width', width);
+    // playlistButton.setAttribute('height', '0.3');
     const playlistButtonText = document.createElement('a-text');
     playlistButtonText.setAttribute('value', title);
     playlistButtonText.setAttribute('position', '0 0.01 0.03');
