@@ -118,20 +118,13 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
-    // let button;
-    // button = this.setupButton(scene, this.playlistContainer, '-1.030', 'join in', '1',  'large',  () => {
-    //   this.imIn = !this.imIn;
-    //   window.setText(button.object3D.id, this.imIn ? 'skip it' : 'join in');
-    //   this.sendMessage({ path: this.imIn ? Commands.ADD_TO_PLAYERS : Commands.REMOVE_FROM_PLAYERS });
-    // }, 0);
     
-    const yScale = Number(this.params.scale.split(" ")[1]);
     const playlistButton = document.createElement('a-plane');
     playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
     playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/image.png?v=1689772204522');
-    playlistButton.setAttribute('position', `0 ${-yScale*0.335} 3`);
-    playlistButton.setAttribute('rotation', `-30 180 0`);
+    playlistButton.setAttribute('position', this.params["singer-button-position"]);
+    playlistButton.setAttribute('rotation', this.params["singer-button-rotation"]);
     playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
@@ -212,6 +205,9 @@ class Core{
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
     this.setOrDefault("scale", "1 1 1");
+    const yScale = Number(this.params.scale.split(" ")[1]);
+    this.setOrDefault("singer-button-position", `0 ${-yScale*0.335} 3`);
+    this.setOrDefault("singer-button-rotation", "-30 180 0");
     this.setOrDefault("instance", "666");
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '40');
@@ -358,13 +354,6 @@ class Core{
   }
   setupCommandsScript(callback) {
     return this.setupScript(callback, "commands");
-    
-    // new Promise(resolve => {
-    //   let myScript = document.createElement("script");
-    //   myScript.setAttribute("src", `https://${this.hostUrl}/commands.js`);
-    //   myScript.addEventListener ("load", resolve, false);
-    //   document.body.appendChild(myScript);  
-    // });
   }
   setupScript(callback, name) {
     return new Promise(resolve => {
