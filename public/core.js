@@ -118,7 +118,6 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
-    
     const playlistButton = document.createElement('a-plane');
     playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
