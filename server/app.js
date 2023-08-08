@@ -458,12 +458,13 @@ class App{
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
+      const map = new Map(this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => [s.u.id, s]));
       return {
         playlist: this.videoPlayers[instanceId].playlist,
         currentTime: this.videoPlayers[instanceId].currentTime,
         currentTrack: this.videoPlayers[instanceId].currentTrack,
         locked: this.videoPlayers[instanceId].locked,
-        players: this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => ({name: s.u.name, p: s.p, id: s.u.id, v: s.p_v})),
+        players: [...map.values()].map(s => ({name: s.u.name, p: s.p, id: s.u.id, v: s.p_v})),
         canTakeOver: this.videoPlayers[instanceId].canTakeOver,
         canVote: this.videoPlayers[instanceId].canVote,
         host: this.videoPlayers[instanceId].host,
