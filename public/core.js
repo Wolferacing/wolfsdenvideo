@@ -118,22 +118,16 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
-    
-   
     const playlistButton = document.createElement('a-entity');
     playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
     const buttonGlb = document.createElement('a-entity');
     buttonGlb.setAttribute('gltf-model','https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonL.glb?v=1689782699922');
     playlistButton.appendChild(buttonGlb);
-    // playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/image.png?v=1689772204522');
     playlistButton.setAttribute('position', this.params["singer-button-position"]);
     playlistButton.setAttribute('rotation', this.params["singer-button-rotation"]);
-    // playlistButton.setAttribute('depth', '0.05');
     playlistButton.setAttribute('opacity', '0.3');
     playlistButton.setAttribute('transparent', 'true');
-    // playlistButton.setAttribute('width', '1');
-    // playlistButton.setAttribute('height', '0.3');
     this.playlistContainer.appendChild(playlistButton);
     const playlistButtonText = document.createElement('a-text');
     playlistButtonText.setAttribute('value', "singers");
@@ -142,6 +136,22 @@ class Core{
     playlistButtonText.setAttribute('scale', '0.8 0.8 0.8');
     playlistButton.appendChild(playlistButtonText);
     playlistButton.addEventListener('click', () => this.openPlaylist());
+    
+    if(this.params["box-trigger-enabled"] === "true") {
+      const boxTrigger = document.createElement('a-box');
+      boxTrigger.setAttribute('sq-boxcollider', '');
+      boxTrigger.setAttribute('sq-triggercollider', '');
+      boxTrigger.setAttribute('position', this.params["box-trigger-position"]);
+      boxTrigger.setAttribute('rotation', this.params["box-trigger-rotation"]);
+      boxTrigger.setAttribute('scale', this.params["box-trigger-scale"]);
+      boxTrigger.addEventListener('trigger-enter', () => {
+        
+      });
+      boxTrigger.addEventListener('trigger-exit', () => {
+        
+      });
+      this.playlistContainer.appendChild(boxTrigger);
+    }
   }
   setupPlaylistButton(scene, playlistContainer) {
     this.setupButton(scene, playlistContainer, '-1.7', this.isKaraoke ? 'singers' : 'playlist', '1',  'large',  ()=>{
@@ -218,6 +228,10 @@ class Core{
     const yScale = Number(this.params.scale.split(" ")[1]);
     this.setOrDefault("singer-button-position", `0 ${-yScale*0.335} 3`);
     this.setOrDefault("singer-button-rotation", "-30 180 0");
+    this.setOrDefault("box-trigger-enabled", 'false');
+    this.setOrDefault("box-trigger-position", '0 0 0');
+    this.setOrDefault("box-trigger-rotation", '0 0 0');
+    this.setOrDefault("box-trigger-scale", '1 1 1');
     this.setOrDefault("instance", "666");
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '40');
