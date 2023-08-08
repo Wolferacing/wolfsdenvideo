@@ -142,13 +142,26 @@ class App{
         this.addToPlayers(msg.data, ws);
         break;
       case Commands.REMOVE_FROM_PLAYERS:
-        ws.p = false;
-        this.updateClients(ws.i, "remove-from-players");
+        this.removeFromPlayers(msg.data, ws);
         break; 
     }
   }
   measureLatency(ws) {
     this.send(ws, Commands.MEASURE_LATENCY);
+  }
+  removeFromPlayers(uid, ws) {
+    if(uid === ws.u.id) {
+      ws.p = false;
+    }else{
+      this.onlyIfHost(ws, () => {
+        this.videoPlayers[ws.i].sockets.forEach(s => {
+          if(s.u.id === uid) {
+            s.p = false;
+          }
+        })
+      });
+    }
+    this.updateClients(ws.i, "remove-from-players");
   }
   stop(ws) {
     this.onlyIfHost(ws, () => {
