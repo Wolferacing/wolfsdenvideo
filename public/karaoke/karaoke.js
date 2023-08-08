@@ -45,11 +45,12 @@ class Karaoke{
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
     
-    this.stopVideo = document.querySelector('#stopVideo');
-    this.stopVideo.addEventListener('click', () => {
-      this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-      this.core.sendMessage({path: Commands.STOP});
-    });
+    // this.stopVideo = document.querySelector('#stopVideo');
+    // this.stopVideo.addEventListener('click', () => {
+    //   this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+    //   this.core.sendMessage({path: Commands.STOP});
+    // });
+
     this.autoSync = document.querySelector('#autoSync');
     
     this.autoSyncEnabled = false;
@@ -145,7 +146,7 @@ class Karaoke{
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
-    this.stopVideo.style.display = !isMe && player.locked ? 'none' : 'inline-block';
+    // this.stopVideo.style.display = !isMe && player.locked ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
@@ -172,7 +173,7 @@ class Karaoke{
       
       videoTitle.innerHTML = `${(i+1)+"."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
-      if(p.id === window.user.id) {
+      if(p.id === window.user.id || isMe) {
         
        const buttons = this.core.makeAndAddElement('div',{marginTop: "10px"}, videoTitle);
         if(i == 0) {
@@ -189,7 +190,9 @@ class Karaoke{
         remove.className = 'button slim red extra-margin-left';
         remove.innerText = "Remove Me";
         remove.addEventListener('click', () => {
-          this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS }); 
+          this.core.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: p.id });
+          this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+          this.core.sendMessage({path: Commands.STOP});
         });
       }
     });
