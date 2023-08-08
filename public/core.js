@@ -147,30 +147,33 @@ class Core{
       boxTrigger.setAttribute('scale', this.params["box-trigger-scale"]);
       let hasStarted = false;
       let hasStartedTimeout;
-      boxTrigger.addEventListener('trigger-enter', () => {
-        clearTimeout(hasStartedTimeout);
-        console.log(window.user.id, this.player);
-        if(triggerEnter && this.player && this.player.players.length && this.player.players[0].id === window.user.id && !hasStarted) {
-          this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-          this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: this.player.players[0].v, isYoutubeWebsite: false, skipUpdate: true });
-          this.sendMessage({path: Commands.SET_TRACK, data: 0});
-          hasStarted = true;
+      boxTrigger.addEventListener('trigger-enter', e => {
+        if(e.detail.isLocalPlayer) {
+          clearTimeout(hasStartedTimeout);
+          if(triggerEnter && this.player && this.player.players.length && this.player.players[0].id === window.user.id && !hasStarted) {
+            this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+            this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: this.player.players[0].v, isYoutubeWebsite: false, skipUpdate: true });
+            this.sendMessage({path: Commands.SET_TRACK, data: 0});
+            hasStarted = true;
+          }
         }
       });
-      boxTrigger.addEventListener('trigger-exit', () => {
-        clearTimeout(hasStartedTimeout);
-        hasStartedTimeout = setTimeout(() => {
-          if(triggerExit && this.player && this.player.players.length && hasStarted) {
-            const player = this.player.players[0];
-            console.log(player.id, window.user.id, this.player);
-            if(player.id === window.user.id) {
-                this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: player.id });
-                this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-                this.sendMessage({path: Commands.STOP});
-                hasStarted = false;
+      boxTrigger.addEventListener('trigger-exit', e => {
+        if(e.detail.isLocalPlayer) {
+          clearTimeout(hasStartedTimeout);
+          hasStartedTimeout = setTimeout(() => {
+            if(triggerExit && this.player && this.player.players.length && hasStarted) {
+              const player = this.player.players[0];
+              console.log(player.id, window.user.id, this.player);
+              if(player.id === window.user.id) {
+                  this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: player.id });
+                  this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+                  this.sendMessage({path: Commands.STOP});
+                  hasStarted = false;
+              }
             }
-          }
-        }, 5000);
+          }, 5000);
+        }
       });
       this.playlistContainer.appendChild(boxTrigger);
     }
@@ -186,7 +189,6 @@ class Core{
   setupVolButton(scene, isUp, playlistContainer) {
     this.setupButton(scene, playlistContainer, isUp ? 1.25 : 1.78, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>{
         this.setVolume(isUp);
-        console.warn({path: Commands.SET_VOLUME, data: this.params.volume});
         this.sendBrowserMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
@@ -377,6 +379,7 @@ class Core{
       case Commands.STOP:
       case Commands.PLAYBACK_UPDATE:
         this.player = json.data.video;
+        this.player.players.sort((a, b) => a.p - b.p);
       case Commands.SYNC_TIME:
         json.volume = this.tempVolume;
         
