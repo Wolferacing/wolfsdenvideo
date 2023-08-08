@@ -150,24 +150,23 @@ class App{
     this.send(ws, Commands.MEASURE_LATENCY);
   }
   removeFromPlayers(uid, ws) {
-    if(uid === ws.u.id) {
-      ws.p = false;
-      console.log("Remove me from players:", ws.u.name);
-    }else{
-      this.onlyIfHost(ws, () => {
-        this.videoPlayers[ws.i].sockets.forEach(s => {
-          if(s.u.id === uid) {
-            s.p = false;
-            console.log("Remove from players:", s.u.name);
-          }
-        })
-      });
-    }
+        console.log(ws.u.id, uid);
+    this.onlyIfHost(ws, () => {
+      this.videoPlayers[ws.i].sockets.forEach(s => {
+        console.log(s.u.id, uid);
+        if(s.u.id === uid) {
+          s.p = false;
+          console.log("Remove from players:", s.u.name, this.getVideoObject(ws.i).players.length);
+        }
+      })
+    }, uid === ws.u.id);
     this.updateClients(ws.i, "remove-from-players");
+    console.log("Remove from players updateClients:", ws.u.name, this.getVideoObject(ws.i).players.length);
   }
   stop(ws) {
     this.onlyIfHost(ws, () => {
       this.updateClients(ws.i, "stop");
+      console.log("stop video", this.getVideoObject(ws.i).players.length);
     }, this.videoPlayers[ws.i].locked);
   }
   setAutoSync(autoSync, ws) {
