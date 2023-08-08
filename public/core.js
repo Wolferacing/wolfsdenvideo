@@ -149,6 +149,7 @@ class Core{
       let hasStartedTimeout;
       boxTrigger.addEventListener('trigger-enter', () => {
         clearTimeout(hasStartedTimeout);
+        console.log(window.user.id, this.player);
         if(triggerEnter && this.player && this.player.players.length && this.player.players[0].id === window.user.id && !hasStarted) {
           this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
           this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: this.player.players[0].v, isYoutubeWebsite: false, skipUpdate: true });
@@ -157,19 +158,19 @@ class Core{
         }
       });
       boxTrigger.addEventListener('trigger-exit', () => {
-        if(triggerExit && this.player && this.player.players.length) {
-          const player = this.player.players[0];
-          console.log(player.id, window.user.id);
-          if(player.id === window.user.id && hasStarted) {
-            clearTimeout(hasStartedTimeout);
-            hasStartedTimeout = setTimeout(() => {
-              this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: player.id });
-              this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-              this.sendMessage({path: Commands.STOP});
-              hasStarted = false;
-            }, 5000);
+        clearTimeout(hasStartedTimeout);
+        hasStartedTimeout = setTimeout(() => {
+          if(triggerExit && this.player && this.player.players.length && hasStarted) {
+            const player = this.player.players[0];
+            console.log(player.id, window.user.id, this.player);
+            if(player.id === window.user.id) {
+                this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: player.id });
+                this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+                this.sendMessage({path: Commands.STOP});
+                hasStarted = false;
+            }
           }
-        }
+        }, 5000);
       });
       this.playlistContainer.appendChild(boxTrigger);
     }
