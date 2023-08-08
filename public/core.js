@@ -157,14 +157,18 @@ class Core{
         }
       });
       boxTrigger.addEventListener('trigger-exit', () => {
-        if(triggerExit && this.player && this.player.players.length && this.player.players[0].id === window.user.id && hasStarted) {
-          clearTimeout(hasStartedTimeout);
-          hasStartedTimeout = setTimeout(()=> {
-            this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: this.player.players[0].id });
-            this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-            this.sendMessage({path: Commands.STOP});
-            hasStarted = false;
-          }, 5000);
+        if(triggerExit && this.player && this.player.players.length) {
+          const player = this.player.players[0];
+          console.log(player.id, window.user.id);
+          if(player.id === window.user.id && hasStarted) {
+            clearTimeout(hasStartedTimeout);
+            hasStartedTimeout = setTimeout(() => {
+              this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: player.id });
+              this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+              this.sendMessage({path: Commands.STOP});
+              hasStarted = false;
+            }, 5000);
+          }
         }
       });
       this.playlistContainer.appendChild(boxTrigger);
