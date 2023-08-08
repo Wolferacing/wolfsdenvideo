@@ -150,7 +150,7 @@ class App{
     this.send(ws, Commands.MEASURE_LATENCY);
   }
   removeFromPlayers(uid, ws) {
-        console.log(ws.u.id, uid);
+    console.log("Removing players: " + (uid === ws.u.id));
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].sockets.forEach(s => {
         console.log(s.u.id, uid);
@@ -161,12 +161,10 @@ class App{
       })
     }, uid === ws.u.id);
     this.updateClients(ws.i, "remove-from-players");
-    console.log("Remove from players updateClients:", ws.u.name, this.getVideoObject(ws.i).players.length);
   }
   stop(ws) {
     this.onlyIfHost(ws, () => {
       this.updateClients(ws.i, "stop");
-      console.log("stop video", this.getVideoObject(ws.i).players.length);
     }, this.videoPlayers[ws.i].locked);
   }
   setAutoSync(autoSync, ws) {
