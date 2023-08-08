@@ -152,7 +152,6 @@ class App{
   removeFromPlayers(uid, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].sockets.forEach(s => {
-        console.log(s.u.id, uid);
         if(s.u.id === uid) {
           s.p = false;
         }
@@ -171,8 +170,12 @@ class App{
     }
   }
   addToPlayers(video, ws){
-    ws.p = new Date().getTime();
-    ws.p_v = video;
+    this.videoPlayers[ws.i].sockets.forEach(s => {
+      if(s.u.id === ws.u.id) {
+        s.p = new Date().getTime();
+        s.p_v = video;
+      }
+    });
     this.updateClients(ws.i, "add-to-players");
   }
   toggleVote(ws) {
