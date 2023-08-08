@@ -48,16 +48,16 @@ class App{
     });
   }
   handleClose(ws) {
-    console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.');
+    console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.', ws.type);
     Object.keys(this.videoPlayers).forEach(key => {
       const videoPlayer = this.videoPlayers[key];
-      videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
-      videoPlayer.votes = videoPlayer.votes.filter(v => v !== ws);
-      this.updateVotes(ws);
-      if(videoPlayer.host === ws.u && videoPlayer.sockets.filter(_ws => _ws.u === ws.u).length === 0) {
+      if(videoPlayer.host.id === ws.u.id && ws.type === "space") {
         console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
         videoPlayer.canTakeOver = true;
       }
+      videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
+      videoPlayer.votes = videoPlayer.votes.filter(v => v !== ws);
+      this.updateVotes(ws);
       this.updateClients(ws.i);
     });
   }
