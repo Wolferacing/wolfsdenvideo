@@ -145,7 +145,7 @@ class App{
         this.removeFromPlayers(msg.data, ws);
         break; 
     }
-  }
+  } 
   measureLatency(ws) {
     this.send(ws, Commands.MEASURE_LATENCY);
   }

@@ -144,11 +144,25 @@ class Core{
       boxTrigger.setAttribute('position', this.params["box-trigger-position"]);
       boxTrigger.setAttribute('rotation', this.params["box-trigger-rotation"]);
       boxTrigger.setAttribute('scale', this.params["box-trigger-scale"]);
+      let hasStarted = false;
+      let hasStartedTimeout;
       boxTrigger.addEventListener('trigger-enter', () => {
-        
+        clearTimeout(hasStartedTimeout);
+        if(this.player && this.player.players.length && this.player.players[0].id === window.user.id && !hasStarted) {
+          this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+          this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: this.player.players[0].v, isYoutubeWebsite: false, skipUpdate: true });
+          this.sendMessage({path: Commands.SET_TRACK, data: 0});
+          hasStarted = true;
+        }
       });
       boxTrigger.addEventListener('trigger-exit', () => {
-        
+        if(this.player && this.player.players.length && this.player.players[0].id === window.user.id && hasStarted) {
+          this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: this.player.players[0].id });
+          this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+          this.sendMessage({path: Commands.STOP});
+          clearTimeout(hasStartedTimeout);
+          hasStartedTimeout = setTimeout(()=>hasStarted = false, 5000);
+        }
       });
       this.playlistContainer.appendChild(boxTrigger);
     }
@@ -353,8 +367,10 @@ class Core{
         break;
       case Commands.STOP:
       case Commands.PLAYBACK_UPDATE:
+        this.player = json.data.video;
       case Commands.SYNC_TIME:
         json.volume = this.tempVolume;
+        
         this.sendBrowserMessage(json);
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {
