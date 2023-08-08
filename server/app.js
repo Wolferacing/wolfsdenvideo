@@ -150,17 +150,14 @@ class App{
     this.send(ws, Commands.MEASURE_LATENCY);
   }
   removeFromPlayers(uid, ws) {
-    console.log("Removing players: " + (uid === ws.u.id));
     this.onlyIfHost(ws, () => {
-      console.log("here", ws.u.id, uid);
       this.videoPlayers[ws.i].sockets.forEach(s => {
         console.log(s.u.id, uid);
         if(s.u.id === uid) {
           s.p = false;
-          console.log("Remove from players:", s.u.name, this.getVideoObject(ws.i).players.length);
         }
       })
-    }, uid === ws.u.id);
+    }, uid !== ws.u.id);
     this.updateClients(ws.i, "remove-from-players");
   }
   stop(ws) {
