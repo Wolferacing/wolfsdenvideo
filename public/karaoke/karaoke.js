@@ -127,6 +127,7 @@ class Karaoke{
     const json = JSON.parse(msg);
     switch(json.path) {
       case Commands.PLAYBACK_UPDATE:
+        console.log(json);
         this.core.player = json.data.video;
         this.updatePlaylist(this.core.player);
         break;
@@ -146,7 +147,6 @@ class Karaoke{
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
-    // this.stopVideo.style.display = !isMe && player.locked ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
@@ -174,8 +174,7 @@ class Karaoke{
       videoTitle.innerHTML = `${(i+1)+"."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       if(p.id === window.user.id || isMe) {
-        
-       const buttons = this.core.makeAndAddElement('div',{marginTop: "10px"}, videoTitle);
+        const buttons = this.core.makeAndAddElement('div',{marginTop: "10px"}, videoTitle);
         if(i == 0) {
           const preview = this.core.makeAndAddElement('div',null, buttons);
           preview.className = 'button slim teal';
@@ -225,8 +224,6 @@ class Karaoke{
         this.YtPlayer.loadVideoById(this.core.getId(v.link), 0);
       });
       
-      
-      
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       videoThumbnail.src = v.thumbnail;
@@ -262,7 +259,7 @@ class Karaoke{
         'mute': 1,
         'autoplay': 1,
         'disablekb': 1,
-        'controls': 1,
+        'controls': 0,
         'modestbranding': true,
         'cc_load_policy': 1,
         'cc_lang_pref': 'en',

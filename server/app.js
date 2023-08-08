@@ -152,11 +152,13 @@ class App{
   removeFromPlayers(uid, ws) {
     if(uid === ws.u.id) {
       ws.p = false;
+      console.log("Remove me from players:", ws.u.name);
     }else{
       this.onlyIfHost(ws, () => {
         this.videoPlayers[ws.i].sockets.forEach(s => {
           if(s.u.id === uid) {
             s.p = false;
+            console.log("Remove from players:", s.u.name);
           }
         })
       });

@@ -136,9 +136,10 @@ class Core{
     playlistButtonText.setAttribute('scale', '0.8 0.8 0.8');
     playlistButton.appendChild(playlistButtonText);
     playlistButton.addEventListener('click', () => this.openPlaylist());
-    
-    if(this.params["box-trigger-enabled"] === "true") {
-      const boxTrigger = document.createElement('a-box');
+    const triggerEnter = this.params["box-trigger-enter-enabled"] === "true";
+    const triggerExit = this.params["box-trigger-exit-enabled"] === "true"
+    if(triggerEnter || triggerExit) {
+      const boxTrigger = document.createElement('a-entity');
       boxTrigger.setAttribute('sq-boxcollider', '');
       boxTrigger.setAttribute('sq-triggercollider', '');
       boxTrigger.setAttribute('position', this.params["box-trigger-position"]);
@@ -148,7 +149,7 @@ class Core{
       let hasStartedTimeout;
       boxTrigger.addEventListener('trigger-enter', () => {
         clearTimeout(hasStartedTimeout);
-        if(this.player && this.player.players.length && this.player.players[0].id === window.user.id && !hasStarted) {
+        if(triggerEnter && this.player && this.player.players.length && this.player.players[0].id === window.user.id && !hasStarted) {
           this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
           this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: this.player.players[0].v, isYoutubeWebsite: false, skipUpdate: true });
           this.sendMessage({path: Commands.SET_TRACK, data: 0});
@@ -156,12 +157,14 @@ class Core{
         }
       });
       boxTrigger.addEventListener('trigger-exit', () => {
-        if(this.player && this.player.players.length && this.player.players[0].id === window.user.id && hasStarted) {
-          this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: this.player.players[0].id });
-          this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-          this.sendMessage({path: Commands.STOP});
+        if(triggerExit && this.player && this.player.players.length && this.player.players[0].id === window.user.id && hasStarted) {
           clearTimeout(hasStartedTimeout);
-          hasStartedTimeout = setTimeout(()=>hasStarted = false, 5000);
+          hasStartedTimeout = setTimeout(()=> {
+            this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: this.player.players[0].id });
+            this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+            this.sendMessage({path: Commands.STOP});
+            hasStarted = false;
+          }, 5000);
         }
       });
       this.playlistContainer.appendChild(boxTrigger);
@@ -242,7 +245,8 @@ class Core{
     const yScale = Number(this.params.scale.split(" ")[1]);
     this.setOrDefault("singer-button-position", `0 ${-yScale*0.335} 3`);
     this.setOrDefault("singer-button-rotation", "-30 180 0");
-    this.setOrDefault("box-trigger-enabled", 'false');
+    this.setOrDefault("box-trigger-enter-enabled", 'false');
+    this.setOrDefault("box-trigger-exit-enabled", 'false');
     this.setOrDefault("box-trigger-position", '0 0 0');
     this.setOrDefault("box-trigger-rotation", '0 0 0');
     this.setOrDefault("box-trigger-scale", '1 1 1');
