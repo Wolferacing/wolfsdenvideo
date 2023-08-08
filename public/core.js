@@ -382,7 +382,6 @@ class Core{
         this.player.players.sort((a, b) => a.p - b.p);
       case Commands.SYNC_TIME:
         json.volume = this.tempVolume;
-        
         this.sendBrowserMessage(json);
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {

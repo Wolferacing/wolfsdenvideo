@@ -127,7 +127,6 @@ class Karaoke{
     const json = JSON.parse(msg);
     switch(json.path) {
       case Commands.PLAYBACK_UPDATE:
-        console.log(json);
         this.core.player = json.data.video;
         this.updatePlaylist(this.core.player);
         break;
