@@ -16,7 +16,7 @@ class Player {
        this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
        this.core.sendMessage({path: "user-video-player", data: window.user});
      }, ()=>{
-        this.showToast("Reconnecting...");
+        this.core.showToast("Reconnecting...");
      });
      this.core.setupLatencyMeasure();
      this.playPlaylist();
@@ -83,21 +83,6 @@ class Player {
       this.isPlayerStarted = true;
     }
   }
-  showToast(text) {
-    Toastify({
-      text: text,
-      duration: 500,
-      gravity: "bottom", // `top` or `bottom`
-      position: "right", // `left`, `center` or `right`
-      style: {
-        background: "url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813) center center no-repeat",
-        backgroundSize: "cover",
-        opacity: 0.7,
-        fontSize: "2em",
-        fontFamily: "'Roboto', sans-serif"
-      },
-    }).showToast();
-  }
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
@@ -112,12 +97,12 @@ class Player {
       case Commands.SKIP_BACK:
         const time = this.player.getCurrentTime() - 0.25;
         this.player.seekTo(time);
-        this.showToast("-0.25s");
+        this.core.showToast("-0.25s");
         break;
       case Commands.SKIP_FORWARD:
         const timeForward = this.player.getCurrentTime() + 0.25;
         this.player.seekTo(timeForward);
-        this.showToast("+0.25s");
+        this.core.showToast("+0.25s");
         break;
       case Commands.AUTO_SYNC:
         this.autoSync = json.data;
@@ -132,7 +117,7 @@ class Player {
         break;
       case Commands.MUTE:
         this.core.params.mute = json.data;
-        this.showToast(this.core.params.mute === true || this.core.params.mute === 'true' ? "mute" : "unmute");
+        this.core.showToast(this.core.params.mute === true || this.core.params.mute === 'true' ? "mute" : "unmute");
         this.setMute();
         break;
       case Commands.MEASURE_LATENCY:
@@ -147,7 +132,7 @@ class Player {
           const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
           document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
           if(timediff > 0.5 && this.autoSync) {
-             this.showToast("AutoSync: " + Math.round(timediff*100)/100 + "s");
+             this.core.showToast("AutoSync: " + Math.round(timediff*100)/100 + "s");
              this.player.seekTo(json.data.currentTime + this.core.currentLatency);
           }
           this.core.params.volume = json.volume;
@@ -162,7 +147,7 @@ class Player {
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.core.getId(url), currentTime);
         this.player.playVideo();
-        this.showToast("Playing: " + this.playerData.playlist[currentTrack].title);
+        this.core.showToast("Playing: " + this.playerData.playlist[currentTrack].title);
         this.setVolume("spatial");
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
@@ -182,7 +167,7 @@ class Player {
     if(this.player.getVolume() != this.core.params.volume) {
       this.player.setVolume(this.core.params.volume);
       const isSpatial = type === "spatial";
-      const showToast = () => this.showToast((isSpatial ? "(spatial) " : "") + "vol: " + (this.core.params.volume) + "%");
+      const showToast = () => this.core.showToast((isSpatial ? "(spatial) " : "") + "vol: " + (this.core.params.volume) + "%");
       if(isSpatial) {
         clearTimeout(this.spatialUpdateTimeout);
         this.spatialUpdateTimeout = setTimeout(() => showToast(), 600);

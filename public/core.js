@@ -151,10 +151,14 @@ class Core{
         if(e.detail.isLocalPlayer) {
           clearTimeout(hasStartedTimeout);
           if(triggerEnter && this.player && this.player.players.length && this.player.players[0].id === window.user.id && !hasStarted) {
-            this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-            this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: this.player.players[0].v, isYoutubeWebsite: false, skipUpdate: true });
-            this.sendMessage({path: Commands.SET_TRACK, data: 0});
-            hasStarted = true;
+            if(this.player.locked) {
+              this.showToast("Player is locked! The host needs to unlock it first!");
+            }else{
+              this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+              this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: this.player.players[0].v, isYoutubeWebsite: false, skipUpdate: true });
+              this.sendMessage({path: Commands.SET_TRACK, data: 0});
+              hasStarted = true;
+            }
           }
         }
       });
@@ -176,6 +180,26 @@ class Core{
         }
       });
       this.playlistContainer.appendChild(boxTrigger);
+    }
+  }
+  showToast(text) {
+    if(Toastify) {
+      Toastify({
+        text: text,
+        duration: 1000,
+        // close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        // stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813) center center no-repeat",
+          backgroundSize: "cover",
+          opacity: 0.7,
+          fontSize: "2em",
+          fontFamily: "'Roboto', sans-serif"
+        },
+        // onClick: function(){} // Callback after click
+      }).showToast();
     }
   }
   setupPlaylistButton(scene, playlistContainer) {

@@ -13,7 +13,7 @@ class Karaoke{
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance});
     }, () => {
-        this.showToast("Reconnecting...");
+        this.core.showToast("Reconnecting...");
     });
     this.addYoutubeScript();
   }
@@ -23,34 +23,10 @@ class Karaoke{
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   }
-  showToast(text) {
-    Toastify({
-      text: text,
-      duration: 1000,
-      // close: true,
-      gravity: "bottom", // `top` or `bottom`
-      position: "right", // `left`, `center` or `right`
-      // stopOnFocus: true, // Prevents dismissing of toast on hover
-      style: {
-        background: "url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813) center center no-repeat",
-        backgroundSize: "cover",
-        opacity: 0.7,
-        fontSize: "2em",
-        fontFamily: "'Roboto', sans-serif"
-      },
-      // onClick: function(){} // Callback after click
-    }).showToast();
-  }
   setupKaraokeUI() {
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
     
-    // this.stopVideo = document.querySelector('#stopVideo');
-    // this.stopVideo.addEventListener('click', () => {
-    //   this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-    //   this.core.sendMessage({path: Commands.STOP});
-    // });
-
     this.autoSync = document.querySelector('#autoSync');
     
     this.autoSyncEnabled = false;
@@ -179,9 +155,13 @@ class Karaoke{
           preview.className = 'button slim teal';
           preview.innerText = "Play & Sing";
           preview.addEventListener('click', () => {
-            this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-            this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: p.v, isYoutubeWebsite: false, skipUpdate: true });
-            this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
+            if(this.core.player.locked) {
+              this.core.showToast("Player is locked! The host needs to unlock it first!");
+            }else{
+              this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+              this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: p.v, isYoutubeWebsite: false, skipUpdate: true });
+              this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
+            }
           });
         }
        const remove = this.core.makeAndAddElement('div',null, buttons);

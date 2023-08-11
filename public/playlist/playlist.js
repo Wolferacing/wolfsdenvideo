@@ -13,7 +13,7 @@ class Playlist {
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance});
     }, ()=>{
-        this.showToast("Reconnecting...");
+        this.core.showToast("Reconnecting...");
     });
   }
   playPlaylist(shouldClear) {
@@ -21,24 +21,6 @@ class Playlist {
   }
   clearPlaylist() {
     this.core.sendMessage({path: Commands.CLEAR_PLAYLIST});
-  }
-  showToast(text) {
-    Toastify({
-      text: text,
-      duration: 1000,
-      // close: true,
-      gravity: "bottom", // `top` or `bottom`
-      position: "right", // `left`, `center` or `right`
-      // stopOnFocus: true, // Prevents dismissing of toast on hover
-      style: {
-        background: "url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813) center center no-repeat",
-        backgroundSize: "cover",
-        opacity: 0.7,
-        fontSize: "2em",
-        fontFamily: "'Roboto', sans-serif"
-      },
-      // onClick: function(){} // Callback after click
-    }).showToast();
   }
   parseMessage(msg) {
     const json = JSON.parse(msg);
