@@ -27,6 +27,12 @@ class Portals {
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
+  setupPortal(url) {
+    const portal = document.createElement('a-link');
+    portal.setAttribute('href', url);
+    portal.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0 0');
+    this.portalCount++;
+  }
   async tick() {
     const parent = document.querySelector('#portalParent');
     if(!parent) {
@@ -40,7 +46,7 @@ class Portals {
     const events = await fetch('https://api.sidequestvr.com/v2/events/banter');
     events.length = events.length < 5 ? events.length : 5;
     spaces.length = spaces.length - events.length;
-    let portalCount = 0;
+    this.portalCount = 0;
     events.filter(e => {
       const start = new Date(e.scheduledStartTimestamp);
       const startTime = start.getTime();
@@ -48,6 +54,7 @@ class Portals {
       const isActive = startTime < Date.now();
       return isActive;
     }).forEach(e => {
+      this.setupPortal(e.location);
       const portal = document.createElement('a-link');
       portal.setAttribute('href', e.location);
       portal.setAttribute('position', (portalCount * this.params.spacing) + ' 0 0');
