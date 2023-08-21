@@ -19,7 +19,7 @@ class Portals {
     this.setOrDefault("space-limit", "5");
     this.setOrDefault("show-events", "true");
     this.setOrDefault("shape", "line");
-    this.setOrDefault("spacing", "1.5");
+    this.setOrDefault("spacing", "2");
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
   }
@@ -37,15 +37,13 @@ class Portals {
         break;
       case "circle":
         const radius = (this.totalItems / (2 * Math.PI)) * this.params.spacing;
-        if(radius > 2) {
-          radius = 2;
-        }
         const angle = (this.portalCount / this.totalItems) * 2 * Math.PI;
         const rotation = (angle * 180 / Math.PI); 
+        console.log(rotation);
         const x = radius * Math.cos(angle);
         const y = radius * Math.sin(angle);
         portal.setAttribute('position', `${x} 0 ${y}`);
-        portal.setAttribute('rotation', `0 ${rotation + 90} 0`);
+        portal.setAttribute('rotation', `0 ${rotation - 90} 0`);
         break;
       case "spiral":
         const spiralAngle = this.portalCount * 0.1 * Math.PI;
@@ -54,7 +52,7 @@ class Portals {
         const spiralX = spiralRadius * Math.cos(spiralAngle);
         const spiralY = spiralRadius * Math.sin(spiralAngle);
         portal.setAttribute('position', `${spiralX} 0 ${spiralY}`);
-        portal.setAttribute('rotation', `0 ${spiralRotation + 90} 0`);
+        portal.setAttribute('rotation', `0 ${spiralRotation - 90} 0`);
         this.distanceFromCenter += this.params.spacing / Math.sqrt(1 + Math.pow(spiralAngle, 2));
         break;
     }
@@ -79,6 +77,8 @@ class Portals {
       const isActive = startTime < Date.now();
       return isActive;
     });
+    console.log(events);
+    console.log(spaces);
     events.length = events.length < 5 ? events.length : 5;
     this.totalItems = spaces.length = spaces.length - events.length;
     this.portalCount = 0;
