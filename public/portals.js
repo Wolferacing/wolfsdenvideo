@@ -1,5 +1,7 @@
 class Portals {
   constructor() {
+    this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
+    this.urlParams = new URLSearchParams(window.location.search);
     this.init();
   }
   async init() {
@@ -13,8 +15,7 @@ class Portals {
       this.tick();
     }
   }
-  parseParams(currentScript) {
-    this.currentScript = currentScript;
+  parseParams() {
     this.setOrDefault("space-limit", "5");
     this.setOrDefault("show-events", "true");
     this.setOrDefault("shape", "line");
@@ -58,9 +59,10 @@ class Portals {
         break;
     }
     this.portalCount++;
+    return portal;
   }
   async tick() {
-    const parent = document.querySelector('#portalParent');
+    let parent = document.querySelector('#portalParent');
     if(!parent) {
       parent = document.createElement('a-entity');
       parent.setAttribute('position', this.params.position);
@@ -68,8 +70,8 @@ class Portals {
       this.sceneParent.appendChild(parent);
     }
     Array.from(parent.children).forEach(c => parent.removeChild(c));
-    const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]);
-    const events = this.prarams['show-events'] === 'false' ? [] : await fetch('https://api.sidequestvr.com/v2/events/banter');
+    const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]).then(r=>r.json());
+    const events = this.params['show-events'] === 'false' ? [] : await fetch('https://api.sidequestvr.com/v2/events/banter').then(r=>r.json());
     events.length = events.length < 5 ? events.length : 5;
     this.totalItems = spaces.length = spaces.length - events.length;
     this.portalCount = 0;
@@ -80,7 +82,10 @@ class Portals {
       const endTime = new Date(e.scheduledEndTimestamp).getTime();
       const isActive = startTime < Date.now();
       return isActive;
-    }).forEach(e => this.setupPortal(e.location));
-    spaces.forEach(e => this.setupPortal(e.space_url));
+    }).forEach(e => parent.appendChild(this.setupPortal(e.location)));
+    
+    
+    spaces.forEach(e => parent.appendChild(this.setupPortal(e.space_url)));
   }
 }
+new Portals();
