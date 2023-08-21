@@ -11,7 +11,7 @@ class Portals {
       await window.AframeInjection.waitFor(window.AFRAME.scenes, 0);
       this.sceneParent = window.AFRAME.scenes[0];
       this.parseParams();
-      setInterval(() => this.tick(), 60 * 1000);
+      setInterval(() => this.tick(), 5 * 60 * 1000);
       this.tick();
     }
   }
@@ -38,12 +38,12 @@ class Portals {
       liveNow.setAttribute('value', 'Event Live Now!');
       liveNow.setAttribute('scale', '0.5 0.5 0.5');
       liveNow.setAttribute('align', 'center');
-      liveNow.setAttribute('sq-billboard', '');
+      // liveNow.setAttribute('sq-billboard', '');
     }
     switch(this.params.shape) {
       case "line":
         portal.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0 0');
-        if(liveNow)liveNow.setAttribute('position', (this.portalCount * this.params.spacing) + ' 2 0');
+        if(liveNow)liveNow.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0.1 0');
         break;
       case "circle":
         const radius = (this.totalItems / (2 * Math.PI)) * this.params.spacing;
@@ -52,7 +52,7 @@ class Portals {
         const x = radius * Math.cos(angle);
         const y = radius * Math.sin(angle);
         portal.setAttribute('position', `${x} 0 ${y}`);
-        if(liveNow)liveNow.setAttribute('position', `${x} 2 ${y}`);
+        if(liveNow)liveNow.setAttribute('position', `${x} 0.1 ${y}`);
         portal.setAttribute('rotation', `0 ${-rotation - 90} 0`);
         break;
       case "spiral":
@@ -62,7 +62,7 @@ class Portals {
         const spiralX = spiralRadius * Math.cos(spiralAngle);
         const spiralY = spiralRadius * Math.sin(spiralAngle);
         portal.setAttribute('position', `${spiralX} 0 ${spiralY}`);
-        if(liveNow)liveNow.setAttribute('position', `${spiralX} 2 ${spiralY}`);
+        if(liveNow)liveNow.setAttribute('position', `${spiralX} 0.1 ${spiralY}`);
         portal.setAttribute('rotation', `0 ${-spiralRotation - 90} 0`);
         this.distanceFromCenter += this.params.spacing / Math.sqrt(1 + Math.pow(spiralAngle, 2));
         break;
