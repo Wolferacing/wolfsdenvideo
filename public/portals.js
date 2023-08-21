@@ -83,10 +83,8 @@ class Portals {
     Array.from(parent.children).forEach(c => parent.removeChild(c));
     events.forEach(e => {
       const portal = this.setupPortal(e.location);
-      console.log(portal);
       parent.appendChild(portal);
     });
-    
     spaces.forEach(e => {
       const portal = this.setupPortal(e.space_url);
       parent.appendChild(portal);
