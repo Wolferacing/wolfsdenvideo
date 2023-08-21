@@ -70,8 +70,7 @@ class Portals {
     }
     const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]).then(r=>r.json());
     let events = this.params['show-events'] === 'false' ? [] : (await fetch('https://api.sidequestvr.com/v2/events/banter')).then(r=>r.json());
-    console.log(events);
-    events = events.filter(e => {
+    events = (events || []).filter(e => {
       const start = new Date(e.scheduledStartTimestamp);
       const startTime = start.getTime();
       const isActive = startTime < Date.now();
