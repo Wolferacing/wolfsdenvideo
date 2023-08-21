@@ -27,10 +27,52 @@ class Portals {
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
+  function positionItemsAroundCircle() {
+    // Get all items
+    const items = document.querySelectorAll('.item');
+    const n = items.length;
+
+    // Calculate the radius of the circle based on the number of items
+    const radius = (n / (2 * Math.PI)) * 0.5;  // in meters
+    const radiusInPixels = radius * 100;  // assuming 100 pixels per meter
+
+    // Position the center of the circle
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    // Loop through each item to set its position
+    items.forEach((item, index) => {
+      const angle = (index / n) * 2 * Math.PI;  // Angle in radians
+
+      const x = centerX + radiusInPixels * Math.cos(angle);
+      const y = centerY + radiusInPixels * Math.sin(angle);
+
+      // Convert angle to degrees and add 90 degrees to make the item face the center
+      const rotation = (angle * 180 / Math.PI) + 90; 
+
+      item.style.left = `${x}px`;
+      item.style.top = `${y}px`;
+      item.style.transform = `rotate(${rotation}deg)`;
+    });
+  }
   setupPortal(url) {
     const portal = document.createElement('a-link');
     portal.setAttribute('href', url);
-    portal.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0 0');
+    switch(this.params.shape) {
+      case "line":
+        portal.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0 0');
+        break;
+      case "circle":
+        const radius = (this.totalItems / (2 * Math.PI)) * this.params.spacing;
+        const angle = (this.portalCount / this.totalItems);
+        const angleRad = angle * 2 * Math.PI;
+        const angleDeg = angle * 360;
+        
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+        break;
+    }
+    
     this.portalCount++;
   }
   async tick() {
@@ -45,7 +87,7 @@ class Portals {
     const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]);
     const events = await fetch('https://api.sidequestvr.com/v2/events/banter');
     events.length = events.length < 5 ? events.length : 5;
-    spaces.length = spaces.length - events.length;
+    this.totalItems = spaces.length = spaces.length - events.length;
     this.portalCount = 0;
     events.filter(e => {
       const start = new Date(e.scheduledStartTimestamp);
@@ -53,18 +95,7 @@ class Portals {
       const endTime = new Date(e.scheduledEndTimestamp).getTime();
       const isActive = startTime < Date.now();
       return isActive;
-    }).forEach(e => {
-      this.setupPortal(e.location);
-      const portal = document.createElement('a-link');
-      portal.setAttribute('href', e.location);
-      portal.setAttribute('position', (portalCount * this.params.spacing) + ' 0 0');
-      portalCount++;
-    });
-    spaces.forEach(s => {
-      const portal = document.createElement('a-link');
-      portal.setAttribute('href', s.space_url);
-      portal.setAttribute('position', (portalCount * this.params.spacing) + ' 0 0');
-      portalCount++;
-    });
+    }).forEach(e => this.setupPortal(e.location));
+    spaces.forEach(e => this.setupPortal(e.space_url));
   }
 }
