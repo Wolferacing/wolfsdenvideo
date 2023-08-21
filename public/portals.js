@@ -29,20 +29,18 @@ class Portals {
   }
   async tick() {
     const parent = document.querySelector('#portalParent');
-    
     if(!parent) {
       parent = document.createElement('a-entity');
       parent.setAttribute('position', this.params.position);
       parent.setAttribute('rotation', this.params.rotation);
       this.sceneParent.appendChild(parent);
     }
-    
     Array.from(parent.children).forEach(c => parent.removeChild(c));
-    
-    const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=5');
+    const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]);
     const events = await fetch('https://api.sidequestvr.com/v2/events/banter');
     events.length = events.length < 5 ? events.length : 5;
     spaces.length = spaces.length - events.length;
+    let portalCount = 0;
     events.filter(e => {
       const start = new Date(e.scheduledStartTimestamp);
       const startTime = start.getTime();
@@ -52,7 +50,14 @@ class Portals {
     }).forEach(e => {
       const portal = document.createElement('a-link');
       portal.setAttribute('href', e.location);
+      portal.setAttribute('position', (portalCount * this.params.spacing) + ' 0 0');
+      portalCount++;
     });
-    spaces
+    spaces.forEach(s => {
+      const portal = document.createElement('a-link');
+      portal.setAttribute('href', s.space_url);
+      portal.setAttribute('position', (portalCount * this.params.spacing) + ' 0 0');
+      portalCount++;
+    });
   }
 }
