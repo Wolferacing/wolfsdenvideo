@@ -19,7 +19,7 @@ class Portals {
     this.setOrDefault("space-limit", "5");
     this.setOrDefault("show-events", "true");
     this.setOrDefault("shape", "line");
-    this.setOrDefault("spacing", "0.5");
+    this.setOrDefault("spacing", "1.5");
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
   }
@@ -68,24 +68,32 @@ class Portals {
       parent.setAttribute('position', this.params.position);
       parent.setAttribute('rotation', this.params.rotation);
       this.sceneParent.appendChild(parent);
+      parent.id = 'portalParent';
     }
     Array.from(parent.children).forEach(c => parent.removeChild(c));
     const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]).then(r=>r.json());
-    const events = this.params['show-events'] === 'false' ? [] : await fetch('https://api.sidequestvr.com/v2/events/banter').then(r=>r.json());
+    let events = this.params['show-events'] === 'false' ? [] : await fetch('https://api.sidequestvr.com/v2/events/banter').then(r=>r.json());
+    events = events.filter(e => {
+      const start = new Date(e.scheduledStartTimestamp);
+      const startTime = start.getTime();
+      const isActive = startTime < Date.now();
+      return isActive;
+    });
     events.length = events.length < 5 ? events.length : 5;
     this.totalItems = spaces.length = spaces.length - events.length;
     this.portalCount = 0;
     this.distanceFromCenter = 0;
-    events.filter(e => {
-      const start = new Date(e.scheduledStartTimestamp);
-      const startTime = start.getTime();
-      const endTime = new Date(e.scheduledEndTimestamp).getTime();
-      const isActive = startTime < Date.now();
-      return isActive;
-    }).forEach(e => parent.appendChild(this.setupPortal(e.location)));
+    events.forEach(e => {
+      const portal = this.setupPortal(e.location);
+      console.log(portal);
+      parent.appendChild(portal);
+    });
     
-    
-    spaces.forEach(e => parent.appendChild(this.setupPortal(e.space_url)));
+    spaces.forEach(e => {
+      const portal = this.setupPortal(e.space_url);
+      console.log(portal);
+      parent.appendChild(portal);
+    });
   }
 }
 new Portals();
