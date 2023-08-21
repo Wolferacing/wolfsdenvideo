@@ -17,8 +17,8 @@ class Portals {
     this.currentScript = currentScript;
     this.setOrDefault("space-limit", "5");
     this.setOrDefault("show-events", "true");
-    this.setOrDefault("shape", "line"); // or circle or spiral
-    this.setOrDefault("spacing", "0.5"); // does nothing on circle
+    this.setOrDefault("shape", "line");
+    this.setOrDefault("spacing", "0.5");
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
   }
@@ -26,34 +26,6 @@ class Portals {
     const value = this.currentScript.getAttribute(attr);
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
-  }
-  function positionItemsAroundCircle() {
-    // Get all items
-    const items = document.querySelectorAll('.item');
-    const n = items.length;
-
-    // Calculate the radius of the circle based on the number of items
-    const radius = (n / (2 * Math.PI)) * 0.5;  // in meters
-    const radiusInPixels = radius * 100;  // assuming 100 pixels per meter
-
-    // Position the center of the circle
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-
-    // Loop through each item to set its position
-    items.forEach((item, index) => {
-      const angle = (index / n) * 2 * Math.PI;  // Angle in radians
-
-      const x = centerX + radiusInPixels * Math.cos(angle);
-      const y = centerY + radiusInPixels * Math.sin(angle);
-
-      // Convert angle to degrees and add 90 degrees to make the item face the center
-      const rotation = (angle * 180 / Math.PI) + 90; 
-
-      item.style.left = `${x}px`;
-      item.style.top = `${y}px`;
-      item.style.transform = `rotate(${rotation}deg)`;
-    });
   }
   setupPortal(url) {
     const portal = document.createElement('a-link');
@@ -64,15 +36,27 @@ class Portals {
         break;
       case "circle":
         const radius = (this.totalItems / (2 * Math.PI)) * this.params.spacing;
-        const angle = (this.portalCount / this.totalItems);
-        const angleRad = angle * 2 * Math.PI;
-        const angleDeg = angle * 360;
-        
+        if(radius > 2) {
+          radius = 2;
+        }
+        const angle = (this.portalCount / this.totalItems) * 2 * Math.PI;
+        const rotation = (angle * 180 / Math.PI); 
         const x = radius * Math.cos(angle);
         const y = radius * Math.sin(angle);
+        portal.setAttribute('position', `${x} 0 ${y}`);
+        portal.setAttribute('rotation', `0 ${rotation + 90} 0`);
+        break;
+      case "spiral":
+        const spiralAngle = this.portalCount * 0.1 * Math.PI;
+        const spiralRotation = (spiralAngle * 180 / Math.PI); 
+        const spiralRadius = this.distanceFromCenter;
+        const spiralX = spiralRadius * Math.cos(spiralAngle);
+        const spiralY = spiralRadius * Math.sin(spiralAngle);
+        portal.setAttribute('position', `${spiralX} 0 ${spiralY}`);
+        portal.setAttribute('rotation', `0 ${spiralRotation + 90} 0`);
+        this.distanceFromCenter += this.params.spacing / Math.sqrt(1 + Math.pow(spiralAngle, 2));
         break;
     }
-    
     this.portalCount++;
   }
   async tick() {
@@ -85,10 +69,11 @@ class Portals {
     }
     Array.from(parent.children).forEach(c => parent.removeChild(c));
     const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]);
-    const events = await fetch('https://api.sidequestvr.com/v2/events/banter');
+    const events = this.prarams['show-events'] === 'false' ? [] : await fetch('https://api.sidequestvr.com/v2/events/banter');
     events.length = events.length < 5 ? events.length : 5;
     this.totalItems = spaces.length = spaces.length - events.length;
     this.portalCount = 0;
+    this.distanceFromCenter = 0;
     events.filter(e => {
       const start = new Date(e.scheduledStartTimestamp);
       const startTime = start.getTime();
