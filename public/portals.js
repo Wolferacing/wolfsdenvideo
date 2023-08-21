@@ -1,6 +1,10 @@
 class Portals {
   constructor() {
-    this.parseParams();
+    if(window.isBanter) {
+      this.parseParams();
+      setInterval(() => this.tick(), 60 * 1000);
+      this.tick();
+    }
   }
   parseParams(currentScript) {
     this.currentScript = currentScript;
@@ -14,19 +18,26 @@ class Portals {
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
-}
-(async ()=>{
-  if(window.isBanter) {
-    const now = Date.now();
-    const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=5');
+  async tick() {
     
+    const parent = document.querySelector('#portalParent');
+    
+    if(!parent) {
+      parent = document.createElement('a-entity');
+      
+    }
+    
+    const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=5');
     const events = await fetch('https://api.sidequestvr.com/v2/events/banter');
     
-    /*
-        const start = new Date(space.scheduledStartTimestamp);
-        const startTime = start.getTime();
-        const endTime = new Date(space.scheduledEndTimestamp).getTime();
-        const isActive = startTime < Date.now();
-    */
+    events.filter(e => {
+      const start = new Date(e.scheduledStartTimestamp);
+      const startTime = start.getTime();
+      const endTime = new Date(e.scheduledEndTimestamp).getTime();
+      const isActive = startTime < Date.now();
+      return isActive;
+    }).forEach(e => {
+      
+    });
   }
-})();
+}
