@@ -68,7 +68,6 @@ class Portals {
       this.sceneParent.appendChild(parent);
       parent.id = 'portalParent';
     }
-    Array.from(parent.children).forEach(c => parent.removeChild(c));
     const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]).then(r=>r.json());
     let events = this.params['show-events'] === 'false' ? [] : await fetch('https://api.sidequestvr.com/v2/events/banter').then(r=>r.json());
     events = events.filter(e => {
@@ -77,12 +76,11 @@ class Portals {
       const isActive = startTime < Date.now();
       return isActive;
     });
-    console.log(events);
-    console.log(spaces);
     events.length = events.length < 5 ? events.length : 5;
     this.totalItems = spaces.length = spaces.length - events.length;
     this.portalCount = 0;
     this.distanceFromCenter = 0;
+    Array.from(parent.children).forEach(c => parent.removeChild(c));
     events.forEach(e => {
       const portal = this.setupPortal(e.location);
       console.log(portal);
@@ -91,7 +89,6 @@ class Portals {
     
     spaces.forEach(e => {
       const portal = this.setupPortal(e.space_url);
-      console.log(portal);
       parent.appendChild(portal);
     });
   }
