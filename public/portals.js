@@ -37,7 +37,7 @@ class Portals {
       liveNow = document.createElement('a-text');
       liveNow.setAttribute('value', 'Event Live Now!');
       liveNow.setAttribute('scale', '0.5 0.5 0.5');
-      liveNow.setAttribute('scale', 'center');
+      liveNow.setAttribute('align', 'center');
       liveNow.setAttribute('sq-billboard', '');
     }
     switch(this.params.shape) {
@@ -82,7 +82,7 @@ class Portals {
       this.sceneParent.appendChild(parent);
       parent.id = 'portalParent';
     }
-    const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]).then(r=>r.json());
+    let spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=' + this.params["space-limit"]).then(r=>r.json());
     let events = this.params['show-events'] === 'false' ? [] : await fetch('https://api.sidequestvr.com/v2/events/banter').then(r=>r.json());
     events = (events || []).filter(e => {
       const start = new Date(e.scheduledStartTimestamp);
@@ -91,6 +91,9 @@ class Portals {
       return isActive;
     });
     events.length = events.length < 5 ? events.length : 5;
+    
+    const eventLinks = events.map(e => e.location);
+    spaces = spaces.filter(s=>eventLinks.indexOf(s.space_url)===-1&&eventLinks.indexOf(s.space_url+"/")===-1);
     this.totalItems = spaces.length = spaces.length - events.length;
     this.portalCount = 0;
     this.distanceFromCenter = 0;
