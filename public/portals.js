@@ -1,6 +1,13 @@
 class Portals {
   constructor() {
+    this.init();
+  }
+  async init() {
     if(window.isBanter) {
+      await window.AframeInjection.waitFor(window, 'user');
+      await window.AframeInjection.waitFor(window, 'AFRAME');
+      await window.AframeInjection.waitFor(window.AFRAME.scenes, 0);
+      this.sceneParent = window.AFRAME.scenes[0];
       this.parseParams();
       setInterval(() => this.tick(), 60 * 1000);
       this.tick();
@@ -12,6 +19,8 @@ class Portals {
     this.setOrDefault("show-events", "true");
     this.setOrDefault("shape", "line"); // or circle or spiral
     this.setOrDefault("spacing", "0.5"); // does nothing on circle
+    this.setOrDefault("position", "0 0 0");
+    this.setOrDefault("rotation", "0 0 0");
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
@@ -19,17 +28,21 @@ class Portals {
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
   async tick() {
-    
     const parent = document.querySelector('#portalParent');
     
     if(!parent) {
       parent = document.createElement('a-entity');
-      
+      parent.setAttribute('position', this.params.position);
+      parent.setAttribute('rotation', this.params.rotation);
+      this.sceneParent.appendChild(parent);
     }
+    
+    Array.from(parent.children).forEach(c => parent.removeChild(c));
     
     const spaces = await fetch('https://api.sidequestvr.com/v2/communities?is_verified=true&has_space=true&sortOn=user_count,name&descending=true,false&limit=5');
     const events = await fetch('https://api.sidequestvr.com/v2/events/banter');
-    
+    events.length = events.length < 5 ? events.length : 5;
+    spaces.length = spaces.length - events.length;
     events.filter(e => {
       const start = new Date(e.scheduledStartTimestamp);
       const startTime = start.getTime();
@@ -37,7 +50,9 @@ class Portals {
       const isActive = startTime < Date.now();
       return isActive;
     }).forEach(e => {
-      
+      const portal = document.createElement('a-link');
+      portal.setAttribute('href', e.location);
     });
+    spaces
   }
 }
