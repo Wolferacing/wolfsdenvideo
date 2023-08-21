@@ -5,7 +5,9 @@ class Portals {
   parseParams(currentScript) {
     this.currentScript = currentScript;
     this.setOrDefault("space-limit", "5");
-    this.setOrDefault("space-limit", "5");
+    this.setOrDefault("show-events", "true");
+    this.setOrDefault("shape", "line"); // or circle or spiral
+    this.setOrDefault("spacing", "0.5"); // does nothing on circle
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
