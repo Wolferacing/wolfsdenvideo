@@ -29,12 +29,21 @@ class Portals {
     this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
-  setupPortal(url) {
+  setupPortal(url, parent, isEvent) {
     const portal = document.createElement('a-link');
     portal.setAttribute('href', url);
+    let liveNow;
+    if(isEvent) {
+      liveNow = document.createElement('a-text');
+      liveNow.setAttribute('value', 'Event Live Now!');
+      liveNow.setAttribute('scale', '0.5 0.5 0.5');
+      liveNow.setAttribute('scale', 'center');
+      liveNow.setAttribute('sq-billboard', '');
+    }
     switch(this.params.shape) {
       case "line":
         portal.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0 0');
+        if(liveNow)liveNow.setAttribute('position', (this.portalCount * this.params.spacing) + ' 2 0');
         break;
       case "circle":
         const radius = (this.totalItems / (2 * Math.PI)) * this.params.spacing;
@@ -43,6 +52,7 @@ class Portals {
         const x = radius * Math.cos(angle);
         const y = radius * Math.sin(angle);
         portal.setAttribute('position', `${x} 0 ${y}`);
+        if(liveNow)liveNow.setAttribute('position', `${x} 2 ${y}`);
         portal.setAttribute('rotation', `0 ${-rotation - 90} 0`);
         break;
       case "spiral":
@@ -52,12 +62,16 @@ class Portals {
         const spiralX = spiralRadius * Math.cos(spiralAngle);
         const spiralY = spiralRadius * Math.sin(spiralAngle);
         portal.setAttribute('position', `${spiralX} 0 ${spiralY}`);
+        if(liveNow)liveNow.setAttribute('position', `${spiralX} 2 ${spiralY}`);
         portal.setAttribute('rotation', `0 ${-spiralRotation - 90} 0`);
         this.distanceFromCenter += this.params.spacing / Math.sqrt(1 + Math.pow(spiralAngle, 2));
         break;
     }
     this.portalCount++;
-    return portal;
+    parent.appendChild(portal);
+    if(liveNow) {
+      parent.appendChild(liveNow);
+    }
   }
   async tick() {
     let parent = document.querySelector('#portalParent');
@@ -81,14 +95,8 @@ class Portals {
     this.portalCount = 0;
     this.distanceFromCenter = 0;
     Array.from(parent.children).forEach(c => parent.removeChild(c));
-    events.forEach(e => {
-      const portal = this.setupPortal(e.location);
-      parent.appendChild(portal);
-    });
-    spaces.forEach(e => {
-      const portal = this.setupPortal(e.space_url);
-      parent.appendChild(portal);
-    });
+    events.forEach(e => this.setupPortal(e.location, parent, true));
+    spaces.forEach(e => this.setupPortal(e.space_url, parent));
   }
 }
 new Portals();
