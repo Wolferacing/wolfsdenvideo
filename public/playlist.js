@@ -7,6 +7,7 @@ class PlaylistPlayer {
   async init() {
     await this.setupCoreScript();
     this.core = window.videoPlayerCore;
+    await this.core.setupCommandsScript();
     this.core.parseParams(this.currentScript);
     await this.core.init(this.hostUrl);
     await this.core.setupWebsocket("space", null, () => {

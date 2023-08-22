@@ -7,6 +7,7 @@ class Karaoke{
   async init() {
     await this.setupCoreScript();
     this.core = window.videoPlayerCore;
+    await this.core.setupCommandsScript();
     this.core.parseParams(this.currentScript);
     this.setupKaraokeUI();
     await this.core.init(this.hostUrl);

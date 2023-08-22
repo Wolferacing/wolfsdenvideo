@@ -7,7 +7,6 @@ class Core{
     this.imIn = false;
     this.hostUrl = hostUrl;
     this.defaultVideo = "https://www.youtube.com/watch?v=L_LUpnjgPso";
-    await this.setupCommandsScript();
     if(this.params.announce === 'true') { 
       await this.setupSayNamesScript();
     }

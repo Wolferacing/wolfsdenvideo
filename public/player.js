@@ -9,6 +9,7 @@ class Player {
      this.currentTime = 0;
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
+      await this.core.setupCommandsScript();
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
@@ -58,9 +59,10 @@ class Player {
       },
       events: {
         onStateChange: event => {
+          console.log(event.data)
           if(event.data === YT.PlayerState.PLAYING) {
             this.readyToPlay = true;
-          }else if(this.readyToPlay && event.data === YT.PlayerState.PAUSED && event.data === YT.PlayerState.ENDED) {
+          }else if(this.readyToPlay && event.data !== YT.PlayerState.PLAYING) {
             this.player.playVideo();
           }
         },
