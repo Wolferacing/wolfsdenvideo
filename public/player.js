@@ -9,9 +9,9 @@ class Player {
      this.currentTime = 0;
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
-      await this.core.setupCommandsScript();
      this.core.parseParams(this.currentScript);
      await this.core.init(this.hostUrl);
+     await this.core.setupCommandsScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
        this.setupYoutubeScript();
        this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
@@ -59,7 +59,7 @@ class Player {
       },
       events: {
         onStateChange: event => {
-          console.log(event.data)
+          console.log(event.data);
           if(event.data === YT.PlayerState.PLAYING) {
             this.readyToPlay = true;
           }else if(this.readyToPlay && event.data !== YT.PlayerState.PLAYING) {
@@ -158,11 +158,11 @@ class Player {
     }
   }
   setMute() {
-      if(this.core.params.mute === 'true' || this.core.params.volume === 0) {
-        this.player.mute();
-      }else{
-        this.player.unMute();
-      }
+    if(this.core.params.mute === 'true' || this.core.params.volume === 0) {
+      this.player.mute();
+    }else{
+      this.player.unMute();
+    }
   }
   setVolume(type) {
     this.core.params.volume = Number(this.core.params.volume);
