@@ -69,7 +69,7 @@ class Core{
     if(this.params.is3d === true || this.params.is3d === 'true') {
       browser.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
     }
-    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": 1600, "mode": "local", "url": url});
+    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url});
     scene.appendChild(browser);
     this.browser = browser;
     this.browser.addEventListener('browsermessage', (e) => {
@@ -280,6 +280,7 @@ class Core{
     this.setOrDefault("box-trigger-position", '0 0 0');
     this.setOrDefault("box-trigger-rotation", '0 0 0');
     this.setOrDefault("box-trigger-scale", '1 1 1');
+    this.setOrDefault("resolution", '1600');
     this.setOrDefault("instance", "666");
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '40');
