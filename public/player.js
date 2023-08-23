@@ -97,14 +97,14 @@ class Player {
         }
         break;
       case Commands.SKIP_BACK:
-        const time = this.player.getCurrentTime() - 0.25;
+        const time = this.player.getCurrentTime() - 0.5;
         this.player.seekTo(time);
-        this.core.showToast("-0.25s");
+        this.core.showToast("-0.5s");
         break;
       case Commands.SKIP_FORWARD:
-        const timeForward = this.player.getCurrentTime() + 0.25;
+        const timeForward = this.player.getCurrentTime() + 0.5;
         this.player.seekTo(timeForward);
-        this.core.showToast("+0.25s");
+        this.core.showToast("+0.5s");
         break;
       case Commands.AUTO_SYNC:
         this.autoSync = json.data;
