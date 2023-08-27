@@ -21,6 +21,7 @@ class Player {
      });
      this.core.setupLatencyMeasure();
      this.playPlaylist();
+     window.seek = this.seek.bind(this);
   }
   setupBrowserMessaging() {
      window.addEventListener("bantermessage", (e) => this.parseMessage(e.detail.message));
@@ -59,7 +60,6 @@ class Player {
       },
       events: {
         onStateChange: event => {
-          console.log(event.data);
           if(event.data === YT.PlayerState.PLAYING) {
             this.readyToPlay = true;
           }else if(this.readyToPlay && event.data !== YT.PlayerState.PLAYING) {
@@ -83,6 +83,13 @@ class Player {
     if(this.player && !this.isPlayerStarted && this.core.connected()) {
       this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
       this.isPlayerStarted = true;
+    }
+  }
+  seek(time) {
+    if(this.player) {
+      const timeForward = this.player.getCurrentTime() + time;
+      this.player.seekTo(timeForward);
+      return "Seeking to: " + timeForward;
     }
   }
   parseMessage(msg) {
