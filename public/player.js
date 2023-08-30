@@ -99,9 +99,6 @@ class Player {
         if(json.data >= 0 && json.data <= 100) {
           this.core.params.volume = Number(json.data);
           this.setVolume(json.type);
-          if(this.core.params.mute === 'true' && this.core.params.volume) {
-            this.core.params.mute = 'false';
-          }
           this.setMute();
           this.sendBrowserMessage(json);
         }

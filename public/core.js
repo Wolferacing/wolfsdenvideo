@@ -212,6 +212,10 @@ class Core{
   setupVolButton(scene, isUp, playlistContainer) {
     this.setupButton(scene, playlistContainer, isUp ? 1.25 : 1.78, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>{
         this.setVolume(isUp);
+        if(isUp && this.params.mute == 'true') {
+          this.params.mute = 'false';
+          this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
+        }
         this.sendBrowserMessage({path: Commands.SET_VOLUME, data: this.params.volume});
     })
   }
