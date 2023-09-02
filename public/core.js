@@ -70,6 +70,14 @@ class Core{
       browser.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
     }
     browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url});
+    if(this.params.geometry) {
+      const shape = document.createElement('a-entity');
+      shape.setAttribute("geometry", this.params.geometry);
+      if(this.params.material) {
+        shape.setAttribute("material", this.params.material);
+      }
+      browser.appendChild(shape);
+    }
     scene.appendChild(browser);
     this.browser = browser;
     this.browser.addEventListener('browsermessage', (e) => {
@@ -82,7 +90,7 @@ class Core{
     this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
   }
   setupBrowserUi() {
-     const scene = document.querySelector("a-scene");
+    const scene = document.querySelector("a-scene");
     if(!scene) {
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
@@ -286,6 +294,8 @@ class Core{
     this.setOrDefault("box-trigger-scale", '1 1 1');
     this.setOrDefault("resolution", '1600');
     this.setOrDefault("instance", "666");
+    this.setOrDefault("material", "");
+    this.setOrDefault("geometry", "");
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '40');
     this.setOrDefault("mute", 'false');
