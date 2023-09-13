@@ -53,7 +53,9 @@ class Karaoke{
       this.videoPreviewContainer.style.display = "none";
       this.hideSearch();
     });
+    
     const searchButtons = document.querySelectorAll(".searchButtons > .button");
+    
     for (let i = 0; i < searchButtons.length; i++) {
        searchButtons[i].addEventListener("click", () => {
          this.searchInput.value += " " + searchButtons[i].innerText;
@@ -170,8 +172,10 @@ class Karaoke{
         remove.innerText = "Remove Me";
         remove.addEventListener('click', () => {
           this.core.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: p.id });
-          this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-          this.core.sendMessage({path: Commands.STOP});
+          if(i == 0) {
+            this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+            this.core.sendMessage({path: Commands.STOP});
+          }
         });
       }
     });
