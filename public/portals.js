@@ -16,7 +16,7 @@ class Portals {
     }
   }
   parseParams() {
-    this.setOrDefault("space-limit", "10");
+    this.setOrDefault("space-limit", "5");
     this.setOrDefault("show-events", "true");
     this.setOrDefault("shape", "line");
     this.setOrDefault("spiral-tightness", "0.2");
@@ -38,7 +38,6 @@ class Portals {
       liveNow.setAttribute('value', 'Event Live Now!');
       liveNow.setAttribute('scale', '0.5 0.5 0.5');
       liveNow.setAttribute('align', 'center');
-      // liveNow.setAttribute('sq-billboard', '');
     }
     switch(this.params.shape) {
       case "line":
