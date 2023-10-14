@@ -293,6 +293,7 @@ class Core{
     this.setOrDefault("box-trigger-rotation", '0 0 0');
     this.setOrDefault("box-trigger-scale", '1 1 1');
     this.setOrDefault("resolution", '1600');
+    this.setOrDefault("one-for-each-instance", "false");
     this.setOrDefault("instance", "666");
     // this.setOrDefault("material", "");
     // this.setOrDefault("geometry", "");
@@ -307,6 +308,9 @@ class Core{
     this.params.volume = Number(this.params.volume);
     this.tempVolume = this.params.volume;
     this.params.mute = this.params.mute === 'true' ? 'true' : 'false';
+    if(this.params["one-for-each-instance"] === "true" && window.user && window.user.instance) {
+      this.params.instance += window.user.instance;
+    }
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
