@@ -18,7 +18,8 @@ class Playlist {
     });
   }
   playPlaylist(shouldClear) {
-    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
+    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId || this.core.params.playlist, shouldClear}});
+    this.playlistId = null;
   }
   clearPlaylist() {
     this.core.sendMessage({path: Commands.CLEAR_PLAYLIST});
