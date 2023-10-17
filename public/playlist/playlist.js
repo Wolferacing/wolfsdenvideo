@@ -108,7 +108,7 @@ class Playlist {
       }, videoTitle);
 
       videoAuthor.className = "currentTimeAuthor";
-      videoAuthor.innerText = "Added By: " + player.playlist[player.currentTrack].user;
+      videoAuthor.innerText = "Added By: " + v.user;
       
       if(player.currentTrack !== i) {
         if(isMe || (!player.locked && !player.canVote)) {

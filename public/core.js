@@ -295,8 +295,6 @@ class Core{
     this.setOrDefault("resolution", '1600');
     this.setOrDefault("one-for-each-instance", "false");
     this.setOrDefault("instance", "666");
-    // this.setOrDefault("material", "");
-    // this.setOrDefault("geometry", "");
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '40');
     this.setOrDefault("mute", 'false');
@@ -377,6 +375,9 @@ class Core{
     }
   }
   sendBrowserMessage(msg){
+    if(!window.isBanter) {
+      return;
+    }
     this.browserAcks = this.browserAcks || {};
     msg.u = window.user;
     msg.i = this.params.instance;
