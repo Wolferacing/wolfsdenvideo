@@ -259,9 +259,10 @@ class App{
       return;
     }
     let playlist = await ytfps(data.id, { limit: 100 });
-    this.onlyIfHost(ws, async () => {
       console.log("got", playlist.videos.length, "videos for playlist id", data.id, data, this.videoPlayers[ws.i].playlist.length);
-      if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
+    this.onlyIfHost(ws, async () => {
+      if(this.videoPlayers[ws.i]) { // (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)
+      console.log("got", playlist.videos.length, "videos for playlist id 2 ", data.id, data, this.videoPlayers[ws.i].playlist.length);
         this.videoPlayers[ws.i].playlist.length = 0;
         playlist.videos.forEach(v => {
           this.videoPlayers[ws.i].playlist.push({
