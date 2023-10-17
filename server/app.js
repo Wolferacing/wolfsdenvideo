@@ -53,12 +53,11 @@ class App{
       const videoPlayer = this.videoPlayers[key];
       if(videoPlayer.host.id === ws.u.id && ws.type === "space") {
         console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver in 5 mins');
-        setTimeout(()=>{
-          if(videoPlayer.sockets.map(d => d.u.id ).indexOf(videoPlayer.host.id) > -1) {
+        videoPlayer.hostConnected = false;
+        videoPlayer.takeoverTimeout = setTimeout(()=>{
+          if(!videoPlayer.hostConnected) {
             console.log(ws.u.name ? ws.u.name : 'Unknown', 'takeover enabled after 5 mins');
             videoPlayer.canTakeOver = true;
-          }else{
-            console.log(ws.u.name ? ws.u.name : 'Unknown', 'user returned, takeover not enabled');
           }
         }, 1000 * 60 * 5);
       }
@@ -80,6 +79,11 @@ class App{
           ws.i = msg.data;
           this.createVideoPlayer(msg.data, msg.u, ws);
           this.getUserVideoPlayer(ws);
+          if(this.videoPlayers[msg.data].host && this.videoPlayers[msg.data].host.id === msg.u.id) {
+            clearTimeout(this.videoPlayers[msg.data].takeoverTimeout);
+            this.videoPlayers[msg.data].hostConnected = true;
+            console.log(ws.u.name ? ws.u.name : 'Unknown', 'user returned, takeover not enabled');
+          }
         }else{
           this.send(ws, 'error');
         }
@@ -255,7 +259,8 @@ class App{
       return;
     }
     let playlist = await ytfps(data.id, { limit: 100 });
-    this.onlyIfHost(ws, async () => {
+    console.log("got", playlist.videos.length, "videos for playlist id")
+    this.onlyIfHost(ws, async () => {, 
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
         this.videoPlayers[ws.i].playlist.length = 0;
         playlist.videos.forEach(v=>{
@@ -422,8 +427,8 @@ class App{
         currentTime: 0,
         locked: false,
         host: user,
+        hostConnected: true,
         sockets: [ws],
-        hasNoHost: false,
         canTakeOver: true,
         canVote: false,
         currentPlayerUrl: "",
@@ -456,10 +461,6 @@ class App{
       if(!this.videoPlayers[instanceId].sockets.includes(ws)) {
          this.videoPlayers[instanceId].sockets.push(ws);
       }
-      if(this.videoPlayers[instanceId].hasNoHost) {
-        this.videoPlayers[instanceId].host = ws.u;
-        this.videoPlayers[instanceId].hasNoHost = false;
-      }
     } 
     this.syncWsTime(ws, instanceId);
     if(ws.type !== "player") {
@@ -478,7 +479,6 @@ class App{
         canTakeOver: this.videoPlayers[instanceId].canTakeOver,
         canVote: this.videoPlayers[instanceId].canVote,
         host: this.videoPlayers[instanceId].host,
-        hasNoHost: this.videoPlayers[instanceId].hasNoHost,
         duration: this.videoPlayers[instanceId].playlist.length ? this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000 : 0
       };
     }
