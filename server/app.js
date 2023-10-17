@@ -52,8 +52,15 @@ class App{
     Object.keys(this.videoPlayers).forEach(key => {
       const videoPlayer = this.videoPlayers[key];
       if(videoPlayer.host.id === ws.u.id && ws.type === "space") {
-        console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver');
-        videoPlayer.canTakeOver = true;
+        console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver in 5 mins');
+        setTimeout(()=>{
+          if(videoPlayer.sockets.map(d => d.u.id ).indexOf(videoPlayer.host.id) > -1) {
+            console.log(ws.u.name ? ws.u.name : 'Unknown', 'takeover enabled after 5 mins');
+            videoPlayer.canTakeOver = true;
+          }else{
+            console.log(ws.u.name ? ws.u.name : 'Unknown', 'user returned, takeover not enabled');
+          }
+        }, 1000 * 60 * 5);
       }
       videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
       videoPlayer.votes = videoPlayer.votes.filter(v => v !== ws);
