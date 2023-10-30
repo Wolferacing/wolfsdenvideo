@@ -21,6 +21,7 @@ class Portals {
     this.setOrDefault("shape", "line");
     this.setOrDefault("spiral-tightness", "0.2");
     this.setOrDefault("spacing", "2");
+    this.setOrDefault("offsets", "0");
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
   }
@@ -41,8 +42,15 @@ class Portals {
     }
     switch(this.params.shape) {
       case "line":
-        portal.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0 0');
-        if(liveNow)liveNow.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0.1 0');
+        const offsets = this.params.offsets.split(",");
+        console.log(offsets.length, this.params["space-limit"]);
+        if(offsets.length === this.params["space-limit"]) {
+          portal.setAttribute('position', offsets[this.portalCount] + ' 0 0');
+          if(liveNow)liveNow.setAttribute('position', offsets[this.portalCount] + ' 0.1 0');
+        }else{
+          portal.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0 0');
+          if(liveNow)liveNow.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0.1 0');
+        }
         break;
       case "circle":
         const radius = (this.totalItems / (2 * Math.PI)) * this.params.spacing;
