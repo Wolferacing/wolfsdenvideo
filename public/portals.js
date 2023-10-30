@@ -6,7 +6,7 @@ class Portals {
   }
   async init() {
     if(window.isBanter) {
-      await window.AframeInjection.waitFor(window, 'user');
+      // await window.AframeInjection.waitFor(window, 'user');
       await window.AframeInjection.waitFor(window, 'AFRAME');
       await window.AframeInjection.waitFor(window.AFRAME.scenes, 0);
       this.sceneParent = window.AFRAME.scenes[0];
