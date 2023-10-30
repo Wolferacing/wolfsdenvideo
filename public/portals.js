@@ -6,7 +6,6 @@ class Portals {
   }
   async init() {
     if(window.isBanter) {
-      // await window.AframeInjection.waitFor(window, 'user');
       await window.AframeInjection.waitFor(window, 'AFRAME');
       await window.AframeInjection.waitFor(window.AFRAME.scenes, 0);
       this.sceneParent = window.AFRAME.scenes[0];
@@ -22,7 +21,7 @@ class Portals {
     this.setOrDefault("spiral-tightness", "0.2");
     this.setOrDefault("spacing", "2");
     this.setOrDefault("offsets", "0");
-    this.setOrDefault("scale-offsets", "0");
+    this.setOrDefault("scale-offsets", "1");
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
   }
