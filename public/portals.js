@@ -22,6 +22,7 @@ class Portals {
     this.setOrDefault("spiral-tightness", "0.2");
     this.setOrDefault("spacing", "2");
     this.setOrDefault("offsets", "0");
+    this.setOrDefault("scale-offsets", "0");
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
   }
@@ -43,13 +44,16 @@ class Portals {
     switch(this.params.shape) {
       case "line":
         const offsets = this.params.offsets.split(",");
-        console.log(offsets.length, this.params["space-limit"]);
-        if(offsets.length === this.params["space-limit"]) {
+        const scaleOffsets = this.params["scale-offsets"].split(",");
+        if(offsets.length === Number(this.params["space-limit"])) {
           portal.setAttribute('position', offsets[this.portalCount] + ' 0 0');
           if(liveNow)liveNow.setAttribute('position', offsets[this.portalCount] + ' 0.1 0');
         }else{
           portal.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0 0');
           if(liveNow)liveNow.setAttribute('position', (this.portalCount * this.params.spacing) + ' 0.1 0');
+        }
+        if(scaleOffsets.length === Number(this.params["space-limit"])) {
+          portal.setAttribute('scale', scaleOffsets[this.portalCount] + ' ' + scaleOffsets[this.portalCount] + ' ' + scaleOffsets[this.portalCount]);
         }
         break;
       case "circle":
