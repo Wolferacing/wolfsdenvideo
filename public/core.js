@@ -21,7 +21,7 @@ class Core{
           const b = userinputs.head.position.y - positionOfBrowser[1];
           const c = userinputs.head.position.z - positionOfBrowser[2];
           const distance = Math.sqrt(a * a + b * b + c * c);
-          let volume =  ((maxDistance - distance) / (maxDistance));
+          let volume = ((maxDistance - (distance - minDistance)) / maxDistance);
           if(volume > 1) {
             volume = 1;
           }else if(volume < 0) {
