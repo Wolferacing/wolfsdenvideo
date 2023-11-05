@@ -261,7 +261,7 @@ class App{
     let playlist = await ytfps(data.id, { limit: 100 });
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
-        this.videoPlayers[ws.i].playlist.length = 0;
+        this.resetPlaylist(ws);
         playlist.videos.forEach(v => {
           this.videoPlayers[ws.i].playlist.push({
             title: v.title,
@@ -277,10 +277,15 @@ class App{
       }
     }, this.videoPlayers[ws.i].locked);
   }
+  resetPlaylist(ws) {
+    this.videoPlayers[ws.i].playlist.length = 0;
+    this.videoPlayers[ws.i].currentTrack = true;
+    this.videoPlayers[ws.i].currentTime = true;
+  }
   async clearPlaylist(skipUpdate, ws) {
      if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
-        this.videoPlayers[ws.i].playlist.length = 0;
+        this.resetPlaylist(ws);
         if(!skipUpdate) {
           this.updateClients(ws.i);
         }
