@@ -259,9 +259,9 @@ class App{
       return;
     }
     this.onlyIfHost(ws, async () => {
-      let playlist = await ytfps(data.id, { limit: 100 });
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
         console.log("fromPlaylist");
+        let playlist = await ytfps(data.id, { limit: 100 });
         this.resetPlaylist(ws);
         playlist.videos.forEach(v => {
           this.videoPlayers[ws.i].playlist.push({
@@ -484,7 +484,7 @@ class App{
         canTakeOver: this.videoPlayers[instanceId].canTakeOver,
         canVote: this.videoPlayers[instanceId].canVote,
         host: this.videoPlayers[instanceId].host,
-        duration: this.videoPlayers[instanceId].playlist.length ? this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000 : 0
+        duration: this.videoPlayers[instanceId].playlist.length && this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack] ? this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000 : 0
       };
     }
   }
@@ -493,7 +493,7 @@ class App{
       this.send(socket, Commands.SYNC_TIME, {
         currentTrack: this.videoPlayers[key].currentTrack,
         currentTime: this.videoPlayers[key].currentTime,
-        duration: this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack].duration / 1000
+        duration: this.videoPlayers[key].playlist.length && this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack] ? this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack].duration / 1000 : 0
       });
     }
   }
