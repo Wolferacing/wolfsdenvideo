@@ -95,9 +95,10 @@ class Core{
       console.log("No a-scene tag found, is this an AFRAME scene ?");
       return;
     }
+    
     this.playlistContainer = document.createElement('a-entity');
-    this.playlistContainer.setAttribute('position', this.params.position);
-    this.playlistContainer.setAttribute('rotation', this.params.rotation);
+    this.playlistContainer.setAttribute('position', this.params["button-position"] === "0 0 0" ? this.params.position : this.params["button-position"]);
+    this.playlistContainer.setAttribute('rotation', this.params["button-rotation"] === "0 0 0" ? this.params.rotation : this.params["button-rotation"]);
     this.setupPlaylistButton(scene, this.playlistContainer);
     this.setupVolButton(scene, true, this.playlistContainer);
     this.setupVolButton(scene, false, this.playlistContainer);
@@ -243,9 +244,6 @@ class Core{
     const buttonContainer = document.createElement('a-entity');
     
     buttonContainer.setAttribute('position', `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0`); 
-    
-    // this.params["button-position"] === "0 0 0" ? `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0` : this.params["button-position"]
-    // buttonContainer.setAttribute('rotation', this.params["button-rotation"]);
     
     const playlistButton = document.createElement('a-entity');
     playlistButton.setAttribute('sq-boxcollider', `size: ${size == 'small' ? '0.3 0.2 0.05': size == 'medium' ? '0.45 0.2 0.05' : '0.6 0.2 0.05' }`);
