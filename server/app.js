@@ -283,7 +283,7 @@ class App{
     this.videoPlayers[ws.i].currentTime = true;
   }
   async clearPlaylist(skipUpdate, ws) {
-     if(this.videoPlayers[ws.i]) {
+    if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         this.resetPlaylist(ws);
         if(!skipUpdate) {
