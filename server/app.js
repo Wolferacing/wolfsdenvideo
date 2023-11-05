@@ -254,7 +254,7 @@ class App{
       this.updateClients(ws.i, "set-vote");
     }
   }
-  async fromPlaylist(data, ws) {
+  fromPlaylist(data, ws) {
     if(!data.id || !data.id.startsWith("PL")) {
       return;
     }
@@ -279,8 +279,8 @@ class App{
   }
   resetPlaylist(ws) {
     this.videoPlayers[ws.i].playlist.length = 0;
-    this.videoPlayers[ws.i].currentTrack = true;
-    this.videoPlayers[ws.i].currentTime = true;
+    this.videoPlayers[ws.i].currentTrack = 0;
+    this.videoPlayers[ws.i].currentTime = 0;
   }
   async clearPlaylist(skipUpdate, ws) {
     if(this.videoPlayers[ws.i]) {
