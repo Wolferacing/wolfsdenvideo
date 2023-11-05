@@ -99,8 +99,7 @@ class Core{
     }
     
     const yScale = Number(this.params.scale.split(" ")[1]);
-    const position = Number(this.params.position.split(" ")[0]) + " " + (Number(this.params.position.split(" ")[1]) - (yScale*0.335)) + " " + Number(this.params.position.split(" ")[0]);
-    
+    const position = Number(this.params.position.split(" ")[0]) + " " + (Number(this.params.position.split(" ")[1]) - (yScale*0.335)) + " " + Number(this.params.position.split(" ")[2]);
     this.playlistContainer = document.createElement('a-entity');
     this.playlistContainer.setAttribute('position', this.params["button-position"] === "0 0 0" ? position : this.params["button-position"]);
     this.playlistContainer.setAttribute('rotation', this.params["button-rotation"] === "0 0 0" ? this.params.rotation : this.params["button-rotation"]);
@@ -245,7 +244,7 @@ class Core{
       this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
     })
   }
-  setupButton(scene, playlistContainer, xOffset, title, width, size, callback, yOffset) {
+  setupButton(scene, playlistContainer, xOffset, title, width, size, callback) {
     const buttonContainer = document.createElement('a-entity');
     
     buttonContainer.setAttribute('position', `${xOffset} 0 0`); 
