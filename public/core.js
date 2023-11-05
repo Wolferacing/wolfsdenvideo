@@ -242,7 +242,11 @@ class Core{
     const yScale = Number(this.params.scale.split(" ")[1]);
     const buttonContainer = document.createElement('a-entity');
     
-    buttonContainer.setAttribute('position', `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0`);
+    buttonContainer.setAttribute('position', `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0`); 
+    
+    // this.params["button-position"] === "0 0 0" ? `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0` : this.params["button-position"]
+    // buttonContainer.setAttribute('rotation', this.params["button-rotation"]);
+    
     const playlistButton = document.createElement('a-entity');
     playlistButton.setAttribute('sq-boxcollider', `size: ${size == 'small' ? '0.3 0.2 0.05': size == 'medium' ? '0.45 0.2 0.05' : '0.6 0.2 0.05' }`);
     playlistButton.setAttribute('sq-interactable', '');
@@ -287,6 +291,8 @@ class Core{
     const yScale = Number(this.params.scale.split(" ")[1]);
     this.setOrDefault("singer-button-position", `0 ${-yScale*0.335} 3`);
     this.setOrDefault("singer-button-rotation", "-30 180 0");
+    this.setOrDefault("button-position", `0 0 0`);
+    this.setOrDefault("button-rotation", `0 0 0`);
     this.setOrDefault("box-trigger-enter-enabled", 'false');
     this.setOrDefault("box-trigger-exit-enabled", 'false');
     this.setOrDefault("box-trigger-position", '0 0 0');
