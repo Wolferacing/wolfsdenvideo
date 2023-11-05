@@ -15,11 +15,13 @@ class Core{
       const positionOfBrowser = this.params.position.split(" ");
       window.userPoseCallback = async pose => {
         if(this.params.spatial === 'true') {
+          const minDistance = Number(this.params["spatial-min-distance"]);
+          const maxDistance = Number(this.params["spatial-max-distance"]);
           const a = userinputs.head.position.x - positionOfBrowser[0];
           const b = userinputs.head.position.y - positionOfBrowser[1];
           const c = userinputs.head.position.z - positionOfBrowser[2];
           const distance = Math.sqrt(a * a + b * b + c * c);
-          let volume =  ((40 - distance) / 40);
+          let volume =  ((maxDistance - distance) / (maxDistance));
           if(volume > 1) {
             volume = 1;
           }else if(volume < 0) {
@@ -28,7 +30,7 @@ class Core{
           const now = Date.now();
           if(now - lastSendTime > 500) {
             lastSendTime = now;
-            const roundedVolume = Math.round((this.params.volume * volume) / 2) * 2;
+            const roundedVolume = Math.round(this.params.volume * volume);
             if(this.tempVolume != roundedVolume) {
               this.sendBrowserMessage({path: Commands.SET_VOLUME, data: roundedVolume, type: 'spatial'});
             }
@@ -305,6 +307,8 @@ class Core{
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
     this.setOrDefault("spatial", 'true');
+    this.setOrDefault("spatial-min-distance", '5');
+    this.setOrDefault("spatial-max-distance", '40');
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
     
     this.params.volume = Number(this.params.volume);
