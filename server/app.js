@@ -51,7 +51,7 @@ class App{
     console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.', ws.type);
     Object.keys(this.videoPlayers).forEach(key => {
       const videoPlayer = this.videoPlayers[key];
-      if(videoPlayer.host.id === ws.u.id && ws.type === "space") {
+      if(ws.u && videoPlayer.host.id === ws.u.id && ws.type === "space") {
         console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver in 42 secs');
         videoPlayer.hostConnected = false;
         videoPlayer.takeoverTimeout = setTimeout(()=>{
@@ -260,7 +260,7 @@ class App{
     }
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
-        console.log("fromPlaylist");
+        console.log("fromPlaylist", ws.i, ws.u);
         let playlist = await ytfps(data.id, { limit: 100 });
         this.resetPlaylist(ws);
         playlist.videos.forEach(v => {
