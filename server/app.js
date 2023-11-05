@@ -286,6 +286,7 @@ class App{
   async clearPlaylist(skipUpdate, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
+        console.log("clearPlaylist", ws.i, ws.u);
         this.resetPlaylist(ws);
         if(!skipUpdate) {
           this.updateClients(ws.i);
