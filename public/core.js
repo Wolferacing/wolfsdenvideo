@@ -101,6 +101,7 @@ class Core{
     this.playlistContainer = document.createElement('a-entity');
     this.playlistContainer.setAttribute('position', this.params["button-position"] === "0 0 0" ? this.params.position : this.params["button-position"]);
     this.playlistContainer.setAttribute('rotation', this.params["button-rotation"] === "0 0 0" ? this.params.rotation : this.params["button-rotation"]);
+    this.playlistContainer.setAttribute('scale', this.params["button-scale"]);
     this.setupPlaylistButton(scene, this.playlistContainer);
     this.setupVolButton(scene, true, this.playlistContainer);
     this.setupVolButton(scene, false, this.playlistContainer);
@@ -293,6 +294,7 @@ class Core{
     this.setOrDefault("singer-button-rotation", "-30 180 0");
     this.setOrDefault("button-position", `0 0 0`);
     this.setOrDefault("button-rotation", `0 0 0`);
+    this.setOrDefault("button-scale", `1 1 1`);
     this.setOrDefault("box-trigger-enter-enabled", 'false');
     this.setOrDefault("box-trigger-exit-enabled", 'false');
     this.setOrDefault("box-trigger-position", '0 0 0');
