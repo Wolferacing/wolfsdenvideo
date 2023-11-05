@@ -98,8 +98,11 @@ class Core{
       return;
     }
     
+    const yScale = Number(this.params.scale.split(" ")[1]);
+    const position = Number(this.params.position.split(" ")[0]) + " " + (Number(this.params.position.split(" ")[1]) - (yScale*0.335)) + " " + Number(this.params.position.split(" ")[0]);
+    
     this.playlistContainer = document.createElement('a-entity');
-    this.playlistContainer.setAttribute('position', this.params["button-position"] === "0 0 0" ? this.params.position : this.params["button-position"]);
+    this.playlistContainer.setAttribute('position', this.params["button-position"] === "0 0 0" ? position : this.params["button-position"]);
     this.playlistContainer.setAttribute('rotation', this.params["button-rotation"] === "0 0 0" ? this.params.rotation : this.params["button-rotation"]);
     this.playlistContainer.setAttribute('scale', this.params["button-scale"]);
     this.setupPlaylistButton(scene, this.playlistContainer);
@@ -243,10 +246,9 @@ class Core{
     })
   }
   setupButton(scene, playlistContainer, xOffset, title, width, size, callback, yOffset) {
-    const yScale = Number(this.params.scale.split(" ")[1]);
     const buttonContainer = document.createElement('a-entity');
     
-    buttonContainer.setAttribute('position', `${xOffset} ${(-yScale*0.335)-(yOffset||0)} 0`); 
+    buttonContainer.setAttribute('position', `${xOffset} 0 0`); 
     
     const playlistButton = document.createElement('a-entity');
     playlistButton.setAttribute('sq-boxcollider', `size: ${size == 'small' ? '0.3 0.2 0.05': size == 'medium' ? '0.45 0.2 0.05' : '0.6 0.2 0.05' }`);
