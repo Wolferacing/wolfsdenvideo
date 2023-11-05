@@ -261,6 +261,7 @@ class App{
     this.onlyIfHost(ws, async () => {
       let playlist = await ytfps(data.id, { limit: 100 });
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
+        console.log("fromPlaylist");
         this.resetPlaylist(ws);
         playlist.videos.forEach(v => {
           this.videoPlayers[ws.i].playlist.push({
