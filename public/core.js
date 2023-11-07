@@ -224,7 +224,7 @@ class Core{
     window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
   }
   setupVolButton(scene, isUp, playlistContainer) {
-    this.setupButton(scene, playlistContainer, isUp ? 1.25 : 1.78, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>{
+    this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>{
         this.setVolume(isUp);
         if(isUp && this.params.mute == 'true') {
           this.params.mute = 'false';
