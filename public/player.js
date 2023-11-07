@@ -39,7 +39,7 @@ class Player {
     })
   }
   playPlaylist(shouldClear) {
-    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear}});
+    this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear, fromPlayer: true}});
   }
   onYouTubeIframeAPIReady() {
     new YT.Player('player', {
