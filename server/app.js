@@ -200,7 +200,7 @@ class App{
         this.updateClients(ws.i);
       });
     }
-  }
+  } 
   sendBrowserClick(click, video_ws) {
     if(this.videoPlayers[video_ws.i]) {
       this.videoPlayers[video_ws.i].sockets.forEach(ws => {
