@@ -22,7 +22,7 @@ class App{
     this.server.on('upgrade', (request, socket, head) => {
       this.wss.handleUpgrade(request, socket, head, (ws) => {
         this.wss.emit('connection', ws, request);
-      });
+      }); 
     });
     this.wss.startAutoPing(10000);
     this.wss.on('connection', (ws, req) => {
