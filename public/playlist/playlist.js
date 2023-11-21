@@ -65,8 +65,8 @@ class Playlist {
     this.lockPlayer.innerText = player.locked ? 'Unlock' : 'Lock';
     this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
-    this.clearPlaylistButton.style.display = player.locked && !isMe ? 'none' :  'inline-block';
-    this.addPlaylist.style.display = player.locked && !isMe ? 'none' :  'inline-block';
+    this.clearPlaylistButton.style.display = !isMe ? 'none' :  'inline-block';
+    this.addPlaylist.style.display = !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';

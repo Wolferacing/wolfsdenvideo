@@ -276,7 +276,7 @@ class App{
         });
         this.updateClients(ws.i);
       }
-    }, this.videoPlayers[ws.i].locked);
+    });
   }
   resetPlaylist(ws) {
     this.videoPlayers[ws.i].playlist.length = 0;
@@ -291,7 +291,7 @@ class App{
         if(!skipUpdate) {
           this.updateClients(ws.i);
         }
-      }, this.videoPlayers[ws.i].locked);
+      });
     }
   }
   async search(term, ws) {
