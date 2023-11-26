@@ -28,5 +28,11 @@ class KaraokePlayer {
       document.body.appendChild(myScript);
     });
   }
+  back() {
+    this.sendBrowserMessage({path: Commands.SKIP_BACK});
+  }
+  foward() {
+    this.sendBrowserMessage({path: Commands.SKIP_FORWARD});
+  }
 }
-new KaraokePlayer();
+window.karaoke = new KaraokePlayer();
