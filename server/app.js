@@ -291,7 +291,7 @@ class App{
         if(!skipUpdate) {
           this.updateClients(ws.i);
         }
-      });
+      }, this.videoPlayers[ws.i].locked);
     }
   }
   async search(term, ws) {
