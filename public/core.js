@@ -468,6 +468,15 @@ class Core{
       document.body.appendChild(myScript);  
     });
   }
+  back() {
+    this.sendBrowserMessage({path: Commands.SKIP_BACK});
+  }
+  foward() {
+    this.sendBrowserMessage({path: Commands.SKIP_FORWARD});
+  }
+  vol(num) {
+    this.sendBrowserMessage({path: Commands.SET_VOLUME, data: num});
+  }
 }
 window.videoPlayerCore = new Core();
 
