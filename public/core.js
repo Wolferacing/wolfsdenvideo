@@ -6,7 +6,7 @@ class Core{
     this.currentLatency = 0;
     this.imIn = false;
     this.hostUrl = hostUrl;
-    this.defaultVideo = "https://www.youtube.com/watch?v=L_LUpnjgPso";
+    this.defaultVideo = this.params["default-video"];
     if(this.params.announce === 'true') { 
       await this.setupSayNamesScript();
     }
@@ -310,6 +310,7 @@ class Core{
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
     this.setOrDefault("spatial", 'true');
+    this.setOrDefault("default-video", "https://www.youtube.com/watch?v=L_LUpnjgPso");
     this.setOrDefault("spatial-min-distance", '5');
     this.setOrDefault("spatial-max-distance", '40');
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
