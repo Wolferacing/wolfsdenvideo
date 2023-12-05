@@ -57,9 +57,6 @@ class Core{
       }
     }
   }
-  setBrowserUrl(url) {
-    this.browser.setAttribute("sq-browser", {"url": url||"about:blank"});
-  }
   setupBrowserElement(url) {
     this.initialUrl = url;
     const scene = document.querySelector("a-scene");
@@ -71,7 +68,7 @@ class Core{
     browser.setAttribute("position", this.params.position);
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
-    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url||"about:blank"});
+    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url});
     if(this.params.geometry && this.params.geometry !== "false") {
       const shape = document.createElement('a-entity');
       // if(this.params.is3d === true || this.params.is3d === 'true') {
