@@ -7,6 +7,7 @@ class PlaylistPlayer {
   async init() {
     await this.setupCoreScript();
     this.core = window.videoPlayerCore;
+    this.core.setupBrowserElement();
     this.core.parseParams(this.currentScript);
     await this.core.init(this.hostUrl);
     await this.core.setupCommandsScript();
@@ -14,7 +15,7 @@ class PlaylistPlayer {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
     });
     const url = `https://${this.hostUrl}/?youtube=${encodeURIComponent(this.core.params.youtube)}&start=0&playlist=${this.core.params.playlist}&mute=${this.core.params.mute}&volume=${this.core.tempVolume}&instance=${this.core.params.instance}&user=${window.user.id}-_-${window.user.name}`;
-    this.core.setupBrowserElement(url);
+    this.core.setBrowserUrl(url);
   }
   setupCoreScript() {
     return new Promise(resolve => {
