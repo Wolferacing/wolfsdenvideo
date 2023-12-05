@@ -8,7 +8,7 @@ class PlaylistPlayer {
     await this.setupCoreScript();
     this.core = window.videoPlayerCore;
     this.core.parseParams(this.currentScript);
-    this.core.setupBrowserElement();
+    // this.core.setupBrowserElement();
     await this.core.init(this.hostUrl);
     await this.core.setupCommandsScript();
     await this.core.setupWebsocket("space", null, () => {
