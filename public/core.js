@@ -71,14 +71,14 @@ class Core{
     browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url});
     if(this.params.geometry && this.params.geometry !== "false") {
       const shape = document.createElement('a-entity');
-      if(this.params.is3d === true || this.params.is3d === 'true') {
-        shape.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
-      }
+      // if(this.params.is3d === true || this.params.is3d === 'true') {
+        // shape.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
+      // }
       shape.setAttribute("geometry", this.params.geometry);
       shape.setAttribute("material", "color: white");
       browser.appendChild(shape);
     }else if(this.params.is3d === true || this.params.is3d === 'true') {
-      browser.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
+      // browser.setAttribute("sq-custommaterial", "shaderName: Banter/StereoscopicUnlit;");
     }
     scene.appendChild(browser);
     this.browser = browser;
