@@ -74,10 +74,10 @@ class App{
     switch(msg.path) {
       case Commands.INSTANCE:
         if(msg.u) { 
-          console.log(msg.u.name, 'connected', msg.data);
           ws.u = msg.u;
           ws.i = msg.data;
           this.createVideoPlayer(msg.data, msg.u, ws);
+          console.log(msg.u.name, 'connected', msg.data, "host: ", this.videoPlayers[msg.data].host.name);
           this.getUserVideoPlayer(ws);
           if(this.videoPlayers[msg.data].host && this.videoPlayers[msg.data].host.id === msg.u.id) {
             clearTimeout(this.videoPlayers[msg.data].takeoverTimeout);
@@ -258,9 +258,9 @@ class App{
     if(!data.id || !data.id.startsWith("PL")) {
       return;
     }
+        console.log("fromPlaylist", ws.i, ws.u, data);
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
-        console.log("fromPlaylist", ws.i, ws.u, data);
         let playlist = await ytfps(data.id, { limit: 100 });
         this.resetPlaylist(ws);
         playlist.videos.forEach(v => {
