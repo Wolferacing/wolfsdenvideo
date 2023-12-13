@@ -68,7 +68,7 @@ class Core{
     browser.setAttribute("position", this.params.position);
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
-    browser.setAttribute("sq-browser", {"mipMaps": 1, "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url});
+    browser.setAttribute("sq-browser", {"mipMaps": this.params['mip-maps'], "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url});
     if(this.params.geometry && this.params.geometry !== "false") {
       const shape = document.createElement('a-entity');
       // if(this.params.is3d === true || this.params.is3d === 'true') {
@@ -309,6 +309,7 @@ class Core{
     this.setOrDefault("mute", 'false');
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
+    this.setOrDefault("mip-maps", '1');
     this.setOrDefault("spatial", 'true');
     this.setOrDefault("geometry", "false");
     this.setOrDefault("spatial-min-distance", '5');
@@ -316,6 +317,7 @@ class Core{
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
     
     this.params.volume = Number(this.params.volume);
+    this.params['mip-maps'] = Number(this.params['mip-maps']);
     this.tempVolume = this.params.volume;
     this.params.mute = this.params.mute === 'true' ? 'true' : 'false';
     if(this.params["one-for-each-instance"] === "true" && window.user && window.user.instance) {
