@@ -473,6 +473,9 @@ class Core{
     this.sendBrowserMessage({path: Commands.SKIP_BACK});
   }
   foward() {
+    this.forward();
+  }
+  forward() {
     this.sendBrowserMessage({path: Commands.SKIP_FORWARD});
   }
   vol(num) {
