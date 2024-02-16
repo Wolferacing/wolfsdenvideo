@@ -7,8 +7,11 @@ class Portals {
   }
   async init() {
     if(window.isBanter) {
+      console.log("here0");
       await window.AframeInjection.waitFor(window, 'AFRAME');
+      console.log("here1");
       await window.AframeInjection.waitFor(window.AFRAME.scenes, 0);
+      console.log("here");
       this.sceneParent = window.AFRAME.scenes[0];
       this.parseParams();
       setInterval(() => this.tick(), 5 * 60 * 1000);
