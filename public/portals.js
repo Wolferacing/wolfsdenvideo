@@ -1,7 +1,6 @@
 class Portals {
   constructor() {
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
-    console.log(this.currentScript);
     this.urlParams = new URLSearchParams(window.location.search);
     this.init();
   }
