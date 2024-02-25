@@ -27,7 +27,7 @@ class App{
     this.wss.startAutoPing(10000);
     this.wss.on('connection', (ws, req) => {
       ws.t = new Date().getTime();
-      ws.on('message', msg => {
+      ws.on('message', msg => { 
         try{
           if(msg !== "keepalive") {
             this.parseMessage(JSON.parse(msg), ws);

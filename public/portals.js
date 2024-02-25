@@ -26,7 +26,7 @@ class Portals {
     this.setOrDefault("scale-offsets", "1");
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
-  }
+  } 
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
     this.params = this.params || {};
