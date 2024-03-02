@@ -89,7 +89,7 @@ class Core{
     this.setupBrowserUi();
   }
   clickBrowser(x,y) {
-    this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
+    // this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
   }
   setupBrowserUi() {
     const scene = document.querySelector("a-scene");
@@ -444,7 +444,7 @@ class Core{
         this.sendBrowserMessage(json);
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {
-          this.browser.setAttribute("sq-browser", {"url": json.data.link, "afterLoadActions": [ { "actionType": "delayseconds", "numParam1": 0.75}, {"actionType": "click2d", "numParam1": 150, "numParam2": 150}]});
+          this.browser.setAttribute("sq-browser", {"url": json.data.link});
         }
         break;
       case Commands.CLICK_BROWSER:
