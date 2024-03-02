@@ -66,7 +66,7 @@ class App{
       this.updateVotes(ws);
       this.updateClients(ws.i);
     });
-  }
+  } 
   send(socket, path, data) {
      socket.send(JSON.stringify({path, data}));
   }

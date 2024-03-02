@@ -89,7 +89,7 @@ class Core{
     this.setupBrowserUi();
   }
   clickBrowser(x,y) {
-    // this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
+    this.browser.components['sq-browser'].runActions([{actionType: "click2d", numParam1: x, numParam2: y}])
   }
   setupBrowserUi() {
     const scene = document.querySelector("a-scene");
