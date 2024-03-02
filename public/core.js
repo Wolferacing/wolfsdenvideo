@@ -303,7 +303,7 @@ class Core{
     this.setOrDefault("box-trigger-scale", '1 1 1');
     this.setOrDefault("resolution", '1600');
     this.setOrDefault("one-for-each-instance", "false");
-    this.setOrDefault("instance", encodeURIComponent(location.href));
+    this.setOrDefault("instance", location.href);
     this.setOrDefault("playlist", "");
     this.setOrDefault("volume", '40');
     this.setOrDefault("mute", 'false');
