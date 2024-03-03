@@ -15,7 +15,7 @@ class App{
     setInterval(() => this.syncTime(), 1000);
     this.syncTime();
   }
-  setupWebserver() {
+  setupWebserver() { 
     this.app = express();
     this.server = http.createServer( this.app ); 
     this.wss = new WebSocket.Server({ noServer: true }); 
