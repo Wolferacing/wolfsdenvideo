@@ -75,12 +75,13 @@ class Player {
           this.player = event.target; 
           this.setVolume();
           this.setMute();
+          setTimeout(() => this.startPlayerOrNot(), 3000);
         }
       }
     });
   }
   startPlayerOrNot() {
-    if(this.player && !this.isPlayerStarted && this.core.connected()) {
+    if(this.player && !this.isPlayerStarted && this.core.connected() && !this.readyToPlay) {
       this.core.sendMessage({path: Commands.CLICK_BROWSER, data: {x: window.innerHeight / 2, y: window.innerWidth / 2}});
       this.isPlayerStarted = true;
     }
