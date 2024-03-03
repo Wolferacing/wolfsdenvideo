@@ -401,6 +401,7 @@ class Core{
     return new Promise((resolve, reject) => {
       if(this.browser) {
         this.browserAcks[msg.id] = resolve;
+        console.log(JSON.stringify(msg));
         this.browser.components['sq-browser'].runActions([{actionType: "postmessage", strParam1: JSON.stringify(msg)}]);
       }else{
         reject();

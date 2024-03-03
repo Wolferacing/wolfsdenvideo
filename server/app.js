@@ -322,6 +322,7 @@ class App{
         v.user = ws.u.name;
         v.votes = 0;
         v.is_youtube_website = isYoutubeWebsite;
+        
         this.videoPlayers[ws.i].playlist.push(v);
         if(!skipUpdate) {
           this.updateClients(ws.i);
