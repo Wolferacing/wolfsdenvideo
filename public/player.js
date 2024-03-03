@@ -75,7 +75,7 @@ class Player {
           this.player = event.target; 
           this.setVolume();
           this.setMute();
-          setTimeout(() => this.startPlayerOrNot(), 3000);
+          setTimeout(() => this.startPlayerOrNot(), 500);
         }
       }
     });
