@@ -135,7 +135,7 @@ class Karaoke{
       " the host" + 
       (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "<span style=\"color: red;\">to take over ASAP!!!</span>") + " )!": "") +
       (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
-    this.videoPlaylistContainer.innerHTML = player.players.length ? '' : '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!<br><br><div style="color: red;">DONT FORGET TO TAKE OVER THE KARAOKE PLAYER BEFORE YOU START!!</div></h2>';
+    this.videoPlaylistContainer.innerHTML = player.players.length ? '' : '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!<br><br><div style="color: red;">DONT FORGET TO TAKE OVER THE KARAOKE PLAYER BEFORE YOU START!!<br>IF SOMEONE ELSE TOOK OVER, BAN THEM AND WAIT 45s THEN TAKE OVER</div></h2>';
     player.players.sort((a, b) => a.p - b.p);
     player.players.forEach((p, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
