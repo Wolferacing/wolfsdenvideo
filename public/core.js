@@ -69,6 +69,7 @@ class Core{
     browser.setAttribute("rotation", this.params.rotation);
     browser.setAttribute("scale", this.params.scale);
     console.log({"mipMaps": this.params['mip-maps'], "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url});
+    console.log("setupBrowserElement", url);
     browser.setAttribute("sq-browser", {"mipMaps": this.params['mip-maps'], "pixelsPerUnit": Number(this.params.resolution), "mode": "local", "url": url});
     if(this.params.geometry && this.params.geometry !== "false") {
       const shape = document.createElement('a-entity');
@@ -431,6 +432,7 @@ class Core{
         break;
       case Commands.RESET_BROWSER:
         if(window.isBanter && this.browser) {
+          console.log("RESET_BROWSER");
           this.browser.setAttribute("sq-browser", {"url": this.initialUrl});
         }
         break;
@@ -443,6 +445,7 @@ class Core{
         this.sendBrowserMessage(json);
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {
+          console.log("SET_BROWSER_URL");
           this.browser.setAttribute("sq-browser", {"url": json.data.link});
         }
         break;
