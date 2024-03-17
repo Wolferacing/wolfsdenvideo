@@ -34,7 +34,7 @@ class Portals {
   }
   setupPortal(url, parent, isEvent) {
     const portal = document.createElement('a-link');
-    console.log("portal setAttribute", 'href', url);
+    // console.log("portal setAttribute", 'href', url);
     portal.setAttribute('href', url);
     let liveNow;
     if(isEvent) {
@@ -81,7 +81,7 @@ class Portals {
         break;
     }
     this.portalCount++;
-    console.log("append portal");
+    // console.log("append portal");
     parent.appendChild(portal);
     if(liveNow) {
       parent.appendChild(liveNow);
