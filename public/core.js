@@ -432,7 +432,7 @@ class Core{
         break;
       case Commands.RESET_BROWSER:
         if(window.isBanter && this.browser) {
-          console.log("RESET_BROWSER", {"url": this.initialUrl});
+          // console.log("RESET_BROWSER", {"url": this.initialUrl});
           this.browser.setAttribute("sq-browser", {"url": this.initialUrl});
         }
         break;
@@ -445,7 +445,7 @@ class Core{
         this.sendBrowserMessage(json);
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {
-          console.log("SET_BROWSER_URL", {"url": json.data.link});
+          // console.log("SET_BROWSER_URL", {"url": json.data.link});
           this.browser.setAttribute("sq-browser", {"url": json.data.link});
         }
         break;
