@@ -326,6 +326,124 @@ class Core{
       this.params.instance += window.user.instance;
     }
   }
+  setupHandControls() {
+    // This was a great innovation by HBR 
+    const handControlsContainer = document.createElement("a-entity");
+    [
+      {
+        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Playlist.png?v=1711786451727",
+        position: "-1 -0.2 0.4"
+      },
+      {
+        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Sync_Bk.png?v=1711785429431",
+        position: "-1 -0.2 0"
+      },
+      {
+        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Sync_FW.png?v=1711785429798",
+        position: "-1 -0.2 -0.4"
+      },
+      {
+        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Mute_Off.png?v=1711785430667",
+        position: "-1 0.2 0.4"
+      },
+      {
+        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Dn.png?v=1711785430202",
+        position: "-1 0.2 0"
+      },
+      {
+        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Up.png?v=1711785431096",
+        position: "-1 0.2 -0.4"
+      }
+    ].forEach(item => {
+      const button = document.createElement("a-plane");
+      button.setAttribute("sq-interactable", "");
+      button.setAttribute("sq-collider", "");
+      button.setAttribute("scale", "0.001 0.4 0.4");
+      button.setAttribute("rotation", "180 0 0");
+      button.setAttribute("src", item.image);
+      button.setAttribute("transparent", true);
+      button.setAttribute("position", item.position);
+      handControlsContainer.appendChild(button);
+    })
+    document.querySelector("a-scene").appendChild(handControlsContainer);
+      /*
+       <a-box
+      id="handbuttons"
+      sq-lefthand="whoToShow: onlyme;"
+      scale="0.001 0.08 0.08"
+      position="-0.02 0.006 -0.010"
+      material="opacity: 0; transparent: true"
+    >
+      <a-box
+        handmenu="button: playlist"
+        sq-interactable
+        sq-collider
+        scale="0.001 0.4 0.4"
+        position="-1 -0.2 0.4"
+        rotation="180 0 0"
+        src="https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Playlist.png?v=1711786451727"
+        material="transparent: true"
+      >
+      </a-box>
+      <a-box
+        handmenu="button: <<"
+        sq-interactable
+        sq-collider
+        scale="0.001 0.4 0.4"
+        position="-1 -0.2 0"
+        rotation="180 0 0"
+        src="https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Sync_Bk.png?v=1711785429431"
+        material="transparent: true"
+      >
+      </a-box>
+      <a-box
+        handmenu="button: >>"
+        sq-interactable
+        sq-collider
+        scale="0.001 0.4 0.4"
+        position="-1 -0.2 -0.4"
+        rotation="180 0 0"
+        src="https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Sync_FW.png?v=1711785429798"
+        material="transparent: true"
+      >
+      </a-box>
+
+      <a-box        
+        handmenu="button: mute"
+        sq-interactable
+        sq-collider
+        scale="0.001 0.4 0.4"
+        position="-1 0.2 0.4"
+        rotation="180 0 0"
+        src="https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Mute_Off.png?v=1711785430667"
+        material="transparent: true"
+      >
+      </a-box>
+      <a-box
+        handmenu="button: - vol"
+        sq-interactable
+        sq-collider
+        scale="0.001 0.4 0.4"
+        position="-1 0.2 0"
+        rotation="180 0 0"
+        src="https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Dn.png?v=1711785430202"
+        material="transparent: true"
+      >
+      </a-box>
+      <a-box
+        handmenu="button: + vol"
+        sq-interactable
+        sq-collider
+        scale="0.001 0.4 0.4"
+        position="-1 0.2 -0.4"
+        rotation="180 0 0"
+        src="https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Up.png?v=1711785431096"
+        material="transparent: true"
+      >
+      </a-box>
+    </a-box>
+      */
+  }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
     this.params = this.params || {};
