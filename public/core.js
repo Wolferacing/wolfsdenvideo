@@ -10,9 +10,6 @@ class Core{
     if(this.params.announce === 'true') { 
       await this.setupSayNamesScript();
     }
-    if(this.params["hand-controls"] === 'true') { 
-      this.setupHandControls();
-    }
     if(window.isBanter) {
       let lastSendTime = Date.now();
       const positionOfBrowser = this.params.position.split(" ");
@@ -42,6 +39,10 @@ class Core{
         }
       }
       await window.AframeInjection.waitFor(window, 'user');
+      if(this.params["hand-controls"] === 'true') { 
+        console.log("setting up hand controls");
+        this.setupHandControls();
+      }
     }else{
       try{
         if(!window.user) {
@@ -256,6 +257,7 @@ class Core{
   setupHandControls() {
     // This was a great innovation by HBR 
     const handControlsContainer = document.createElement("a-entity");
+    handControlsContainer.setAttribute("sq-lefthand", "whoToShow: " + window.user.id);
     [
       {
         image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Playlist.png?v=1711786451727",
