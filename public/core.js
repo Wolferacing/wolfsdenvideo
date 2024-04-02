@@ -255,10 +255,10 @@ class Core{
     this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
   }
   setupHandControls() {
-    // This was a great innovation by HBR 
+    // This was a great innovation by HBR, who wanted Skizot to also get credit for the original idea. 
     const handControlsContainer = document.createElement("a-entity");
     handControlsContainer.setAttribute("scale", "0.08 0.08 0.08");
-    handControlsContainer.setAttribute("position", "-0.04 0.006 -0.010");
+    handControlsContainer.setAttribute("position", "0.05 0.006 -0.010");
     handControlsContainer.setAttribute("sq-lefthand", "whoToShow: " + window.user.id);
     [
       {
