@@ -257,6 +257,8 @@ class Core{
   setupHandControls() {
     // This was a great innovation by HBR 
     const handControlsContainer = document.createElement("a-entity");
+    handControlsContainer.setAttribute("scale", "0.08 0.08 0.08");
+    handControlsContainer.setAttribute("position", "-0.04 0.006 -0.010");
     handControlsContainer.setAttribute("sq-lefthand", "whoToShow: " + window.user.id);
     [
       {
@@ -293,8 +295,8 @@ class Core{
       const button = document.createElement("a-plane");
       button.setAttribute("sq-interactable", "");
       button.setAttribute("sq-collider", "");
-      button.setAttribute("scale", "0.001 0.4 0.4");
-      button.setAttribute("rotation", "180 0 0");
+      button.setAttribute("scale", "0.4 0.4 0.4");
+      button.setAttribute("rotation", "0 -90 0");
       button.setAttribute("src", item.image);
       button.setAttribute("transparent", true);
       button.setAttribute("position", item.position);
