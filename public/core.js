@@ -394,7 +394,6 @@ class Core{
     if(this.params["one-for-each-instance"] === "true" && window.user && window.user.instance) {
         this.params.instance += window.user.instance;
     }
-    console.log(this.params.instance);
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
