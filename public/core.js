@@ -30,6 +30,7 @@ class Core{
           const now = Date.now();
           if(now - lastSendTime > 500) {
             lastSendTime = now;
+            console.log("setting distance volume")
             const roundedVolume = Math.round(this.params.volume * volume);
             if(this.tempVolume != roundedVolume) {
               this.sendBrowserMessage({path: Commands.SET_VOLUME, data: roundedVolume, type: 'spatial'});
