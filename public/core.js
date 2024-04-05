@@ -392,8 +392,9 @@ class Core{
     this.tempVolume = this.params.volume;
     this.params.mute = this.params.mute === 'true' ? 'true' : 'false';
     if(this.params["one-for-each-instance"] === "true" && window.user && window.user.instance) {
-      this.params.instance += window.user.instance;
+        this.params.instance += window.user.instance;
     }
+    console.log(this.params.instance);
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
