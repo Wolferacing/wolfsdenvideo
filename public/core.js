@@ -297,7 +297,7 @@ class Core{
       button.setAttribute("sq-interactable", "");
       button.setAttribute("sq-collider", "");
       button.setAttribute("scale", "0.4 0.4 0.4");
-      button.setAttribute("rotation", "0 -90 0");
+      button.setAttribute("rotation", "0 -90 180");
       button.setAttribute("src", item.image);
       button.setAttribute("transparent", true);
       button.setAttribute("position", item.position);
