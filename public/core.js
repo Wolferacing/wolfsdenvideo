@@ -2,17 +2,6 @@ class Core{
   constructor() {
     this.urlParams = new URLSearchParams(window.location.search);
   }
-  
-  static ICON_URLS = {
-  playlist: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389",
-  skipBack: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443",
-  skipForward: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134",
-  mute: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675",
-  volumeDown: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785",
-  volumeUp: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100"
-};
-
-  
   async init(hostUrl) {
     this.currentLatency = 0;
     this.imIn = false;
@@ -239,8 +228,9 @@ class Core{
   //   })
   // }
   
-setupPlaylistButton(scene, playlistContainer) {
-  this.setupButton(scene, playlistContainer, '-1.7', ICON_URLS.playlist, () => {
+  setupPlaylistButton(scene, playlistContainer) {
+  const playlistIconUrl = this.isKaraoke ? 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389' : 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
+  this.setupButton(scene, playlistContainer, '-1.7', playlistIconUrl, 'large', () => {
     this.openPlaylist();
   });
 }
@@ -255,16 +245,9 @@ setupPlaylistButton(scene, playlistContainer) {
   
   
   
-  // setupVolButton(scene, isUp, playlistContainer) {
-  //   this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>this.volume(isUp))
-  // }
-
-setupPlaylistButton(scene, playlistContainer) {
-  this.setupButton(scene, playlistContainer, '-1.7', ICON_URLS.volumeUp, () => {
-    this.openPlaylist();
-  });
-} 
-
+  setupVolButton(scene, isUp, playlistContainer) {
+    this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>this.volume(isUp))
+  }
   setupSkipButton(scene, isBack, playlistContainer) {
     this.setupButton(scene, playlistContainer, isBack ? -0.475 : -0.125, isBack ? '<<' : '>>', '0.5',  'small', () => this.skip(isBack))
   }
@@ -283,35 +266,57 @@ setupPlaylistButton(scene, playlistContainer) {
      this.params.mute = this.params.mute == 'true' ? 'false' : 'true';
     this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
   }
-setupHandControls() {
-  const handControlsContainer = document.createElement("a-entity");
-  handControlsContainer.setAttribute("scale", "0.08 0.08 0.08");
-  handControlsContainer.setAttribute("position", "0.05 0.006 -0.010");
-  handControlsContainer.setAttribute("sq-lefthand", "whoToShow: " + window.user.id);
-
-  [
-    { key: 'playlist', position: "-1 -0.2 0.4", callback: () => this.openPlaylist() },
-    { key: 'skipBack', position: "-1 -0.2 0", callback: () => this.sendBrowserMessage({path: Commands.SKIP_BACK}) },
-    { key: 'skipForward', position: "-1 -0.2 -0.4", callback: () => this.sendBrowserMessage({path: Commands.SKIP_FORWARD}) },
-    { key: 'mute', position: "-1 0.2 0.4", callback: () => this.mute() },
-    { key: 'volumeDown', position: "-1 0.2 0", callback: () => this.volume(false) },
-    { key: 'volumeUp', position: "-1 0.2 -0.4", callback: () => this.volume(true) }
-  ].forEach(item => {
-    const button = document.createElement("a-plane");
-    button.setAttribute("sq-interactable", "");
-    button.setAttribute("sq-collider", "");
-    button.setAttribute("scale", "0.4 0.4 0.4");
-    button.setAttribute("rotation", "0 -90 180");
-    button.setAttribute("src", ICON_URLS[item.key]);
-    button.setAttribute("transparent", true);
-    button.setAttribute("position", item.position);
-    button.addEventListener("click", item.callback);
-    handControlsContainer.appendChild(button);
-  });
-
-  document.querySelector("a-scene").appendChild(handControlsContainer);
-}
-
+  setupHandControls() {
+    // This was a great innovation by HBR, who wanted Skizot to also get credit for the original idea. 
+    const handControlsContainer = document.createElement("a-entity");
+    handControlsContainer.setAttribute("scale", "0.08 0.08 0.08");
+    handControlsContainer.setAttribute("position", "0.05 0.006 -0.010");
+    handControlsContainer.setAttribute("sq-lefthand", "whoToShow: " + window.user.id);
+    [
+      {
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389",
+        position: "-1 -0.2 0.4", 
+        callback: () => this.openPlaylist()
+      },
+      {
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443",
+        position: "-1 -0.2 0", 
+        callback: () => this.sendBrowserMessage({path: Commands.SKIP_BACK})
+      },
+      {
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134",
+        position: "-1 -0.2 -0.4", 
+        callback: () => this.sendBrowserMessage({path: Commands.SKIP_FORWARD})
+      },
+      {
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675",
+        position: "-1 0.2 0.4", 
+        callback: () => this.mute()
+      },
+      {
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785",
+        position: "-1 0.2 0", 
+        callback: () => this.volume(false)
+      },
+      {
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100",
+        position: "-1 0.2 -0.4", 
+        callback: () => this.volume(true)
+      }
+    ].forEach(item => {
+      const button = document.createElement("a-plane");
+      button.setAttribute("sq-interactable", "");
+      button.setAttribute("sq-collider", "");
+      button.setAttribute("scale", "0.4 0.4 0.4");
+      button.setAttribute("rotation", "0 -90 180");
+      button.setAttribute("src", item.image);
+      button.setAttribute("transparent", true);
+      button.setAttribute("position", item.position);
+      button.addEventListener("click", () => item.callback());
+      handControlsContainer.appendChild(button);
+    })
+    document.querySelector("a-scene").appendChild(handControlsContainer);
+  }
   setupMuteButton(scene, playlistContainer) {
     this.setupButton(scene, playlistContainer, '0.73', 'mute', '0.5',  'medium', () => this.mute())
   }
