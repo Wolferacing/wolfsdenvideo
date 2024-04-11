@@ -9,14 +9,15 @@ class Core {
         const scriptTag = document.currentScript ||
                           Array.from(document.getElementsByTagName('script')).find(s => s.src.includes('playlist.js'));
         if (scriptTag) {
-            this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'DEFAULT_PLAYLIST_ICON_URL';
-            this.volUpIconUrl = scriptTag.getAttribute('data-vol-up-icon-url') || 'DEFAULT_VOL_UP_ICON_URL';
-            this.volDownIconUrl = scriptTag.getAttribute('data-vol-down-icon-url') || 'DEFAULT_VOL_DOWN_ICON_URL';
-            this.muteIconUrl = scriptTag.getAttribute('data-mute-icon-url') || 'DEFAULT_MUTE_ICON_URL';
-            this.skipForwardIconUrl = scriptTag.getAttribute('data-skip-forward-icon-url') || 'DEFAULT_FORWARD_ICON_URL';
-            this.skipBackwardIconUrl = scriptTag.getAttribute('data-skip-backward-icon-url') || 'DEFAULT_BACKWARD_ICON_URL';
+            this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
+          console.log('Playlist Icon URL:', this.playlistIconUrl); // Add this line
+            this.volUpIconUrl = scriptTag.getAttribute('data-vol-up-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100';
+            this.volDownIconUrl = scriptTag.getAttribute('data-vol-down-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785';
+            this.muteIconUrl = scriptTag.getAttribute('data-mute-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675';
+            this.skipForwardIconUrl = scriptTag.getAttribute('data-skip-forward-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134';
+            this.skipBackwardIconUrl = scriptTag.getAttribute('data-skip-backward-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443';
             // Log to ensure URLs are being read correctly
-            console.log("Icon URLs:", this.playlistIconUrl, this.volUpIconUrl, this.volDownIconUrl);
+            //console.log("Icon URLs:", this.playlistIconUrl, this.volUpIconUrl, this.volDownIconUrl);
         }
     }
   
