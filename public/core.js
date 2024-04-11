@@ -1,26 +1,10 @@
 class Core {
     constructor() {
         this.urlParams = new URLSearchParams(window.location.search);
-        this.readCustomIconUrls(); // Ensure URLs are read as soon as an instance is created
+        //this.readCustomIconUrls(); // Ensure URLs are read as soon as an instance is created
         // Additional initializations can go here
     }
-  
-    readCustomIconUrls() {
-        const scriptTag = document.currentScript ||
-                          Array.from(document.getElementsByTagName('script')).find(s => s.src.includes('playlist.js'));
-        if (scriptTag) {
-            this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
-          console.log('Playlist Icon URL:', this.playlistIconUrl); // Add this line
-            this.volUpIconUrl = scriptTag.getAttribute('data-vol-up-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100';
-            this.volDownIconUrl = scriptTag.getAttribute('data-vol-down-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785';
-            this.muteIconUrl = scriptTag.getAttribute('data-mute-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675';
-            this.skipForwardIconUrl = scriptTag.getAttribute('data-skip-forward-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134';
-            this.skipBackwardIconUrl = scriptTag.getAttribute('data-skip-backward-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443';
-            // Log to ensure URLs are being read correctly
-            //console.log("Icon URLs:", this.playlistIconUrl, this.volUpIconUrl, this.volDownIconUrl);
-        }
-    }
-  
+
   async init(hostUrl) {
     this.currentLatency = 0;
     this.imIn = false;
@@ -270,7 +254,7 @@ class Core {
   //   this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>this.volume(isUp))
   // }
   setupVolButton(scene, isUp, playlistContainer) {
-  const volIconUrl = isUp ? this.volUpIconUrl : this.volDownIconUrl;
+  const volIconUrl = isUp ? this.params["data-vol-up-icon-url"] : this.params["data-vol-down-icon-url"];
   this.setupButton(scene, playlistContainer, isUp ? 0.693 : 0.471, volIconUrl, () => this.volume(isUp));
 }
 
@@ -284,7 +268,7 @@ class Core {
   // }
   
 setupSkipButton(scene, isBack, playlistContainer) {
-  const skipIconUrl = isBack ? this.skipBackwardIconUrl : this.skipForwardIconUrl;
+  const skipIconUrl = isBack ? this.params["data-skip-backward-icon-url"] : this.params["data-skip-forward-icon-url"];
   this.setupButton(scene, playlistContainer, isBack ? -0.332 : -0.081, skipIconUrl, () => this.skip(isBack));
 }
   
@@ -304,7 +288,7 @@ setupSkipButton(scene, isBack, playlistContainer) {
     this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
   }
   setupMuteButton(scene, playlistContainer) {
-  const muteIconUrl = this.muteIconUrl; // URL for the mute button icon
+  const muteIconUrl = this.params["data-mute-icon-url"]; // URL for the mute button icon
   this.setupButton(scene, playlistContainer, '0.23', muteIconUrl, () => this.mute());
 }
   
@@ -329,27 +313,27 @@ setupSkipButton(scene, isBack, playlistContainer) {
         callback: () => this.openPlaylist()
       },
       {
-        image: this.skipBackwardIconUrl,
+        image: this.params["data-skip-backward-icon-url"],
         position: "-1 -0.2 0", 
         callback: () => this.sendBrowserMessage({path: Commands.SKIP_BACK})
       },
       {
-        image: this.skipForwardIconUrl,
+        image: this.params["data-skip-forward-icon-url"],
         position: "-1 -0.2 -0.4", 
         callback: () => this.sendBrowserMessage({path: Commands.SKIP_FORWARD})
       },
       {
-        image: this.muteIconUrl,
+        image: this.params["data-mute-icon-url"],
         position: "-1 0.2 0.4", 
         callback: () => this.mute()
       },
       {
-        image: this.volDownIconUrl,
+        image:this.params["data-vol-down-icon-url"],
         position: "-1 0.2 0", 
         callback: () => this.volume(false)
       },
       {
-        image: this.volUpIconUrl,
+        image: this.params["data-vol-up-icon-url"],
         position: "-1 0.2 -0.4", 
         callback: () => this.volume(true)
       }
@@ -432,6 +416,11 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     this.setOrDefault("spatial-max-distance", '40');
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
     this.setOrDefault("data-playlist-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389");
+    this.setOrDefault("data-vol-up-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389");
+    this.setOrDefault("data-vol-down-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389");
+    this.setOrDefault("data-mute-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389");
+    this.setOrDefault("data-skip-forward-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389");
+    this.setOrDefault("data-skip-backward-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389");
     //this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
     
     this.params.volume = Number(this.params.volume);
