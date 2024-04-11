@@ -263,32 +263,32 @@ class Core{
     handControlsContainer.setAttribute("sq-lefthand", "whoToShow: " + window.user.id);
     [
       {
-        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Playlist.png?v=1711786451727",
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389",
         position: "-1 -0.2 0.4", 
         callback: () => this.openPlaylist()
       },
       {
-        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Sync_Bk.png?v=1711785429431",
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443",
         position: "-1 -0.2 0", 
         callback: () => this.sendBrowserMessage({path: Commands.SKIP_BACK})
       },
       {
-        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Sync_FW.png?v=1711785429798",
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134",
         position: "-1 -0.2 -0.4", 
         callback: () => this.sendBrowserMessage({path: Commands.SKIP_FORWARD})
       },
       {
-        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Mute_Off.png?v=1711785430667",
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675",
         position: "-1 0.2 0.4", 
         callback: () => this.mute()
       },
       {
-        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Dn.png?v=1711785430202",
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785",
         position: "-1 0.2 0", 
         callback: () => this.volume(false)
       },
       {
-        image: "https://cdn.glitch.global/47f0acb4-4420-4f3f-bb01-dba17f8c0edb/Vol_Up.png?v=1711785431096",
+        image: "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100",
         position: "-1 0.2 -0.4", 
         callback: () => this.volume(true)
       }
