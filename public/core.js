@@ -222,11 +222,17 @@ class Core{
       }).showToast();
     }
   }
-  setupPlaylistButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '-1.7', this.isKaraoke ? 'singers' : 'playlist', '1',  'large',  ()=>{
-      this.openPlaylist();
-    })
-  }
+  // setupPlaylistButton(scene, playlistContainer) {
+  //   this.setupButton(scene, playlistContainer, '-1.7', this.isKaraoke ? 'singers' : 'playlist', '1',  'large',  ()=>{
+  //     this.openPlaylist();
+  //   })
+  // }
+  
+  setupButton(scene, playlistContainer, xOffset, iconUrl, size, callback) {
+  const buttonContainer = document.createElement('a-entity');
+  buttonContainer.setAttribute('position', `${xOffset} 0 0`);
+  
+  
   openPlaylist() {
     window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
   }
@@ -314,39 +320,30 @@ class Core{
   
   
   
-  setupButton(scene, playlistContainer, xOffset, title, width, size, callback) {
-    const buttonContainer = document.createElement('a-entity');
-    
-    buttonContainer.setAttribute('position', `${xOffset} 0 0`); 
-    
-    const playlistButton = document.createElement('a-entity');
-    playlistButton.setAttribute('sq-boxcollider', `size: ${size == 'small' ? '0.3 0.2 0.05': size == 'medium' ? '0.45 0.2 0.05' : '0.6 0.2 0.05' }`);
-    playlistButton.setAttribute('sq-interactable', '');
-    playlistButton.setAttribute('src', 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813');
-    
-    const glb = size == 'small' ? 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonS.glb?v=1689782700343' 
-    : size == 'medium' ? 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonM.glb?v=1689785121891'
-    : 'https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonL.glb?v=1689782699922';
-    
-    playlistButton.setAttribute('gltf-model',glb);
-    // playlistButton.setAttribute('depth', '0.05');
-    playlistButton.setAttribute('opacity', '0.3');
-    playlistButton.setAttribute('transparent', 'true');
-    // playlistButton.setAttribute('width', width);
-    // playlistButton.setAttribute('height', '0.3');
-    const playlistButtonText = document.createElement('a-text');
-    playlistButtonText.setAttribute('value', title);
-    playlistButtonText.setAttribute('position', '0 0.01 0.03');
-    playlistButtonText.setAttribute('align', 'center');
-    playlistButtonText.setAttribute('scale', '0.8 0.8 0.8');
-    buttonContainer.appendChild(playlistButtonText);
-    buttonContainer.appendChild(playlistButton);
-    playlistContainer.appendChild(buttonContainer);
-    playlistButton.addEventListener('click', ()=>{
-      callback();
-    });
-    return playlistButtonText;
-  }
+setupButton(scene, playlistContainer, xOffset, iconUrl, size, callback) {
+  const buttonContainer = document.createElement('a-entity');
+  buttonContainer.setAttribute('position', `${xOffset} 0 0`);
+
+  // Create an a-plane to serve as the button, using the provided icon URL
+  const buttonIcon = document.createElement('a-plane');
+  buttonIcon.setAttribute('sq-boxcollider', `size: ${size === 'small' ? '0.3 0.2 0.05' : size === 'medium' ? '0.45 0.2 0.05' : '0.6 0.2 0.05'}`);
+  buttonIcon.setAttribute('sq-interactable', '');
+  buttonIcon.setAttribute('src', iconUrl); // Use the icon URL passed to the function
+  buttonIcon.setAttribute('transparent', 'true');
+  buttonIcon.setAttribute('opacity', '0.8'); // Adjust opacity as needed
+  buttonIcon.setAttribute('scale', '0.2 0.2 0.2'); // Example scale, adjust as needed
+
+  buttonContainer.appendChild(buttonIcon);
+  playlistContainer.appendChild(buttonContainer);
+
+  // Set up the click event listener to trigger the callback function
+  buttonIcon.addEventListener('click', callback);
+
+  // Return the buttonIcon element in case you need to manipulate it further outside this function
+  return buttonIcon;
+}
+
+
   generateGuestUser() {
     const id = this.getUniquId();
     window.user = {id, name: "Guest " + id};
