@@ -230,7 +230,7 @@ class Core{
   
   setupPlaylistButton(scene, playlistContainer) {
   const playlistIconUrl = this.isKaraoke ? 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389' : 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
-  this.setupButton(scene, playlistContainer, '-1.7', playlistIconUrl, () => {
+  this.setupButton(scene, playlistContainer, '-0.633', playlistIconUrl, () => {
     this.openPlaylist();
   });
 }
@@ -250,7 +250,7 @@ class Core{
   // }
   setupVolButton(scene, isUp, playlistContainer) {
   const volIconUrl = isUp ? 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100' : 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785';
-  this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, volIconUrl, () => this.volume(isUp));
+  this.setupButton(scene, playlistContainer, isUp ? 0.693 : 0.471, volIconUrl, () => this.volume(isUp));
 }
 
   
@@ -264,7 +264,7 @@ class Core{
   
 setupSkipButton(scene, isBack, playlistContainer) {
   const skipIconUrl = isBack ? 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443' : 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134';
-  this.setupButton(scene, playlistContainer, isBack ? -0.475 : -0.125, skipIconUrl, () => this.skip(isBack));
+  this.setupButton(scene, playlistContainer, isBack ? -0.332 : -0.081, skipIconUrl, () => this.skip(isBack));
 }
   
   
@@ -284,7 +284,7 @@ setupSkipButton(scene, isBack, playlistContainer) {
   }
   setupMuteButton(scene, playlistContainer) {
   const muteIconUrl = 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675'; // URL for the mute button icon
-  this.setupButton(scene, playlistContainer, '0.73', muteIconUrl, () => this.mute());
+  this.setupButton(scene, playlistContainer, '0.23', muteIconUrl, () => this.mute());
 }
   
 //     setupMuteButton(scene, playlistContainer) {
