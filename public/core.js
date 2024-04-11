@@ -352,7 +352,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
   buttonContainer.setAttribute('position', `${xOffset} 0 0`);
 
   const buttonIcon = document.createElement('a-plane');
-  buttonIcon.setAttribute('sq-boxcollider', 'size: 0.3 0.2 0.05'); // Adjust if needed for general use
+  buttonIcon.setAttribute('sq-boxcollider', 'size: 1 1 0.05'); // Adjust if needed for general use
   buttonIcon.setAttribute('sq-interactable', '');
   buttonIcon.setAttribute('src', iconUrl);
   buttonIcon.setAttribute('transparent', 'true');

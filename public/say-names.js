@@ -6,18 +6,21 @@ if(window.isBanter) {
     "arrived",
     "is here",
     "beamed in",
-    "has glitched into the matrix!",
     "just teleported in.",
+    "has glitched into the matrix!",
+    "is too late",
     "has joined. Quick, Hide your avatars.",
     "just dropped in from another dimension",
     "has entered the simulation!",
     "has logged into the mainframe!",
     "is now part of our virtual mischief",
     "just crossed the digital threshold",
-    "decided to join us in the simulation. Alert the media, this is groundbreaking stuff.",
+    "decided to join us in the simulation.",
     "just stumbled into our virtual realm. Someone hold their hand, they look lost.",
     "is wanted in several other spaces. Take cover and shoot!",
-    "is here for cuddles and milk and is all out of cuddles"
+    "is here for cuddles and milk and is all out of cuddles",
+    "is here to kiss snowy butt cheeks",
+    " Alert the media, a real human actually joined the space."
   ];
 
   window.userJoinedCallback = async user => {
