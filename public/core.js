@@ -124,6 +124,8 @@ class Core {
       return;
     }
     
+     this.readCustomIconUrls();
+    
     const yScale = Number(this.params.scale.split(" ")[1]);
     const position = Number(this.params.position.split(" ")[0]) + " " + (Number(this.params.position.split(" ")[1]) - (yScale*0.335)) + " " + Number(this.params.position.split(" ")[2]);
     this.playlistContainer = document.createElement('a-entity');
@@ -313,6 +315,8 @@ setupSkipButton(scene, isBack, playlistContainer) {
   
   
   setupHandControls() {
+    
+     this.readCustomIconUrls();
     // This was a great innovation by HBR, who wanted Skizot to also get credit for the original idea. 
     const handControlsContainer = document.createElement("a-entity");
     handControlsContainer.setAttribute("scale", "0.08 0.08 0.08");
