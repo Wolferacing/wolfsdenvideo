@@ -1,10 +1,7 @@
 class Core {
     constructor() {
         this.urlParams = new URLSearchParams(window.location.search);
-        //this.readCustomIconUrls(); // Ensure URLs are read as soon as an instance is created
-        // Additional initializations can go here
     }
-
   async init(hostUrl) {
     this.currentLatency = 0;
     this.imIn = false;
@@ -227,53 +224,23 @@ class Core {
       }).showToast();
     }
   }
-  // setupPlaylistButton(scene, playlistContainer) {
-  //   this.setupButton(scene, playlistContainer, '-1.7', this.isKaraoke ? 'singers' : 'playlist', '1',  'large',  ()=>{
-  //     this.openPlaylist();
-  //   })
-  // }
-  
   setupPlaylistButton(scene, playlistContainer) {
   const playlistIconUrl = this.params["data-playlist-icon-url"]//this.isKaraoke ? this.playlistIconUrl : this.playlistIconUrl;
   this.setupButton(scene, playlistContainer, '-0.633', playlistIconUrl, () => {
     this.openPlaylist();
   });
 }
-
-  
-  
-  
   openPlaylist() {
     window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
   }
-  
-  
-  
-  
-  // setupVolButton(scene, isUp, playlistContainer) {
-  //   this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>this.volume(isUp))
-  // }
   setupVolButton(scene, isUp, playlistContainer) {
   const volIconUrl = isUp ? this.params["data-vol-up-icon-url"] : this.params["data-vol-down-icon-url"];
   this.setupButton(scene, playlistContainer, isUp ? 0.693 : 0.471, volIconUrl, () => this.volume(isUp));
 }
-
-  
-  
-  // setupSkipButton(scene, isBack, playlistContainer) {
-  //   this.setupButton(scene, playlistContainer, isBack ? -0.475 : -0.125, isBack ? '<<' : '>>', '0.5',  'small', () => this.skip(isBack))
-  // }
-  // skip(isBack) {
-  //   this.sendBrowserMessage({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
-  // }
-  
 setupSkipButton(scene, isBack, playlistContainer) {
   const skipIconUrl = isBack ? this.params["data-skip-backward-icon-url"] : this.params["data-skip-forward-icon-url"];
   this.setupButton(scene, playlistContainer, isBack ? -0.332 : -0.081, skipIconUrl, () => this.skip(isBack));
 }
-  
-  
-  
   volume(isUp) {
     this.setVolume(isUp);
     if(isUp && this.params.mute == 'true') {
@@ -291,16 +258,8 @@ setupSkipButton(scene, isBack, playlistContainer) {
   const muteIconUrl = this.params["data-mute-icon-url"]; // URL for the mute button icon
   this.setupButton(scene, playlistContainer, '0.23', muteIconUrl, () => this.mute());
 }
-  
-//     setupMuteButton(scene, playlistContainer) {
-//     this.setupButton(scene, playlistContainer, '0.73', 'mute', '0.5',  'medium', () => this.mute())
-// }
 
-  
-  
   setupHandControls() {
-    
-     //this.readCustomIconUrls();
     // This was a great innovation by HBR, who wanted Skizot to also get credit for the original idea. 
     const handControlsContainer = document.createElement("a-entity");
     handControlsContainer.setAttribute("scale", "0.08 0.08 0.08");
@@ -352,8 +311,6 @@ setupSkipButton(scene, isBack, playlistContainer) {
     document.querySelector("a-scene").appendChild(handControlsContainer);
   }
 
-  
-  
 setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
   const buttonContainer = document.createElement('a-entity');
   buttonContainer.setAttribute('position', `${xOffset} 0 0`);
@@ -373,8 +330,6 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
 
   return buttonIcon;
 }
-
-
 
   generateGuestUser() {
     const id = this.getUniquId();

@@ -20,7 +20,7 @@ if(window.isBanter) {
     "is wanted in several other spaces. Take cover and shoot!",
     "is here for cuddles and milk and is all out of cuddles",
     "is here to kiss snowy butt cheeks",
-    ", a real human actually joined the space. Alert the media. This is crazy. Now everyone sct like a human"
+    ", a real human actually joined the space. Now everyone act like a human"
   ];
 
   window.userJoinedCallback = async user => {
