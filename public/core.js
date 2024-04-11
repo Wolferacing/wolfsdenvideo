@@ -1,23 +1,24 @@
-class Core{
-  constructor() {
-    this.urlParams = new URLSearchParams(window.location.search);
-  }
-  
-  readCustomIconUrls() {
-    // Assuming the script tag includes 'playlist.js', adjust if necessary.
-    const scriptTag = document.currentScript ||
-                      Array.from(document.getElementsByTagName('script')).find(s => s.src.includes('playlist.js'));
-    if (scriptTag) {
-      // Read custom icon URLs or fallback to default ones
-      this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
-      this.volUpIconUrl = scriptTag.getAttribute('data-vol-up-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100';
-      this.volDownIconUrl = scriptTag.getAttribute('data-vol-down-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785';
-      this.muteIconUrl = scriptTag.getAttribute('data-mute-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675';
-      this.skipForwardIconUrl = scriptTag.getAttribute('data-skip-forward-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134';
-      this.skipBackwardIconUrl = scriptTag.getAttribute('data-skip-backward-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443';
-      // Add more icons as needed
+class Core {
+    constructor() {
+        this.urlParams = new URLSearchParams(window.location.search);
+        this.readCustomIconUrls(); // Ensure URLs are read as soon as an instance is created
+        // Additional initializations can go here
     }
-  }
+  
+    readCustomIconUrls() {
+        const scriptTag = document.currentScript ||
+                          Array.from(document.getElementsByTagName('script')).find(s => s.src.includes('playlist.js'));
+        if (scriptTag) {
+            this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'DEFAULT_PLAYLIST_ICON_URL';
+            this.volUpIconUrl = scriptTag.getAttribute('data-vol-up-icon-url') || 'DEFAULT_VOL_UP_ICON_URL';
+            this.volDownIconUrl = scriptTag.getAttribute('data-vol-down-icon-url') || 'DEFAULT_VOL_DOWN_ICON_URL';
+            this.muteIconUrl = scriptTag.getAttribute('data-mute-icon-url') || 'DEFAULT_MUTE_ICON_URL';
+            this.skipForwardIconUrl = scriptTag.getAttribute('data-skip-forward-icon-url') || 'DEFAULT_FORWARD_ICON_URL';
+            this.skipBackwardIconUrl = scriptTag.getAttribute('data-skip-backward-icon-url') || 'DEFAULT_BACKWARD_ICON_URL';
+            // Log to ensure URLs are being read correctly
+            console.log("Icon URLs:", this.playlistIconUrl, this.volUpIconUrl, this.volDownIconUrl);
+        }
+    }
   
   async init(hostUrl) {
     this.currentLatency = 0;
@@ -229,7 +230,7 @@ class Core{
         position: "right", // `left`, `center` or `right`
         // stopOnFocus: true, // Prevents dismissing of toast on hover
         style: {
-          background: "url(https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Button_bg.png?v=1712855139337) center center no-repeat",
+          background: "url(https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Button_bg.png?v=1712857063078) center center no-repeat",
           backgroundSize: "cover",
           opacity: 0.7,
           fontSize: "2em",
