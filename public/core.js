@@ -230,7 +230,7 @@ class Core{
   
   setupPlaylistButton(scene, playlistContainer) {
   const playlistIconUrl = this.isKaraoke ? 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389' : 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
-  this.setupButton(scene, playlistContainer, '-1.7', playlistIconUrl, 'large', () => {
+  this.setupButton(scene, playlistContainer, '-1.7', playlistIconUrl, () => {
     this.openPlaylist();
   });
 }
@@ -245,15 +245,30 @@ class Core{
   
   
   
+  // setupVolButton(scene, isUp, playlistContainer) {
+  //   this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>this.volume(isUp))
+  // }
   setupVolButton(scene, isUp, playlistContainer) {
-    this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, isUp ? '+ vol' : '- vol', '0.5', 'medium', ()=>this.volume(isUp))
-  }
-  setupSkipButton(scene, isBack, playlistContainer) {
-    this.setupButton(scene, playlistContainer, isBack ? -0.475 : -0.125, isBack ? '<<' : '>>', '0.5',  'small', () => this.skip(isBack))
-  }
-  skip(isBack) {
-    this.sendBrowserMessage({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
-  }
+  const volIconUrl = isUp ? 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100' : 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785';
+  this.setupButton(scene, playlistContainer, isUp ? 1.78 : 1.25, volIconUrl, () => this.volume(isUp));
+}
+
+  
+  
+  // setupSkipButton(scene, isBack, playlistContainer) {
+  //   this.setupButton(scene, playlistContainer, isBack ? -0.475 : -0.125, isBack ? '<<' : '>>', '0.5',  'small', () => this.skip(isBack))
+  // }
+  // skip(isBack) {
+  //   this.sendBrowserMessage({path: isBack? Commands.SKIP_BACK : Commands.SKIP_FORWARD});
+  // }
+  
+setupSkipButton(scene, isBack, playlistContainer) {
+  const skipIconUrl = isBack ? 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443' : 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134';
+  this.setupButton(scene, playlistContainer, isBack ? -0.475 : -0.125, skipIconUrl, () => this.skip(isBack));
+}
+  
+  
+  
   volume(isUp) {
     this.setVolume(isUp);
     if(isUp && this.params.mute == 'true') {
@@ -262,10 +277,22 @@ class Core{
     }
     this.sendBrowserMessage({path: Commands.SET_VOLUME, data: this.params.volume});
   }
+  
   mute() {
      this.params.mute = this.params.mute == 'true' ? 'false' : 'true';
     this.sendBrowserMessage({path: Commands.MUTE, data: this.params.mute});
   }
+  setupMuteButton(scene, playlistContainer) {
+  const muteIconUrl = 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675'; // URL for the mute button icon
+  this.setupButton(scene, playlistContainer, '0.73', muteIconUrl, () => this.mute());
+}
+  
+//     setupMuteButton(scene, playlistContainer) {
+//     this.setupButton(scene, playlistContainer, '0.73', 'mute', '0.5',  'medium', () => this.mute())
+// }
+
+  
+  
   setupHandControls() {
     // This was a great innovation by HBR, who wanted Skizot to also get credit for the original idea. 
     const handControlsContainer = document.createElement("a-entity");
@@ -317,36 +344,29 @@ class Core{
     })
     document.querySelector("a-scene").appendChild(handControlsContainer);
   }
-  setupMuteButton(scene, playlistContainer) {
-    this.setupButton(scene, playlistContainer, '0.73', 'mute', '0.5',  'medium', () => this.mute())
-  }
+
   
   
-  
-  
-  
-setupButton(scene, playlistContainer, xOffset, iconUrl, size, callback) {
+setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
   const buttonContainer = document.createElement('a-entity');
   buttonContainer.setAttribute('position', `${xOffset} 0 0`);
 
-  // Create an a-plane to serve as the button, using the provided icon URL
   const buttonIcon = document.createElement('a-plane');
-  buttonIcon.setAttribute('sq-boxcollider', `size: ${size === 'small' ? '0.3 0.2 0.05' : size === 'medium' ? '0.45 0.2 0.05' : '0.6 0.2 0.05'}`);
+  buttonIcon.setAttribute('sq-boxcollider', 'size: 0.3 0.2 0.05'); // Adjust if needed for general use
   buttonIcon.setAttribute('sq-interactable', '');
-  buttonIcon.setAttribute('src', iconUrl); // Use the icon URL passed to the function
+  buttonIcon.setAttribute('src', iconUrl);
   buttonIcon.setAttribute('transparent', 'true');
-  buttonIcon.setAttribute('opacity', '0.8'); // Adjust opacity as needed
-  buttonIcon.setAttribute('scale', '0.2 0.2 0.2'); // Example scale, adjust as needed
+  buttonIcon.setAttribute('opacity', '0.8');
+  buttonIcon.setAttribute('scale', '0.2 0.2 0.2'); // Adjust scale as needed
 
   buttonContainer.appendChild(buttonIcon);
   playlistContainer.appendChild(buttonContainer);
 
-  // Set up the click event listener to trigger the callback function
   buttonIcon.addEventListener('click', callback);
 
-  // Return the buttonIcon element in case you need to manipulate it further outside this function
   return buttonIcon;
 }
+
 
 
   generateGuestUser() {
