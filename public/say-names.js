@@ -15,7 +15,8 @@ if(window.isBanter) {
     "is now part of our virtual mischief",
     "just crossed the digital threshold",
     "decided to join us in the simulation. Alert the media, this is groundbreaking stuff.",
-    "just stumbled into our virtual realm. Someone hold their hand, they look lost."
+    "just stumbled into our virtual realm. Someone hold their hand, they look lost.",
+    "is wanted in several other spaces. Take cover and shoot!"
   ];
 
   window.userJoinedCallback = async user => {
