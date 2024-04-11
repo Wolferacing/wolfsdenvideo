@@ -124,7 +124,7 @@ class Core {
       return;
     }
     
-     this.readCustomIconUrls();
+     //this.readCustomIconUrls();
     
     const yScale = Number(this.params.scale.split(" ")[1]);
     const position = Number(this.params.position.split(" ")[0]) + " " + (Number(this.params.position.split(" ")[1]) - (yScale*0.335)) + " " + Number(this.params.position.split(" ")[2]);
@@ -250,7 +250,7 @@ class Core {
   // }
   
   setupPlaylistButton(scene, playlistContainer) {
-  const playlistIconUrl = this.isKaraoke ? this.playlistIconUrl : this.playlistIconUrl;
+  const playlistIconUrl = this.params["data-playlist-icon-url"]//this.isKaraoke ? this.playlistIconUrl : this.playlistIconUrl;
   this.setupButton(scene, playlistContainer, '-0.633', playlistIconUrl, () => {
     this.openPlaylist();
   });
@@ -316,7 +316,7 @@ setupSkipButton(scene, isBack, playlistContainer) {
   
   setupHandControls() {
     
-     this.readCustomIconUrls();
+     //this.readCustomIconUrls();
     // This was a great innovation by HBR, who wanted Skizot to also get credit for the original idea. 
     const handControlsContainer = document.createElement("a-entity");
     handControlsContainer.setAttribute("scale", "0.08 0.08 0.08");
@@ -324,7 +324,7 @@ setupSkipButton(scene, isBack, playlistContainer) {
     handControlsContainer.setAttribute("sq-lefthand", "whoToShow: " + window.user.id);
     [
       {
-        image: this.playlistIconUrl,
+        image: this.params["data-playlist-icon-url"],
         position: "-1 -0.2 0.4", 
         callback: () => this.openPlaylist()
       },
@@ -431,6 +431,8 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     this.setOrDefault("spatial-min-distance", '5');
     this.setOrDefault("spatial-max-distance", '40');
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
+    this.setOrDefault("data-playlist-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389");
+    //this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
     
     this.params.volume = Number(this.params.volume);
     this.params['mip-maps'] = Number(this.params['mip-maps']);
