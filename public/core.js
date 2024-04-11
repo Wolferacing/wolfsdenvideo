@@ -373,7 +373,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
   buttonIcon.setAttribute('sq-interactable', '');
   buttonIcon.setAttribute('src', iconUrl);
   buttonIcon.setAttribute('transparent', 'true');
-  buttonIcon.setAttribute('opacity', '0.8');
+  //buttonIcon.setAttribute('opacity', '0.8');
   buttonIcon.setAttribute('scale', '0.2 0.2 0.2'); // Adjust scale as needed
 
   buttonContainer.appendChild(buttonIcon);
