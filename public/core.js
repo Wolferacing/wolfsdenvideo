@@ -229,7 +229,7 @@ class Core{
         position: "right", // `left`, `center` or `right`
         // stopOnFocus: true, // Prevents dismissing of toast on hover
         style: {
-          background: "url(https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/angryimg.png?v=1689619321813) center center no-repeat",
+          background: "url(https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Button_bg.png?v=1712855139337) center center no-repeat",
           backgroundSize: "cover",
           opacity: 0.7,
           fontSize: "2em",
