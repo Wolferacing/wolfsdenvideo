@@ -32,21 +32,26 @@ function setOrDefault(attr, defaultValue) {
 setOrDefault("four-twenty", 'false');
 setOrDefault("announce-events", 'true');
 if(params["four-twenty"] === "true") {
-  const ws = new WebSocket('wss://calicocut.glitch.me');
-  ws.onmessage = (msg) => {
-    console.log(msg.data);
-    speak(msg.data);
-  };
-  ws.onopen = (msg) => {
-    console.log("connected to 420 announcer.");
-  };
-  ws.onerror = (msg) => {
-    console.log("error", msg);
-  };
-  ws.onclose = (e) => {
-    console.log('Disconnected!');
-  };
-  setInterval(()=>{ws.send("keep-alive")}, 60000)
+  let keepAlive;
+  function connect() {
+    const ws = new WebSocket('wss://calicocut.glitch.me');
+    ws.onmessage = (msg) => {
+      speak(msg.data);
+    };
+    ws.onopen = (msg) => {
+      console.log("connected to 420 announcer.");
+    };
+    ws.onerror = (msg) => {
+      console.log("error", msg);
+    };
+    ws.onclose = (e) => {
+      console.log('Disconnected!');
+      clearInterval(keepAlive);
+      setTimeout(()=>connect(), 3000);
+    };
+    keepAlive = setInterval(()=>{ws.send("keep-alive")}, 120000)
+  }
+  connect();
 }
 
 async function speak(text) {
