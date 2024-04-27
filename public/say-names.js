@@ -51,7 +51,7 @@ async function speak(text) {
 
 function loop(interval, callback) {
   let readyToTrigger;
-  const loop = () => {
+  const _loop = () => {
     let nowInMs = new Date().getTime();
     let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / (interval * 1000)) * interval;
     if(timeSinceLast > interval - 1 && !this.readyToTrigger) {
@@ -62,8 +62,8 @@ function loop(interval, callback) {
         callback();
     }
   };
-  setInterval(loop, 500);
-  loop();
+  setInterval(_loop, 500);
+  _loop();
 }
 
 const now = Date.now();
@@ -78,11 +78,11 @@ window.userJoinedCallback = async user => {
 }
 if(params["announce-events"] === "true") {
   let lastEventsId = 0;
-  loop(60, async () => {
+  loop(20, async () => {
     let event = await (await fetch("https://api.sidequestvr.com/v2/events?limit=1")).json();
     if(event.length) {
       const difference = Math.abs(new Date(event[0].start_time) - new Date());
-      if(difference < 61 * 1000 && lastEventsId !== event[0].events_v2_id) {
+      if(difference < 60 * 1000 && lastEventsId !== event[0].events_v2_id) {
         lastEventsId = event[0].events_v2_id;
         await speak(event[0].name + ", event starting now!");
       }
