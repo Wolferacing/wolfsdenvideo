@@ -46,6 +46,7 @@ if(params["four-twenty"] === "true") {
   ws.onclose = (e) => {
     console.log('Disconnected!');
   };
+  setInterval(()=>{ws.send("keep-alive")}, 60000)
 }
 
 async function speak(text) {
