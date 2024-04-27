@@ -37,7 +37,7 @@ if(params["four-twenty"] === "true") {
     speak(msg.data);
   };
   ws.onopen = function message(msg) {
-    console.log("connected to 420 announcer.");
+    // console.log("connected to 420 announcer.");
   };
 }
 
@@ -55,12 +55,12 @@ function loop(interval, callback) {
   let readyToTrigger;
   const _loop = () => {
     let nowInMs = new Date().getTime();
-    let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / (0 * 1000)) * interval;
-    if(timeSinceLast > interval - 1 && !this.readyToTrigger) {
-        this.readyToTrigger = true;
+    let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / (interval * 1000)) * interval;
+    if(timeSinceLast > interval - 1 && !readyToTrigger) {
+        readyToTrigger = true;
     }
-    if(timeSinceLast < 1 && this.readyToTrigger) {
-        this.readyToTrigger = false;
+    if(timeSinceLast < 1 && readyToTrigger) {
+        readyToTrigger = false;
         callback();
     }
   };
@@ -72,6 +72,7 @@ const now = Date.now();
 window.userJoinedCallback = async user => {
   if(Date.now() - now > 30000) {
     const name = (user.name ? user.name : user.id.substr(0, 6));
+    
     const randomWelcomeMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
     const message = name + " " + randomWelcomeMessage; 
     await speak(message);
