@@ -68,7 +68,7 @@ function loop(interval, callback) {
         callback();
     }
   };
-  setInterval(_loop, 500);
+  setInterval(_loop, 800);
   _loop();
 }
 
