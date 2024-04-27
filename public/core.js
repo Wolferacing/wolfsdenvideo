@@ -363,6 +363,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     this.setOrDefault("mute", 'false');
     this.setOrDefault("is3d", 'false');
     this.setOrDefault("announce", 'true');
+    this.setOrDefault("announce-four-twenty", 'false');
     this.setOrDefault("hand-controls", 'false');
     this.setOrDefault("mip-maps", '1');
     this.setOrDefault("spatial", 'true');
@@ -522,15 +523,20 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     return (match&&match[7].length==11)? match[7] : false;
   }
   setupSayNamesScript(callback) {
-    return this.setupScript(callback, "say-names");
+    return this.setupScript(callback, "say-names", {"announce-four-twenty": this.params["announce-four-twenty"]});
   }
   setupCommandsScript(callback) {
     return this.setupScript(callback, "commands");
   }
-  setupScript(callback, name) {
+  setupScript(callback, name, attrs) {
     return new Promise(resolve => {
       let myScript = document.createElement("script");
       myScript.setAttribute("src", `https://${this.hostUrl}/${name}.js`);
+      if(attrs) {
+        Object.keys(attrs).forEach(k => {
+          myScript.setAttribute(k, attrs[k]);
+        })
+      }
       myScript.addEventListener ("load", resolve, false);
       document.body.appendChild(myScript);  
     });
