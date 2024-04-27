@@ -53,7 +53,7 @@ function loop(interval, callback) {
   let readyToTrigger;
   const _loop = () => {
     let nowInMs = new Date().getTime();
-    let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / (interval * 1000)) * interval;
+    let timeSinceLast = nowInMs / 1000 - Math.floor( nowInMs / (0 * 1000)) * interval;
     if(timeSinceLast > interval - 1 && !this.readyToTrigger) {
         this.readyToTrigger = true;
     }
