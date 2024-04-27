@@ -70,10 +70,18 @@ function loop(interval, callback) {
 
 const now = Date.now();
 window.userJoinedCallback = async user => {
-  if(Date.now() - now > 30000) {
+  const _now = Date.now();
+  if(_now - now > 30000) {
     const name = (user.name ? user.name : user.id.substr(0, 6));
-    
-    const randomWelcomeMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+    let randomWelcomeMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+    const time = 1000 * 60 * 10;
+    const remainder = _now % time;
+    for(let i = 0; i < welcomeMessages.length; i++) {
+      if(remainder / time < i / welcomeMessages.length) {
+        randomWelcomeMessage = welcomeMessages[i];
+        break;
+      }
+    }
     const message = name + " " + randomWelcomeMessage; 
     await speak(message);
   }
