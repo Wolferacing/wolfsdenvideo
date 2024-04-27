@@ -30,7 +30,6 @@ class Core {
           const now = Date.now();
           if(now - lastSendTime > 500) {
             lastSendTime = now;
-            console.log("setting distance volume")
             const roundedVolume = Math.round(this.params.volume * volume);
             if(this.tempVolume != roundedVolume) {
               this.sendBrowserMessage({path: Commands.SET_VOLUME, data: roundedVolume, type: 'spatial'});
@@ -41,7 +40,6 @@ class Core {
       }
       await window.AframeInjection.waitFor(window, 'user');
       if(this.params["hand-controls"] === 'true') { 
-        console.log("setting up hand controls");
         this.setupHandControls();
       }
     }else{
@@ -523,7 +521,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     return (match&&match[7].length==11)? match[7] : false;
   }
   setupSayNamesScript(callback) {
-    return this.setupScript(callback, "say-names", {"announce-four-twenty": this.params["announce-four-twenty"]});
+    return this.setupScript(() => {console.log("say names setup");callback()}, "say-names", {"four-twenty": this.params["announce-four-twenty"]});
   }
   setupCommandsScript(callback) {
     return this.setupScript(callback, "commands");
