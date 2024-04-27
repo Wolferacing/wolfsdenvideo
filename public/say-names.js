@@ -33,14 +33,14 @@ setOrDefault("four-twenty", 'false');
 setOrDefault("announce-events", 'true');
 if(params["four-twenty"] === "true") {
   const ws = new WebSocket('wss://calicocut.glitch.me');
-  ws.onmessage = function message(msg) {
-    console.log(msg.data)
+  ws.onmessage = (msg) => {
+    console.log(msg.data);
     speak(msg.data);
   };
-  ws.onopen = function message(msg) {
+  ws.onopen = (msg) => {
     console.log("connected to 420 announcer.");
   };
-  ws.onerror = function message(msg) {
+  ws.onerror = (msg) => {
     console.log("error", msg);
   };
 }
