@@ -43,6 +43,9 @@ if(params["four-twenty"] === "true") {
   ws.onerror = (msg) => {
     console.log("error", msg);
   };
+  ws.onclose = (e) => {
+    console.log('Disconnected!');
+  };
 }
 
 async function speak(text) {
