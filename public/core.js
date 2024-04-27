@@ -8,7 +8,7 @@ class Core {
     this.hostUrl = hostUrl;
     // this.defaultVideo = this.params["default-video"];
     if(this.params.announce === 'true') { 
-      await this.setupSayNamesScript();
+      this.setupSayNamesScript();
     }
     if(window.isBanter) {
       let lastSendTime = Date.now();
@@ -521,7 +521,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     return (match&&match[7].length==11)? match[7] : false;
   }
   setupSayNamesScript(callback) {
-    return this.setupScript(() => {console.log("say names setup");callback()}, "say-names", {"four-twenty": this.params["announce-four-twenty"]});
+    return this.setupScript(callback, "say-names", {"four-twenty": this.params["announce-four-twenty"]});
   }
   setupCommandsScript(callback) {
     return this.setupScript(callback, "commands");

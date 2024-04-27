@@ -31,7 +31,6 @@ function setOrDefault(attr, defaultValue) {
 
 setOrDefault("four-twenty", 'false');
 setOrDefault("announce-events", 'true');
-console.log(params);
 if(params["four-twenty"] === "true") {
   const ws = new WebSocket('wss://calicocut.glitch.me');
   ws.onmessage = function message(msg) {
@@ -71,7 +70,6 @@ function loop(interval, callback) {
 
 const now = Date.now();
 window.userJoinedCallback = async user => {
-  console.log(user);
   if(Date.now() - now > 30000) {
     const name = (user.name ? user.name : user.id.substr(0, 6));
     const randomWelcomeMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
