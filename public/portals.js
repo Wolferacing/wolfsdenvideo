@@ -6,12 +6,13 @@ class Portals {
   }
   async init() {
     if(window.isBanter) {
-      await window.AframeInjection.waitFor(window, 'AFRAME');
+      // await window.AframeInjection.waitFor(window, 'AFRAME');
       // console.log(window.AFRAME.scenes, document.querySelector("a-scene"));
-      // await window.AframeInjection.waitFor(window.AFRAME.scenes, 0);
-      // console.log("here");
+      // await window.AframeInjection.waitFor(window.AFRAME.scenes, "0");
+      console.log("here");
       this.sceneParent = document.querySelector("a-scene");
       this.parseParams();
+      console.log(this.params);
       setInterval(() => this.tick(), 5 * 60 * 1000);
       this.tick();
     }
