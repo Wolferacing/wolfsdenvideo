@@ -7,6 +7,7 @@ const youtube = new Youtube();
 const ytfps = require('ytfps');
 const fetch = require('node-fetch');
 const Commands = require('../public/commands.js');
+const test =1;
 
 class App{
   constructor() {
