@@ -1,6 +1,6 @@
 class Karaoke{
   constructor() {
-    this.hostUrl = 'best-v-player.glitch.me';
+    this.hostUrl = 'fire-v-player.glitch.me';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.init();
   }
