@@ -112,16 +112,18 @@ class Playlist {
       videoAuthor.innerText = "Added By: " + v.user;
       
       if(player.currentTrack !== i) {
-//         if(isMe || (!player.locked && !player.canVote)) {
-//           const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+        if(this.core.player.host.id === window.user.id) {
+          if(isMe || (!player.locked && !player.canVote)) {
+            const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-//           playTrack.className = 'button slim green';
-//           playTrack.innerText = "Play Now";
+            playTrack.className = 'button slim green';
+            playTrack.innerText = "Play Now.";
 
-//           playTrack.addEventListener('click', () => {
-//             this.core.sendMessage({path: Commands.SET_TRACK, data: i });
-//           });          
-//         }
+            playTrack.addEventListener('click', () => {
+              this.core.sendMessage({path: Commands.SET_TRACK, data: i });
+            });          
+          };    
+        };
         if(player.canVote) {
           const voteDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
@@ -140,33 +142,35 @@ class Playlist {
             this.core.sendMessage({path: Commands.UP_VOTE, data: i });
           });
         }else{
-          const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+          if(this.core.player.host.id === window.user.id) {
+            const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-          moveDown.className = 'button slim teal';
-          moveDown.innerText = "Move Down";
+            moveDown.className = 'button slim teal';
+            moveDown.innerText = "Move Down";
 
-          moveDown.addEventListener('click', () => {
-            this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
-          });
+            moveDown.addEventListener('click', () => {
+              this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
+            });
 
-          const moveUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-          moveUp.className = 'button slim teal';
-          moveUp.innerText = "Move Up";
+            const moveUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+            moveUp.className = 'button slim teal';
+            moveUp.innerText = "Move Up";
 
-          moveUp.addEventListener('click', () => {
-            this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
-          });
-        }
-        if(isMe || (!player.locked && !player.canVote)) {
-          const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+            moveUp.addEventListener('click', () => {
+              this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
+            });
+            if(isMe || (!player.locked && !player.canVote)) {
+              const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-          remove.className = 'button slim red';
-          remove.innerText = "Remove";
+              remove.className = 'button slim red';
+              remove.innerText = "Remove";
 
-          remove.addEventListener('click', () => {
-            this.core.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
-          });         
-        }
+              remove.addEventListener('click', () => {
+                this.core.sendMessage({path: Commands.REMOVE_PLAYLIST_ITEM, data: i });
+              });         
+            };    
+          };
+        };
       }else{
         
         const currentTimeText = this.core.makeAndAddElement('div',{
