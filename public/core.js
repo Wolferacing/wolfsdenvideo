@@ -174,7 +174,7 @@ class Core {
             if(this.player.locked) {
               this.showToast("Player is locked! The host needs to unlock it first!");
             }else{
-              this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+              // this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
               this.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: this.player.players[0].v, isYoutubeWebsite: false, skipUpdate: true });
               this.sendMessage({path: Commands.SET_TRACK, data: 0});
               hasStarted = true;
@@ -191,7 +191,7 @@ class Core {
               console.log(player.id, window.user.id, this.player);
               if(player.id === window.user.id) {
                   this.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: player.id });
-                  this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
+                  // this.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
                   this.sendMessage({path: Commands.STOP});
                   hasStarted = false;
               }
