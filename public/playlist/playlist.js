@@ -112,16 +112,16 @@ class Playlist {
       videoAuthor.innerText = "Added By: " + v.user;
       
       if(player.currentTrack !== i) {
-        if(isMe || (!player.locked && !player.canVote)) {
-          const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+//         if(isMe || (!player.locked && !player.canVote)) {
+//           const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
-          playTrack.className = 'button slim green';
-          playTrack.innerText = "Play Now";
+//           playTrack.className = 'button slim green';
+//           playTrack.innerText = "Play Now";
 
-          playTrack.addEventListener('click', () => {
-            this.core.sendMessage({path: Commands.SET_TRACK, data: i });
-          });          
-        }
+//           playTrack.addEventListener('click', () => {
+//             this.core.sendMessage({path: Commands.SET_TRACK, data: i });
+//           });          
+//         }
         if(player.canVote) {
           const voteDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
@@ -233,21 +233,21 @@ class Playlist {
       playNow.className = 'button slim teal';
       playNow.innerText = "Play Now";
       
-      playNow.addEventListener('click', () => {
-        this.hideSearch();
-        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-        this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
-      }); 
+      // playNow.addEventListener('click', () => {
+      //   this.hideSearch();
+      //   this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
+      //   this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
+      // }); 
       
       const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
       
       playNext.className = 'button slim teal';
       playNext.innerText = "Play Next";
       
-      playNext.addEventListener('click', () => {
-        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-        this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
-      }); 
+      // playNext.addEventListener('click', () => {
+      //   this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
+      //   this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
+      // }); 
       
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
