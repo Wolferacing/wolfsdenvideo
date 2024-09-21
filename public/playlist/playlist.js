@@ -146,7 +146,7 @@ class Playlist {
             const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
             moveDown.className = 'button slim teal';
-            moveDown.innerText = "Move Down";
+            moveDown.innerText = "Move Down.";
 
             moveDown.addEventListener('click', () => {
               this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
@@ -154,7 +154,7 @@ class Playlist {
 
             const moveUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
             moveUp.className = 'button slim teal';
-            moveUp.innerText = "Move Up";
+            moveUp.innerText = "Move Up.";
 
             moveUp.addEventListener('click', () => {
               this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
