@@ -183,7 +183,7 @@ class Player {
         clearTimeout(this.spatialUpdateTimeout);
         this.spatialUpdateTimeout = setTimeout(() => showToast(), 600);
       }else{
-         ();
+        showToast();
       }
     }
   }
