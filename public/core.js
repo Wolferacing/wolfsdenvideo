@@ -121,12 +121,12 @@ class Core {
   }
   setVolume(isUp) {
     if(isUp) {
-      this.params.volume += 5;
+      this.params.volume += 1;
       if(this.params.volume > 100) {
         this.params.volume = 100;
       }
     }else{
-      this.params.volume -= 5;
+      this.params.volume -= 3;
       if(this.params.volume < 0) {
         this.params.volume = 0;
       }
