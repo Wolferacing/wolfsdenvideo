@@ -44,7 +44,8 @@ class App{
       });
     });
     this.app.use(express.static(path.join(__dirname, '..', 'public')));
-    this.server.listen( 3000, function listening(){
+    const port = process.env.PORT || 3000;
+    this.server.listen( port, function listening(){
         console.log("Video Player started."); 
     });
   }
