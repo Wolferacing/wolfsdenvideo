@@ -142,7 +142,7 @@ class Core {
     playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
     const buttonGlb = document.createElement('a-entity');
-    buttonGlb.setAttribute('gltf-model','./assets/ButtonL.glb');
+    buttonGlb.setAttribute('gltf-model','https://vidya.firer.at/assets/ButtonL.glb');
     playlistButton.appendChild(buttonGlb);
     playlistButton.setAttribute('position', this.params["singer-button-position"]);
     playlistButton.setAttribute('rotation', this.params["singer-button-rotation"]);
@@ -212,7 +212,7 @@ class Core {
         position: "right", // `left`, `center` or `right`
         // stopOnFocus: true, // Prevents dismissing of toast on hover
         style: {
-          background: "url(./assets/Button_bg.png) center center no-repeat",
+          background: "url(https://vidya.firer.at/assets/Button_bg.png) center center no-repeat",
           backgroundSize: "cover",
           opacity: 0.7,
           fontSize: "2em",
@@ -370,13 +370,13 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     this.setOrDefault("spatial-min-distance", '5');
     this.setOrDefault("spatial-max-distance", '40');
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
-    this.setOrDefault("data-playlist-icon-url", "./assets/Playlist.png");
-    this.setOrDefault("data-vol-up-icon-url", "./assets/VolUp.png");
-    this.setOrDefault("data-vol-down-icon-url", "./assets/VolDown.png");
-    this.setOrDefault("data-mute-icon-url", "./assets/Mute.png");
-    this.setOrDefault("data-skip-forward-icon-url", "./assets/Forward.png");
-    this.setOrDefault("data-skip-backward-icon-url", "./assets/Backwards.png");
-    //this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || './assets/Playlist.png';
+    this.setOrDefault("data-playlist-icon-url", "https://vidya.firer.at/assets/Playlist.png");
+    this.setOrDefault("data-vol-up-icon-url", "https://vidya.firer.at/assets/VolUp.png");
+    this.setOrDefault("data-vol-down-icon-url", "https://vidya.firer.at/assets/VolDown.png");
+    this.setOrDefault("data-mute-icon-url", "https://vidya.firer.at/assets/Mute.png");
+    this.setOrDefault("data-skip-forward-icon-url", "https://vidya.firer.at/assets/Forward.png");
+    this.setOrDefault("data-skip-backward-icon-url", "https://vidya.firer.at/assets/Backwards.png");
+    //this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'https://vidya.firer.at/assets/Playlist.png';
     
     this.params.volume = Number(this.params.volume);
     this.params['mip-maps'] = Number(this.params['mip-maps']);
