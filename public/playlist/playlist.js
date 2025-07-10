@@ -235,7 +235,7 @@ class Playlist {
         this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       }); 
       
-      if(isMe) {
+      if(this.core.player && this.core.player.host.id === window.user.id) {
         const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
         playNow.className = 'button slim teal';
@@ -316,7 +316,7 @@ class Playlist {
     this.takeOver = document.querySelector('#takeOver');
     
     this.takeOver.addEventListener('click', () => {
-        if(isMe) {
+        if(this.core.player && this.core.player.host.id === window.user.id) {
           this.core.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.core.player.canTakeOver });
         }else{
           this.core.sendMessage({ path: Commands.TAKE_OVER });
