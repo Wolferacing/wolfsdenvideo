@@ -143,7 +143,7 @@ class App{
         this.fromPlaylist(msg.data, ws);
         break;
       case Commands.CLEAR_PLAYLIST:
-        // this.clearPlaylist(msg.skipUpdate, ws);
+        this.clearPlaylist(msg.skipUpdate, ws);
         break;
       case Commands.USER_VIDEO_PLAYER:
         ws.is_video_player = true;
