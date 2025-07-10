@@ -1,6 +1,6 @@
 class PlaylistPlayer {
   constructor() {
-    this.hostUrl = 'fire-v-player.glitch.me';
+    this.hostUrl = 'vidya.firer.at';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.init();
   }

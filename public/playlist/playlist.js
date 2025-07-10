@@ -1,6 +1,6 @@
 class Playlist {
   constructor() {
-    this.hostUrl = 'fire-v-player.glitch.me';
+    this.hostUrl = 'vidya.firer.at';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.init();
   }
@@ -72,12 +72,15 @@ class Playlist {
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
     this.voting.style.display = !isMe ? 'none' : 'inline-block';
     this.voting.innerText = player.canVote ? 'Voting: On' : 'Voting: Off';
-    this.hostTitle.innerHTML = 
-      'Welcome ' + window.user.name + '.' +
-      (isMe ? 'You are' : player.host.name + ' is') +
-      " the host" + 
-      (player.canTakeOver ? " but it can be taken over ( click " + (isMe ? "again to disable" : "<span style=\"color: red;\">to take over ASAP!!!</span>") + " )!": "") +
-      (player.locked && !player.canTakeOver ? " and it's locked!" : !player.canTakeOver ? "." : "");
+    // Using textContent for user-provided names to prevent potential XSS.
+    this.hostTitle.textContent = `Welcome ${window.user.name}. ${isMe ? 'You are' : `${player.host.name} is`} the host`;
+    if (player.canTakeOver) {
+      this.hostTitle.innerHTML += ` but it can be taken over ( click ${isMe ? "again to disable" : "<span style=\"color: red;\">to take over ASAP!!!</span>"} )!`;
+    } else if (player.locked) {
+      this.hostTitle.textContent += " and it's locked!";
+    } else {
+      this.hostTitle.textContent += ".";
+    }
     this.videoPlaylistContainer.innerHTML = '';
     player.playlist.sort((a, b) => b.votes - a.votes);
     player.playlist.forEach((v, i) => {
@@ -112,7 +115,7 @@ class Playlist {
       videoAuthor.innerText = "Added By: " + v.user;
       
       if(player.currentTrack !== i) {
-        if(this.core.player.host.id === window.user.id) {
+        if(isMe) {
           if(isMe || (!player.locked && !player.canVote)) {
             const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
 
@@ -232,26 +235,28 @@ class Playlist {
         this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
       }); 
       
-      const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-      
-      playNow.className = 'button slim teal';
-      playNow.innerText = "Play Now";
-      
-      // playNow.addEventListener('click', () => {
-      //   this.hideSearch();
-      //   this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-      //   this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
-      // }); 
-      
-      const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
-      
-      playNext.className = 'button slim teal';
-      playNext.innerText = "Play Next";
-      
-      // playNext.addEventListener('click', () => {
-      //   this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-      //   this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
-      // }); 
+      if(isMe) {
+        const playNow = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+
+        playNow.className = 'button slim teal';
+        playNow.innerText = "Play Now";
+
+        playNow.addEventListener('click', () => {
+          this.hideSearch();
+          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
+          this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
+        }); 
+
+        const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+
+        playNext.className = 'button slim teal';
+        playNext.innerText = "Play Next";
+
+        playNext.addEventListener('click', () => {
+          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
+          this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
+        }); 
+      }
       
       this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
@@ -311,7 +316,7 @@ class Playlist {
     this.takeOver = document.querySelector('#takeOver');
     
     this.takeOver.addEventListener('click', () => {
-        if(this.core.player.host.id === window.user.id) {
+        if(isMe) {
           this.core.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.core.player.canTakeOver });
         }else{
           this.core.sendMessage({ path: Commands.TAKE_OVER });

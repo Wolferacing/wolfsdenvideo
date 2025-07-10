@@ -8,7 +8,7 @@ class Core {
     this.hostUrl = hostUrl;
     // this.defaultVideo = this.params["default-video"];
     if(this.params.announce === 'true') { 
-      this.setupSayNamesScript();
+      // this.setupSayNamesScript();
     }
     if(window.isBanter) {
       let lastSendTime = Date.now();
@@ -142,7 +142,7 @@ class Core {
     playlistButton.setAttribute('sq-boxcollider', 'size: 1 0.3 0.05');
     playlistButton.setAttribute('sq-interactable', '');
     const buttonGlb = document.createElement('a-entity');
-    buttonGlb.setAttribute('gltf-model','https://cdn.glitch.global/cf03534b-1293-4351-8903-ba15ffa931d3/ButtonL.glb?v=1689782699922');
+    buttonGlb.setAttribute('gltf-model','./assets/ButtonL.glb');
     playlistButton.appendChild(buttonGlb);
     playlistButton.setAttribute('position', this.params["singer-button-position"]);
     playlistButton.setAttribute('rotation', this.params["singer-button-rotation"]);
@@ -212,7 +212,7 @@ class Core {
         position: "right", // `left`, `center` or `right`
         // stopOnFocus: true, // Prevents dismissing of toast on hover
         style: {
-          background: "url(https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Button_bg.png?v=1712857063078) center center no-repeat",
+          background: "url(./assets/Button_bg.png) center center no-repeat",
           backgroundSize: "cover",
           opacity: 0.7,
           fontSize: "2em",
@@ -223,13 +223,13 @@ class Core {
     }
   }
   setupPlaylistButton(scene, playlistContainer) {
-  const playlistIconUrl = this.params["data-playlist-icon-url"]//this.isKaraoke ? this.playlistIconUrl : this.playlistIconUrl;
+  const playlistIconUrl = this.params["data-playlist-icon-url"]
   this.setupButton(scene, playlistContainer, '-0.633', playlistIconUrl, () => {
     this.openPlaylist();
   });
 }
   openPlaylist() {
-    window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
+    window.openPage("https://" + this.hostUrl + "/" + 'playlist' + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
   }
   setupVolButton(scene, isUp, playlistContainer) {
   const volIconUrl = isUp ? this.params["data-vol-up-icon-url"] : this.params["data-vol-down-icon-url"];
@@ -339,6 +339,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
   }
   parseParams(currentScript) {
     this.currentScript = currentScript;
+    this.params = {};
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
     this.setOrDefault("scale", "1 1 1");
@@ -369,13 +370,13 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     this.setOrDefault("spatial-min-distance", '5');
     this.setOrDefault("spatial-max-distance", '40');
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
-    this.setOrDefault("data-playlist-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389");
-    this.setOrDefault("data-vol-up-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolUp.png?v=1712832764100");
-    this.setOrDefault("data-vol-down-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/VolDown.png?v=1712832763785");
-    this.setOrDefault("data-mute-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Mute.png?v=1712832764675");
-    this.setOrDefault("data-skip-forward-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Forward.png?v=1712832763134");
-    this.setOrDefault("data-skip-backward-icon-url", "https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Backwardsd.png?v=1712832763443");
-    //this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || 'https://cdn.glitch.global/0e90146e-13e1-4a7c-bf74-a3242ad522a7/Playlist.png?v=1712832764389';
+    this.setOrDefault("data-playlist-icon-url", "./assets/Playlist.png");
+    this.setOrDefault("data-vol-up-icon-url", "./assets/VolUp.png");
+    this.setOrDefault("data-vol-down-icon-url", "./assets/VolDown.png");
+    this.setOrDefault("data-mute-icon-url", "./assets/Mute.png");
+    this.setOrDefault("data-skip-forward-icon-url", "./assets/Forward.png");
+    this.setOrDefault("data-skip-backward-icon-url", "./assets/Backwards.png");
+    //this.playlistIconUrl = scriptTag.getAttribute('data-playlist-icon-url') || './assets/Playlist.png';
     
     this.params.volume = Number(this.params.volume);
     this.params['mip-maps'] = Number(this.params['mip-maps']);
@@ -387,7 +388,6 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
   }
   setOrDefault(attr, defaultValue) {
     const value = this.currentScript.getAttribute(attr);
-    this.params = this.params || {};
     this.params[attr] = value || (this.urlParams.has(attr) ? this.urlParams.get(attr) : defaultValue);
   }
   setupWebsocket(type, messageCallback, connectedCallback, closeCallback){
@@ -472,11 +472,6 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     (parent ? parent : document.body).appendChild(element);
     return element;
   }
-  getYTId(url){
-    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    var match = url.match(regExp);
-    return (match&&match[7].length==11)? match[7] : false;
-  }
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
@@ -499,9 +494,11 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
       case Commands.PLAYBACK_UPDATE:
         this.player = json.data.video;
         this.player.players.sort((a, b) => a.p - b.p);
+        break;
       case Commands.SYNC_TIME:
         json.volume = this.tempVolume;
         this.sendBrowserMessage(json);
+        break;
       case Commands.SET_BROWSER_URL:
         if(window.isBanter && this.browser) {
           // console.log("SET_BROWSER_URL", {"url": json.data.link});
@@ -553,23 +550,3 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
   }
 }
 window.videoPlayerCore = new Core();
-
-/*
- <script>
-        setTimeout(() => {
-          window.openPage("https://spotc.glitch.me/menu.html");
-
-        }, 6000);
-                setTimeout(() => {
-          window.banter.sendMenuBrowserMessage("here r message");
-
-        }, 10000);
-        window.addEventListener("menubrowsermessage", (e) => {
-          console.log("got thing");
-          window.banter.sendMenuBrowserMessage("ok did get: " + e.detail.message);
-          console.log(e);
-        });
-        
-
-      </script>
-*/
