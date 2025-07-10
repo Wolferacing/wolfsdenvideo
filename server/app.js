@@ -25,9 +25,21 @@ class App{
         this.wss.emit('connection', ws, request);
       }); 
     });
-    this.wss.startAutoPing(10000);
+
+    const interval = setInterval(() => {
+      this.wss.clients.forEach(function each(ws) {
+        if (ws.isAlive === false) return ws.terminate();
+        ws.isAlive = false;
+        ws.ping();
+      });
+    }, 30000);
+
     this.wss.on('connection', (ws, req) => {
       ws.t = new Date().getTime();
+      ws.isAlive = true;
+      ws.on('pong', () => {
+        ws.isAlive = true;
+      });
       ws.on('message', msg => { 
         try{
           if(msg !== "keepalive") {
@@ -42,6 +54,10 @@ class App{
       ws.on('close', (code, reason) => {
         this.handleClose(ws);
       });
+    });
+
+    this.server.on('close', () => {
+      clearInterval(interval);
     });
     this.app.use(express.static(path.join(__dirname, '..', 'public')));
     const port = process.env.PORT || 3000;
