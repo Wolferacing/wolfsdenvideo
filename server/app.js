@@ -293,7 +293,7 @@ class App{
         break;
     }
   }
-  _createVideoObject(videoData, userName, source) {
+  _createVideoObject(videoData, userName, source, isYoutubeWebsite = false) {
     // Standardizes video objects from different sources (ytfps, scraper)
     if (source === 'ytfps') {
       return {
@@ -303,7 +303,7 @@ class App{
         link: videoData.url,
         votes: 0,
         user: userName,
-        is_youtube_website: false
+        is_youtube_website: isYoutubeWebsite
       };
     }
     // Default to 'scraper' source
@@ -319,7 +319,7 @@ class App{
       link: videoData.link,
       votes: 0,
       user: userName,
-      is_youtube_website: false
+      is_youtube_website: isYoutubeWebsite
     };
   }
   removeFromPlayers(uid, ws) {
@@ -529,8 +529,7 @@ class App{
           this.videoPlayers[ws.i].currentTime = 0;
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
-        const newVideo = this._createVideoObject(v, ws.u.name, 'scraper');
-        newVideo.is_youtube_website = isYoutubeWebsite;
+        const newVideo = this._createVideoObject(v, ws.u.name, 'scraper', isYoutubeWebsite);
         this.videoPlayers[ws.i].playlist.push(newVideo);
         if(!skipUpdate) {
           this.updateClients(ws.i);

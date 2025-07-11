@@ -43,7 +43,13 @@ class Playlist {
         alert("I cant let you do that...");
         break;
       case Commands.SHOW_REPLACE_PROMPT:
-        this.pendingReplacement = json.data;
+        // By cloning the alternative video object, we prevent it from being accidentally
+        // mutated if the same video appears in a later search result. This is a defensive
+        // measure to ensure the object we send back to the server is pristine.
+        this.pendingReplacement = {
+          original: json.data.original,
+          alternative: JSON.parse(JSON.stringify(json.data.alternative))
+        };
         const { original, alternative } = this.pendingReplacement;
 
         this.notificationArea.textContent = `A user can't watch: "${original.title}". Suggested replacement: "${alternative.title}".`;
