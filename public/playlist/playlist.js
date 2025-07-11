@@ -169,10 +169,20 @@ class Playlist {
     welcomeSpan.textContent = `Welcome ${window.user.name}. ${isMe ? 'You are' : `${player.host.name} is`} the host`;
     this.hostTitle.appendChild(welcomeSpan);
 
+    // Programmatically create elements instead of using innerHTML for better security.
     if (player.canTakeOver) {
       const takeoverSpan = document.createElement('span');
-      // This part contains intentional HTML, so we use innerHTML here, but on a separate, controlled element.
-      takeoverSpan.innerHTML = ` but it can be taken over ( click ${isMe ? "again to disable" : "<span style='color: red;'>to take over ASAP!!!</span>"} )!`;
+      takeoverSpan.append(' but it can be taken over ( click '); // .append() can mix text and elements
+
+      if (isMe) {
+        takeoverSpan.append('again to disable');
+      } else {
+        const takeoverActionSpan = document.createElement('span');
+        takeoverActionSpan.style.color = 'red';
+        takeoverActionSpan.textContent = 'to take over ASAP!!!';
+        takeoverSpan.appendChild(takeoverActionSpan);
+      }
+      takeoverSpan.append(' )!');
       this.hostTitle.appendChild(takeoverSpan);
     } else {
       const statusSpan = document.createElement('span');
