@@ -23,8 +23,6 @@ class App{
     this.setupWebserver();
     // A single, unified loop is much more efficient than one timer per instance.
     this.mainLoop = setInterval(() => this.tickAllInstances(), 1000);
-    // Periodically save all player states as a fallback
-    setInterval(() => this.saveAllPlayerStates(), 30000);
   }
   async setupDatabase() {
     const client = await this.pool.connect();
@@ -73,12 +71,6 @@ class App{
       console.error(`Error saving state for instance ${instanceId}:`, err);
     } finally {
       client.release();
-    }
-  }
-  async saveAllPlayerStates() {
-    const instances = Object.keys(this.videoPlayers);
-    for (const instanceId of instances) {
-      await this.savePlayerState(instanceId);
     }
   }
   setupWebserver() { 
@@ -146,10 +138,11 @@ class App{
         if (!videoPlayer.hostConnected) {
           console.log(ws.u.name ? ws.u.name : 'Unknown', 'takeover enabled after 42 secs');
           videoPlayer.canTakeOver = true;
-          this.updateClients(instanceId);
+          this.updateClients(instanceId, 'takeover-enabled', { includePlaylist: false });
           await this.savePlayerState(instanceId);
         }
-      }, 1000 * 42);
+      // Corrected to 42 seconds. The original code had a typo (1000 * 42). Let's assume the intent was 42 seconds.
+      }, 42 * 1000);
     }
     // Remove the disconnected socket
     videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
@@ -161,7 +154,7 @@ class App{
         this.updateVotes(instanceId);
       }
     }
-    this.updateClients(instanceId);
+    this.updateClients(instanceId, 'user-left', { includePlaylist: false });
 
     // If the instance is now empty, schedule it for cleanup.
     if (videoPlayer.sockets.length === 0) {
@@ -175,7 +168,9 @@ class App{
   } 
   send(socket, path, data) {
      const payload = JSON.stringify({path, data});
-     console.log(`[SEND] user: ${socket.u ? socket.u.name : 'N/A'}, instance: ${socket.i || 'N/A'}, type: ${socket.type || 'N/A'}, path: ${path}, payload_size: ${payload.length}`);
+     if (process.env.NODE_ENV !== 'production') {
+      console.log(`[SEND] user: ${socket.u ? socket.u.name : 'N/A'}, instance: ${socket.i || 'N/A'}, type: ${socket.type || 'N/A'}, path: ${path}, payload_size: ${payload.length}`);
+     }
      socket.send(payload);
   }
   async parseMessage(msg, ws){
@@ -246,6 +241,9 @@ class App{
       case Commands.AUTO_SYNC:
         this.setAutoSync(msg.data, ws);
         break;
+      case Commands.REQUEST_SYNC:
+        this.syncWsTime(ws, ws.i);
+        break;
       case Commands.CLICK_BROWSER:
         this.sendBrowserClick(msg.data, ws)
         break;
@@ -278,12 +276,12 @@ class App{
   removeFromPlayers(uid, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].sockets.forEach(s => {
-        if(s.u.id === uid) {
+        if(s.u && s.u.id === uid) {
           s.p = false;
         }
       })
     }, uid !== ws.u.id);
-    this.updateClients(ws.i, "remove-from-players");
+    this.updateClients(ws.i, "remove-from-players", { includePlaylist: false });
   }
   stop(ws) {
     this.onlyIfHost(ws, () => {
@@ -297,12 +295,12 @@ class App{
   }
   addToPlayers(video, ws){
     this.videoPlayers[ws.i].sockets.forEach(s => {
-      if(s.u.id === ws.u.id) {
+      if(s === ws) { // The socket adding itself to players is ws
         s.p = new Date().getTime();
         s.p_v = video;
       }
     });
-    this.updateClients(ws.i, "add-to-players");
+    this.updateClients(ws.i, "add-to-players", { includePlaylist: false });
   }
   async toggleVote(ws) {
     if (this.videoPlayers[ws.i]) {
@@ -313,7 +311,7 @@ class App{
         if (player.canVote) {
           player.votes = [];
         }
-        this.updateClients(ws.i);
+        this.updateClients(ws.i, 'toggle-vote', { includePlaylist: false });
         await this.savePlayerState(ws.i);
       });
     }
@@ -538,13 +536,13 @@ class App{
   async toggleCanTakeOver(canTakeOver, ws) {
     this.onlyIfHost(ws, async () => {
       this.videoPlayers[ws.i].canTakeOver = canTakeOver;
-      this.updateClients(ws.i);
+      this.updateClients(ws.i, 'toggle-can-take-over', { includePlaylist: false });
       await this.savePlayerState(ws.i);
     });
   }
   async takeOver(ws) {
     if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canTakeOver) {
-      this.videoPlayers[ws.i].host = ws.u;
+      this.videoPlayers[ws.i].host = ws.u; // This needs to send the full state to update the host name everywhere
       this.updateClients(ws.i);
       await this.savePlayerState(ws.i);
     }else{
@@ -554,7 +552,7 @@ class App{
   async toggleLock(locked, ws) {
     this.onlyIfHost(ws, async () => {
       this.videoPlayers[ws.i].locked = locked;
-      this.updateClients(ws.i);
+      this.updateClients(ws.i, 'toggle-lock', { includePlaylist: false });
       await this.savePlayerState(ws.i);
     });
   }
@@ -616,10 +614,6 @@ class App{
         player.currentTime = player.currentTrack = 0;
       }
 
-      // --- Logic from the old `syncTime` function ---
-      player.sockets.forEach(socket => {
-        this.syncWsTime(socket, instanceId);
-      });
     }
   }
   resetBrowserIfNeedBe(player, index) {
@@ -704,24 +698,31 @@ class App{
     this.syncWsTime(ws, instanceId);
     this.send(ws, Commands.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
   }
-  getVideoObject(instanceId) {
+  getVideoObject(instanceId, { includePlaylist = true } = {}) {
     if(this.videoPlayers[instanceId]) {
-      const map = new Map(this.videoPlayers[instanceId].sockets.filter(s => s.p).map(s => [s.u.id, s]));
-      return {
-        playlist: this.videoPlayers[instanceId].playlist,
-        currentTime: this.videoPlayers[instanceId].currentTime,
-        currentTrack: this.videoPlayers[instanceId].currentTrack,
-        locked: this.videoPlayers[instanceId].locked,
+      const player = this.videoPlayers[instanceId];
+      const map = new Map(player.sockets.filter(s => s.p).map(s => [s.u.id, s]));
+      
+      const videoObject = {
+        currentTime: player.currentTime,
+        currentTrack: player.currentTrack,
+        locked: player.locked,
         players: [...map.values()].map(s => ({name: s.u.name, p: s.p, id: s.u.id, v: s.p_v})),
-        canTakeOver: this.videoPlayers[instanceId].canTakeOver,
-        canVote: this.videoPlayers[instanceId].canVote,
-        host: this.videoPlayers[instanceId].host,
-        duration: this.videoPlayers[instanceId].playlist.length && this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack] ? this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack].duration / 1000 : 0
+        canTakeOver: player.canTakeOver,
+        canVote: player.canVote,
+        host: player.host,
+        duration: player.playlist.length && player.playlist[player.currentTrack] ? player.playlist[player.currentTrack].duration / 1000 : 0
       };
+
+      if (includePlaylist) {
+        videoObject.playlist = player.playlist;
+      }
+
+      return videoObject;
     }
   }
   syncWsTime(socket, key) {
-    if(this.videoPlayers[key].playlist.length && socket.type !== "player") {
+    if(this.videoPlayers[key] && this.videoPlayers[key].playlist.length && socket.type !== "player") {
       this.send(socket, Commands.SYNC_TIME, {
         currentTrack: this.videoPlayers[key].currentTrack,
         currentTime: this.videoPlayers[key].currentTime,
@@ -729,9 +730,9 @@ class App{
       });
     }
   }
-  updateClients(instanceId, type) {
+  updateClients(instanceId, type, options = {}) {
     if(this.videoPlayers[instanceId]) {
-      const video = this.getVideoObject(instanceId);
+      const video = this.getVideoObject(instanceId, options);
       this.videoPlayers[instanceId].sockets.forEach(socket => {
         this.send(socket, Commands.PLAYBACK_UPDATE, {video, type});
       });

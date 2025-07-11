@@ -1,6 +1,7 @@
 class Player {
   constructor(){
     this.hostUrl = 'vidya.firer.at';
+    this.autoSyncInterval = null;
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.init();
   }
@@ -117,11 +118,25 @@ class Player {
         break;
       case Commands.AUTO_SYNC:
         this.autoSync = json.data;
+        if (this.autoSync) {
+          if (!this.autoSyncInterval) {
+            this.core.showToast("AutoSync has been enabled.");
+            this.autoSyncInterval = setInterval(() => {
+              this.core.sendMessage({ path: Commands.REQUEST_SYNC });
+            }, 5000); // Request sync every 5 seconds
+          }
+        } else if (this.autoSyncInterval) {
+          this.core.showToast("AutoSync has been disabled.");
+          clearInterval(this.autoSyncInterval);
+          this.autoSyncInterval = null;
+        }
         break;
       case Commands.PLAYBACK_UPDATE:
-        this.playerData = json.data.video;
+        // Merge new data into the existing player state.
+        // This prevents the playlist from being wiped out on updates that don't include it.
+        this.playerData = Object.assign(this.playerData || {}, json.data.video);
         if(json.data.type === "set-track" && this.readyToPlay) {
-          this.playVidya(json.data.video.currentTrack, json.data.video.currentTime, true);
+          this.playVidya(this.playerData.currentTrack, this.playerData.currentTime, true);
         }else if(json.data.type === "stop" && this.readyToPlay) {
           this.player.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
         }

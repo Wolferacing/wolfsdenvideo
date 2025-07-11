@@ -21,6 +21,7 @@ const Commands = {
   SKIP_FORWARD: 'skip-forward',
   MEASURE_LATENCY: 'measure-latency',
   OUT_OF_BOUNDS: 'out-of-bounds',
+  REQUEST_SYNC: 'request-sync',
   DOES_NOT_EXIST: 'does-not-exist',
   PLAYBACK_UPDATE: 'playback-update',
   SYNC_TIME: 'sync-time',

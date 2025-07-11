@@ -38,7 +38,9 @@ class Playlist {
         }
         break;
       case Commands.PLAYBACK_UPDATE:
-        this.core.player = json.data.video;
+        // Merge new data into the existing player state.
+        // This prevents the playlist from being wiped out on updates that don't include it.
+        this.core.player = Object.assign(this.core.player || {}, json.data.video);
         this.updatePlaylist(this.core.player);
         break;
       case Commands.SEARCH_RESULTS:
