@@ -2,19 +2,19 @@ const SKIP_AMOUNT_SECONDS = 5;
 
 class Player {
   constructor(){
-    this.hostUrl = 'vidya.firer.at';
     this.autoSyncInterval = null;
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.init();
   }
   async init() {
+     await this.setupConfigScript();
      await this.setupBrowserMessaging();
      this.initialSyncComplete = false;
      this.currentTime = 0;
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
-     await this.core.init(this.hostUrl);
+     await this.core.init(window.APP_CONFIG.HOST_URL);
      await this.core.setupCommandsScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
        this.setupYoutubeScript();
@@ -256,7 +256,12 @@ class Player {
     return this.setupScript("https://www.youtube.com/iframe_api");
   }
   setupCoreScript() {
-    return this.setupScript(`https://${this.hostUrl}/core.js`);
+    return this.setupScript(`https://${window.APP_CONFIG.HOST_URL}/core.js`);
+  }
+  setupConfigScript() {
+    // Note: This assumes config.js is in the same public root directory.
+    // Adjust the path if it's located elsewhere.
+    return this.setupScript('/config.js');
   }
   setupScript(script) {
     return new Promise(resolve => {

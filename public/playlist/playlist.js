@@ -1,17 +1,17 @@
 class Playlist {
   constructor() {
-    this.hostUrl = 'vidya.firer.at';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.uiUpdateInterval = null;
     this.pendingReplacement = null;
     this.init();
   }
   async init() {
+    await this.setupConfigScript();
     await this.setupCoreScript();
     this.core = window.videoPlayerCore;
     this.core.parseParams(this.currentScript);
     this.setupPlaylistUI();
-    await this.core.init(this.hostUrl);
+    await this.core.init(window.APP_CONFIG.HOST_URL);
     await this.core.setupCommandsScript();
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
@@ -160,7 +160,17 @@ class Playlist {
   setupCoreScript() {
     return new Promise(resolve => {
       let myScript = document.createElement("script");
-      myScript.setAttribute("src", `https://${this.hostUrl}/core.js`);
+      myScript.setAttribute("src", `https://${window.APP_CONFIG.HOST_URL}/core.js`);
+      myScript.addEventListener ("load", resolve, false);
+      document.body.appendChild(myScript);
+    });
+  }
+  setupConfigScript() {
+    // Note: This assumes config.js is in the same public root directory.
+    // Adjust the path if it's located elsewhere.
+    return new Promise(resolve => {
+      let myScript = document.createElement("script");
+      myScript.setAttribute("src", `/config.js`);
       myScript.addEventListener ("load", resolve, false);
       document.body.appendChild(myScript);
     });
