@@ -2,8 +2,7 @@ class Core {
     constructor() {
         this.urlParams = new URLSearchParams(window.location.search);
     }
-  async init(hostUrl) {
-    this.currentLatency = 0;
+  async init(hostUrl) { 
     this.imIn = false;
     this.hostUrl = hostUrl;
     // this.defaultVideo = this.params["default-video"];
@@ -415,21 +414,6 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
       };
     });
   }
-  setupLatencyMeasure() {
-    const measure = async () => {
-      const time = Date.now();
-      await this.measureLatency();
-      this.currentLatency = (Date.now()-time)/2/1000;
-    };
-    setInterval(measure , 5000);
-    measure();
-  }
-  measureLatency() {
-    return new Promise(resolve=>{
-      this.sendMessage({path: Commands.MEASURE_LATENCY});
-      this.measureLatencyResolve = resolve;
-    })
-  }
   connected() {
     return this.ws && this.ws.readyState === WebSocket.OPEN;
   }
@@ -477,12 +461,6 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     switch(json.path) {
       case Commands.ERROR:
         alert("I cant let you do that...");
-        break;
-      case Commands.MEASURE_LATENCY:
-        if(this.measureLatencyResolve){
-          this.measureLatencyResolve();
-          this.measureLatencyResolve = null;
-        }
         break;
       case Commands.RESET_BROWSER:
         if(window.isBanter && this.browser) {

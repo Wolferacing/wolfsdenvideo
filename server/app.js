@@ -192,9 +192,6 @@ class App{
           this.send(ws, 'error');
         }
         break;
-      case Commands.MEASURE_LATENCY:
-        this.measureLatency(ws);
-        break;
       case Commands.SET_WS_TYPE:
         ws.type = msg.data;
         break;
@@ -242,7 +239,7 @@ class App{
         this.setAutoSync(msg.data, ws);
         break;
       case Commands.REQUEST_SYNC:
-        this.syncWsTime(ws, ws.i);
+        this.syncWsTime(ws, ws.i, msg.data);
         break;
       case Commands.CLICK_BROWSER:
         this.sendBrowserClick(msg.data, ws)
@@ -269,9 +266,6 @@ class App{
         await this.addAndPlayNext(msg.data, ws);
         break;
     }
-  } 
-  measureLatency(ws) {
-    this.send(ws, Commands.MEASURE_LATENCY);
   }
   removeFromPlayers(uid, ws) {
     this.onlyIfHost(ws, () => {
@@ -728,13 +722,14 @@ class App{
       return videoObject;
     }
   }
-  syncWsTime(socket, key) {
+  syncWsTime(socket, key, data = {}) {
     // This command is specifically for the video player element to correct its time.
     // The playlist/UI pages use the lastStartTime from PLAYBACK_UPDATE to calculate time.
     // Therefore, we only send this to the 'player' type socket.
     if(this.videoPlayers[key] && this.videoPlayers[key].playlist.length && socket.type === "player") {
       this.send(socket, Commands.SYNC_TIME, {
         currentTrack: this.videoPlayers[key].currentTrack,
+        clientTimestamp: data.clientTimestamp,
         currentTime: this.videoPlayers[key].currentTime,
         duration: this.videoPlayers[key].playlist.length && this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack] ? this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack].duration / 1000 : 0
       });

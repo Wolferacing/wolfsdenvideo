@@ -1,3 +1,5 @@
+const SKIP_AMOUNT_SECONDS = 5;
+
 class Player {
   constructor(){
     this.hostUrl = 'vidya.firer.at';
@@ -21,7 +23,6 @@ class Player {
      }, ()=>{
         this.core.showToast("Reconnecting...");
      });
-     this.core.setupLatencyMeasure();
      this.playPlaylist();
      window.seek = this.seek.bind(this);
   }
@@ -116,14 +117,14 @@ class Player {
         }
         break;
       case Commands.SKIP_BACK:
-        const time = this.player.getCurrentTime() - 0.5;
+        const time = this.player.getCurrentTime() - SKIP_AMOUNT_SECONDS;
         this.player.seekTo(time);
-        this.core.showToast("-0.5s");
+        this.core.showToast(`-${SKIP_AMOUNT_SECONDS}s`);
         break;
       case Commands.SKIP_FORWARD:
-        const timeForward = this.player.getCurrentTime() + 0.5;
+        const timeForward = this.player.getCurrentTime() + SKIP_AMOUNT_SECONDS;
         this.player.seekTo(timeForward);
-        this.core.showToast("+0.5s");
+        this.core.showToast(`+${SKIP_AMOUNT_SECONDS}s`);
         break;
       case Commands.AUTO_SYNC:
         this.autoSync = json.data;
@@ -131,7 +132,7 @@ class Player {
           if (!this.autoSyncInterval) {
             this.core.showToast("AutoSync has been enabled.");
             this.autoSyncInterval = setInterval(() => {
-              this.core.sendMessage({ path: Commands.REQUEST_SYNC });
+              this.core.sendMessage({ path: Commands.REQUEST_SYNC, data: { clientTimestamp: Date.now() } });
             }, 5000); // Request sync every 5 seconds
           }
         } else if (this.autoSyncInterval) {
@@ -158,21 +159,18 @@ class Player {
         this.core.showToast(this.core.params.mute === true || this.core.params.mute === 'true' ? "mute" : "unmute");
         this.setMute();
         break;
-      case Commands.MEASURE_LATENCY:
-        if(this.core.measureLatencyResolve){
-          this.core.measureLatencyResolve();
-          this.core.measureLatencyResolve = null;
-        }
-        break;
       case Commands.SYNC_TIME:
         this.currentTime = json.data.currentTime;
         if(this.player && this.readyToPlay) {
-          const serverTime = json.data.currentTime + this.core.currentLatency;
+          // Calculate latency on-the-fly from the echoed timestamp
+          const roundTripTime = Date.now() - json.data.clientTimestamp;
+          const latency = roundTripTime / 2 / 1000; // latency in seconds
+
+          const serverTime = json.data.currentTime + latency;
           const localTime = this.player.getCurrentTime();
           // Positive timediff means client is BEHIND server. Negative means client is AHEAD.
           const timediff = serverTime - localTime;
-          
-          document.getElementById('status').innerHTML = `Drift: ${Math.round(timediff * 1000)}ms`;
+          document.getElementById('status').innerHTML = `Drift: ${Math.round(timediff * 1000)}ms | Latency: ${Math.round(latency * 1000)}ms`;
 
           if (this.autoSync) {
             const largeDriftThreshold = 0.5; // Over this, we do a hard seek.
