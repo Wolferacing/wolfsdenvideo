@@ -7,14 +7,80 @@ const youtube = new Youtube();
 const ytfps = require('ytfps');
 const fetch = require('node-fetch');
 const Commands = require('../public/commands.js');
+const { Pool } = require('pg');
 const test =1;
 
 class App{
   constructor() {
     this.videoPlayers = {};
+    this.pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      // Render's Hobby plan requires SSL, but does not verify the certificate
+      ssl: process.env.DATABASE_URL ? {
+        rejectUnauthorized: false
+      } : false
+    });
+    this.setupDatabase();
     this.setupWebserver();
     setInterval(() => this.syncTime(), 1000);
     this.syncTime();
+    // Periodically save all player states as a fallback
+    setInterval(() => this.saveAllPlayerStates(), 30000);
+  }
+  async setupDatabase() {
+    const client = await this.pool.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS player_state (
+          instance_id TEXT PRIMARY KEY,
+          player_data JSONB NOT NULL,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+      `);
+      console.log('Database table "player_state" is ready.');
+    } catch (err) {
+      console.error('Error creating database table:', err);
+    } finally {
+      client.release();
+    }
+  }
+  async savePlayerState(instanceId) {
+    const player = this.videoPlayers[instanceId];
+    if (!player) return;
+
+    // Create a clean, serializable object for storage.
+    // We don't want to save sockets, intervals, timeouts, or the host object.
+    const stateToSave = {
+      playlist: player.playlist,
+      currentTrack: player.currentTrack,
+      lastStartTime: player.lastStartTime,
+      locked: player.locked,
+      canTakeOver: player.canTakeOver,
+      canVote: player.canVote,
+      // We don't save votes directly as they are tied to connected sockets.
+      // We also don't save the host, as the first person to connect becomes the new host.
+    };
+
+    const client = await this.pool.connect();
+    try {
+      await client.query(
+        `INSERT INTO player_state (instance_id, player_data, updated_at)
+         VALUES ($1, $2, NOW())
+         ON CONFLICT (instance_id) DO UPDATE
+         SET player_data = EXCLUDED.player_data, updated_at = NOW();`,
+        [instanceId, stateToSave]
+      );
+    } catch (err) {
+      console.error(`Error saving state for instance ${instanceId}:`, err);
+    } finally {
+      client.release();
+    }
+  }
+  async saveAllPlayerStates() {
+    const instances = Object.keys(this.videoPlayers);
+    for (const instanceId of instances) {
+      await this.savePlayerState(instanceId);
+    }
   }
   setupWebserver() { 
     this.app = express();
@@ -34,16 +100,16 @@ class App{
       });
     }, 30000);
 
-    this.wss.on('connection', (ws, req) => {
+    this.wss.on('connection', async (ws, req) => {
       ws.t = new Date().getTime();
       ws.isAlive = true;
       ws.on('pong', () => {
         ws.isAlive = true;
       });
-      ws.on('message', msg => { 
+      ws.on('message', async msg => { 
         try{
           if(msg !== "keepalive") {
-            this.parseMessage(JSON.parse(msg), ws);
+            await this.parseMessage(JSON.parse(msg), ws);
           }else{
             console.log(msg)
           }
@@ -72,10 +138,12 @@ class App{
       if(ws.u && videoPlayer.host.id === ws.u.id && ws.type === "space") {
         console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver in 42 secs');
         videoPlayer.hostConnected = false;
-        videoPlayer.takeoverTimeout = setTimeout(()=>{
+        videoPlayer.takeoverTimeout = setTimeout(async ()=>{
           if(!videoPlayer.hostConnected) {
             console.log(ws.u.name ? ws.u.name : 'Unknown', 'takeover enabled after 42 secs');
             videoPlayer.canTakeOver = true;
+            this.updateClients(key);
+            await this.savePlayerState(key);
           }
         }, 1000 * 42);
       }
@@ -88,13 +156,13 @@ class App{
   send(socket, path, data) {
      socket.send(JSON.stringify({path, data}));
   }
-  parseMessage(msg, ws){
+  async parseMessage(msg, ws){
     switch(msg.path) {
       case Commands.INSTANCE:
         if(msg.u) { 
           ws.u = msg.u;
           ws.i = msg.data;
-          this.createVideoPlayer(msg.data, msg.u, ws);
+          await this.createVideoPlayer(msg.data, msg.u, ws);
           console.log(msg.u.name, 'connected', msg.data, "host: ", this.videoPlayers[msg.data].host.name);
           this.getUserVideoPlayer(ws);
           if(this.videoPlayers[msg.data].host && this.videoPlayers[msg.data].host.id === msg.u.id) {
@@ -113,37 +181,37 @@ class App{
         ws.type = msg.data;
         break;
       case Commands.SET_TIME:
-        this.setVideoTime(msg.data, ws);
+        await this.setVideoTime(msg.data, ws);
         break;
       case Commands.SET_TRACK:
-        this.setVideoTrack(msg.data, ws);
+        await this.setVideoTrack(msg.data, ws);
         break;
       case Commands.TOGGLE_LOCK:
-        this.toggleLock(msg.data, ws);
+        await this.toggleLock(msg.data, ws);
         break;
       case Commands.TOGGLE_CAN_TAKE_OVER:
-        this.toggleCanTakeOver(msg.data, ws);
+        await this.toggleCanTakeOver(msg.data, ws);
         break;
       case Commands.TAKE_OVER:
-        this.takeOver(ws);
+        await this.takeOver(ws);
         break;
       case Commands.ADD_TO_PLAYLIST:
-        this.addToPlaylist(msg.data, msg.skipUpdate, msg.isYoutubeWebsite, ws);
+        await this.addToPlaylist(msg.data, msg.skipUpdate, msg.isYoutubeWebsite, ws);
         break;
       case Commands.MOVE_PLAYLIST_ITEM:
-        this.movePlaylistItem(msg.data, ws);
+        await this.movePlaylistItem(msg.data, ws);
         break;
       case Commands.REMOVE_PLAYLIST_ITEM:
-        this.removePlaylistItem(msg.data, ws);
+        await this.removePlaylistItem(msg.data, ws);
         break;
       case Commands.SEARCH:
         this.search(msg.data, ws);
         break;
       case Commands.FROM_PLAYLIST:
-        this.fromPlaylist(msg.data, ws);
+        await this.fromPlaylist(msg.data, ws);
         break;
       case Commands.CLEAR_PLAYLIST:
-        this.clearPlaylist(msg.skipUpdate, ws);
+        await this.clearPlaylist(msg.skipUpdate, ws);
         break;
       case Commands.USER_VIDEO_PLAYER:
         ws.is_video_player = true;
@@ -159,7 +227,7 @@ class App{
         this.sendBrowserClick(msg.data, ws)
         break;
       case Commands.TOGGLE_VOTE:
-        this.toggleVote(ws)
+        await this.toggleVote(ws)
         break; 
       case Commands.DOWN_VOTE:
         this.setVote(msg.data, true, ws);
@@ -207,15 +275,16 @@ class App{
     });
     this.updateClients(ws.i, "add-to-players");
   }
-  toggleVote(ws) {
+  async toggleVote(ws) {
     if(this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, () => {
+      this.onlyIfHost(ws, async () => {
         this.videoPlayers[ws.i].canVote = !this.videoPlayers[ws.i].canVote;
         if(this.videoPlayers[ws.i].canVote && this.videoPlayers[ws.i].playlist.length) {
           this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack].votes = 9999999;
           this.updateVotes(ws);
         }
         this.updateClients(ws.i);
+        await this.savePlayerState(ws.i);
       });
     }
   } 
@@ -272,7 +341,7 @@ class App{
       this.updateClients(ws.i, "set-vote");
     }
   }
-  fromPlaylist(data, ws) {
+  async fromPlaylist(data, ws) {
     if(!data.id || !data.id.startsWith("PL")) {
       return;
     }
@@ -293,6 +362,7 @@ class App{
           })  
         });
         this.updateClients(ws.i);
+        await this.savePlayerState(ws.i);
       }
     });
   }
@@ -309,6 +379,7 @@ class App{
         if(!skipUpdate) {
           this.updateClients(ws.i);
         }
+        await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
   }
@@ -329,7 +400,7 @@ class App{
       }
     }
   }
-  addToPlaylist(v, skipUpdate, isYoutubeWebsite, ws) {
+  async addToPlaylist(v, skipUpdate, isYoutubeWebsite, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         if(!this.videoPlayers[ws.i].playlist.length) {
@@ -345,23 +416,25 @@ class App{
         if(!skipUpdate) {
           this.updateClients(ws.i);
         }
+        await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
   }
-  removePlaylistItem(index, ws) {
+  async removePlaylistItem(index, ws) {
     if(this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, () => {
+      this.onlyIfHost(ws, async () => {
         this.videoPlayers[ws.i].playlist.splice(index, 1);
         if(index <= this.videoPlayers[ws.i].currentTrack) {
           this.videoPlayers[ws.i].currentTrack--;
         }
         this.updateClients(ws.i);
+        await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
     }
   }
-  movePlaylistItem({url, index}, ws) {
+  async movePlaylistItem({url, index}, ws) {
     if(this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, () => {
+      this.onlyIfHost(ws, async () => {
         const playlist = this.videoPlayers[ws.i].playlist;
         const oldIndex = playlist.map(d => d.link).indexOf(url);
         if(oldIndex > -1) {
@@ -374,34 +447,38 @@ class App{
             }
           }
           this.updateClients(ws.i);
+          await this.savePlayerState(ws.i);
         }else{
           this.send(ws, Commands.DOES_NOT_EXIST);
         }
       }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
     }
   }
-  toggleCanTakeOver(canTakeOver, ws) {
-    this.onlyIfHost(ws, () => {
+  async toggleCanTakeOver(canTakeOver, ws) {
+    this.onlyIfHost(ws, async () => {
       this.videoPlayers[ws.i].canTakeOver = canTakeOver;
       this.updateClients(ws.i);
+      await this.savePlayerState(ws.i);
     });
   }
-  takeOver(ws) {
+  async takeOver(ws) {
     if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canTakeOver) {
       this.videoPlayers[ws.i].host = ws.u;
       this.updateClients(ws.i);
+      await this.savePlayerState(ws.i);
     }else{
       this.send(ws, Commands.ERROR);
     }
   }
-  toggleLock(locked, ws) {
-    this.onlyIfHost(ws, () => {
+  async toggleLock(locked, ws) {
+    this.onlyIfHost(ws, async () => {
       this.videoPlayers[ws.i].locked = locked;
       this.updateClients(ws.i);
+      await this.savePlayerState(ws.i);
     });
   }
-  setVideoTrack(index, ws) {
-    this.onlyIfHost(ws, () => {
+  async setVideoTrack(index, ws) {
+    this.onlyIfHost(ws, async () => {
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
         const track = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
         if(this.videoPlayers[ws.i].canVote) {
@@ -414,6 +491,7 @@ class App{
         this.resetBrowserIfNeedBe(this.videoPlayers[ws.i], index);
         this.updateVotes(ws);
         this.updateClients(ws.i, Commands.SET_TRACK);
+        await this.savePlayerState(ws.i);
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
       }
@@ -437,14 +515,31 @@ class App{
       });
     });
   }
-  setVideoTime(time, ws) {
-    this.onlyIfHost(ws, () => {
+  async setVideoTime(time, ws) {
+    this.onlyIfHost(ws, async () => {
       this.videoPlayers[ws.i].currentTime = time;
       this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
+      await this.savePlayerState(ws.i);
     }, this.videoPlayers[ws.i].locked);
   }
-  createVideoPlayer(instanceId, user, ws) {
+  async createVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {
+      const client = await this.pool.connect();
+      let existingState = null;
+      try {
+        const res = await client.query('SELECT player_data FROM player_state WHERE instance_id = $1', [instanceId]);
+        if (res.rows.length > 0) {
+          existingState = res.rows[0].player_data;
+          // The connecting user is the new host, so we don't restore the old one.
+          delete existingState.host;
+          console.log(`Loaded state for instance: ${instanceId}`);
+        }
+      } catch (err) {
+        console.error('Error loading player state:', err);
+      } finally {
+        client.release();
+      }
+
       this.videoPlayers[instanceId] = {
         playlist:[],
         votes: [],
@@ -474,12 +569,18 @@ class App{
               this.videoPlayers[instanceId].lastStartTime = now;
               this.resetBrowserIfNeedBe(this.videoPlayers[instanceId], this.videoPlayers[instanceId].currentTrack);
               this.updateClients(instanceId, Commands.SET_TRACK);
+              this.savePlayerState(instanceId);
             }
           }else{
              this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;
           }
         }, 1000)
       };
+
+      if (existingState) {
+        Object.assign(this.videoPlayers[instanceId], existingState);
+      }
+
       console.log(user.name, 'is host');
     }else{
       clearTimeout(this.videoPlayers[instanceId].deleteTimeout);
