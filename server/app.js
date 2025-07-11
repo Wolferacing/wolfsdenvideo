@@ -360,7 +360,9 @@ class App{
         if (player.canVote) {
           player.votes = [];
         }
-        this.updateClients(ws.i, 'toggle-vote', { includePlaylist: false });
+        player.sockets.forEach(socket => {
+          this.send(socket, Commands.VOTING_STATE_CHANGED, { canVote: player.canVote });
+        });
         await this.savePlayerState(ws.i);
       });
     }
@@ -430,7 +432,9 @@ class App{
       // Add the new vote
       player.votes.push({u: ws.u, isDown, video: videoObject});
       this.updateVotes(ws.i);
-      this.updateClients(ws.i, "set-vote");
+      player.sockets.forEach(socket => {
+        this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: player.playlist, currentTrack: player.currentTrack });
+      });
     }
   }
   async fromPlaylist(data, ws) {
@@ -553,18 +557,25 @@ class App{
   async movePlaylistItem({url, index}, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
-        const playlist = this.videoPlayers[ws.i].playlist;
-        const oldIndex = playlist.map(d => d.link).indexOf(url);
+        const player = this.videoPlayers[ws.i];
+        const playlist = player.playlist;
+        const oldIndex = playlist.findIndex(d => d.link === url);
+
         if(oldIndex > -1) {
-          playlist.splice(index, 0, playlist.splice(oldIndex, 1)[0]);
-          if(index === this.videoPlayers[ws.i].currentTrack) {
-            if(oldIndex > index) {
-              this.videoPlayers[ws.i].currentTrack++;
-            }else{
-              this.videoPlayers[ws.i].currentTrack--;
-            }
-          }
-          this.updateClients(ws.i);
+          // Robustly track the current track to ensure its index is correct after the move.
+          const currentTrackLink = playlist[player.currentTrack].link;
+
+          // Move the item
+          const [itemToMove] = playlist.splice(oldIndex, 1);
+          playlist.splice(index, 0, itemToMove);
+
+          // Find the new index of the (potentially shifted) current track
+          player.currentTrack = playlist.findIndex(v => v.link === currentTrackLink);
+
+          // Broadcast the updated playlist and current track index
+          player.sockets.forEach(socket => {
+            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: player.playlist, currentTrack: player.currentTrack });
+          });
           await this.savePlayerState(ws.i);
         }else{
           this.send(ws, Commands.DOES_NOT_EXIST);
@@ -574,15 +585,21 @@ class App{
   }
   async toggleCanTakeOver(canTakeOver, ws) {
     this.onlyIfHost(ws, async () => {
-      this.videoPlayers[ws.i].canTakeOver = canTakeOver;
-      this.updateClients(ws.i, 'toggle-can-take-over', { includePlaylist: false });
+      const player = this.videoPlayers[ws.i];
+      player.canTakeOver = canTakeOver;
+      player.sockets.forEach(socket => {
+        this.send(socket, Commands.CAN_TAKE_OVER_STATE_CHANGED, { canTakeOver: player.canTakeOver });
+      });
       await this.savePlayerState(ws.i);
     });
   }
   async takeOver(ws) {
-    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canTakeOver) {
-      this.videoPlayers[ws.i].host = ws.u; // This needs to send the full state to update the host name everywhere
-      this.updateClients(ws.i);
+    const player = this.videoPlayers[ws.i];
+    if(player && player.canTakeOver) {
+      player.host = ws.u;
+      player.sockets.forEach(socket => {
+        this.send(socket, Commands.HOST_CHANGED, { host: player.host });
+      });
       await this.savePlayerState(ws.i);
     }else{
       this.send(ws, Commands.ERROR);
@@ -590,8 +607,12 @@ class App{
   }
   async toggleLock(locked, ws) {
     this.onlyIfHost(ws, async () => {
-      this.videoPlayers[ws.i].locked = locked;
-      this.updateClients(ws.i, 'toggle-lock', { includePlaylist: false });
+      const player = this.videoPlayers[ws.i];
+      player.locked = locked;
+      // Instead of sending the whole state, broadcast a small, specific message.
+      player.sockets.forEach(socket => {
+        this.send(socket, Commands.LOCK_STATE_CHANGED, { locked: player.locked });
+      });
       await this.savePlayerState(ws.i);
     });
   }

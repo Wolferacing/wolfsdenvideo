@@ -42,6 +42,38 @@ class Playlist {
       case Commands.ERROR:
         alert("I cant let you do that...");
         break;
+      case Commands.LOCK_STATE_CHANGED:
+        if (this.core.player) {
+          this.core.player.locked = json.data.locked;
+          // Re-render the UI with the new lock state
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.CAN_TAKE_OVER_STATE_CHANGED:
+        if (this.core.player) {
+          this.core.player.canTakeOver = json.data.canTakeOver;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.HOST_CHANGED:
+        if (this.core.player) {
+          this.core.player.host = json.data.host;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.VOTING_STATE_CHANGED:
+        if (this.core.player) {
+          this.core.player.canVote = json.data.canVote;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.PLAYLIST_UPDATED:
+        if (this.core.player) {
+          this.core.player.playlist = json.data.playlist;
+          this.core.player.currentTrack = json.data.currentTrack;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
       case Commands.SHOW_REPLACE_PROMPT:
         // By cloning the alternative video object, we prevent it from being accidentally
         // mutated if the same video appears in a later search result. This is a defensive
