@@ -307,10 +307,15 @@ class App{
       };
     }
     // Default to 'scraper' source
+    // The duration from the scraper/search can either be a flat number of milliseconds
+    // or an object like { milis: 12345 }. This handles both cases.
+    const durationMs = (typeof videoData.duration === 'object' && videoData.duration !== null)
+      ? videoData.duration.milis
+      : videoData.duration;
     return {
       title: videoData.title,
       thumbnail: videoData.thumbnail,
-      duration: videoData.duration.milis,
+      duration: durationMs,
       link: videoData.link,
       votes: 0,
       user: userName,
