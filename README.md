@@ -16,7 +16,7 @@ It features a persistent state using a PostgreSQL database, making it suitable f
 
 ## Usage / Embedding
 
-To use the player, you need to include the `core.js` script in your HTML page. The player's behavior is configured through attributes on the script tag.
+To use the player, you need to include the `playlist.js` script in your HTML page. The player's behavior is configured through attributes on the script tag.
 
 ### Example
 
@@ -36,7 +36,7 @@ To use the player, you need to include the `core.js` script in your HTML page. T
 
 ### Key Parameters
 
-*   `src`: The URL to your running Fire-V-Player instance's `core.js` file.
+*   `src`: The URL to your running Fire-V-Player instance's `playlist.js` file.
 *   `instance`: **(Required)** A unique ID for the player instance. All users with the same instance ID will see the same synchronized player.
 *   `playlist`: (Optional) The ID of a YouTube playlist (e.g., `PL...`) to load by default if the instance is empty.
 *   `youtube`: (Optional) The URL of a single YouTube video to use as the default.
@@ -129,7 +129,8 @@ This application is designed to be easily deployed on Render.
     -   `app.js`: The main application entry point, handling WebSocket connections, server logic, and the main tick loop.
     -   `/youtube`: Scraper for searching YouTube.
 -   `/public`: Contains all frontend assets served to the client.
-    -   `core.js`: The core client-side script responsible for creating the player in a 3D/VR environment and communicating with the server.
+    -   `core.js`: A library of core functions for creating the player and communicating with the server.
+    -   `playlist.js`: The main entry-point script for embedding the player into an A-Frame scene.
     -   `player.js`: Manages the YouTube IFrame Player API, handling playback, sync, and events.
     -   `/playlist`: The HTML, CSS, and JS for the separate playlist management UI.
 
