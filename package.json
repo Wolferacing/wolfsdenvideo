@@ -12,9 +12,10 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "ws": "^8.17.0",
-    "scraper-edge": "^1.1.0",
     "node-fetch": "^2.6.1",
+    "pg": "^8.16.3",
+    "scraper-edge": "^1.1.0",
+    "ws": "^8.17.0",
     "ytfps": "^1.1.0"
   }
 }
