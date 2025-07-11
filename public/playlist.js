@@ -26,10 +26,12 @@ class PlaylistPlayer {
     });
   }
   setupConfigScript() {
-    // Note: This assumes config.js is in the same public root directory. Adjust the path if it's located elsewhere.
+    // Find the absolute path to this script to reliably locate config.js
+    const scriptUrl = new URL(this.currentScript.src);
+    const configUrl = `${scriptUrl.origin}/config.js`;
     return new Promise(resolve => {
       let myScript = document.createElement("script");
-      myScript.setAttribute("src", `/config.js`);
+      myScript.setAttribute("src", configUrl);
       myScript.addEventListener ("load", resolve, false);
       document.body.appendChild(myScript);
     });

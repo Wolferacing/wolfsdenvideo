@@ -259,9 +259,10 @@ class Player {
     return this.setupScript(`https://${window.APP_CONFIG.HOST_URL}/core.js`);
   }
   setupConfigScript() {
-    // Note: This assumes config.js is in the same public root directory.
-    // Adjust the path if it's located elsewhere.
-    return this.setupScript('/config.js');
+    // Find the absolute path to this script to reliably locate config.js
+    const scriptUrl = new URL(this.currentScript.src);
+    const configUrl = `${scriptUrl.origin}/config.js`;
+    return this.setupScript(configUrl);
   }
   setupScript(script) {
     return new Promise(resolve => {
