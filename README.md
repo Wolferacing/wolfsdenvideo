@@ -7,11 +7,42 @@ It features a persistent state using a PostgreSQL database, making it suitable f
 ## Features
 
 -   Real-time synchronization of video playback.
+-   High-precision sync using playback rate adjustments for smooth, sub-second corrections.
 -   Shared, persistent playlists.
 -   Host controls (lock, skip, reorder).
 -   "Take over" functionality for host role.
 -   Voting system for song selection.
 -   YouTube search and playlist import.
+
+## Usage / Embedding
+
+To use the player, you need to include the `core.js` script in your HTML page. The player's behavior is configured through attributes on the script tag.
+
+### Example
+
+```html
+<!-- This script can be placed in the body of any HTML page, including an A-Frame scene -->
+<script
+  src="https://your-fire-v-player-url.onrender.com/playlist.js"
+  instance="my-video-room"
+  playlist="PLZWiw-xxQ4SPDmADhvme7-pU2bx3s7nKX"
+  volume="10"
+  hand-controls="true"
+  position="0 1.5 -2"
+  rotation="0 0 0"
+  scale="2 2 2"
+></script>
+```
+
+### Key Parameters
+
+*   `src`: The URL to your running Fire-V-Player instance's `core.js` file.
+*   `instance`: **(Required)** A unique ID for the player instance. All users with the same instance ID will see the same synchronized player.
+*   `playlist`: (Optional) The ID of a YouTube playlist (e.g., `PL...`) to load by default if the instance is empty.
+*   `youtube`: (Optional) The URL of a single YouTube video to use as the default.
+*   `volume`: (Optional) The initial volume, from 0 to 100. Default is `40`.
+*   `position`, `rotation`, `scale`: (For VR/3D environments) The transform of the player screen.
+*   `hand-controls`: (For VR) Set to `true` to enable UI controls on the user's hand.
 
 ## Local Development Setup
 
@@ -39,15 +70,14 @@ It features a persistent state using a PostgreSQL database, making it suitable f
     -   The application needs a database connection URL. You can set this as an environment variable.
 
 4.  **Configure Environment Variable:**
-    The application reads the database connection string from the `DATABASE_URL` environment variable.
-
-    You can set this in your shell before running the app:
-    ```bash
-    export DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
+    Create a file named `.env` in the root of the project. This file will store your local database connection string and is ignored by git.
+    Add the following line to your `.env` file, replacing the values with your own:
     ```
-    **Example for a local setup:**
-    ```bash
-    export DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/firevplayer"
+    # .env file
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
+    
+    # Example for a local setup:
+    # DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/firevplayer"
     ```
 
 5.  **Run the server:**
@@ -65,17 +95,17 @@ This application is designed to be easily deployed on Render.
 2.  **Create a PostgreSQL Service:**
     You have two main options for the database.
 
-    **Option A: Render's Free PostgreSQL (for short-term projects)**
+    **Option A: Render's Free PostgreSQL (for testing/demos)**
     -   On your Render dashboard, click "New" -> "PostgreSQL".
     -   Give it a name and choose a region.
-    -   **Important:** Render's free tier databases have a **fixed 90-day lifespan** from the date of creation. They will be deleted after 90 days unless you upgrade to a paid plan. This is suitable for testing, demos, or short-term projects.
+    -   **Important:** Render's free tier databases have a **fixed 90-day lifespan** from the date of creation. They will be deleted after 90 days unless you upgrade. This is suitable for testing or short-term projects.
 
-    **Option B: External Database (Recommended for long-term projects)**
+    **Option B: External Database (Recommended)**
     -   For a "forever free" option that won't be deleted, use a service like [Neon](https://neon.tech/), [Supabase](https://supabase.com/), or [ElephantSQL](https://www.elephantsql.com/).
     -   Sign up and create a new PostgreSQL project on their platform.
     -   They will provide you with a database connection URL (often called a connection string). Copy this URL.
 
-3.  **Create a Web Service:**
+3.  **Create the Web Service on Render:**
     -   On your Render dashboard, click "New" -> "Web Service".
     -   Connect the GitHub repository you forked.
     -   Configure the service:
@@ -92,6 +122,16 @@ This application is designed to be easily deployed on Render.
 
 5.  **Deploy:**
     -   Click "Create Web Service". Render will build and deploy your application. The first time it starts, it will connect to the database and set up the required table.
+
+## Project Structure
+
+-   `/server`: Contains all backend Node.js code.
+    -   `app.js`: The main application entry point, handling WebSocket connections, server logic, and the main tick loop.
+    -   `/youtube`: Scraper for searching YouTube.
+-   `/public`: Contains all frontend assets served to the client.
+    -   `core.js`: The core client-side script responsible for creating the player in a 3D/VR environment and communicating with the server.
+    -   `player.js`: Manages the YouTube IFrame Player API, handling playback, sync, and events.
+    -   `/playlist`: The HTML, CSS, and JS for the separate playlist management UI.
 
 ## License
 
