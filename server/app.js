@@ -712,6 +712,7 @@ class App{
       const videoObject = {
         currentTime: player.currentTime,
         currentTrack: player.currentTrack,
+        lastStartTime: player.lastStartTime,
         locked: player.locked,
         players: [...map.values()].map(s => ({name: s.u.name, p: s.p, id: s.u.id, v: s.p_v})),
         canTakeOver: player.canTakeOver,

@@ -2,6 +2,7 @@ class Playlist {
   constructor() {
     this.hostUrl = 'vidya.firer.at';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
+    this.uiUpdateInterval = null;
     this.init();
   }
   async init() {
@@ -27,21 +28,12 @@ class Playlist {
   parseMessage(msg) {
     const json = JSON.parse(msg);
     switch(json.path) {
-      case Commands.SYNC_TIME:
-        const currentTime = document.querySelector('.currentTime');
-        if(currentTime != null) {
-          currentTime.style.width = ((json.data.currentTime / json.data.duration) * 100) + "%";
-        }
-        const currentTimeText = document.querySelector('.currentTimeText');
-        if(currentTimeText != null) {
-          currentTimeText.innerText = this.timeCode(json.data.currentTime) + " / " + this.timeCode(json.data.duration);
-        }
-        break;
       case Commands.PLAYBACK_UPDATE:
         // Merge new data into the existing player state.
         // This prevents the playlist from being wiped out on updates that don't include it.
         this.core.player = Object.assign(this.core.player || {}, json.data.video);
         this.updatePlaylist(this.core.player);
+        this.startUiUpdater();
         break;
       case Commands.SEARCH_RESULTS:
         this.loadVideos(json.data);
@@ -50,6 +42,38 @@ class Playlist {
         alert("I cant let you do that...");
         break;
     }
+  }
+  startUiUpdater() {
+    // Clear any existing interval to prevent multiple loops running
+    if (this.uiUpdateInterval) {
+      clearInterval(this.uiUpdateInterval);
+    }
+
+    // Only start a new interval if we have a valid player state with a playlist
+    if (!this.core.player || !this.core.player.playlist || this.core.player.playlist.length === 0 || !this.core.player.lastStartTime) {
+      return;
+    }
+
+    this.uiUpdateInterval = setInterval(() => {
+      const { lastStartTime, duration } = this.core.player;
+
+      if (duration <= 0) return;
+
+      // Calculate the current time based on when the track started
+      let calculatedTime = (Date.now() / 1000) - lastStartTime;
+
+      // Clamp the time to be within the video's bounds [0, duration]
+      calculatedTime = Math.max(0, Math.min(calculatedTime, duration));
+
+      const currentTimeBar = document.querySelector('.currentTime');
+      if (currentTimeBar) {
+        currentTimeBar.style.width = `${(calculatedTime / duration) * 100}%`;
+      }
+      const currentTimeText = document.querySelector('.currentTimeText');
+      if (currentTimeText) {
+        currentTimeText.innerText = `${this.timeCode(calculatedTime)} / ${this.timeCode(duration)}`;
+      }
+    }, 1000); // Update every second
   }
   setupCoreScript() {
     return new Promise(resolve => {
