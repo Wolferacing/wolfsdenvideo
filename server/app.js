@@ -267,6 +267,30 @@ class App{
         break;
     }
   }
+  _createVideoObject(videoData, userName, source) {
+    // Standardizes video objects from different sources (ytfps, scraper)
+    if (source === 'ytfps') {
+      return {
+        title: videoData.title,
+        thumbnail: videoData.thumbnail_url,
+        duration: videoData.milis_length,
+        link: videoData.url,
+        votes: 0,
+        user: userName,
+        is_youtube_website: false
+      };
+    }
+    // Default to 'scraper' source
+    return {
+      title: videoData.title,
+      thumbnail: videoData.thumbnail,
+      duration: videoData.duration.milis,
+      link: videoData.link,
+      votes: 0,
+      user: userName,
+      is_youtube_website: false
+    };
+  }
   removeFromPlayers(uid, ws) {
     this.onlyIfHost(ws, () => {
       this.videoPlayers[ws.i].sockets.forEach(s => {
@@ -389,15 +413,7 @@ class App{
         let playlist = await ytfps(data.id, { limit: 100 });
         this.resetPlaylist(ws); // Resets playlist, currentTime, currentTrack
         playlist.videos.forEach(v => {
-          player.playlist.push({
-            title: v.title,
-            thumbnail: v.thumbnail_url,
-            duration: v.milis_length ,
-            link: v.url,
-            votes: 0,
-            user: ws.u.name,
-            is_youtube_website: false
-          })  
+          player.playlist.push(this._createVideoObject(v, ws.u.name, 'ytfps'));
         });
         if (player.playlist.length > 0) {
           player.lastStartTime = new Date().getTime() / 1000;
@@ -430,11 +446,8 @@ class App{
     if (this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
-        // Add the video to the playlist
-        v.user = ws.u.name;
-        v.votes = 0;
-        v.is_youtube_website = false;
-        player.playlist.push(v);
+        const newVideo = this._createVideoObject(v, ws.u.name, 'scraper');
+        player.playlist.push(newVideo);
 
         // Set it as the current track
         const newIndex = player.playlist.length - 1;
@@ -452,11 +465,9 @@ class App{
     if (this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
-        v.user = ws.u.name;
-        v.votes = 0;
-        v.is_youtube_website = false;
+        const newVideo = this._createVideoObject(v, ws.u.name, 'scraper');
         const nextIndex = player.currentTrack + 1;
-        player.playlist.splice(nextIndex, 0, v);
+        player.playlist.splice(nextIndex, 0, newVideo);
         this.updateClients(ws.i);
         await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked);
@@ -487,11 +498,9 @@ class App{
           this.videoPlayers[ws.i].currentTime = 0;
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
-        v.user = ws.u.name;
-        v.votes = 0;
-        v.is_youtube_website = isYoutubeWebsite;
-        
-        this.videoPlayers[ws.i].playlist.push(v);
+        const newVideo = this._createVideoObject(v, ws.u.name, 'scraper');
+        newVideo.is_youtube_website = isYoutubeWebsite;
+        this.videoPlayers[ws.i].playlist.push(newVideo);
         if(!skipUpdate) {
           this.updateClients(ws.i);
         }
