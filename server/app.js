@@ -130,22 +130,36 @@ class App{
       return; // Socket was not in an instance, nothing to do.
     }
     const videoPlayer = this.videoPlayers[instanceId];
-    // Handle host disconnection
-    if (ws.u && videoPlayer.host.id === ws.u.id && ws.type === "space") {
-      console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver in 42 secs');
-      videoPlayer.hostConnected = false;
-      videoPlayer.takeoverTimeout = setTimeout(async () => {
-        if (!videoPlayer.hostConnected) {
-          console.log(ws.u.name ? ws.u.name : 'Unknown', 'takeover enabled after 42 secs');
-          videoPlayer.canTakeOver = true;
-          this.updateClients(instanceId, 'takeover-enabled', { includePlaylist: false });
-          await this.savePlayerState(instanceId);
-        }
-      // Corrected to 42 seconds. The original code had a typo (1000 * 42). Let's assume the intent was 42 seconds.
-      }, 42 * 1000);
-    }
+    const wasHostSocket = ws.u && videoPlayer.host.id === ws.u.id;
+    const wasSpaceSocket = ws.type === "space";
+
     // Remove the disconnected socket
     videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
+
+    // Handle host disconnection. This logic is specifically for when the host leaves the 3D space.
+    // A host with only a playlist UI open is not considered "present" for retaining control.
+    if (wasHostSocket && wasSpaceSocket) {
+      // Check if the host has any *other* connections of type "space" remaining.
+      const hostHasAnotherSpaceConnection = videoPlayer.sockets.some(
+        s => s.u && s.u.id === videoPlayer.host.id && s.type === "space"
+      );
+
+      if (!hostHasAnotherSpaceConnection) {
+        // The host's last "space" connection has dropped. Start the takeover timer.
+        console.log(`${ws.u.name || 'Unknown'} (host) has left the space. Enabling takeover in 42 secs.`);
+        videoPlayer.hostConnected = false; // This flag is checked by the timeout and on reconnect
+        videoPlayer.takeoverTimeout = setTimeout(async () => {
+          // The check is simple: has the host re-established a space connection?
+          if (!videoPlayer.hostConnected) {
+            console.log(`${ws.u.name || 'Unknown'} takeover enabled after 42 secs`);
+            videoPlayer.canTakeOver = true;
+            this.updateClients(instanceId, 'takeover-enabled', { includePlaylist: false });
+            await this.savePlayerState(instanceId);
+          }
+        }, 42 * 1000);
+      }
+    }
+
     // If the user had votes, remove them
     if (ws.u) {
       const voteCount = videoPlayer.votes.length;
@@ -183,17 +197,23 @@ class App{
           await this.createVideoPlayer(msg.data, msg.u, ws);
           console.log(msg.u.name, 'connected', msg.data, "host: ", this.videoPlayers[msg.data].host.name);
           this.getUserVideoPlayer(ws);
-          if(this.videoPlayers[msg.data].host && this.videoPlayers[msg.data].host.id === msg.u.id) {
-            clearTimeout(this.videoPlayers[msg.data].takeoverTimeout);
-            this.videoPlayers[msg.data].hostConnected = true;
-            console.log(ws.u.name ? ws.u.name : 'Unknown', 'user returned, takeover not enabled');
-          }
+          // Takeover cancellation logic is now handled in SET_WS_TYPE,
+          // as the socket type is not known at this point in the connection lifecycle.
         }else{
           this.send(ws, 'error');
         }
         break;
       case Commands.SET_WS_TYPE:
         ws.type = msg.data;
+        const player = this.videoPlayers[ws.i];
+        // If the host establishes a "space" connection, they are considered fully connected.
+        // This is the correct place to cancel any pending takeover.
+        if (player && player.host.id === ws.u.id && ws.type === "space") {
+          clearTimeout(player.takeoverTimeout);
+          player.takeoverTimeout = null; // Also clear the timeout handle
+          player.hostConnected = true;
+          console.log(`${ws.u.name || 'Unknown'} (host) user returned to space, takeover not enabled`);
+        }
         break;
       case Commands.SET_TIME:
         await this.setVideoTime(msg.data, ws);
@@ -738,7 +758,7 @@ class App{
         currentTime: 0,
         locked: false,
         host: user,
-        hostConnected: true,
+        hostConnected: false, // Default to false. Will be set true upon "space" connection.
         sockets: [ws],
         canTakeOver: true,
         canVote: false,
@@ -750,11 +770,10 @@ class App{
         Object.assign(this.videoPlayers[instanceId], existingState);
       }
 
-      // If the connecting user is the host, mark them as connected.
-      if (this.videoPlayers[instanceId].host.id === user.id) {
+      // For a brand new instance (no state loaded from DB), the creator is the host and is connected.
+      if (!existingState) {
         this.videoPlayers[instanceId].hostConnected = true;
       }
-
       console.log(this.videoPlayers[instanceId].host.name, 'is host');
     }else{
       // If a user reconnects to an instance that was scheduled for deletion, cancel the deletion.
