@@ -172,12 +172,12 @@ class App{
 
     // If the instance is now empty, schedule it for cleanup.
     if (videoPlayer.sockets.length === 0) {
-      console.log(`Instance ${instanceId} is empty. Scheduling cleanup in 5 minutes.`);
+      console.log(`Instance ${instanceId} is empty. Scheduling cleanup in 3 minutes.`);
       videoPlayer.deleteTimeout = setTimeout(async () => {
         console.log(`Cleaning up inactive instance: ${instanceId}`);
         await this.savePlayerState(instanceId);
         delete this.videoPlayers[instanceId];
-      }, 1000 * 60 * 5); // 5-minute grace period
+      }, 1000 * 60 * 3); // 3-minute grace period
     }
   } 
   send(socket, path, data) {
