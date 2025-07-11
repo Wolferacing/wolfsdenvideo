@@ -99,6 +99,7 @@ class Playlist {
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
     this.voting.style.display = !isMe ? 'none' : 'inline-block';
     this.voting.innerText = player.canVote ? 'Voting: On' : 'Voting: Off';
+    this.autoSync.style.display = 'inline-block';
     // Using textContent for user-provided names to prevent potential XSS.
     this.hostTitle.textContent = `Welcome ${window.user.name}. ${isMe ? 'You are' : `${player.host.name} is`} the host`;
     if (player.canTakeOver) {

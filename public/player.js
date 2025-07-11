@@ -167,14 +167,33 @@ class Player {
       case Commands.SYNC_TIME:
         this.currentTime = json.data.currentTime;
         if(this.player && this.readyToPlay) {
-          const timediff = Math.abs(this.player.getCurrentTime() - (json.data.currentTime + this.core.currentLatency));
-          document.getElementById('status').innerHTML = this.player.getCurrentTime() + " - " + (json.data.currentTime + this.core.currentLatency) + " = " + timediff;
-          if(timediff > 0.5 && this.autoSync) {
-             this.core.showToast("AutoSync: " + Math.round(timediff*100)/100 + "s");
-             this.player.seekTo(json.data.currentTime + this.core.currentLatency);
+          const serverTime = json.data.currentTime + this.core.currentLatency;
+          const localTime = this.player.getCurrentTime();
+          // Positive timediff means client is BEHIND server. Negative means client is AHEAD.
+          const timediff = serverTime - localTime;
+          
+          document.getElementById('status').innerHTML = `Drift: ${Math.round(timediff * 1000)}ms`;
+
+          if (this.autoSync) {
+            const largeDriftThreshold = 0.5; // Over this, we do a hard seek.
+            const smallDriftThreshold = 0.1; // Under this, we are considered in-sync.
+
+            if (Math.abs(timediff) > largeDriftThreshold) {
+              // Large drift, a hard seek is necessary for a quick correction.
+              this.core.showToast(`Resyncing: ${Math.round(timediff * 100) / 100}s`);
+              this.player.seekTo(serverTime);
+              this.player.setPlaybackRate(1.0); // Ensure rate is normal after a seek.
+            } else if (Math.abs(timediff) > smallDriftThreshold) {
+              // Small drift, adjust playback speed for a smooth, unnoticeable correction.
+              // If we are behind (timediff > 0), speed up. If we are ahead (timediff < 0), slow down.
+              this.player.setPlaybackRate(timediff > 0 ? 1.05 : 0.95);
+            } else {
+              // We are in sync, ensure playback rate is normal.
+              if (this.player.getPlaybackRate() !== 1.0) {
+                this.player.setPlaybackRate(1.0);
+              }
+            }
           }
-          this.core.params.volume = json.volume;
-          this.playVidya(json.data.currentTrack, json.data.currentTime, false);
         }
         break;
     }

@@ -729,7 +729,10 @@ class App{
     }
   }
   syncWsTime(socket, key) {
-    if(this.videoPlayers[key] && this.videoPlayers[key].playlist.length && socket.type !== "player") {
+    // This command is specifically for the video player element to correct its time.
+    // The playlist/UI pages use the lastStartTime from PLAYBACK_UPDATE to calculate time.
+    // Therefore, we only send this to the 'player' type socket.
+    if(this.videoPlayers[key] && this.videoPlayers[key].playlist.length && socket.type === "player") {
       this.send(socket, Commands.SYNC_TIME, {
         currentTrack: this.videoPlayers[key].currentTrack,
         currentTime: this.videoPlayers[key].currentTime,
