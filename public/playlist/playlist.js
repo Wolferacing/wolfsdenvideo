@@ -100,17 +100,27 @@ class Playlist {
     this.voting.style.display = !isMe ? 'none' : 'inline-block';
     this.voting.innerText = player.canVote ? 'Voting: On' : 'Voting: Off';
     this.autoSync.style.display = 'inline-block';
-    // Using textContent for user-provided names to prevent potential XSS.
-    this.hostTitle.textContent = `Welcome ${window.user.name}. ${isMe ? 'You are' : `${player.host.name} is`} the host`;
+
+    // --- Securely build the host title ---
+    this.hostTitle.innerHTML = ''; // Clear previous content
+
+    const welcomeSpan = document.createElement('span');
+    welcomeSpan.textContent = `Welcome ${window.user.name}. ${isMe ? 'You are' : `${player.host.name} is`} the host`;
+    this.hostTitle.appendChild(welcomeSpan);
+
     if (player.canTakeOver) {
-      this.hostTitle.innerHTML += ` but it can be taken over ( click ${isMe ? "again to disable" : "<span style=\"color: red;\">to take over ASAP!!!</span>"} )!`;
-    } else if (player.locked) {
-      this.hostTitle.textContent += " and it's locked!";
+      const takeoverSpan = document.createElement('span');
+      // This part contains intentional HTML, so we use innerHTML here, but on a separate, controlled element.
+      takeoverSpan.innerHTML = ` but it can be taken over ( click ${isMe ? "again to disable" : "<span style='color: red;'>to take over ASAP!!!</span>"} )!`;
+      this.hostTitle.appendChild(takeoverSpan);
     } else {
-      this.hostTitle.textContent += ".";
+      const statusSpan = document.createElement('span');
+      statusSpan.textContent = player.locked ? " and it's locked!" : ".";
+      this.hostTitle.appendChild(statusSpan);
     }
-    this.videoPlaylistContainer.innerHTML = '';
-    player.playlist.sort((a, b) => b.votes - a.votes);
+    // --- End of secure host title build ---
+
+    this.videoPlaylistContainer.innerHTML = ''; // Clear the existing list before re-rendering
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
       
