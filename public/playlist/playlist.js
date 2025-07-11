@@ -19,6 +19,7 @@ class Playlist {
     });
   }
   playPlaylist(shouldClear) {
+    this.clearNotification();
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId || this.core.params.playlist, shouldClear, fromPlaylist: true}});
     this.playlistId = null;
   }
@@ -43,6 +44,7 @@ class Playlist {
         break;
       case Commands.SHOW_REPLACE_PROMPT:
         const { original, alternative } = json.data;
+        this.showNotification(`Video unavailable: '${original.title}'. Click "Yes, Replace" to use '${alternative.title}'.`, true);
         this.replaceConfirmText.innerHTML = `A user can't watch:<br><b>${original.title}</b><br><br>Replace it for everyone with:<br><b>${alternative.title}</b>?`;
         
         this.replaceConfirmModal.style.display = 'block';
@@ -347,6 +349,22 @@ class Playlist {
   autoSync() {
     
   }
+  showNotification(message, isPrompt = false) {
+    this.clearNotification(); // Clear any existing notification
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    if (isPrompt) {
+      notification.classList.add('notification-prompt');
+    }
+    this.notificationArea.appendChild(notification);
+  }
+  clearNotification() {
+    this.notificationArea.innerHTML = '';
+  }
+  setupNotificationArea() {
+    this.notificationArea = document.querySelector('#playlist-notifications');
+  }
   setupPlaylistUI() {
     
     this.searchInput = document.querySelector('.searchInput');
@@ -440,6 +458,8 @@ class Playlist {
     this.replaceConfirmNo = document.querySelector('#replace-confirm-no');
     this.replaceConfirmNo.addEventListener('click', () => this.hideReplacePrompt());
     this.replaceConfirmBackdrop.addEventListener('click', () => this.hideReplacePrompt());
+
+    this.setupNotificationArea();
   }
 }
 new Playlist();

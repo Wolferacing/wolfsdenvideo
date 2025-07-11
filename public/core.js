@@ -502,6 +502,10 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
           this.clickBrowser(json.data.x,json.data.y);
         }
         break;
+      case Commands.SHOW_REPLACE_PROMPT:
+        // This is a notification for the host in the 3D space to check their playlist UI.
+        this.showToast("Video unavailable for a user. Check playlist to replace.");
+        break;
     }
   }
   getId(url){
