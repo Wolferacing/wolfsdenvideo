@@ -7,6 +7,7 @@ class Player {
   }
   async init() {
      await this.setupBrowserMessaging();
+     this.initialSyncComplete = false;
      this.currentTime = 0;
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
@@ -62,9 +63,17 @@ class Player {
       },
       events: {
         onStateChange: event => {
-          if(event.data === YT.PlayerState.PLAYING) {
-            this.readyToPlay = true;
-          }else if(this.readyToPlay && event.data !== YT.PlayerState.PLAYING) {
+          if (event.data === YT.PlayerState.PLAYING) {
+            if (!this.readyToPlay) {
+              this.readyToPlay = true;
+              // First time player is playing, check if we need to perform initial sync
+              if (this.playerData && this.playerData.playlist && this.playerData.playlist.length > 0 && !this.initialSyncComplete) {
+                this.playVidya(this.playerData.currentTrack, this.playerData.currentTime, true);
+                this.initialSyncComplete = true;
+              }
+            }
+          } else if (this.readyToPlay && event.data !== YT.PlayerState.PLAYING) {
+            // This logic tries to force the video to keep playing.
             this.player.playVideo();
           }
         },
@@ -135,11 +144,14 @@ class Player {
         // Merge new data into the existing player state.
         // This prevents the playlist from being wiped out on updates that don't include it.
         this.playerData = Object.assign(this.playerData || {}, json.data.video);
-        if(json.data.type === "set-track" && this.readyToPlay) {
+        // If a track is being set by the host, and we're ready, obey immediately.
+        if (json.data.type === "set-track" && this.readyToPlay) {
           this.playVidya(this.playerData.currentTrack, this.playerData.currentTime, true);
-        }else if(json.data.type === "stop" && this.readyToPlay) {
-          this.player.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=L_LUpnjgPso"), 0);
+          this.initialSyncComplete = true; // A track set is a definitive sync.
+        } else if (json.data.type === "stop" && this.readyToPlay) {
+          this.player.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=_VUKfrA9oLQ"), 0);
         }
+        // The initial sync is now handled by the onStateChange event when the player is ready.
         break;
       case Commands.MUTE:
         this.core.params.mute = json.data;
