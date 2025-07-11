@@ -134,7 +134,7 @@ class Playlist {
           voteDown.innerText = "Down Vote";
 
           voteDown.addEventListener('click', () => {
-            this.core.sendMessage({path: Commands.DOWN_VOTE, data: i  });
+            this.core.sendMessage({path: Commands.DOWN_VOTE, data: v.link });
           });
 
           const voteUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
@@ -142,7 +142,7 @@ class Playlist {
           voteUp.innerText = "Up Vote";
 
           voteUp.addEventListener('click', () => {
-            this.core.sendMessage({path: Commands.UP_VOTE, data: i });
+            this.core.sendMessage({path: Commands.UP_VOTE, data: v.link });
           });
         }else{
           if(this.core.player.host.id === window.user.id) {
@@ -243,8 +243,7 @@ class Playlist {
 
         playNow.addEventListener('click', () => {
           this.hideSearch();
-          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-          this.core.sendMessage({path: Commands.SET_TRACK, data: this.core.player.playlist.length });
+          this.core.sendMessage({path: Commands.ADD_AND_PLAY, data: v });
         }); 
 
         const playNext = this.core.makeAndAddElement('div',null, videoTitleAndAction);
@@ -253,8 +252,8 @@ class Playlist {
         playNext.innerText = "Play Next";
 
         playNext.addEventListener('click', () => {
-          this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v, skipUpdate: true });
-          this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: this.core.player.currentTrack + 1} });
+          this.hideSearch();
+          this.core.sendMessage({path: Commands.ADD_AND_PLAY_NEXT, data: v });
         }); 
       }
       
