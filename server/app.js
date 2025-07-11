@@ -265,6 +265,12 @@ class App{
       case Commands.ADD_AND_PLAY_NEXT:
         await this.addAndPlayNext(msg.data, ws);
         break;
+      case Commands.VIDEO_UNAVAILABLE:
+        await this.handleVideoUnavailable(msg.data, ws);
+        break;
+      case Commands.REPLACE_VIDEO:
+        await this.handleReplaceVideo(msg.data, ws);
+        break;
     }
   }
   _createVideoObject(videoData, userName, source) {
@@ -649,6 +655,63 @@ class App{
       this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
       await this.savePlayerState(ws.i);
     }, this.videoPlayers[ws.i].locked);
+  }
+  async handleVideoUnavailable(data, ws) {
+    const player = this.videoPlayers[ws.i];
+    if (!player) return;
+
+    const blockedVideo = player.playlist.find(v => v.link === data.link);
+    if (!blockedVideo) return;
+
+    console.log(`Video '${blockedVideo.title}' is unavailable for ${ws.u.name}. Searching for alternative.`);
+
+    // Search for a replacement using the title
+    const results = await youtube.search(blockedVideo.title, { searchType: 'video' });
+    if (results.videos && results.videos.length > 0) {
+      // Find the first result that is not the same as the blocked video, or default to the first one.
+      const alternative = results.videos.find(v => v.link !== blockedVideo.link) || results.videos[0];
+
+      console.log(`Found alternative: '${alternative.title}'. Prompting host.`);
+
+      // Find all of the host's sockets to send the prompt to.
+      const hostSockets = player.sockets.filter(s => s.u.id === player.host.id);
+
+      if (hostSockets.length > 0) {
+        hostSockets.forEach(socket => {
+          this.send(socket, Commands.SHOW_REPLACE_PROMPT, {
+            original: blockedVideo,
+            alternative: alternative // This is a raw scraper object
+          });
+        });
+      }
+    }
+  }
+  async handleReplaceVideo(data, ws) {
+    this.onlyIfHost(ws, async () => {
+      const player = this.videoPlayers[ws.i];
+      if (!player) return;
+
+      const { originalLink, alternativeVideo } = data;
+      const videoIndex = player.playlist.findIndex(v => v.link === originalLink);
+
+      if (videoIndex > -1) {
+        const originalVideo = player.playlist[videoIndex];
+        // Create a standardized video object from the raw scraper data
+        const newVideo = this._createVideoObject(alternativeVideo, originalVideo.user, 'scraper');
+
+        // Replace the old video with the new one
+        player.playlist[videoIndex] = newVideo;
+
+        console.log(`Host ${ws.u.name} replaced '${originalVideo.title}' with '${newVideo.title}'.`);
+
+        // If the replaced video was the one currently playing, we need to send a SET_TRACK command
+        // to force clients to reload the video source. Otherwise, a simple update is fine.
+        const updateType = (videoIndex === player.currentTrack) ? Commands.SET_TRACK : undefined;
+
+        this.updateClients(ws.i, updateType);
+        await this.savePlayerState(ws.i);
+      }
+    });
   }
   async createVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {

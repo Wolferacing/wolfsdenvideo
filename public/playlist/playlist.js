@@ -41,6 +41,22 @@ class Playlist {
       case Commands.ERROR:
         alert("I cant let you do that...");
         break;
+      case Commands.SHOW_REPLACE_PROMPT:
+        const { original, alternative } = json.data;
+        this.replaceConfirmText.innerHTML = `A user can't watch:<br><b>${original.title}</b><br><br>Replace it for everyone with:<br><b>${alternative.title}</b>?`;
+        
+        this.replaceConfirmModal.style.display = 'block';
+        this.replaceConfirmBackdrop.style.display = 'block';
+
+        // Use a one-time event listener to handle the confirmation
+        this.replaceConfirmYes.onclick = () => {
+          this.core.sendMessage({
+            path: Commands.REPLACE_VIDEO,
+            data: { originalLink: original.link, alternativeVideo: alternative }
+          });
+          this.hideReplacePrompt();
+        };
+        break;
     }
   }
   startUiUpdater() {
@@ -322,6 +338,12 @@ class Playlist {
       this.addItemContainer.style.display = 'none';
       this.addItemBackDrop.style.display = 'none';
   }
+  hideReplacePrompt() {
+    this.replaceConfirmModal.style.display = 'none';
+    this.replaceConfirmBackdrop.style.display = 'none';
+    // Clear the onclick to prevent accidental future clicks
+    this.replaceConfirmYes.onclick = null;
+  }
   autoSync() {
     
   }
@@ -409,6 +431,15 @@ class Playlist {
     });
     
     this.hostTitle = document.querySelector('.hostTitle');
+
+    // --- Replace Video Confirmation Modal ---
+    this.replaceConfirmModal = document.querySelector('#replace-confirm-modal');
+    this.replaceConfirmBackdrop = document.querySelector('#replace-confirm-backdrop');
+    this.replaceConfirmText = document.querySelector('#replace-confirm-text');
+    this.replaceConfirmYes = document.querySelector('#replace-confirm-yes');
+    this.replaceConfirmNo = document.querySelector('#replace-confirm-no');
+    this.replaceConfirmNo.addEventListener('click', () => this.hideReplacePrompt());
+    this.replaceConfirmBackdrop.addEventListener('click', () => this.hideReplacePrompt());
   }
 }
 new Playlist();

@@ -43,6 +43,18 @@
       <div class="button slim teal" id="addItemSubmit">Load Playlist</div>
     </div>
     <img src="https://vidya.firer.at/assets/3-dots-move.svg" class="loadingSpinner"/>
+
+    <!-- Confirmation Modal for Replacing Videos -->
+    <div class="confirm-backdrop" id="replace-confirm-backdrop" style="display: none;"></div>
+    <div class="confirm-modal" id="replace-confirm-modal" style="display: none;">
+      <div class="confirm-title">Replace Unavailable Video?</div>
+      <div class="confirm-text" id="replace-confirm-text"></div>
+      <div class="confirm-actions">
+        <div class="button slim red" id="replace-confirm-no">No</div>
+        <div class="button slim green" id="replace-confirm-yes">Yes, Replace</div>
+      </div>
+    </div>
+
     <script src="./playlist.js"></script>
   </body> 
 </html>

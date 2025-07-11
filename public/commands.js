@@ -37,6 +37,9 @@ const Commands = {
   DOWN_VOTE: 'down-vote',
   UP_VOTE: 'up-vote',
   STOP: 'stop',
+  VIDEO_UNAVAILABLE: 'video-unavailable',
+  SHOW_REPLACE_PROMPT: 'show-replace-prompt',
+  REPLACE_VIDEO: 'replace-video',
   ADD_AND_PLAY: 'add-and-play',
   ADD_AND_PLAY_NEXT: 'add-and-play-next'
 };

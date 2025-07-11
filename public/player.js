@@ -79,7 +79,16 @@ class Player {
           }
         },
         onError: event => {
-          console.log(event.data);
+          // Error 150: The video owner has not made this video available in your country.
+          // Error 101 is a variation of this.
+          if (event.data === 150 || event.data === 101) {
+            const currentVideo = this.playerData.playlist[this.playerData.currentTrack];
+            if (currentVideo) {
+              this.core.showToast(`Video unavailable in your region: ${currentVideo.title}`);
+              this.core.sendMessage({ path: Commands.VIDEO_UNAVAILABLE, data: { link: currentVideo.link } });
+            }
+          }
+          console.log("YT Player Error:", event.data);
         },
         onApiChange: async event => {
         },

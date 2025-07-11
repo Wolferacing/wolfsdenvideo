@@ -531,9 +531,6 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
   back() {
     this.sendBrowserMessage({path: Commands.SKIP_BACK});
   }
-  foward() {
-    this.forward();
-  }
   forward() {
     this.sendBrowserMessage({path: Commands.SKIP_FORWARD});
   }
