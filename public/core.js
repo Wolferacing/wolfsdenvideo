@@ -254,7 +254,7 @@ class Core {
   });
 }
   openPlaylist() {
-    window.openPage("https://" + this.hostUrl + "/" + 'playlist' + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlistId : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
+    window.openPage("https://" + this.hostUrl + "/" + 'playlist' + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlist : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
   }
   setupVolButton(scene, isUp, playlistContainer) {
   const volIconUrl = isUp ? this.params["data-vol-up-icon-url"] : this.params["data-vol-down-icon-url"];

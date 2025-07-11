@@ -523,7 +523,9 @@ class Playlist {
     this.loadDefaultPlaylistButton = document.querySelector('#loadDefaultPlaylist');
     
     this.loadDefaultPlaylistButton.addEventListener('click', () => {
-      this.playPlaylist(true);
+      // Set the playlistId from the core parameters, which are read from the URL.
+      this.playlistId = this.core.params.playlist;
+      this.playPlaylist(true); // `true` to clear the existing playlist
     });
     
     this.hostTitle = document.querySelector('.hostTitle');
