@@ -35,7 +35,9 @@ const Commands = {
   TOGGLE_VOTE: 'toggle-vote',
   DOWN_VOTE: 'down-vote',
   UP_VOTE: 'up-vote',
-  STOP: 'stop'
+  STOP: 'stop',
+  ADD_AND_PLAY: 'add-and-play',
+  ADD_AND_PLAY_NEXT: 'add-and-play-next'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {
