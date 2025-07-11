@@ -62,8 +62,22 @@ class Core {
   setupBrowserElement(url) {
     this.initialUrl = url;
     const scene = document.querySelector("a-scene");
-    if(!scene) {
-      console.log("No a-scene tag found, is this an AFRAME scene ?");
+    if (!scene) {
+      console.log("No <a-scene> tag found. Creating a fallback 2D player.");
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.style.width = "80vw";
+      iframe.style.height = "80vh";
+      iframe.style.border = "none";
+      iframe.style.position = "fixed";
+      iframe.style.top = "10vh";
+      iframe.style.left = "10vw";
+      iframe.style.zIndex = "1000";
+      document.body.appendChild(iframe);
+
+      const playlistUrl = `https://${this.hostUrl}/playlist/?instance=${this.params.instance}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}`;
+      this.showToast(`Player is in 2D mode. See console for playlist URL.`);
+      console.log(`Player is in 2D mode. Open the playlist controls here: ${playlistUrl}`);
       return;
     }
     const browser = document.createElement('a-entity');
