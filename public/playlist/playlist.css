@@ -174,10 +174,10 @@ body{
 }
 .notification-area {
   padding: 10px 15px;
-  background-color: #065a00; /* A color that fits the theme */
+  background-color: #5a0000; /* A color that fits the theme */
   color: #fff;
   text-align: center;
   font-size: 1.1em;
-  border-bottom: 1px solid #065a00;
+  border-bottom: 1px solid #4e4e4e;
   display: none; /* Hidden by default */
 }
