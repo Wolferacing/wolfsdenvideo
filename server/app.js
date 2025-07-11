@@ -545,11 +545,19 @@ class App{
   async removePlaylistItem(index, ws) {
     if(this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
-        this.videoPlayers[ws.i].playlist.splice(index, 1);
-        if(index <= this.videoPlayers[ws.i].currentTrack) {
-          this.videoPlayers[ws.i].currentTrack--;
+        const player = this.videoPlayers[ws.i];
+        if (index < 0 || index >= player.playlist.length) return; // Bounds check
+
+        player.playlist.splice(index, 1);
+
+        // Adjust currentTrack if an item before it was removed.
+        if (index < player.currentTrack) {
+          player.currentTrack--;
         }
-        this.updateClients(ws.i);
+        // Send a granular update: the index of the removed item and the new currentTrack index.
+        player.sockets.forEach(socket => {
+          this.send(socket, Commands.ITEM_REMOVED, { index: index, newCurrentTrack: player.currentTrack });
+        });
         await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
     }

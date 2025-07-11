@@ -12,6 +12,7 @@ const Commands = {
   ADD_TO_PLAYLIST: 'add-to-playlist',
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
+  ITEM_REMOVED: 'item-removed',
   TAKE_OVER: 'take-over',
   FROM_PLAYLIST: 'from-playlist',
   CLEAR_PLAYLIST: 'clear-playlist',

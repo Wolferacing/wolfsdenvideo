@@ -74,6 +74,15 @@ class Playlist {
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.ITEM_REMOVED:
+        if (this.core.player && this.core.player.playlist) {
+          // Update local state based on the granular message
+          this.core.player.playlist.splice(json.data.index, 1);
+          this.core.player.currentTrack = json.data.newCurrentTrack;
+          // Re-render the UI with the new state
+          this.updatePlaylist(this.core.player);
+        }
+        break;
       case Commands.SHOW_REPLACE_PROMPT:
         // By cloning the alternative video object, we prevent it from being accidentally
         // mutated if the same video appears in a later search result. This is a defensive
