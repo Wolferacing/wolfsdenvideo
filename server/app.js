@@ -154,9 +154,12 @@ class App{
     });
   } 
   send(socket, path, data) {
-     socket.send(JSON.stringify({path, data}));
+     const payload = JSON.stringify({path, data});
+     console.log(`[SEND] user: ${socket.u ? socket.u.name : 'N/A'}, instance: ${socket.i || 'N/A'}, type: ${socket.type || 'N/A'}, path: ${path}, payload_size: ${payload.length}`);
+     socket.send(payload);
   }
   async parseMessage(msg, ws){
+    console.log(`[RECV] user: ${ws.u ? ws.u.name : 'N/A'}, instance: ${ws.i || 'N/A'}, type: ${ws.type || 'N/A'}, path: ${msg.path}`);
     switch(msg.path) {
       case Commands.INSTANCE:
         if(msg.u) { 
@@ -589,9 +592,7 @@ class App{
       }
     } 
     this.syncWsTime(ws, instanceId);
-    if(ws.type !== "player") {
-      this.send(ws, Commands.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
-    }
+    this.send(ws, Commands.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
   }
   getVideoObject(instanceId) {
     if(this.videoPlayers[instanceId]) {
@@ -629,9 +630,7 @@ class App{
     if(this.videoPlayers[instanceId]) {
       const video = this.getVideoObject(instanceId);
       this.videoPlayers[instanceId].sockets.forEach(socket => {
-        if(socket.type !== "player") {
-          this.send(socket, Commands.PLAYBACK_UPDATE, {video, type});
-        }
+        this.send(socket, Commands.PLAYBACK_UPDATE, {video, type});
       });
     }
   }
