@@ -133,25 +133,35 @@ class App{
   }
   handleClose(ws) {
     console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.', ws.type);
-    Object.keys(this.videoPlayers).forEach(key => {
-      const videoPlayer = this.videoPlayers[key];
-      if(ws.u && videoPlayer.host.id === ws.u.id && ws.type === "space") {
-        console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver in 42 secs');
-        videoPlayer.hostConnected = false;
-        videoPlayer.takeoverTimeout = setTimeout(async ()=>{
-          if(!videoPlayer.hostConnected) {
-            console.log(ws.u.name ? ws.u.name : 'Unknown', 'takeover enabled after 42 secs');
-            videoPlayer.canTakeOver = true;
-            this.updateClients(key);
-            await this.savePlayerState(key);
-          }
-        }, 1000 * 42);
+    const instanceId = ws.i;
+    if (!instanceId || !this.videoPlayers[instanceId]) {
+      return; // Socket was not in an instance, nothing to do.
+    }
+    const videoPlayer = this.videoPlayers[instanceId];
+    // Handle host disconnection
+    if (ws.u && videoPlayer.host.id === ws.u.id && ws.type === "space") {
+      console.log(ws.u.name ? ws.u.name : 'Unknown', 'user was host, enabling takeOver in 42 secs');
+      videoPlayer.hostConnected = false;
+      videoPlayer.takeoverTimeout = setTimeout(async () => {
+        if (!videoPlayer.hostConnected) {
+          console.log(ws.u.name ? ws.u.name : 'Unknown', 'takeover enabled after 42 secs');
+          videoPlayer.canTakeOver = true;
+          this.updateClients(instanceId);
+          await this.savePlayerState(instanceId);
+        }
+      }, 1000 * 42);
+    }
+    // Remove the disconnected socket
+    videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
+    // If the user had votes, remove them
+    if (ws.u) {
+      const voteCount = videoPlayer.votes.length;
+      videoPlayer.votes = videoPlayer.votes.filter(vote => vote.u.id !== ws.u.id);
+      if (voteCount > videoPlayer.votes.length) {
+        this.updateVotes(instanceId);
       }
-      videoPlayer.sockets = videoPlayer.sockets.filter(_ws => _ws !== ws);
-      videoPlayer.votes = videoPlayer.votes.filter(v => v !== ws);
-      this.updateVotes(ws);
-      this.updateClients(ws.i);
-    });
+    }
+    this.updateClients(instanceId);
   } 
   send(socket, path, data) {
      const payload = JSON.stringify({path, data});
@@ -243,7 +253,13 @@ class App{
         break;
       case Commands.REMOVE_FROM_PLAYERS:
         this.removeFromPlayers(msg.data, ws);
-        break; 
+        break;
+      case Commands.ADD_AND_PLAY:
+        await this.addAndPlay(msg.data, ws);
+        break;
+      case Commands.ADD_AND_PLAY_NEXT:
+        await this.addAndPlayNext(msg.data, ws);
+        break;
     }
   } 
   measureLatency(ws) {
@@ -279,12 +295,13 @@ class App{
     this.updateClients(ws.i, "add-to-players");
   }
   async toggleVote(ws) {
-    if(this.videoPlayers[ws.i]) {
+    if (this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
-        this.videoPlayers[ws.i].canVote = !this.videoPlayers[ws.i].canVote;
-        if(this.videoPlayers[ws.i].canVote && this.videoPlayers[ws.i].playlist.length) {
-          this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack].votes = 9999999;
-          this.updateVotes(ws);
+        const player = this.videoPlayers[ws.i];
+        player.canVote = !player.canVote;
+        // When turning voting on, clear all existing votes to start fresh.
+        if (player.canVote) {
+          player.votes = [];
         }
         this.updateClients(ws.i);
         await this.savePlayerState(ws.i);
@@ -318,29 +335,44 @@ class App{
       });
     }
   }
-  updateVotes(ws) {
-    if(this.videoPlayers[ws.i] && this.videoPlayers[ws.i].canVote) {
-      this.videoPlayers[ws.i].playlist.forEach(d => {
-          const downVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && v.isDown).length;
-          const upVotes = this.videoPlayers[ws.i].votes.filter(v => v.video === d && !v.isDown).length;
-          d.votes = upVotes - downVotes; 
+  updateVotes(instanceId) {
+    const player = this.videoPlayers[instanceId];
+    // Only sort if voting is on and there's something to sort.
+    if (player && player.canVote && player.playlist.length > 1) {
+      // Identify and temporarily remove the currently playing track.
+      const currentTrackObject = player.playlist.splice(player.currentTrack, 1)[0];
+
+      // Calculate votes for the rest of the playlist.
+      player.playlist.forEach(d => {
+        const downVotes = player.votes.filter(v => v.video === d && v.isDown).length;
+        const upVotes = player.votes.filter(v => v.video === d && !v.isDown).length;
+        d.votes = upVotes - downVotes;
       });
-      
-      const current = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
-      current.votes = 9999999;
-      
-      this.videoPlayers[ws.i].playlist.sort((a, b) => {
-        return b.votes - a.votes;
-      });
-      this.videoPlayers[ws.i].currentTrack = 0;
+
+      // Sort the rest of the playlist based on votes.
+      player.playlist.sort((a, b) => b.votes - a.votes);
+
+      // Add the currently playing track back to the top.
+      player.playlist.unshift(currentTrackObject);
+
+      // The current track is now always at index 0.
+      player.currentTrack = 0;
     }
   }
-  setVote(track, isDown, ws) {
+  setVote(link, isDown, ws) {
     const player = this.videoPlayers[ws.i];
-    if(player && this.videoPlayers[ws.i].playlist.length > track && this.videoPlayers[ws.i].canVote) {
-      player.votes = player.votes.filter(d => !(d.u === ws.u && player.playlist[track] === d.video));
-      player.votes.push({u: ws.u, isDown, video: player.playlist[track]});
-      this.updateVotes(ws);
+    const videoObject = player ? player.playlist.find(v => v.link === link) : null;
+
+    if (player && videoObject && player.canVote) {
+      // Prevent voting on the currently playing track
+      if (player.playlist[player.currentTrack].link === link) {
+        return;
+      }
+      // Remove any previous vote from this user for this video
+      player.votes = player.votes.filter(d => !(d.u.id === ws.u.id && d.video.link === link));
+      // Add the new vote
+      player.votes.push({u: ws.u, isDown, video: videoObject});
+      this.updateVotes(ws.i);
       this.updateClients(ws.i, "set-vote");
     }
   }
@@ -382,6 +414,42 @@ class App{
         if(!skipUpdate) {
           this.updateClients(ws.i);
         }
+        await this.savePlayerState(ws.i);
+      }, this.videoPlayers[ws.i].locked);
+    }
+  }
+  async addAndPlay(v, ws) {
+    if (this.videoPlayers[ws.i]) {
+      this.onlyIfHost(ws, async () => {
+        const player = this.videoPlayers[ws.i];
+        // Add the video to the playlist
+        v.user = ws.u.name;
+        v.votes = 0;
+        v.is_youtube_website = false;
+        player.playlist.push(v);
+
+        // Set it as the current track
+        const newIndex = player.playlist.length - 1;
+        player.currentTrack = newIndex;
+        player.currentTime = 0;
+        player.lastStartTime = new Date().getTime() / 1000;
+        this.resetBrowserIfNeedBe(player, newIndex);
+        this.updateVotes(ws.i);
+        this.updateClients(ws.i, Commands.SET_TRACK);
+        await this.savePlayerState(ws.i);
+      }, this.videoPlayers[ws.i].locked);
+    }
+  }
+  async addAndPlayNext(v, ws) {
+    if (this.videoPlayers[ws.i]) {
+      this.onlyIfHost(ws, async () => {
+        const player = this.videoPlayers[ws.i];
+        v.user = ws.u.name;
+        v.votes = 0;
+        v.is_youtube_website = false;
+        const nextIndex = player.currentTrack + 1;
+        player.playlist.splice(nextIndex, 0, v);
+        this.updateClients(ws.i);
         await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
@@ -483,16 +551,15 @@ class App{
   async setVideoTrack(index, ws) {
     this.onlyIfHost(ws, async () => {
       if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
-        const track = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
         if(this.videoPlayers[ws.i].canVote) {
+          const track = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
           this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video !== track);
-          this.videoPlayers[ws.i].playlist[index].votes = 9999999;
         }
         this.videoPlayers[ws.i].currentTrack = index;
         this.videoPlayers[ws.i].currentTime = 0;
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         this.resetBrowserIfNeedBe(this.videoPlayers[ws.i], index);
-        this.updateVotes(ws);
+        this.updateVotes(ws.i);
         this.updateClients(ws.i, Commands.SET_TRACK);
         await this.savePlayerState(ws.i);
       }else{
@@ -556,23 +623,37 @@ class App{
         canVote: false,
         currentPlayerUrl: "",
         lastStartTime: new Date().getTime() / 1000,
-        tick: setInterval(() => {
+        tick: setInterval(async () => {
           if(this.videoPlayers[instanceId].playlist.length) {
-            const track = this.videoPlayers[instanceId].playlist[this.videoPlayers[instanceId].currentTrack];
             const now = new Date().getTime() / 1000;
             this.videoPlayers[instanceId].currentTime = now - this.videoPlayers[instanceId].lastStartTime;
-            if(this.videoPlayers[instanceId].currentTime > (track ? track.duration : 0) / 1000) {
-              this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video !== track);
-              this.videoPlayers[instanceId].currentTrack ++;
-              if(this.videoPlayers[instanceId].currentTrack >= this.videoPlayers[instanceId].playlist.length) {
-                this.videoPlayers[instanceId].currentTrack = 0;
+
+            // Use a while loop to correctly handle advancing multiple tracks after a long sleep/downtime.
+            while (true) {
+              const player = this.videoPlayers[instanceId];
+              if (!player.playlist.length) break;
+
+              const track = player.playlist[player.currentTrack];
+              const trackDuration = (track ? track.duration : 0) / 1000;
+
+              if (trackDuration > 0 && player.currentTime > trackDuration) {
+                // Time to advance to the next track
+                player.currentTime -= trackDuration; // Carry over the extra time
+                player.lastStartTime += trackDuration; // Also advance the start time to maintain sync
+
+                player.votes = player.votes.filter(v => v.video !== track);
+                player.currentTrack++;
+                if (player.currentTrack >= player.playlist.length) {
+                  player.currentTrack = 0;
+                }
+                this.updateVotes(instanceId);
+                this.resetBrowserIfNeedBe(player, player.currentTrack);
+                this.updateClients(instanceId, Commands.SET_TRACK);
+                await this.savePlayerState(instanceId);
+              } else {
+                // Current time is within the current track's duration, so we can stop.
+                break;
               }
-              this.videoPlayers[instanceId].currentTime = 0;
-              this.updateVotes(ws);
-              this.videoPlayers[instanceId].lastStartTime = now;
-              this.resetBrowserIfNeedBe(this.videoPlayers[instanceId], this.videoPlayers[instanceId].currentTrack);
-              this.updateClients(instanceId, Commands.SET_TRACK);
-              this.savePlayerState(instanceId);
             }
           }else{
              this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;
