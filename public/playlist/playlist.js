@@ -83,6 +83,22 @@ class Playlist {
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.TRACK_CHANGED:
+        if (this.core.player) {
+          // If the message includes a new playlist (e.g., from add-and-play), update it.
+          if (json.data.playlist) {
+            this.core.player.playlist = json.data.playlist;
+          }
+          this.core.player.currentTrack = json.data.newTrackIndex;
+          this.core.player.lastStartTime = json.data.newLastStartTime;
+          // The playlist UI also needs the duration of the new track for the progress bar.
+          if (this.core.player.playlist[this.core.player.currentTrack]) {
+              this.core.player.duration = this.core.player.playlist[this.core.player.currentTrack].duration / 1000;
+          }
+          this.updatePlaylist(this.core.player);
+          this.startUiUpdater(); // Restart the progress bar timer
+        }
+        break;
       case Commands.SHOW_REPLACE_PROMPT:
         // By cloning the alternative video object, we prevent it from being accidentally
         // mutated if the same video appears in a later search result. This is a defensive

@@ -452,9 +452,11 @@ class App{
         });
         if (player.playlist.length > 0) {
           player.lastStartTime = new Date().getTime() / 1000;
-          this.updateClients(ws.i, Commands.SET_TRACK);
+          player.sockets.forEach(socket => {
+            this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, playlist: player.playlist });
+          });
         } else {
-          this.updateClients(ws.i);
+          this.updateClients(ws.i); // This is fine, sends an empty playlist.
         }
         await this.savePlayerState(ws.i);
       }
@@ -471,7 +473,9 @@ class App{
         console.log("clearPlaylist", ws.i, ws.u);
         this.resetPlaylist(ws);
         if(!skipUpdate) {
-          this.updateClients(ws.i);
+          this.videoPlayers[ws.i].sockets.forEach(socket => {
+            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: [], currentTrack: 0 });
+          });
         }
         await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked);
@@ -491,7 +495,9 @@ class App{
         player.lastStartTime = new Date().getTime() / 1000;
         this.resetBrowserIfNeedBe(player, newIndex);
         this.updateVotes(ws.i);
-        this.updateClients(ws.i, Commands.SET_TRACK);
+        player.sockets.forEach(socket => {
+          this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, playlist: player.playlist });
+        });
         await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
@@ -636,7 +642,10 @@ class App{
         this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         this.resetBrowserIfNeedBe(this.videoPlayers[ws.i], index);
         this.updateVotes(ws.i);
-        this.updateClients(ws.i, Commands.SET_TRACK);
+        const player = this.videoPlayers[ws.i];
+        player.sockets.forEach(socket => {
+          this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime });
+        });
         await this.savePlayerState(ws.i);
       }else{
         this.send(ws, Commands.OUT_OF_BOUNDS);
@@ -671,7 +680,9 @@ class App{
             }
             this.updateVotes(instanceId);
             this.resetBrowserIfNeedBe(player, player.currentTrack);
-            this.updateClients(instanceId, Commands.SET_TRACK);
+            player.sockets.forEach(socket => {
+              this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime });
+            });
             await this.savePlayerState(instanceId);
           } else {
             // Current time is within the current track's duration, so we can stop.
@@ -759,9 +770,17 @@ class App{
 
         // If the replaced video was the one currently playing, we need to send a SET_TRACK command
         // to force clients to reload the video source. Otherwise, a simple update is fine.
-        const updateType = (videoIndex === player.currentTrack) ? Commands.SET_TRACK : undefined;
-
-        this.updateClients(ws.i, updateType);
+        const wasCurrentTrack = (videoIndex === player.currentTrack);
+        if (wasCurrentTrack) {
+          player.lastStartTime = new Date().getTime() / 1000;
+          player.sockets.forEach(socket => {
+            this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, playlist: player.playlist });
+          });
+        } else {
+          player.sockets.forEach(socket => {
+            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: player.playlist, currentTrack: player.currentTrack });
+          });
+        }
         await this.savePlayerState(ws.i);
       }
     });

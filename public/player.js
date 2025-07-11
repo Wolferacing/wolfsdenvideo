@@ -154,14 +154,26 @@ class Player {
         // Merge new data into the existing player state.
         // This prevents the playlist from being wiped out on updates that don't include it.
         this.playerData = Object.assign(this.playerData || {}, json.data.video);
-        // If a track is being set by the host, and we're ready, obey immediately.
-        if (json.data.type === "set-track" && this.readyToPlay) {
-          this.playVidya(this.playerData.currentTrack, this.playerData.currentTime, true);
-          this.initialSyncComplete = true; // A track set is a definitive sync.
-        } else if (json.data.type === "stop" && this.readyToPlay) {
+        // The specific 'set-track' logic is now handled by the TRACK_CHANGED command.
+        if (json.data.type === "stop" && this.readyToPlay) {
           this.player.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=_VUKfrA9oLQ"), 0);
         }
         // The initial sync is now handled by the onStateChange event when the player is ready.
+        break;
+      case Commands.TRACK_CHANGED:
+        // This is the new authoritative command for changing tracks.
+        if (this.playerData && this.readyToPlay) {
+          // If the message includes a new playlist (e.g., from add-and-play), update it.
+          if (json.data.playlist) {
+            this.playerData.playlist = json.data.playlist;
+          }
+          this.playerData.currentTrack = json.data.newTrackIndex;
+          this.playerData.lastStartTime = json.data.newLastStartTime;
+          // The server now provides the definitive start time.
+          const startTime = json.data.newCurrentTime || 0;
+          this.playVidya(this.playerData.currentTrack, startTime, true);
+          this.initialSyncComplete = true; // A track change is a definitive sync.
+        }
         break;
       case Commands.MUTE:
         this.core.params.mute = json.data;

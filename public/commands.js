@@ -13,6 +13,7 @@ const Commands = {
   MOVE_PLAYLIST_ITEM: 'move-playlist-item',
   REMOVE_PLAYLIST_ITEM: 'remove-playlist-item',
   ITEM_REMOVED: 'item-removed',
+  TRACK_CHANGED: 'track-changed',
   TAKE_OVER: 'take-over',
   FROM_PLAYLIST: 'from-playlist',
   CLEAR_PLAYLIST: 'clear-playlist',
