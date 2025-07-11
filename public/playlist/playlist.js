@@ -458,6 +458,9 @@ class Playlist {
     
     this.loadingSpinner = document.querySelector('.loadingSpinner');
     
+    // Set the spinner's src from the config
+    this.loadingSpinner.src = `https://${window.APP_CONFIG.HOST_URL}/assets/3-dots-move.svg`;
+    
     this.lockPlayer = document.querySelector('#lockPlayer');
     
     this.lockPlayer.addEventListener('click', () => {
@@ -529,6 +532,12 @@ class Playlist {
     this.replaceConfirmButton = document.querySelector('#replaceConfirm');
     this.replaceDismissButton = document.querySelector('#replaceDismiss');
     this.replaceDismissButton.addEventListener('click', () => this.hideReplacePrompt());
+
+    // Dynamically set styles that depend on the host URL
+    document.querySelectorAll('.teal').forEach(el => {
+      el.style.background = `url(https://${window.APP_CONFIG.HOST_URL}/assets/Button_bg.png)`;
+      el.style.backgroundSize = '100% 100%';
+    });
   }
 }
 new Playlist();
