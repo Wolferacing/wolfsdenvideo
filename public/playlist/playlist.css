@@ -172,32 +172,12 @@ body{
 .extra-padding{
   padding: 5 10;
 }
-
 .notification-area {
-  position: fixed;
-  top: 10px; /* Adjust as needed */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  max-width: 600px;
-  z-index: 1000; /* Ensure it's on top */
-}
-
-.notification {
-  background-color: #333;
-  color: white;
-  padding: 10px;
-  margin-bottom: 5px;
-  border-radius: 5px;
+  padding: 10px 15px;
+  background-color: #065a00; /* A color that fits the theme */
+  color: #fff;
   text-align: center;
-  opacity: 0.9;
-}
-
-.notification-prompt {
-  background-color: #4CAF50; /* Green for prompts */
-  font-weight: bold;
-}
-
-.notification-prompt:hover {
-  opacity: 1;
+  font-size: 1.1em;
+  border-bottom: 1px solid #065a00;
+  display: none; /* Hidden by default */
 }

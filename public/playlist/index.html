@@ -4,8 +4,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link href="./playlist.css" rel="stylesheet">
   </head>
   <body>
@@ -15,13 +13,13 @@
       </div>
       <div class="playlistTitle"><div class="title">
           Video Playlist
-        </div><div class="button teal " id="lockPlayer">Unlock</div><div class="button teal " id="takeOver">TakeOver: Off</div><div class="button teal " id="voting">Voting: Off</div><div class="button teal" id="clearPlaylist">Clear List</div><div class="button teal" id="loadDefaultPlaylist" style="display: none;">Load Default</div><div class="button teal" id="addPlaylist">Add Playlist Id</div><div class="button teal " id="autoSync">Auto Sync: Off</div>
+        </div><div class="button teal " id="lockPlayer">Unlock</div><div class="button teal " id="takeOver">TakeOver: Off</div><div class="button teal " id="voting">Voting: Off</div><div class="button teal" id="clearPlaylist">Clear List</div><div class="button teal" id="loadDefaultPlaylist" style="display: none;">Load Default</div><div class="button teal" id="addPlaylist">Add Playlist Id</div><div class="button teal " id="autoSync">Auto Sync: Off</div><div class="button green" id="replaceConfirm" style="display: none;">Confirm Replace</div><div class="button red" id="replaceDismiss" style="display: none;">Dismiss</div>
       </div>
     </div>
     <div class="hostTitle">
 
     </div>
-    <div class="notification-area" id="playlist-notifications"></div>
+    <div class="notification-area" id="playlist-notifications" style="display: none;"></div>
     <div class="videoPlaylistContainer">
       
     </div>
@@ -44,17 +42,6 @@
       <div class="button slim teal" id="addItemSubmit">Load Playlist</div>
     </div>
     <img src="https://vidya.firer.at/assets/3-dots-move.svg" class="loadingSpinner"/>
-
-    <!-- Confirmation Modal for Replacing Videos -->
-    <div class="confirm-backdrop" id="replace-confirm-backdrop" style="display: none;"></div>
-    <div class="confirm-modal" id="replace-confirm-modal" style="display: none;">
-      <div class="confirm-title">Replace Unavailable Video?</div>
-      <div class="confirm-text" id="replace-confirm-text"></div>
-      <div class="confirm-actions">
-        <div class="button slim red" id="replace-confirm-no">No</div>
-        <div class="button slim green" id="replace-confirm-yes">Yes, Replace</div>
-      </div>
-    </div>
 
     <script src="./playlist.js"></script>
   </body> 

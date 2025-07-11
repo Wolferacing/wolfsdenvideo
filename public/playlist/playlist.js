@@ -3,6 +3,7 @@ class Playlist {
     this.hostUrl = 'vidya.firer.at';
     this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.uiUpdateInterval = null;
+    this.pendingReplacement = null;
     this.init();
   }
   async init() {
@@ -19,7 +20,6 @@ class Playlist {
     });
   }
   playPlaylist(shouldClear) {
-    this.clearNotification();
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId || this.core.params.playlist, shouldClear, fromPlaylist: true}});
     this.playlistId = null;
   }
@@ -43,18 +43,19 @@ class Playlist {
         alert("I cant let you do that...");
         break;
       case Commands.SHOW_REPLACE_PROMPT:
-        const { original, alternative } = json.data;
-        this.showNotification(`Video unavailable: '${original.title}'. Click "Yes, Replace" to use '${alternative.title}'.`, true);
-        this.replaceConfirmText.innerHTML = `A user can't watch:<br><b>${original.title}</b><br><br>Replace it for everyone with:<br><b>${alternative.title}</b>?`;
-        
-        this.replaceConfirmModal.style.display = 'block';
-        this.replaceConfirmBackdrop.style.display = 'block';
+        this.pendingReplacement = json.data;
+        const { original, alternative } = this.pendingReplacement;
 
-        // Use a one-time event listener to handle the confirmation
-        this.replaceConfirmYes.onclick = () => {
+        this.notificationArea.textContent = `A user can't watch: "${original.title}". Suggested replacement: "${alternative.title}".`;
+        this.notificationArea.style.display = 'block';
+
+        this.replaceConfirmButton.style.display = 'inline-block';
+        this.replaceDismissButton.style.display = 'inline-block';
+
+        this.replaceConfirmButton.onclick = () => {
           this.core.sendMessage({
             path: Commands.REPLACE_VIDEO,
-            data: { originalLink: original.link, alternativeVideo: alternative }
+            data: { originalLink: this.pendingReplacement.original.link, alternativeVideo: this.pendingReplacement.alternative }
           });
           this.hideReplacePrompt();
         };
@@ -118,6 +119,10 @@ class Playlist {
     this.voting.style.display = !isMe ? 'none' : 'inline-block';
     this.voting.innerText = player.canVote ? 'Voting: On' : 'Voting: Off';
     this.autoSync.style.display = 'inline-block';
+    if (!this.pendingReplacement) {
+      this.replaceConfirmButton.style.display = 'none';
+      this.replaceDismissButton.style.display = 'none';
+    }
 
     // --- Securely build the host title ---
     this.hostTitle.innerHTML = ''; // Clear previous content
@@ -341,26 +346,12 @@ class Playlist {
       this.addItemBackDrop.style.display = 'none';
   }
   hideReplacePrompt() {
-    this.replaceConfirmModal.style.display = 'none';
-    this.replaceConfirmBackdrop.style.display = 'none';
-    // Clear the onclick to prevent accidental future clicks
-    this.replaceConfirmYes.onclick = null;
-  }
-  autoSync() {
-    
-  }
-  showNotification(message, isPrompt = false) {
-    this.clearNotification(); // Clear any existing notification
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    if (isPrompt) {
-      notification.classList.add('notification-prompt');
-    }
-    this.notificationArea.appendChild(notification);
-  }
-  clearNotification() {
-    this.notificationArea.innerHTML = '';
+    this.pendingReplacement = null;
+    this.notificationArea.style.display = 'none';
+    this.notificationArea.textContent = '';
+    this.replaceConfirmButton.style.display = 'none';
+    this.replaceDismissButton.style.display = 'none';
+    this.replaceConfirmButton.onclick = null; // Clean up listener
   }
   setupNotificationArea() {
     this.notificationArea = document.querySelector('#playlist-notifications');
@@ -450,16 +441,11 @@ class Playlist {
     
     this.hostTitle = document.querySelector('.hostTitle');
 
-    // --- Replace Video Confirmation Modal ---
-    this.replaceConfirmModal = document.querySelector('#replace-confirm-modal');
-    this.replaceConfirmBackdrop = document.querySelector('#replace-confirm-backdrop');
-    this.replaceConfirmText = document.querySelector('#replace-confirm-text');
-    this.replaceConfirmYes = document.querySelector('#replace-confirm-yes');
-    this.replaceConfirmNo = document.querySelector('#replace-confirm-no');
-    this.replaceConfirmNo.addEventListener('click', () => this.hideReplacePrompt());
-    this.replaceConfirmBackdrop.addEventListener('click', () => this.hideReplacePrompt());
-
-    this.setupNotificationArea();
+    // --- Replace Video Prompt ---
+    this.notificationArea = document.querySelector('#playlist-notifications');
+    this.replaceConfirmButton = document.querySelector('#replaceConfirm');
+    this.replaceDismissButton = document.querySelector('#replaceDismiss');
+    this.replaceDismissButton.addEventListener('click', () => this.hideReplacePrompt());
   }
 }
 new Playlist();

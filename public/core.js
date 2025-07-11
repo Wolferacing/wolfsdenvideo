@@ -2,7 +2,8 @@ class Core {
     constructor() {
         this.urlParams = new URLSearchParams(window.location.search);
     }
-  async init(hostUrl) { 
+  async init(hostUrl) {
+    await this.setupToastify();
     this.imIn = false;
     this.hostUrl = hostUrl;
     // this.defaultVideo = this.params["default-video"];
@@ -76,7 +77,7 @@ class Core {
       document.body.appendChild(iframe);
 
       const playlistUrl = `https://${this.hostUrl}/playlist/?instance=${this.params.instance}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}`;
-      this.showToast(`Player is in 2D mode. See console for playlist URL.`);
+      this.showToast(`Player is in 2D mode. See console for playlist URL.`, 5000);
       console.log(`Player is in 2D mode. Open the playlist controls here: ${playlistUrl}`);
       return;
     }
@@ -215,14 +216,17 @@ class Core {
       this.playlistContainer.appendChild(boxTrigger);
     }
   }
-  showToast(text) {
-    if(Toastify) {
+  showToast(text, duration = 3000) {
+    if(typeof Toastify !== 'undefined') {
       Toastify({
         text: text,
-        duration: 1000,
+        duration: duration,
         // close: true,
         gravity: "bottom", // `top` or `bottom`
         position: "right", // `left`, `center` or `right`
+        offset: {
+          y: '3em' // Moves the toast up from the bottom edge
+        },
         // stopOnFocus: true, // Prevents dismissing of toast on hover
         style: {
           background: "url(https://vidya.firer.at/assets/Button_bg.png) center center no-repeat",
@@ -504,7 +508,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
         break;
       case Commands.SHOW_REPLACE_PROMPT:
         // This is a notification for the host in the 3D space to check their playlist UI.
-        this.showToast("Video unavailable for a user. Check playlist to replace.");
+        this.showToast("Video unavailable for a user. Check playlist to replace.", 5000);
         break;
     }
   }
@@ -512,6 +516,27 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     var match = url.match(regExp);
     return (match&&match[7].length==11)? match[7] : false;
+  }
+  async setupToastify() {
+    if (typeof Toastify === 'undefined') {
+      // Load CSS
+      const cssLink = document.createElement('link');
+      cssLink.rel = 'stylesheet';
+      cssLink.type = 'text/css';
+      cssLink.href = 'https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css';
+      document.head.appendChild(cssLink);
+
+      // Load JS
+      await this._loadExternalScript('https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.js');
+    }
+  }
+  _loadExternalScript(url) {
+    return new Promise(resolve => {
+      let myScript = document.createElement("script");
+      myScript.setAttribute("src", url);
+      myScript.addEventListener ("load", resolve, false);
+      document.body.appendChild(myScript);
+    });
   }
   setupSayNamesScript(callback) {
     return this.setupScript(callback, "say-names", {"four-twenty": this.params["announce-four-twenty"]});
