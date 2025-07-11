@@ -8,7 +8,6 @@ const ytfps = require('ytfps');
 const fetch = require('node-fetch');
 const Commands = require('../public/commands.js');
 const { Pool } = require('pg');
-const test =1;
 
 class App{
   constructor() {
@@ -22,8 +21,8 @@ class App{
     });
     this.setupDatabase();
     this.setupWebserver();
-    setInterval(() => this.syncTime(), 1000);
-    this.syncTime();
+    // A single, unified loop is much more efficient than one timer per instance.
+    this.mainLoop = setInterval(() => this.tickAllInstances(), 1000);
     // Periodically save all player states as a fallback
     setInterval(() => this.saveAllPlayerStates(), 30000);
   }
@@ -57,8 +56,8 @@ class App{
       locked: player.locked,
       canTakeOver: player.canTakeOver,
       canVote: player.canVote,
-      // We don't save votes directly as they are tied to connected sockets.
-      // We also don't save the host, as the first person to connect becomes the new host.
+      host: player.host,
+      // We don't save votes as they are tied to connected sockets.
     };
 
     const client = await this.pool.connect();
@@ -123,6 +122,7 @@ class App{
     });
 
     this.server.on('close', () => {
+      clearInterval(this.mainLoop);
       clearInterval(interval);
     });
     this.app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -162,6 +162,16 @@ class App{
       }
     }
     this.updateClients(instanceId);
+
+    // If the instance is now empty, schedule it for cleanup.
+    if (videoPlayer.sockets.length === 0) {
+      console.log(`Instance ${instanceId} is empty. Scheduling cleanup in 5 minutes.`);
+      videoPlayer.deleteTimeout = setTimeout(async () => {
+        console.log(`Cleaning up inactive instance: ${instanceId}`);
+        await this.savePlayerState(instanceId);
+        delete this.videoPlayers[instanceId];
+      }, 1000 * 60 * 5); // 5-minute grace period
+    }
   } 
   send(socket, path, data) {
      const payload = JSON.stringify({path, data});
@@ -567,6 +577,51 @@ class App{
       }
     }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
   }
+  async tickAllInstances() {
+    for (const instanceId in this.videoPlayers) {
+      const player = this.videoPlayers[instanceId];
+
+      // --- Logic from the old per-instance `tick` ---
+      if (player.playlist.length) {
+        const now = new Date().getTime() / 1000;
+        player.currentTime = now - player.lastStartTime;
+
+        // Use a while loop to correctly handle advancing multiple tracks after a long sleep/downtime.
+        while (true) {
+          if (!player.playlist.length) break;
+
+          const track = player.playlist[player.currentTrack];
+          const trackDuration = (track ? track.duration : 0) / 1000;
+
+          if (trackDuration > 0 && player.currentTime > trackDuration) {
+            // Time to advance to the next track
+            player.currentTime -= trackDuration; // Carry over the extra time
+            player.lastStartTime += trackDuration; // Also advance the start time to maintain sync
+
+            player.votes = player.votes.filter(v => v.video !== track);
+            player.currentTrack++;
+            if (player.currentTrack >= player.playlist.length) {
+              player.currentTrack = 0;
+            }
+            this.updateVotes(instanceId);
+            this.resetBrowserIfNeedBe(player, player.currentTrack);
+            this.updateClients(instanceId, Commands.SET_TRACK);
+            await this.savePlayerState(instanceId);
+          } else {
+            // Current time is within the current track's duration, so we can stop.
+            break;
+          }
+        }
+      } else {
+        player.currentTime = player.currentTrack = 0;
+      }
+
+      // --- Logic from the old `syncTime` function ---
+      player.sockets.forEach(socket => {
+        this.syncWsTime(socket, instanceId);
+      });
+    }
+  }
   resetBrowserIfNeedBe(player, index) {
     const users = [...new Set(player.sockets.map(ws => ws.u.id))];
     users.forEach(uid => {
@@ -600,8 +655,6 @@ class App{
         const res = await client.query('SELECT player_data FROM player_state WHERE instance_id = $1', [instanceId]);
         if (res.rows.length > 0) {
           existingState = res.rows[0].player_data;
-          // The connecting user is the new host, so we don't restore the old one.
-          delete existingState.host;
           console.log(`Loaded state for instance: ${instanceId}`);
         }
       } catch (err) {
@@ -610,6 +663,8 @@ class App{
         client.release();
       }
 
+      // Create the new player object, defaulting the connecting user as host.
+      // This will be overwritten by existingState if a host is already saved.
       this.videoPlayers[instanceId] = {
         playlist:[],
         votes: [],
@@ -622,52 +677,26 @@ class App{
         canTakeOver: true,
         canVote: false,
         currentPlayerUrl: "",
-        lastStartTime: new Date().getTime() / 1000,
-        tick: setInterval(async () => {
-          if(this.videoPlayers[instanceId].playlist.length) {
-            const now = new Date().getTime() / 1000;
-            this.videoPlayers[instanceId].currentTime = now - this.videoPlayers[instanceId].lastStartTime;
-
-            // Use a while loop to correctly handle advancing multiple tracks after a long sleep/downtime.
-            while (true) {
-              const player = this.videoPlayers[instanceId];
-              if (!player.playlist.length) break;
-
-              const track = player.playlist[player.currentTrack];
-              const trackDuration = (track ? track.duration : 0) / 1000;
-
-              if (trackDuration > 0 && player.currentTime > trackDuration) {
-                // Time to advance to the next track
-                player.currentTime -= trackDuration; // Carry over the extra time
-                player.lastStartTime += trackDuration; // Also advance the start time to maintain sync
-
-                player.votes = player.votes.filter(v => v.video !== track);
-                player.currentTrack++;
-                if (player.currentTrack >= player.playlist.length) {
-                  player.currentTrack = 0;
-                }
-                this.updateVotes(instanceId);
-                this.resetBrowserIfNeedBe(player, player.currentTrack);
-                this.updateClients(instanceId, Commands.SET_TRACK);
-                await this.savePlayerState(instanceId);
-              } else {
-                // Current time is within the current track's duration, so we can stop.
-                break;
-              }
-            }
-          }else{
-             this.videoPlayers[instanceId].currentTime = this.videoPlayers[instanceId].currentTrack = 0;
-          }
-        }, 1000)
+        lastStartTime: new Date().getTime() / 1000
       };
 
       if (existingState) {
         Object.assign(this.videoPlayers[instanceId], existingState);
       }
 
-      console.log(user.name, 'is host');
+      // If the connecting user is the host, mark them as connected.
+      if (this.videoPlayers[instanceId].host.id === user.id) {
+        this.videoPlayers[instanceId].hostConnected = true;
+      }
+
+      console.log(this.videoPlayers[instanceId].host.name, 'is host');
     }else{
-      clearTimeout(this.videoPlayers[instanceId].deleteTimeout);
+      // If a user reconnects to an instance that was scheduled for deletion, cancel the deletion.
+      if (this.videoPlayers[instanceId].deleteTimeout) {
+        console.log(`User reconnected to instance ${instanceId}. Cancelling cleanup.`);
+        clearTimeout(this.videoPlayers[instanceId].deleteTimeout);
+        this.videoPlayers[instanceId].deleteTimeout = null;
+      }
       if(!this.videoPlayers[instanceId].sockets.includes(ws)) {
          this.videoPlayers[instanceId].sockets.push(ws);
       }
@@ -699,13 +728,6 @@ class App{
         duration: this.videoPlayers[key].playlist.length && this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack] ? this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack].duration / 1000 : 0
       });
     }
-  }
-  syncTime() {
-    Object.keys(this.videoPlayers).forEach(key => {
-      this.videoPlayers[key].sockets.forEach(socket => {
-        this.syncWsTime(socket, key);
-      });
-    });
   }
   updateClients(instanceId, type) {
     if(this.videoPlayers[instanceId]) {
