@@ -391,10 +391,11 @@ class App{
         console.log("fromPlaylist", ws.i, ws.u, data);
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
+        const player = this.videoPlayers[ws.i];
         let playlist = await ytfps(data.id, { limit: 100 });
-        this.resetPlaylist(ws);
+        this.resetPlaylist(ws); // Resets playlist, currentTime, currentTrack
         playlist.videos.forEach(v => {
-          this.videoPlayers[ws.i].playlist.push({
+          player.playlist.push({
             title: v.title,
             thumbnail: v.thumbnail_url,
             duration: v.milis_length ,
@@ -404,7 +405,12 @@ class App{
             is_youtube_website: false
           })  
         });
-        this.updateClients(ws.i);
+        if (player.playlist.length > 0) {
+          player.lastStartTime = new Date().getTime() / 1000;
+          this.updateClients(ws.i, Commands.SET_TRACK);
+        } else {
+          this.updateClients(ws.i);
+        }
         await this.savePlayerState(ws.i);
       }
     });

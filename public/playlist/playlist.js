@@ -12,7 +12,7 @@ class Playlist {
     await this.core.init(this.hostUrl);
     await this.core.setupCommandsScript();
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
-      this.core.sendMessage({path: "instance", data: this.core.params.instance});
+      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
     }, ()=>{
         this.core.showToast("Reconnecting...");
     });
@@ -68,6 +68,7 @@ class Playlist {
     this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.clearPlaylistButton.style.display = !isMe ? 'none' :  'inline-block';
+    this.loadDefaultPlaylistButton.style.display = (isMe && player.playlist.length === 0 && this.core.params.playlist) ? 'inline-block' : 'none';
     this.addPlaylist.style.display = !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
@@ -364,6 +365,12 @@ class Playlist {
         this.hideAddItem();
       };
       this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
+    });
+    
+    this.loadDefaultPlaylistButton = document.querySelector('#loadDefaultPlaylist');
+    
+    this.loadDefaultPlaylistButton.addEventListener('click', () => {
+      this.playPlaylist(true);
     });
     
     this.hostTitle = document.querySelector('.hostTitle');
