@@ -2,8 +2,8 @@ const SKIP_AMOUNT_SECONDS = 5;
 
 class Player {
   constructor(){
+    this.currentScript = document.currentScript;
     this.autoSyncInterval = null;
-    this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
     this.init();
   }
   async init() {
@@ -259,7 +259,7 @@ class Player {
     return this.setupScript(`https://${window.APP_CONFIG.HOST_URL}/core.js`);
   }
   setupConfigScript() {
-    // Find the absolute path to this script to reliably locate config.js
+    // Use the script's own src attribute to reliably find the config file.
     const scriptUrl = new URL(this.currentScript.src);
     const configUrl = `${scriptUrl.origin}/config.js`;
     return this.setupScript(configUrl);

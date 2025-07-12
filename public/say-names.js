@@ -1,4 +1,4 @@
-const currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
+const currentScript = document.currentScript;
 const urlParams = new URLSearchParams(window.location.search);
 const params = {};
 

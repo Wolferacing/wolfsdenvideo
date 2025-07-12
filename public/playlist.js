@@ -1,6 +1,6 @@
 class PlaylistPlayer {
   constructor() {
-    this.currentScript = Array.from(document.getElementsByTagName('script')).slice(-1)[0];
+    this.currentScript = document.currentScript;
     this.init();
   }
   async init() {
@@ -26,7 +26,7 @@ class PlaylistPlayer {
     });
   }
   setupConfigScript() {
-    // Find the absolute path to this script to reliably locate config.js
+    // Use the script's own src attribute to reliably find the config file.
     const scriptUrl = new URL(this.currentScript.src);
     const configUrl = `${scriptUrl.origin}/config.js`;
     return new Promise(resolve => {
