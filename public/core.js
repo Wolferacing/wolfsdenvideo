@@ -574,10 +574,22 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
     });
   }
   back() {
-    this.sendBrowserMessage({path: Commands.SKIP_BACK});
+    const isHost = this.player && this.player.host && this.player.host.id === window.user.id;
+    if (isHost) {
+      // If the host skips, send a command to the server to sync everyone.
+      this.sendMessage({ path: Commands.HOST_SKIP_BACK });
+    } else {
+      // If a regular user skips, it's a local-only adjustment.
+      this.sendBrowserMessage({ path: Commands.SKIP_BACK });
+    }
   }
   forward() {
-    this.sendBrowserMessage({path: Commands.SKIP_FORWARD});
+    const isHost = this.player && this.player.host && this.player.host.id === window.user.id;
+    if (isHost) {
+      this.sendMessage({ path: Commands.HOST_SKIP_FORWARD });
+    } else {
+      this.sendBrowserMessage({ path: Commands.SKIP_FORWARD });
+    }
   }
   vol(num) {
     this.sendBrowserMessage({path: Commands.SET_VOLUME, data: num});

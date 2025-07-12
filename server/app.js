@@ -364,6 +364,12 @@ class App{
           });
         }
         break;
+      case Commands.HOST_SKIP_BACK:
+        await this.hostSkip(ws, false);
+        break;
+      case Commands.HOST_SKIP_FORWARD:
+        await this.hostSkip(ws, true);
+        break;
       case Commands.VIDEO_UNAVAILABLE:
         await this.handleVideoUnavailable(msg.data, ws);
         break;
@@ -568,6 +574,28 @@ class App{
       const player = this.videoPlayers[ws.i];
       player.autoAdvance = !player.autoAdvance;
       this.updateClients(ws.i, Commands.AUTO_ADVANCE_STATE_CHANGED, { autoAdvance: player.autoAdvance });
+      await this.savePlayerState(ws.i);
+    });
+  }
+  async hostSkip(ws, isForward) {
+    this.onlyIfHost(ws, async () => {
+      const player = this.videoPlayers[ws.i];
+      if (!player || !player.playlist.length) return;
+
+      const isKaraokeContext = Array.isArray(player.singers);
+      const skipAmount = isKaraokeContext ? 1 : 5;
+
+      // To skip forward in time, we subtract from the start timestamp.
+      // To skip backward, we add to it.
+      player.lastStartTime += isForward ? -skipAmount : skipAmount;
+
+      // Broadcast the change to all clients to force a resync.
+      player.sockets.forEach(socket => {
+        this.send(socket, Commands.TRACK_CHANGED, {
+          newTrackIndex: player.currentTrack,
+          newLastStartTime: player.lastStartTime
+        });
+      });
       await this.savePlayerState(ws.i);
     });
   }
