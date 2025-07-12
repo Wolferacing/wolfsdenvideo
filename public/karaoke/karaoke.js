@@ -193,6 +193,22 @@ class Karaoke{
           this.startUiUpdater();
         }
         break;
+      case Commands.HOST_SEEK:
+        if (this.core.player) {
+          this.core.player.lastStartTime = json.data.newLastStartTime;
+          this.core.player.currentTime = json.data.newCurrentTime;
+          // The UI updater will pick up the new lastStartTime on its next interval.
+          // To make the change immediate, we can manually update the relevant elements.
+          const currentTimeBar = document.querySelector('.currentTime');
+          if (currentTimeBar && this.core.player.duration > 0) {
+            currentTimeBar.style.width = `${(this.core.player.currentTime / this.core.player.duration) * 100}%`;
+          }
+          const currentTimeText = document.querySelector('.currentTimeText');
+          if (currentTimeText) {
+            currentTimeText.innerText = `${this.timeCode(this.core.player.currentTime)} / ${this.timeCode(this.core.player.duration)}`;
+          }
+        }
+        break;
       case Commands.SINGER_LIST_UPDATED:
         if (this.core.player) {
           // This is the new authoritative source for the singer list.
