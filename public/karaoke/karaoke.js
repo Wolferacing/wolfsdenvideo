@@ -1,4 +1,4 @@
-class Karaoke{
+var Karaoke = class {
   constructor() {
     this.currentScript = document.currentScript;
     this.uiUpdateInterval = null;
@@ -483,8 +483,10 @@ class Karaoke{
     });
   }
 }
-const karaoke = new Karaoke();
+window.karaokeUiInstance = new Karaoke();
 
 function onYouTubeIframeAPIReady() {
-  karaoke.setupYoutubePlayer();
+  if (window.karaokeUiInstance) {
+    window.karaokeUiInstance.setupYoutubePlayer();
+  }
 }

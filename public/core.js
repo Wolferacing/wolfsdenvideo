@@ -1,4 +1,4 @@
-class Core {
+var Core = class {
     constructor() {
         this.urlParams = new URLSearchParams(window.location.search);
         this.isKaraoke = false;
@@ -632,6 +632,16 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
     }
     if (window.karaokePlayerInstance) {
       window.karaokePlayerInstance = null;
+    }
+    // Nullify the other global instances to allow for complete garbage collection.
+    if (window.playerInstance) {
+      window.playerInstance = null;
+    }
+    if (window.playlistUiInstance) {
+      window.playlistUiInstance = null;
+    }
+    if (window.karaokeUiInstance) {
+      window.karaokeUiInstance = null;
     }
     window.videoPlayerCore = null;
 

@@ -1,4 +1,4 @@
-class Playlist {
+var Playlist = class {
   constructor() {
     this.currentScript = document.currentScript;
     this.uiUpdateInterval = null;
@@ -563,4 +563,4 @@ class Playlist {
     });
   }
 }
-new Playlist();
+window.playlistUiInstance = new Playlist();

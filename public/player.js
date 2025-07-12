@@ -1,4 +1,4 @@
-class Player {
+var Player = class {
   constructor(){
     this.currentScript = document.currentScript;
     this.autoSyncInterval = null;
@@ -324,7 +324,10 @@ class Player {
     });
   }
 }
-const player = new Player();
+window.playerInstance = new Player();
 function onYouTubeIframeAPIReady() {
-  player.onYouTubeIframeAPIReady();
+  // Check if the instance exists before calling, to prevent errors during cleanup.
+  if (window.playerInstance) {
+    window.playerInstance.onYouTubeIframeAPIReady();
+  }
 }
