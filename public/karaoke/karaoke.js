@@ -175,6 +175,10 @@ class Karaoke{
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.AUTO_SYNC_STATE_CHANGED:
+        this.autoSyncEnabled = json.data.enabled;
+        this.autoSync.innerText = this.autoSyncEnabled ? "Auto Sync: On" : "Auto Sync: Off";
+        break;
       case Commands.TRACK_CHANGED:
         if (this.core.player) {
           // This is the authoritative message that a new song is playing.

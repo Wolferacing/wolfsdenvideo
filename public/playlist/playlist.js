@@ -67,6 +67,10 @@ class Playlist {
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.AUTO_SYNC_STATE_CHANGED:
+        this.autoSyncEnabled = json.data.enabled;
+        this.autoSync.innerText = this.autoSyncEnabled ? "Auto Sync: On" : "Auto Sync: Off";
+        break;
       case Commands.PLAYLIST_UPDATED:
         if (this.core.player) {
           this.core.player.playlist = json.data.playlist;

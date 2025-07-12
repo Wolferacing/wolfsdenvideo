@@ -99,6 +99,7 @@ class App{
       canTakeOver: player.canTakeOver,
       canVote: player.canVote,
       hostId: player.host ? player.host.id : null,
+      autoAdvance: player.autoAdvance
     };
 
     const client = await this.pool.connect();
@@ -349,6 +350,19 @@ class App{
         break;
       case Commands.TOGGLE_AUTO_ADVANCE:
         await this.toggleAutoAdvance(ws);
+        break;
+      case Commands.AUTO_SYNC_STATE_CHANGED:
+        // This message comes from the player when it disables auto-sync internally.
+        // We need to broadcast this to the user's UI(s).
+        const playerInstance = this.videoPlayers[ws.i];
+        if (playerInstance) {
+          playerInstance.sockets.forEach(socket => {
+            // Send only to the same user's UI sockets (playlist/karaoke)
+            if (socket.u.id === ws.u.id && socket.type === 'playlist') {
+              this.send(socket, Commands.AUTO_SYNC_STATE_CHANGED, msg.data);
+            }
+          });
+        }
         break;
       case Commands.VIDEO_UNAVAILABLE:
         await this.handleVideoUnavailable(msg.data, ws);

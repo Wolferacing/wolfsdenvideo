@@ -138,30 +138,24 @@ class Player {
         }
         break;
       case Commands.SKIP_BACK:
-        const skipAmountBack = this.core.isKaraoke ? 0.2 : 5;
+        this.disableAutoSync(true); // Disable auto-sync on manual skip
+        const skipAmountBack = this.core.isKaraoke ? 1 : 5;
         const time = this.player.getCurrentTime() - skipAmountBack;
         this.player.seekTo(time);
         this.core.showToast(`-${skipAmountBack}s`);
         break;
       case Commands.SKIP_FORWARD:
-        const skipAmountForward = this.core.isKaraoke ? 0.5 : 5;
+        this.disableAutoSync(true); // Disable auto-sync on manual skip
+        const skipAmountForward = this.core.isKaraoke ? 1 : 5;
         const timeForward = this.player.getCurrentTime() + skipAmountForward;
         this.player.seekTo(timeForward);
         this.core.showToast(`+${skipAmountForward}s`);
         break;
       case Commands.AUTO_SYNC:
-        this.autoSync = json.data;
-        if (this.autoSync) {
-          if (!this.autoSyncInterval) {
-            this.core.showToast("AutoSync has been enabled.");
-            this.autoSyncInterval = setInterval(() => {
-              this.core.sendMessage({ path: Commands.REQUEST_SYNC, data: { clientTimestamp: Date.now() } });
-            }, 5000); // Request sync every 5 seconds
-          }
-        } else if (this.autoSyncInterval) {
-          this.core.showToast("AutoSync has been disabled.");
-          clearInterval(this.autoSyncInterval);
-          this.autoSyncInterval = null;
+        if (json.data) {
+          this.enableAutoSync();
+        } else {
+          this.disableAutoSync();
         }
         break;
       case Commands.PLAYBACK_UPDATE:
@@ -246,6 +240,30 @@ class Player {
       this.lastUrl = this.playerData.playlist[currentTrack].link;
     }else{
       console.log("No player data!");
+    }
+  }
+  enableAutoSync() {
+    if (!this.autoSync) {
+      this.autoSync = true;
+      if (!this.autoSyncInterval) {
+        this.core.showToast("AutoSync has been enabled.");
+        this.autoSyncInterval = setInterval(() => {
+          this.core.sendMessage({ path: Commands.REQUEST_SYNC, data: { clientTimestamp: Date.now() } });
+        }, 5000);
+      }
+    }
+  }
+  disableAutoSync(fromManualSkip = false) {
+    if (this.autoSync) {
+      this.autoSync = false;
+      if (this.autoSyncInterval) {
+        clearInterval(this.autoSyncInterval);
+        this.autoSyncInterval = null;
+      }
+      this.core.showToast(fromManualSkip ? "AutoSync disabled by manual skip." : "AutoSync has been disabled.");
+      if (fromManualSkip) {
+        this.core.sendMessage({ path: Commands.AUTO_SYNC_STATE_CHANGED, data: { enabled: false } });
+      }
     }
   }
   setMute() {

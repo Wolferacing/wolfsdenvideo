@@ -54,7 +54,8 @@ const Commands = {
   SINGER_LIST_UPDATED: 'singer-list-updated',
   RESTART_SONG: 'restart-song',
   TOGGLE_AUTO_ADVANCE: 'toggle-auto-advance',
-  AUTO_ADVANCE_STATE_CHANGED: 'auto-advance-state-changed'
+  AUTO_ADVANCE_STATE_CHANGED: 'auto-advance-state-changed',
+  AUTO_SYNC_STATE_CHANGED: 'auto-sync-state-changed'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {
