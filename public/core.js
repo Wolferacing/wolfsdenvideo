@@ -2,6 +2,7 @@ class Core {
     constructor() {
         this.urlParams = new URLSearchParams(window.location.search);
         this.isKaraoke = false;
+        this.createdElements = [];
     }
   async init(hostUrl) {
     await this.setupToastify();
@@ -110,6 +111,7 @@ class Core {
     }
     scene.appendChild(browser);
     this.browser = browser;
+    this.createdElements.push(browser);
     this.browser.addEventListener('browsermessage', (e) => {
       // console.log("got a browser message");
       // console.log(e);
@@ -140,6 +142,7 @@ class Core {
     this.setupMuteButton(scene, this.playlistContainer);
     this.setupSkipButton(scene, true, this.playlistContainer);
     this.setupSkipButton(scene, false, this.playlistContainer);
+    this.createdElements.push(this.playlistContainer);
     scene.appendChild(this.playlistContainer);
   }
   setVolume(isUp) {
@@ -333,6 +336,8 @@ setupSkipButton(scene, isBack, playlistContainer) {
       button.addEventListener("click", () => item.callback());
       handControlsContainer.appendChild(button);
     })
+    this.handControlsContainer = handControlsContainer;
+    this.createdElements.push(handControlsContainer);
     document.querySelector("a-scene").appendChild(handControlsContainer);
   }
 
@@ -541,6 +546,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
       cssLink.type = 'text/css';
       cssLink.href = 'https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css';
       document.head.appendChild(cssLink);
+      this.createdElements.push(cssLink);
 
       // Load JS
       await this._loadExternalScript('https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.js');
@@ -552,6 +558,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
       myScript.setAttribute("src", url);
       myScript.addEventListener ("load", resolve, false);
       document.body.appendChild(myScript);
+      this.createdElements.push(myScript);
     });
   }
   setupSayNamesScript(callback) {
@@ -570,6 +577,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
         })
       }
       myScript.addEventListener ("load", resolve, false);
+      this.createdElements.push(myScript);
       document.body.appendChild(myScript);  
     });
   }
@@ -594,5 +602,41 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
   vol(num) {
     this.sendBrowserMessage({path: Commands.SET_VOLUME, data: num});
   }
+  destroy() { // To Use : window.cleanupVideoPlayer();
+    console.log("Cleaning up Fire-V-Player instance...");
+
+    if (this.ws) {
+      this.ws.onclose = null; // prevent reconnection logic
+      this.ws.close();
+      console.log("WebSocket disconnected.");
+    }
+
+    this.createdElements.forEach(element => {
+      if (element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
+    });
+    this.createdElements = [];
+    console.log("Removed created DOM elements.");
+
+    // Remove any global references to this instance
+    this.browser = null;
+    this.playlistContainer = null;
+    this.handControlsContainer = null;
+    this.ws = null;
+    window.videoPlayerCore = null;
+
+    // Remove event listeners from the window, if any were added directly.
+    // This is a general cleanup step.
+    window.onYouTubeIframeAPIReady = null;
+    // You might have other global event listeners. Add them here as needed.
+
+    console.log("Clean up complete.");
+  }
 }
 window.videoPlayerCore = new Core();
+window.cleanupVideoPlayer = () => {
+  if (window.videoPlayerCore) {
+    window.videoPlayerCore.destroy();
+  }
+};
