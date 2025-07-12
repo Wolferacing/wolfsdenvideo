@@ -4,6 +4,7 @@ class Player {
   constructor(){
     this.currentScript = document.currentScript;
     this.autoSyncInterval = null;
+    this.pendingTrackChange = null;
     this.init();
   }
   async init() {
@@ -67,8 +68,21 @@ class Player {
           if (event.data === YT.PlayerState.PLAYING) {
             if (!this.readyToPlay) {
               this.readyToPlay = true;
-              // First time player is playing, check if we need to perform initial sync
-              if (this.playerData && this.playerData.playlist && this.playerData.playlist.length > 0 && !this.initialSyncComplete) {
+              // First time player is playing. Check for pending changes or initial sync.
+              if (this.pendingTrackChange) {
+                // A track change was received before we were ready. Apply it now.
+                const data = this.pendingTrackChange;
+                if (data.playlist) {
+                  this.playerData.playlist = data.playlist;
+                }
+                this.playerData.currentTrack = data.newTrackIndex;
+                this.playerData.lastStartTime = data.newLastStartTime;
+                const startTime = data.newCurrentTime || 0;
+                this.playVidya(this.playerData.currentTrack, startTime, true);
+                this.initialSyncComplete = true;
+                this.pendingTrackChange = null; // Clear the cached message
+              } else if (this.playerData && this.playerData.playlist && this.playerData.playlist.length > 0 && !this.initialSyncComplete) {
+                // This handles rejoining an instance that already has a playlist.
                 this.playVidya(this.playerData.currentTrack, this.playerData.currentTime, true);
                 this.initialSyncComplete = true;
               }
@@ -162,7 +176,7 @@ class Player {
         break;
       case Commands.TRACK_CHANGED:
         // This is the new authoritative command for changing tracks.
-        if (this.playerData && this.readyToPlay) {
+        if (this.playerData && this.readyToPlay) { // Player is ready, apply immediately.
           // If the message includes a new playlist (e.g., from add-and-play), update it.
           if (json.data.playlist) {
             this.playerData.playlist = json.data.playlist;
@@ -173,6 +187,9 @@ class Player {
           const startTime = json.data.newCurrentTime || 0;
           this.playVidya(this.playerData.currentTrack, startTime, true);
           this.initialSyncComplete = true; // A track change is a definitive sync.
+        } else {
+          // Player isn't ready. Cache the track change data to be applied when it is.
+          this.pendingTrackChange = json.data;
         }
         break;
       case Commands.MUTE:
