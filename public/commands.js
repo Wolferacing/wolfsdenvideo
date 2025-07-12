@@ -50,7 +50,8 @@ const Commands = {
   ADD_AND_PLAY: 'add-and-play',
   ADD_AND_PLAY_NEXT: 'add-and-play-next',
   MOVE_SINGER: 'move-singer',
-  PLAY_KARAOKE_TRACK: 'play-karaoke-track'
+  PLAY_KARAOKE_TRACK: 'play-karaoke-track',
+  SINGER_LIST_UPDATED: 'singer-list-updated'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

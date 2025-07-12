@@ -158,6 +158,13 @@ class Karaoke{
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.SINGER_LIST_UPDATED:
+        if (this.core.player) {
+          // This is the new authoritative source for the singer list.
+          this.core.player.players = json.data.players;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
     }
   }
   search(data) {

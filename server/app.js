@@ -402,7 +402,7 @@ class App{
           console.log(`Current singer was removed. Stopping player for instance ${ws.i}.`);
           this.updateClients(ws.i, "stop");
         }
-        this.updateClients(ws.i, "remove-from-players", { includePlaylist: false });
+        this.broadcastSingerList(ws.i);
         await this.savePlayerState(ws.i);
       }
     } else {
@@ -437,7 +437,7 @@ class App{
     });
     
     console.log(`${ws.u.name} was added to the singer list with video: ${video.title}`);
-    this.updateClients(ws.i, "add-to-players", { includePlaylist: false });
+    this.broadcastSingerList(ws.i);
     await this.savePlayerState(ws.i);
   }
   async moveSinger({ userId, direction }, ws) {
@@ -465,7 +465,7 @@ class App{
         player.singers[oldIndex] = player.singers[newIndex];
         player.singers[newIndex] = temp;
 
-        this.updateClients(ws.i, 'singers-reordered', { includePlaylist: false });
+        this.broadcastSingerList(ws.i);
         await this.savePlayerState(ws.i);
     });
   }
@@ -502,12 +502,17 @@ class App{
     
     console.log(`${ws.u.name} started karaoke track for ${nextSinger.user.name}`);
 
+    // Explicitly notify all UIs that the singer list has changed.
+    this.broadcastSingerList(ws.i);
+
     // Notify all clients with the correct message type for their role.
     player.sockets.forEach(socket => {
       if (socket.type === 'player') {
         this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: 0, newLastStartTime: player.lastStartTime, playlist: player.playlist });
       } else {
-        this.send(socket, Commands.PLAYBACK_UPDATE, { video: this.getVideoObject(ws.i), type: 'karaoke-track-started' });
+        // Send a lightweight update for other state changes, without the singer list.
+        const videoObject = this.getVideoObject(ws.i, { includePlaylist: false });
+        this.send(socket, Commands.PLAYBACK_UPDATE, { video: videoObject, type: 'karaoke-track-started' });
       }
     });
     await this.savePlayerState(ws.i);
@@ -1100,6 +1105,21 @@ class App{
         this.send(socket, Commands.PLAYBACK_UPDATE, {video, type});
       });
     }
+  }
+  broadcastSingerList(instanceId) {
+    const player = this.videoPlayers[instanceId];
+    if (!player) return;
+
+    // Create the payload with the current singer list.
+    const singers = player.singers.map(s => ({
+      name: s.user.name,
+      p: s.timestamp,
+      id: s.user.id,
+      v: s.video
+    }));
+
+    // Send the specific update to all connected UIs.
+    player.sockets.forEach(socket => this.send(socket, Commands.SINGER_LIST_UPDATED, { players: singers }));
   }
 }
 
