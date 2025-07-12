@@ -1,5 +1,3 @@
-const SKIP_AMOUNT_SECONDS = 5;
-
 class Player {
   constructor(){
     this.currentScript = document.currentScript;
@@ -140,14 +138,16 @@ class Player {
         }
         break;
       case Commands.SKIP_BACK:
-        const time = this.player.getCurrentTime() - SKIP_AMOUNT_SECONDS;
+        const skipAmountBack = this.core.isKaraoke ? 0.2 : 5;
+        const time = this.player.getCurrentTime() - skipAmountBack;
         this.player.seekTo(time);
-        this.core.showToast(`-${SKIP_AMOUNT_SECONDS}s`);
+        this.core.showToast(`-${skipAmountBack}s`);
         break;
       case Commands.SKIP_FORWARD:
-        const timeForward = this.player.getCurrentTime() + SKIP_AMOUNT_SECONDS;
+        const skipAmountForward = this.core.isKaraoke ? 0.5 : 5;
+        const timeForward = this.player.getCurrentTime() + skipAmountForward;
         this.player.seekTo(timeForward);
-        this.core.showToast(`+${SKIP_AMOUNT_SECONDS}s`);
+        this.core.showToast(`+${skipAmountForward}s`);
         break;
       case Commands.AUTO_SYNC:
         this.autoSync = json.data;

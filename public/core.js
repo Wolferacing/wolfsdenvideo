@@ -264,7 +264,7 @@ class Core {
 }
 setupSkipButton(scene, isBack, playlistContainer) {
   const skipIconUrl = isBack ? this.params["data-skip-backward-icon-url"] : this.params["data-skip-forward-icon-url"];
-  this.setupButton(scene, playlistContainer, isBack ? -0.332 : -0.081, skipIconUrl, () => this.skip(isBack));
+  this.setupButton(scene, playlistContainer, isBack ? -0.332 : -0.081, skipIconUrl, () => (isBack ? this.back() : this.forward()));
 }
   volume(isUp) {
     this.setVolume(isUp);
