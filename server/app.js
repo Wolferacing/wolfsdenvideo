@@ -589,11 +589,16 @@ class App{
       // To skip backward, we add to it.
       player.lastStartTime += isForward ? -skipAmount : skipAmount;
 
+      // Calculate the new current time to send to clients for an immediate seek.
+      const newCurrentTime = (new Date().getTime() / 1000) - player.lastStartTime;
+      player.currentTime = newCurrentTime; // Keep server state consistent.
+
       // Broadcast the change to all clients to force a resync.
       player.sockets.forEach(socket => {
         this.send(socket, Commands.TRACK_CHANGED, {
           newTrackIndex: player.currentTrack,
-          newLastStartTime: player.lastStartTime
+          newLastStartTime: player.lastStartTime,
+          newCurrentTime: newCurrentTime // Add the new time to the payload
         });
       });
       await this.savePlayerState(ws.i);
