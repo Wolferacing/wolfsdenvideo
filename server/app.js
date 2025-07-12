@@ -1056,6 +1056,17 @@ class App{
     } 
     this.syncWsTime(ws, instanceId);
     this.send(ws, Commands.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
+    // Explicitly send the current singer list to the newly connected client.
+    const player = this.videoPlayers[instanceId];
+    if (player && player.singers.length > 0) {
+        const singers = player.singers.map(s => ({
+            name: s.user.name,
+            p: s.timestamp,
+            id: s.user.id,
+            v: s.video
+        }));
+        this.send(ws, Commands.SINGER_LIST_UPDATED, { players: singers });
+    }
   }
   getVideoObject(instanceId, { includePlaylist = true } = {}) {
     if(this.videoPlayers[instanceId]) {
@@ -1066,12 +1077,6 @@ class App{
         currentTrack: player.currentTrack,
         lastStartTime: player.lastStartTime,
         locked: player.locked,
-        players: player.singers.map(s => ({
-          name: s.user.name, 
-          p: s.timestamp, 
-          id: s.user.id, 
-          v: s.video
-        })),
         canTakeOver: player.canTakeOver,
         canVote: player.canVote,
         host: player.host,
