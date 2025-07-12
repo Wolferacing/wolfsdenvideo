@@ -51,7 +51,10 @@ const Commands = {
   ADD_AND_PLAY_NEXT: 'add-and-play-next',
   MOVE_SINGER: 'move-singer',
   PLAY_KARAOKE_TRACK: 'play-karaoke-track',
-  SINGER_LIST_UPDATED: 'singer-list-updated'
+  SINGER_LIST_UPDATED: 'singer-list-updated',
+  RESTART_SONG: 'restart-song',
+  TOGGLE_AUTO_ADVANCE: 'toggle-auto-advance',
+  AUTO_ADVANCE_STATE_CHANGED: 'auto-advance-state-changed'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

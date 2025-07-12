@@ -344,6 +344,12 @@ class App{
       case Commands.PLAY_KARAOKE_TRACK:
         await this.playKaraokeTrack(ws);
         break;
+      case Commands.RESTART_SONG:
+        await this.restartSong(ws);
+        break;
+      case Commands.TOGGLE_AUTO_ADVANCE:
+        await this.toggleAutoAdvance(ws);
+        break;
       case Commands.VIDEO_UNAVAILABLE:
         await this.handleVideoUnavailable(msg.data, ws);
         break;
@@ -410,17 +416,18 @@ class App{
     }
   }
   stop(ws) {
-    this.onlyIfHost(ws, async () => {
-      const player = this.videoPlayers[ws.i];
-      // When stopping, we clear the main playlist. This is especially important for karaoke
-      // to return the UI to the singer list view.
-      player.playlist = [];
-      player.currentTrack = 0;
-      player.currentTime = 0;
-
-      this.updateClients(ws.i, "stop");
-      await this.savePlayerState(ws.i);
-    }, this.videoPlayers[ws.i].locked);
+    this.onlyIfHost(ws, async () => this._stop(ws.i), this.videoPlayers[ws.i].locked);
+  }
+  async _stop(instanceId) {
+    const player = this.videoPlayers[instanceId];
+    if (!player) return;
+    // When stopping, we clear the main playlist. This is especially important for karaoke
+    // to return the UI to the singer list view.
+    player.playlist = [];
+    player.currentTrack = 0;
+    player.currentTime = 0;
+    this.updateClients(instanceId, "stop");
+    await this.savePlayerState(instanceId);
   }
   setAutoSync(autoSync, ws) {
     if(ws.user_video) {
@@ -478,24 +485,26 @@ class App{
     });
   }
   async playKaraokeTrack(ws) {
-    const player = this.videoPlayers[ws.i];
-    if (!player) return;
-    if (player.singers.length === 0) return; // No singers in queue.
-
-    // The next singer is always the first in the persistent queue.
-    const nextSinger = player.singers[0];
-
     // The person initiating must be the host, or the singer whose turn it is.
+    const player = this.videoPlayers[ws.i];
+    const nextSinger = player && player.singers.length > 0 ? player.singers[0] : null;
     const isHost = player.host.id === ws.u.id;
-    const isTheSinger = nextSinger.user.id === ws.u.id;
+    const isTheSinger = nextSinger && nextSinger.user.id === ws.u.id;
 
     if (!isHost && !isTheSinger) {
         this.send(ws, Commands.ERROR, { message: "Only the host or the current singer can start the song." });
         return;
     }
 
+    await this._playNextKaraokeSong(ws.i);
+  }
+  async _playNextKaraokeSong(instanceId) {
+    const player = this.videoPlayers[instanceId];
+    if (!player || player.singers.length === 0) return;
+
+    const nextSinger = player.singers[0];
     const videoToPlay = nextSinger.video;
-    if (!videoToPlay) return; // Should not happen, but a good safeguard.
+    if (!videoToPlay) return;
 
     // Atomically update the player state
     player.playlist = [];
@@ -508,10 +517,10 @@ class App{
     // Remove the singer from the queue now that their turn has started.
     player.singers.shift();
     
-    console.log(`${ws.u.name} started karaoke track for ${nextSinger.user.name}`);
+    console.log(`Karaoke track started for ${nextSinger.user.name} in instance ${instanceId}`);
 
     // Explicitly notify all UIs that the singer list has changed.
-    this.broadcastSingerList(ws.i);
+    this.broadcastSingerList(instanceId);
 
     // Notify ALL clients that the track has changed. This is the authoritative message
     // that forces all UIs and the in-world player to sync to the new state.
@@ -522,7 +531,31 @@ class App{
             playlist: player.playlist // Send the new one-song playlist
         });
     });
-    await this.savePlayerState(ws.i);
+    await this.savePlayerState(instanceId);
+  }
+  async restartSong(ws) {
+    const player = this.videoPlayers[ws.i];
+    if (!player || !player.playlist.length) return;
+
+    const currentVideo = player.playlist[player.currentTrack];
+    const isHost = player.host.id === ws.u.id;
+    const isCurrentSinger = currentVideo.user.id === ws.u.id;
+
+    if (isHost || isCurrentSinger) {
+      player.lastStartTime = new Date().getTime() / 1000;
+      player.sockets.forEach(socket => {
+        this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime });
+      });
+      await this.savePlayerState(ws.i);
+    }
+  }
+  async toggleAutoAdvance(ws) {
+    this.onlyIfHost(ws, async () => {
+      const player = this.videoPlayers[ws.i];
+      player.autoAdvance = !player.autoAdvance;
+      this.updateClients(ws.i, Commands.AUTO_ADVANCE_STATE_CHANGED, { autoAdvance: player.autoAdvance });
+      await this.savePlayerState(ws.i);
+    });
   }
   async toggleVote(ws) {
     if (this.videoPlayers[ws.i]) {
@@ -841,25 +874,34 @@ class App{
           const track = player.playlist[player.currentTrack];
           const trackDuration = (track ? track.duration : 0) / 1000;
 
-          if (trackDuration > 0 && player.currentTime > trackDuration) {
-            // Time to advance to the next track
-            player.currentTime -= trackDuration; // Carry over the extra time
-            player.lastStartTime += trackDuration; // Also advance the start time to maintain sync
+        if (track && trackDuration > 0 && player.currentTime > trackDuration) {
+          // A track has finished.
+          const isKaraokeContext = Array.isArray(player.singers);
 
-            player.votes = player.votes.filter(v => v.video !== track);
-            player.currentTrack++;
-            if (player.currentTrack >= player.playlist.length) {
-              player.currentTrack = 0;
+          if (isKaraokeContext) {
+            // In a karaoke context, a song ending means we either stop or auto-advance.
+            if (player.autoAdvance && player.singers.length > 0) {
+              await this._playNextKaraokeSong(instanceId);
+            } else {
+              await this._stop(instanceId);
             }
+            break; // Exit the while loop for this instance.
+          } else {
+            // In a regular playlist context, loop to the next song.
+            player.currentTime -= trackDuration;
+            player.lastStartTime += trackDuration;
+            player.votes = player.votes.filter(v => v.video !== track);
+            player.currentTrack = (player.currentTrack + 1) % player.playlist.length;
             this.updateVotes(instanceId);
             this.resetBrowserIfNeedBe(player, player.currentTrack);
             player.sockets.forEach(socket => {
               this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime });
             });
             await this.savePlayerState(instanceId);
+            }
           } else {
-            // Current time is within the current track's duration, so we can stop.
-            break;
+          // Current time is within the track's duration, so we can exit the loop.
+          break; 
           }
         }
       } else {
@@ -1031,6 +1073,7 @@ class App{
         host: user,
         hostConnected: false, // Default to false. Will be set true upon "space" connection.
         sockets: [ws],
+        autoAdvance: false,
         canTakeOver: true,
         canVote: false,
         currentPlayerUrl: "",

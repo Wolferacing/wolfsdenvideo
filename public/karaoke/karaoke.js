@@ -37,6 +37,14 @@ class Karaoke{
       this.autoSync.innerText = this.autoSyncEnabled ? "Auto Sync: On" : "Auto Sync: Off";
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
     });
+
+    this.autoAdvance = document.querySelector('#autoAdvance');
+    this.autoAdvance.addEventListener('click', () => {
+      if (this.core.player && this.core.player.host.id === window.user.id) {
+        // The new state will be sent back by the server via AUTO_ADVANCE_STATE_CHANGED
+        this.core.sendMessage({ path: Commands.TOGGLE_AUTO_ADVANCE });
+      }
+    });
     
     this.closePreview = document.querySelector('.closePreview');
     
@@ -158,6 +166,13 @@ class Karaoke{
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.AUTO_ADVANCE_STATE_CHANGED:
+        if (this.core.player) {
+          this.core.player.autoAdvance = json.data.autoAdvance;
+          // Re-render the UI with the new auto-advance state
+          this.updatePlaylist(this.core.player);
+        }
+        break;
       case Commands.TRACK_CHANGED:
         if (this.core.player) {
           // This is the authoritative message that a new song is playing.
@@ -186,6 +201,7 @@ class Karaoke{
     this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
+    this.autoAdvance.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
 
@@ -236,6 +252,13 @@ class Karaoke{
       // Add a stop button for the host or the current singer.
       if (isMe || isCurrentSinger) {
         const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitle);
+        
+        const restartButton = this.core.makeAndAddElement('div', null, buttons);
+        restartButton.className = 'button slim teal';
+        restartButton.innerText = "Restart Song";
+        restartButton.addEventListener('click', () => {
+          this.core.sendMessage({ path: Commands.RESTART_SONG });
+        });
         const stopButton = this.core.makeAndAddElement('div', null, buttons);
         stopButton.className = 'button slim red';
         stopButton.innerText = "Stop Song";
@@ -244,6 +267,10 @@ class Karaoke{
         });
       }
     } else if (player.players && player.players.length > 0) {
+      // Update the Auto Advance button text based on the current state
+      this.autoAdvance.innerText = player.autoAdvance ? 'Auto Advance: On' : 'Auto Advance: Off';
+      this.autoAdvance.className = player.autoAdvance ? 'button teal red' : 'button teal';
+
       // No song is playing, render the singer queue.
       this.videoPlaylistContainer.innerHTML = '';
       player.players.sort((a, b) => a.p - b.p);
@@ -339,7 +366,7 @@ class Karaoke{
     this.searchBackDrop.style.display = 'none';
   }
   setupYoutubePlayer() {
-    const youtubeUrl = 'https://www.youtube.com/watch?v=L_LUpnjgPso';
+    const youtubeUrl = 'https://www.youtube.com/watch?v=_VUKfrA9oLQ'; // Default video (Silence)
     new YT.Player('player', {
       height: '100%',
       width: '100%',
