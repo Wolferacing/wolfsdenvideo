@@ -410,8 +410,16 @@ class App{
     }
   }
   stop(ws) {
-    this.onlyIfHost(ws, () => {
+    this.onlyIfHost(ws, async () => {
+      const player = this.videoPlayers[ws.i];
+      // When stopping, we clear the main playlist. This is especially important for karaoke
+      // to return the UI to the singer list view.
+      player.playlist = [];
+      player.currentTrack = 0;
+      player.currentTime = 0;
+
       this.updateClients(ws.i, "stop");
+      await this.savePlayerState(ws.i);
     }, this.videoPlayers[ws.i].locked);
   }
   setAutoSync(autoSync, ws) {
@@ -505,15 +513,14 @@ class App{
     // Explicitly notify all UIs that the singer list has changed.
     this.broadcastSingerList(ws.i);
 
-    // Notify all clients with the correct message type for their role.
+    // Notify ALL clients that the track has changed. This is the authoritative message
+    // that forces all UIs and the in-world player to sync to the new state.
     player.sockets.forEach(socket => {
-      if (socket.type === 'player') {
-        this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: 0, newLastStartTime: player.lastStartTime, playlist: player.playlist });
-      } else {
-        // Send a lightweight update for other state changes, without the singer list.
-        const videoObject = this.getVideoObject(ws.i, { includePlaylist: false });
-        this.send(socket, Commands.PLAYBACK_UPDATE, { video: videoObject, type: 'karaoke-track-started' });
-      }
+        this.send(socket, Commands.TRACK_CHANGED, {
+            newTrackIndex: 0,
+            newLastStartTime: player.lastStartTime,
+            playlist: player.playlist // Send the new one-song playlist
+        });
     });
     await this.savePlayerState(ws.i);
   }

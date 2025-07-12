@@ -158,6 +158,16 @@ class Karaoke{
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.TRACK_CHANGED:
+        if (this.core.player) {
+          // This is the authoritative message that a new song is playing.
+          // It contains the new one-song playlist for the karaoke player.
+          this.core.player.playlist = json.data.playlist;
+          this.core.player.currentTrack = json.data.newTrackIndex;
+          this.core.player.lastStartTime = json.data.newLastStartTime;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
       case Commands.SINGER_LIST_UPDATED:
         if (this.core.player) {
           // This is the new authoritative source for the singer list.
@@ -208,65 +218,71 @@ class Karaoke{
     }
     // --- End of secure host title build ---
 
-    this.videoPlaylistContainer.innerHTML = player.players.length ? '' : '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!<br><br><div style="color: red;">DONT FORGET TO TAKE OVER THE KARAOKE PLAYER BEFORE YOU START!!<br>IF SOMEONE ELSE TOOK OVER, BAN THEM AND WAIT 45s THEN TAKE OVER</div></h2>';
-    player.players.sort((a, b) => a.p - b.p);
-    player.players.forEach((p, i) => {
-      const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
-      const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
-      
-      const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '10 7 10 15', 
-        textOverflow: 'ellipsis', 
-        overflow: 'hidden', 
-        whiteSpace: 'nowrap', 
-        fontSize: '1.4em'
-      }, videoTitleAndAction);
-      
-      videoTitle.innerHTML = `${(i+1)+"."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
-      this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
-      if(p.id === window.user.id || isMe) {
-        const buttons = this.core.makeAndAddElement('div',{marginTop: "10px"}, videoTitle);
-        if(i == 0) {
-          const preview = this.core.makeAndAddElement('div',null, buttons);
-          preview.className = 'button slim teal';
-          preview.innerText = "Play & Sing";
-          preview.addEventListener('click', () => {
-            // Use the new, more reliable command. The server now handles all permission checks.
-            this.core.sendMessage({ path: Commands.PLAY_KARAOKE_TRACK });
-          });
-        }
-       const remove = this.core.makeAndAddElement('div',null, buttons);
-        remove.className = 'button slim red extra-margin-left';
-        remove.innerText = "Remove Me";
-        remove.addEventListener('click', () => {
-          // The client should only tell the server what it wants to do.
-          // The server is responsible for all resulting state changes (like stopping the player).
-          this.core.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: p.id });
+    // --- Intelligent Rendering Logic ---
+    // If a song is playing (playlist has items), show it. Otherwise, show the singer queue.
+    if (player.playlist && player.playlist.length > 0) {
+      // A song is currently playing. Render the main playlist view.
+      this.videoPlaylistContainer.innerHTML = '';
+      const video = player.playlist[player.currentTrack];
+      const videoItemContainer = this.core.makeAndAddElement('div', { background: '#4f4f4f' }, this.videoPlaylistContainer);
+      const videoThumbnail = this.core.makeAndAddElement('img', { height: '80px', width: '142px', float: 'left' }, videoItemContainer);
+      videoThumbnail.src = video.thumbnail;
+      const videoTitleAndAction = this.core.makeAndAddElement('div', { float: 'left', width: 'calc(100% - 180px)' }, videoItemContainer);
+      const videoTitle = this.core.makeAndAddElement('div', { padding: '10px 7px 10px 15px', fontSize: '1.4em' }, videoTitleAndAction);
+      videoTitle.innerHTML = `<b>Now Singing:</b> ${video.user.name} - ${video.title}`;
+      this.core.makeAndAddElement('div', { clear: 'both' }, videoItemContainer);
+      // Add a stop button for the host
+      if (isMe) {
+        const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitle);
+        const stopButton = this.core.makeAndAddElement('div', null, buttons);
+        stopButton.className = 'button slim red';
+        stopButton.innerText = "Stop Song";
+        stopButton.addEventListener('click', () => {
+          this.core.sendMessage({ path: Commands.STOP });
         });
-
-        // Add re-ordering buttons for the host
-        if (isMe) {
-          // Add "Move Up" button if not the first item
-          if (i > 0) {
+      }
+    } else if (player.players && player.players.length > 0) {
+      // No song is playing, render the singer queue.
+      this.videoPlaylistContainer.innerHTML = '';
+      player.players.sort((a, b) => a.p - b.p);
+      player.players.forEach((p, i) => {
+        const videoItemContainer = this.core.makeAndAddElement('div', { background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f' }, this.videoPlaylistContainer);
+        const videoTitleAndAction = this.core.makeAndAddElement('div', { float: 'left', width: '100%' }, videoItemContainer);
+        const videoTitle = this.core.makeAndAddElement('div', { padding: '10px 7px 10px 15px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '1.4em' }, videoTitleAndAction);
+        videoTitle.innerHTML = `${(i + 1) + "."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
+        this.core.makeAndAddElement('div', { clear: 'both' }, videoItemContainer);
+        if (p.id === window.user.id || isMe) {
+          const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitle);
+          if (i == 0) {
+            const playButton = this.core.makeAndAddElement('div', null, buttons);
+            playButton.className = 'button slim teal';
+            playButton.innerText = "Play & Sing";
+            playButton.addEventListener('click', () => this.core.sendMessage({ path: Commands.PLAY_KARAOKE_TRACK }));
+          }
+          const removeButton = this.core.makeAndAddElement('div', null, buttons);
+          removeButton.className = 'button slim red extra-margin-left';
+          removeButton.innerText = "Remove Me";
+          removeButton.addEventListener('click', () => this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS, data: p.id }));
+          if (isMe) {
+            if (i > 0) {
               const moveUp = this.core.makeAndAddElement('div', null, buttons);
               moveUp.className = 'button slim teal extra-margin-left';
               moveUp.innerText = "Move Up";
-              moveUp.addEventListener('click', () => {
-                  this.core.sendMessage({ path: Commands.MOVE_SINGER, data: { userId: p.id, direction: 'up' } });
-              });
-          }
-          // Add "Move Down" button if not the last item
-          if (i < player.players.length - 1) {
+              moveUp.addEventListener('click', () => this.core.sendMessage({ path: Commands.MOVE_SINGER, data: { userId: p.id, direction: 'up' } }));
+            }
+            if (i < player.players.length - 1) {
               const moveDown = this.core.makeAndAddElement('div', null, buttons);
               moveDown.className = 'button slim teal extra-margin-left';
               moveDown.innerText = "Move Down";
-              moveDown.addEventListener('click', () => {
-                  this.core.sendMessage({ path: Commands.MOVE_SINGER, data: { userId: p.id, direction: 'down' } });
-              });
+              moveDown.addEventListener('click', () => this.core.sendMessage({ path: Commands.MOVE_SINGER, data: { userId: p.id, direction: 'down' } }));
+            }
           }
         }
-      }
-    });
+      });
+    } else {
+      // No song playing and no singers in queue.
+      this.videoPlaylistContainer.innerHTML = '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!<br><br><div style="color: red;">DONT FORGET TO TAKE OVER THE KARAOKE PLAYER BEFORE YOU START!!<br>IF SOMEONE ELSE TOOK OVER, BAN THEM AND WAIT 45s THEN TAKE OVER</div></h2>';
+    }
   }
   loadVideos(videos) {
     this.videoSearchContainer.innerHTML = '';
