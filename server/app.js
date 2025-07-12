@@ -274,10 +274,10 @@ class App{
         this.setVote(msg.data, false, ws);
         break;
       case Commands.ADD_TO_PLAYERS:
-        this.addToPlayers(msg.data, ws);
+        await this.addToPlayers(msg.data, ws);
         break;
       case Commands.REMOVE_FROM_PLAYERS:
-        this.removeFromPlayers(msg.data, ws);
+        await this.removeFromPlayers(msg.data, ws);
         break;
       case Commands.ADD_AND_PLAY:
         await this.addAndPlay(msg.data, ws);
@@ -322,15 +322,25 @@ class App{
       is_youtube_website: isYoutubeWebsite
     };
   }
-  removeFromPlayers(uid, ws) {
-    this.onlyIfHost(ws, () => {
-      this.videoPlayers[ws.i].sockets.forEach(s => {
-        if(s.u && s.u.id === uid) {
-          s.p = false;
-        }
-      })
-    }, uid !== ws.u.id);
-    this.updateClients(ws.i, "remove-from-players", { includePlaylist: false });
+  async removeFromPlayers(uid, ws) {
+    const player = this.videoPlayers[ws.i];
+    if (!player) return;
+
+    const isHost = player.host.id === ws.u.id;
+    const isSelf = uid === ws.u.id;
+
+    // A user can remove themselves, or the host can remove anyone.
+    if (isHost || isSelf) {
+      const socketToRemove = player.sockets.find(s => s.u && s.u.id === uid);
+      if (socketToRemove) {
+        socketToRemove.p = false; // Mark as not a player
+        socketToRemove.p_v = null; // Clear their selected video
+        console.log(`${ws.u.name} removed ${socketToRemove.u.name} from the singer list.`);
+        this.updateClients(ws.i, "remove-from-players", { includePlaylist: false });
+      }
+    } else {
+      this.send(ws, Commands.ERROR);
+    }
   }
   stop(ws) {
     this.onlyIfHost(ws, () => {
@@ -342,13 +352,15 @@ class App{
       this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
     }
   }
-  addToPlayers(video, ws){
-    this.videoPlayers[ws.i].sockets.forEach(s => {
-      if(s === ws) { // The socket adding itself to players is ws
-        s.p = new Date().getTime();
-        s.p_v = video;
-      }
-    });
+  async addToPlayers(video, ws){
+    const player = this.videoPlayers[ws.i];
+    if (!player) return;
+
+    // A user can only add themselves. The socket sending the message is the one being added.
+    ws.p = new Date().getTime(); // 'p' for player, timestamp for ordering
+    ws.p_v = video; // The video they will sing
+
+    console.log(`${ws.u.name} was added to the singer list with video: ${video.title}`);
     this.updateClients(ws.i, "add-to-players", { includePlaylist: false });
   }
   async toggleVote(ws) {

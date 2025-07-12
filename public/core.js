@@ -1,6 +1,7 @@
 class Core {
     constructor() {
         this.urlParams = new URLSearchParams(window.location.search);
+        this.isKaraoke = false;
     }
   async init(hostUrl) {
     await this.setupToastify();
@@ -248,13 +249,14 @@ class Core {
     }
   }
   setupPlaylistButton(scene, playlistContainer) {
-  const playlistIconUrl = this.params["data-playlist-icon-url"]
-  this.setupButton(scene, playlistContainer, '-0.633', playlistIconUrl, () => {
-    this.openPlaylist();
-  });
-}
+    const playlistIconUrl = this.params["data-playlist-icon-url"];
+    // Use the isKaraoke flag to provide a context-specific text label
+    const buttonText = this.isKaraoke ? 'Singers' : 'Playlist';
+    this.setupButton(scene, playlistContainer, '-0.633', playlistIconUrl, () => this.openPlaylist(), buttonText);
+  }
+
   openPlaylist() {
-    window.openPage("https://" + this.hostUrl + "/" + 'playlist' + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlist : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
+    window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlist : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
   }
   setupVolButton(scene, isUp, playlistContainer) {
   const volIconUrl = isUp ? this.params["data-vol-up-icon-url"] : this.params["data-vol-down-icon-url"];
@@ -334,21 +336,28 @@ setupSkipButton(scene, isBack, playlistContainer) {
     document.querySelector("a-scene").appendChild(handControlsContainer);
   }
 
-setupButton(scene, playlistContainer, xOffset, iconUrl, callback) {
+setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
   const buttonContainer = document.createElement('a-entity');
   buttonContainer.setAttribute('position', `${xOffset} 0 0`);
 
   const buttonIcon = document.createElement('a-plane');
-  buttonIcon.setAttribute('sq-boxcollider', 'size: 1 1 0.05'); // Adjust if needed for general use
+  buttonIcon.setAttribute('sq-boxcollider', 'size: 1 1 0.05');
   buttonIcon.setAttribute('sq-interactable', '');
   buttonIcon.setAttribute('src', iconUrl);
   buttonIcon.setAttribute('transparent', 'true');
-  //buttonIcon.setAttribute('opacity', '0.8');
-  buttonIcon.setAttribute('scale', '0.2 0.2 0.2'); // Adjust scale as needed
-
+  buttonIcon.setAttribute('scale', '0.2 0.2 0.2');
   buttonContainer.appendChild(buttonIcon);
-  playlistContainer.appendChild(buttonContainer);
 
+  if (text) {
+    const buttonText = document.createElement('a-text');
+    buttonText.setAttribute('value', text);
+    buttonText.setAttribute('align', 'center');
+    buttonText.setAttribute('position', '0 -0.15 0'); // Position text below the icon
+    buttonText.setAttribute('scale', '0.2 0.2 0.2');
+    buttonContainer.appendChild(buttonText);
+  }
+
+  playlistContainer.appendChild(buttonContainer);
   buttonIcon.addEventListener('click', callback);
 
   return buttonIcon;
