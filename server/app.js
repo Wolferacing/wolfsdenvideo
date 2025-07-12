@@ -340,6 +340,9 @@ class App{
       case Commands.MOVE_SINGER:
         await this.moveSinger(msg.data, ws);
         break;
+      case Commands.PLAY_KARAOKE_TRACK:
+        await this.playKaraokeTrack(ws);
+        break;
       case Commands.VIDEO_UNAVAILABLE:
         await this.handleVideoUnavailable(msg.data, ws);
         break;
@@ -384,6 +387,10 @@ class App{
     const isHost = player.host.id === ws.u.id;
     const isSelf = uid === ws.u.id;
 
+    // Find the current singer's index before removal
+    const singers = player.sockets.filter(s => s.p).sort((a, b) => a.p - b.p);
+    const wasCurrentSinger = singers.length > 0 && singers[0].u.id === uid;
+
     // A user can remove themselves, or the host can remove anyone.
     if (isHost || isSelf) {
       const socketToRemove = player.sockets.find(s => s.u && s.u.id === uid);
@@ -391,6 +398,11 @@ class App{
         socketToRemove.p = false; // Mark as not a player
         socketToRemove.p_v = null; // Clear their selected video
         console.log(`${ws.u.name} removed ${socketToRemove.u.name} from the singer list.`);
+        // If the person removed was the one currently singing, stop the main player.
+        if (wasCurrentSinger) {
+          console.log(`Current singer was removed. Stopping player for instance ${ws.i}.`);
+          this.updateClients(ws.i, "stop");
+        }
         this.updateClients(ws.i, "remove-from-players", { includePlaylist: false });
       }
     } else {
@@ -449,6 +461,50 @@ class App{
         [singerToMoveSocket.p, otherSingerSocket.p] = [otherSingerSocket.p, singerToMoveSocket.p];
         this.updateClients(ws.i, 'singers-reordered', { includePlaylist: false });
     });
+  }
+  async playKaraokeTrack(ws) {
+    const player = this.videoPlayers[ws.i];
+    if (!player) return;
+
+    // Find the singer who is up next. They should be the first in the sorted list.
+    const singers = player.sockets.filter(s => s.p).sort((a, b) => a.p - b.p);
+    if (singers.length === 0) return; // No singers in queue.
+
+    const nextSingerSocket = singers[0];
+
+    // The person initiating must be the host, or the singer whose turn it is.
+    const isHost = player.host.id === ws.u.id;
+    const isTheSinger = nextSingerSocket.u.id === ws.u.id;
+
+    if (!isHost && !isTheSinger) {
+        this.send(ws, Commands.ERROR, { message: "Only the host or the current singer can start the song." });
+        return;
+    }
+
+    const videoToPlay = nextSingerSocket.p_v;
+    if (!videoToPlay) return; // Singer has no video selected.
+
+    // Atomically update the player state
+    player.playlist = [];
+    player.currentTrack = 0;
+    player.currentTime = 0;
+    const newVideo = this._createVideoObject(videoToPlay, nextSingerSocket.u, 'scraper');
+    player.playlist.push(newVideo);
+    player.lastStartTime = new Date().getTime() / 1000;
+    nextSingerSocket.p = false;
+    nextSingerSocket.p_v = null;
+    
+    console.log(`${ws.u.name} started karaoke track for ${nextSingerSocket.u.name}`);
+
+    // Notify all clients with the correct message type for their role.
+    player.sockets.forEach(socket => {
+      if (socket.type === 'player') {
+        this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: 0, newLastStartTime: player.lastStartTime, playlist: player.playlist });
+      } else {
+        this.send(socket, Commands.PLAYBACK_UPDATE, { video: this.getVideoObject(ws.i), type: 'karaoke-track-started' });
+      }
+    });
+    await this.savePlayerState(ws.i);
   }
   async toggleVote(ws) {
     if (this.videoPlayers[ws.i]) {

@@ -137,6 +137,25 @@ class Karaoke{
       case Commands.ERROR:
         alert("I cant let you do that...");
         break;
+      // --- Add more granular message handlers to keep the UI responsive ---
+      case Commands.LOCK_STATE_CHANGED:
+        if (this.core.player) {
+          this.core.player.locked = json.data.locked;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.CAN_TAKE_OVER_STATE_CHANGED:
+        if (this.core.player) {
+          this.core.player.canTakeOver = json.data.canTakeOver;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.HOST_CHANGED:
+        if (this.core.player) {
+          this.core.player.host = json.data.host;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
     }
   }
   search(data) {
@@ -204,24 +223,17 @@ class Karaoke{
           preview.className = 'button slim teal';
           preview.innerText = "Play & Sing";
           preview.addEventListener('click', () => {
-            if(this.core.player.locked) {
-              this.core.showToast("Player is locked! The host needs to unlock it first!");
-            }else{
-              this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-              this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: p.v, isYoutubeWebsite: false, skipUpdate: true });
-              this.core.sendMessage({path: Commands.SET_TRACK, data: 0});
-            }
+            // Use the new, more reliable command. The server now handles all permission checks.
+            this.core.sendMessage({ path: Commands.PLAY_KARAOKE_TRACK });
           });
         }
        const remove = this.core.makeAndAddElement('div',null, buttons);
         remove.className = 'button slim red extra-margin-left';
         remove.innerText = "Remove Me";
         remove.addEventListener('click', () => {
+          // The client should only tell the server what it wants to do.
+          // The server is responsible for all resulting state changes (like stopping the player).
           this.core.sendMessage({path: Commands.REMOVE_FROM_PLAYERS, data: p.id });
-          if(i == 0) {
-            this.core.sendMessage({path: Commands.CLEAR_PLAYLIST, skipUpdate: true});
-            this.core.sendMessage({path: Commands.STOP});
-          }
         });
 
         // Add re-ordering buttons for the host

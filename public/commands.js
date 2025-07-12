@@ -49,7 +49,8 @@ const Commands = {
   REPLACE_VIDEO: 'replace-video',
   ADD_AND_PLAY: 'add-and-play',
   ADD_AND_PLAY_NEXT: 'add-and-play-next',
-  MOVE_SINGER: 'move-singer'
+  MOVE_SINGER: 'move-singer',
+  PLAY_KARAOKE_TRACK: 'play-karaoke-track'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {
