@@ -1,6 +1,7 @@
 class Karaoke{
   constructor() {
     this.currentScript = document.currentScript;
+    this.uiUpdateInterval = null;
     this.init();
   }
   async init() {
@@ -140,6 +141,7 @@ class Karaoke{
         // This prevents the singer list from being wiped out on updates that don't include it.
         this.core.player = Object.assign(this.core.player || {}, json.data.video);
         this.updatePlaylist(this.core.player);
+        this.startUiUpdater();
         break;
       case Commands.SEARCH_RESULTS:
         this.loadVideos(json.data);
@@ -180,7 +182,11 @@ class Karaoke{
           this.core.player.playlist = json.data.playlist;
           this.core.player.currentTrack = json.data.newTrackIndex;
           this.core.player.lastStartTime = json.data.newLastStartTime;
+          if (this.core.player.playlist[this.core.player.currentTrack]) {
+              this.core.player.duration = this.core.player.playlist[this.core.player.currentTrack].duration / 1000;
+          }
           this.updatePlaylist(this.core.player);
+          this.startUiUpdater();
         }
         break;
       case Commands.SINGER_LIST_UPDATED:
@@ -240,12 +246,27 @@ class Karaoke{
       // A song is currently playing. Render the main playlist view.
       this.videoPlaylistContainer.innerHTML = '';
       const video = player.playlist[player.currentTrack];
+      // This is a defensive check to prevent errors if the player state is ever inconsistent.
+      if (!video) {
+        this.videoPlaylistContainer.innerHTML = '<h2 style="color: grey; margin-top: 100px; text-align: center;">Error: Could not display current song.</h2>';
+        return;
+      }
       const videoItemContainer = this.core.makeAndAddElement('div', { background: '#4f4f4f' }, this.videoPlaylistContainer);
       const videoThumbnail = this.core.makeAndAddElement('img', { height: '80px', width: '142px', float: 'left' }, videoItemContainer);
       videoThumbnail.src = video.thumbnail;
       const videoTitleAndAction = this.core.makeAndAddElement('div', { float: 'left', width: 'calc(100% - 180px)' }, videoItemContainer);
       const videoTitle = this.core.makeAndAddElement('div', { padding: '10px 7px 10px 15px', fontSize: '1.4em' }, videoTitleAndAction);
       videoTitle.innerHTML = `<b>Now Singing:</b> ${video.user.name} - ${video.title}`;
+      
+      const currentTimeText = this.core.makeAndAddElement('div',{
+        padding: '7px 10px 0px 7px',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap'
+      }, videoTitleAndAction);
+      currentTimeText.className = "currentTimeText";
+      currentTimeText.innerText = `${this.timeCode(player.currentTime)} / ${this.timeCode(player.duration)}`;
+
       this.core.makeAndAddElement('div', { clear: 'both' }, videoItemContainer);
       
       const isCurrentSinger = video.user.id === window.user.id;
@@ -266,6 +287,20 @@ class Karaoke{
           this.core.sendMessage({ path: Commands.STOP });
         });
       }
+
+      // Add the progress bar at the bottom of the item container
+      const currentTime = this.core.makeAndAddElement('div', {
+        height: '4px',
+        width: '100%',
+      }, videoItemContainer);
+      const currentTimeInner = this.core.makeAndAddElement('div', {
+        height: '4px',
+        background: 'red',
+        transition: 'width 1s',
+        transitionTimingFunction: 'linear',
+        width: `${(player.currentTime / player.duration) * 100}%`,
+      }, currentTime);
+      currentTimeInner.className = "currentTime";
     } else if (player.players && player.players.length > 0) {
       // Update the Auto Advance button text based on the current state
       this.autoAdvance.innerText = player.autoAdvance ? 'Auto Advance: On' : 'Auto Advance: Off';
@@ -364,6 +399,41 @@ class Karaoke{
     this.videoSearchContainer.style.display = 'none';
     this.videoSearchContainer.innerHTML = '';
     this.searchBackDrop.style.display = 'none';
+  }
+  startUiUpdater() {
+    // Clear any existing interval to prevent multiple loops running
+    if (this.uiUpdateInterval) {
+      clearInterval(this.uiUpdateInterval);
+    }
+
+    // Only start a new interval if we have a valid player state with a playlist
+    if (!this.core.player || !this.core.player.playlist || this.core.player.playlist.length === 0 || !this.core.player.lastStartTime) {
+      return;
+    }
+
+    this.uiUpdateInterval = setInterval(() => {
+      const { lastStartTime, duration } = this.core.player;
+
+      if (duration <= 0) return;
+
+      // Calculate the current time based on when the track started
+      let calculatedTime = (Date.now() / 1000) - lastStartTime;
+
+      // Clamp the time to be within the video's bounds [0, duration]
+      calculatedTime = Math.max(0, Math.min(calculatedTime, duration));
+
+      const currentTimeBar = document.querySelector('.currentTime');
+      if (currentTimeBar) {
+        currentTimeBar.style.width = `${(calculatedTime / duration) * 100}%`;
+      }
+      const currentTimeText = document.querySelector('.currentTimeText');
+      if (currentTimeText) {
+        currentTimeText.innerText = `${this.timeCode(calculatedTime)} / ${this.timeCode(duration)}`;
+      }
+    }, 1000); // Update every second
+  }
+  timeCode(seconds) {
+    return new Date(seconds * 1000).toISOString().substring(11, 19);
   }
   setupYoutubePlayer() {
     const youtubeUrl = 'https://www.youtube.com/watch?v=_VUKfrA9oLQ'; // Default video (Silence)
