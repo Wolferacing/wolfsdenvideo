@@ -128,7 +128,9 @@ class Karaoke{
     const json = JSON.parse(msg);
     switch(json.path) {
       case Commands.PLAYBACK_UPDATE:
-        this.core.player = json.data.video;
+        // Merge new data into the existing player state.
+        // This prevents the singer list from being wiped out on updates that don't include it.
+        this.core.player = Object.assign(this.core.player || {}, json.data.video);
         this.updatePlaylist(this.core.player);
         break;
       case Commands.SEARCH_RESULTS:
@@ -167,7 +169,6 @@ class Karaoke{
     this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
-    const amIAPlayer = player.players.filter((p, i) => p.id === window.user.id).length > 0;
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
 

@@ -92,6 +92,7 @@ class App{
     const stateToSave = {
       playlist: leanPlaylist,
       userMap: userMap,
+      singers: player.singers,
       currentTrack: player.currentTrack,
       lastStartTime: player.lastStartTime,
       locked: player.locked,
@@ -387,23 +388,22 @@ class App{
     const isHost = player.host.id === ws.u.id;
     const isSelf = uid === ws.u.id;
 
-    // Find the current singer's index before removal
-    const singers = player.sockets.filter(s => s.p).sort((a, b) => a.p - b.p);
-    const wasCurrentSinger = singers.length > 0 && singers[0].u.id === uid;
-
     // A user can remove themselves, or the host can remove anyone.
     if (isHost || isSelf) {
-      const socketToRemove = player.sockets.find(s => s.u && s.u.id === uid);
-      if (socketToRemove) {
-        socketToRemove.p = false; // Mark as not a player
-        socketToRemove.p_v = null; // Clear their selected video
-        console.log(`${ws.u.name} removed ${socketToRemove.u.name} from the singer list.`);
+      const singerIndex = player.singers.findIndex(s => s.user.id === uid);
+
+      if (singerIndex > -1) {
+        const wasCurrentSinger = singerIndex === 0;
+        const removedSinger = player.singers.splice(singerIndex, 1)[0];
+        console.log(`${ws.u.name} removed ${removedSinger.user.name} from the singer list.`);
+
         // If the person removed was the one currently singing, stop the main player.
         if (wasCurrentSinger) {
           console.log(`Current singer was removed. Stopping player for instance ${ws.i}.`);
           this.updateClients(ws.i, "stop");
         }
         this.updateClients(ws.i, "remove-from-players", { includePlaylist: false });
+        await this.savePlayerState(ws.i);
       }
     } else {
       this.send(ws, Commands.ERROR);
@@ -423,22 +423,29 @@ class App{
     const player = this.videoPlayers[ws.i];
     if (!player) return;
 
-    // A user can only add themselves. The socket sending the message is the one being added.
-    ws.p = new Date().getTime(); // 'p' for player, timestamp for ordering
-    ws.p_v = video; // The video they will sing
+    // Prevent a user from adding themselves to the queue more than once.
+    if (player.singers.some(singer => singer.user.id === ws.u.id)) {
+      this.send(ws, Commands.ERROR, { message: "You are already in the singer list." });
+      return;
+    }
 
+    // Add a singer object to the persistent queue.
+    player.singers.push({
+      user: ws.u,
+      video: video,
+      timestamp: new Date().getTime()
+    });
+    
     console.log(`${ws.u.name} was added to the singer list with video: ${video.title}`);
     this.updateClients(ws.i, "add-to-players", { includePlaylist: false });
+    await this.savePlayerState(ws.i);
   }
   async moveSinger({ userId, direction }, ws) {
     this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
         if (!player) return;
-
-        // Get a sorted list of current singers from the sockets
-        const singers = player.sockets.filter(s => s.p).sort((a, b) => a.p - b.p);
         
-        const oldIndex = singers.findIndex(s => s.u.id === userId);
+        const oldIndex = player.singers.findIndex(s => s.user.id === userId);
 
         if (oldIndex === -1) {
             return; // Singer not found
@@ -447,54 +454,53 @@ class App{
         let newIndex;
         if (direction === 'up' && oldIndex > 0) {
             newIndex = oldIndex - 1;
-        } else if (direction === 'down' && oldIndex < singers.length - 1) {
+        } else if (direction === 'down' && oldIndex < player.singers.length - 1) {
             newIndex = oldIndex + 1;
         } else {
             return; // Invalid move
         }
 
-        // The sockets to be swapped
-        const singerToMoveSocket = singers[oldIndex];
-        const otherSingerSocket = singers[newIndex];
+        // Swap the singers directly in the persistent array
+        const temp = player.singers[oldIndex];
+        player.singers[oldIndex] = player.singers[newIndex];
+        player.singers[newIndex] = temp;
 
-        // Swap their 'p' (timestamp) values to change their order, then update clients
-        [singerToMoveSocket.p, otherSingerSocket.p] = [otherSingerSocket.p, singerToMoveSocket.p];
         this.updateClients(ws.i, 'singers-reordered', { includePlaylist: false });
+        await this.savePlayerState(ws.i);
     });
   }
   async playKaraokeTrack(ws) {
     const player = this.videoPlayers[ws.i];
     if (!player) return;
+    if (player.singers.length === 0) return; // No singers in queue.
 
-    // Find the singer who is up next. They should be the first in the sorted list.
-    const singers = player.sockets.filter(s => s.p).sort((a, b) => a.p - b.p);
-    if (singers.length === 0) return; // No singers in queue.
-
-    const nextSingerSocket = singers[0];
+    // The next singer is always the first in the persistent queue.
+    const nextSinger = player.singers[0];
 
     // The person initiating must be the host, or the singer whose turn it is.
     const isHost = player.host.id === ws.u.id;
-    const isTheSinger = nextSingerSocket.u.id === ws.u.id;
+    const isTheSinger = nextSinger.user.id === ws.u.id;
 
     if (!isHost && !isTheSinger) {
         this.send(ws, Commands.ERROR, { message: "Only the host or the current singer can start the song." });
         return;
     }
 
-    const videoToPlay = nextSingerSocket.p_v;
-    if (!videoToPlay) return; // Singer has no video selected.
+    const videoToPlay = nextSinger.video;
+    if (!videoToPlay) return; // Should not happen, but a good safeguard.
 
     // Atomically update the player state
     player.playlist = [];
     player.currentTrack = 0;
     player.currentTime = 0;
-    const newVideo = this._createVideoObject(videoToPlay, nextSingerSocket.u, 'scraper');
+    const newVideo = this._createVideoObject(videoToPlay, nextSinger.user, 'scraper');
     player.playlist.push(newVideo);
     player.lastStartTime = new Date().getTime() / 1000;
-    nextSingerSocket.p = false;
-    nextSingerSocket.p_v = null;
     
-    console.log(`${ws.u.name} started karaoke track for ${nextSingerSocket.u.name}`);
+    // Remove the singer from the queue now that their turn has started.
+    player.singers.shift();
+    
+    console.log(`${ws.u.name} started karaoke track for ${nextSinger.user.name}`);
 
     // Notify all clients with the correct message type for their role.
     player.sockets.forEach(socket => {
@@ -1004,6 +1010,7 @@ class App{
       // Create the new player object, defaulting the connecting user as host.
       // This will be overwritten by existingState if a host is already saved.
       this.videoPlayers[instanceId] = {
+        singers: [],
         playlist:[],
         votes: [],
         currentTrack: 0,
@@ -1020,6 +1027,10 @@ class App{
 
       if (existingState) {
         Object.assign(this.videoPlayers[instanceId], existingState);
+        // Ensure the singers array exists if loading older state from the DB.
+        if (!this.videoPlayers[instanceId].singers) {
+          this.videoPlayers[instanceId].singers = [];
+        }
       }
 
       // For a brand new instance (no state loaded from DB), the creator is the host and is connected.
@@ -1044,14 +1055,18 @@ class App{
   getVideoObject(instanceId, { includePlaylist = true } = {}) {
     if(this.videoPlayers[instanceId]) {
       const player = this.videoPlayers[instanceId];
-      const map = new Map(player.sockets.filter(s => s.p).map(s => [s.u.id, s]));
       
       const videoObject = {
         currentTime: player.currentTime,
         currentTrack: player.currentTrack,
         lastStartTime: player.lastStartTime,
         locked: player.locked,
-        players: [...map.values()].map(s => ({name: s.u.name, p: s.p, id: s.u.id, v: s.p_v})),
+        players: player.singers.map(s => ({
+          name: s.user.name, 
+          p: s.timestamp, 
+          id: s.user.id, 
+          v: s.video
+        })),
         canTakeOver: player.canTakeOver,
         canVote: player.canVote,
         host: player.host,
