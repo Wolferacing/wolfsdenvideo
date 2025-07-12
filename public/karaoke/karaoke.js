@@ -231,8 +231,10 @@ class Karaoke{
       const videoTitle = this.core.makeAndAddElement('div', { padding: '10px 7px 10px 15px', fontSize: '1.4em' }, videoTitleAndAction);
       videoTitle.innerHTML = `<b>Now Singing:</b> ${video.user.name} - ${video.title}`;
       this.core.makeAndAddElement('div', { clear: 'both' }, videoItemContainer);
-      // Add a stop button for the host
-      if (isMe) {
+      
+      const isCurrentSinger = video.user.id === window.user.id;
+      // Add a stop button for the host or the current singer.
+      if (isMe || isCurrentSinger) {
         const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitle);
         const stopButton = this.core.makeAndAddElement('div', null, buttons);
         stopButton.className = 'button slim red';
