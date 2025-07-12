@@ -223,6 +223,28 @@ class Karaoke{
             this.core.sendMessage({path: Commands.STOP});
           }
         });
+
+        // Add re-ordering buttons for the host
+        if (isMe) {
+          // Add "Move Up" button if not the first item
+          if (i > 0) {
+              const moveUp = this.core.makeAndAddElement('div', null, buttons);
+              moveUp.className = 'button slim teal extra-margin-left';
+              moveUp.innerText = "Move Up";
+              moveUp.addEventListener('click', () => {
+                  this.core.sendMessage({ path: Commands.MOVE_SINGER, data: { userId: p.id, direction: 'up' } });
+              });
+          }
+          // Add "Move Down" button if not the last item
+          if (i < player.players.length - 1) {
+              const moveDown = this.core.makeAndAddElement('div', null, buttons);
+              moveDown.className = 'button slim teal extra-margin-left';
+              moveDown.innerText = "Move Down";
+              moveDown.addEventListener('click', () => {
+                  this.core.sendMessage({ path: Commands.MOVE_SINGER, data: { userId: p.id, direction: 'down' } });
+              });
+          }
+        }
       }
     });
   }

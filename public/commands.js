@@ -48,7 +48,8 @@ const Commands = {
   SHOW_REPLACE_PROMPT: 'show-replace-prompt',
   REPLACE_VIDEO: 'replace-video',
   ADD_AND_PLAY: 'add-and-play',
-  ADD_AND_PLAY_NEXT: 'add-and-play-next'
+  ADD_AND_PLAY_NEXT: 'add-and-play-next',
+  MOVE_SINGER: 'move-singer'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {
