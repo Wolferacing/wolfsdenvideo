@@ -186,6 +186,22 @@ class Player {
           this.pendingTrackChange = json.data;
         }
         break;
+      case Commands.HOST_SEEK:
+        if (this.player && this.readyToPlay && this.playerData) {
+          const oldTime = this.player.getCurrentTime();
+          const newTime = json.data.newCurrentTime;
+          const diff = newTime - oldTime;
+
+          this.player.seekTo(newTime);
+          this.playerData.lastStartTime = json.data.newLastStartTime;
+
+          // Show a toast indicating the skip direction and amount.
+          const skipAmount = this.core.isKaraoke ? 1 : 5;
+          const direction = diff > 0 ? '+' : '-';
+          this.core.showToast(`Host skip: ${direction}${skipAmount}s`);
+          this.disableAutoSync(true);
+        }
+        break;
       case Commands.MUTE:
         this.core.params.mute = json.data;
         this.core.showToast(this.core.params.mute === true || this.core.params.mute === 'true' ? "mute" : "unmute");

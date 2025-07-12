@@ -593,12 +593,11 @@ class App{
       const newCurrentTime = (new Date().getTime() / 1000) - player.lastStartTime;
       player.currentTime = newCurrentTime; // Keep server state consistent.
 
-      // Broadcast the change to all clients to force a resync.
+      // Broadcast a seek command to all clients.
       player.sockets.forEach(socket => {
-        this.send(socket, Commands.TRACK_CHANGED, {
-          newTrackIndex: player.currentTrack,
-          newLastStartTime: player.lastStartTime,
-          newCurrentTime: newCurrentTime // Add the new time to the payload
+        this.send(socket, Commands.HOST_SEEK, {
+          newCurrentTime: newCurrentTime,
+          newLastStartTime: player.lastStartTime
         });
       });
       await this.savePlayerState(ws.i);
