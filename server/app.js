@@ -81,6 +81,35 @@ class App{
       }); 
     });
 
+    this.app.use(express.static(path.join(__dirname, '..', 'public')));
+  }
+  attachWebsocketListeners() {
+    // This logic is now separate and will be called only when the server is listening.
+    this.wss.on('connection', async (ws, req) => {
+      ws.t = new Date().getTime();
+      ws.isAlive = true;
+      ws.on('pong', () => {
+        ws.isAlive = true;
+      });
+      ws.on('message', async msg => {
+        try {
+          // Using Buffer.from to handle different message types gracefully.
+          const messageString = Buffer.from(msg).toString();
+          if (messageString !== "keepalive") {
+            await this.parseMessage(JSON.parse(messageString), ws);
+          } else {
+            console.log(messageString);
+          }
+        } catch (e) {
+          console.log("Parse error: ", e, msg);
+        }
+      });
+      ws.on('close', (code, reason) => {
+        this.handleClose(ws);
+      });
+    });
+
+    // The ping/pong interval should also start only when the server is live.
     const interval = setInterval(() => {
       this.wss.clients.forEach(function each(ws) {
         if (ws.isAlive === false) return ws.terminate();
@@ -89,33 +118,10 @@ class App{
       });
     }, 30000);
 
-    this.wss.on('connection', async (ws, req) => {
-      ws.t = new Date().getTime();
-      ws.isAlive = true;
-      ws.on('pong', () => {
-        ws.isAlive = true;
-      });
-      ws.on('message', async msg => { 
-        try{
-          if(msg !== "keepalive") {
-            await this.parseMessage(JSON.parse(msg), ws);
-          }else{
-            console.log(msg)
-          }
-        }catch(e) {
-          console.log("parse error: ", e, msg);
-        }
-      });
-      ws.on('close', (code, reason) => {
-        this.handleClose(ws);
-      });
-    });
-
     this.server.on('close', () => {
       clearInterval(this.mainLoop);
       clearInterval(interval);
     });
-    this.app.use(express.static(path.join(__dirname, '..', 'public')));
   }
   handleClose(ws) {
     console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.', ws.type);
@@ -942,6 +948,8 @@ async function start() {
 
     const port = process.env.PORT || 3000;
     app.server.listen(port, () => {
+      // Attach the connection handlers only AFTER the server is successfully listening.
+      app.attachWebsocketListeners();
       console.log(`Video Player started and listening on port ${port}.`);
     });
   } catch (err) {
