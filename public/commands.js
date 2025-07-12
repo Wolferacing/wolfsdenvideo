@@ -1,4 +1,4 @@
-const Commands = {
+var Commands = {
   INSTANCE: 'instance',
   SEARCH: 'search',
   SET_TIME: 'set-time',
