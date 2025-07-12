@@ -25,6 +25,7 @@ class App{
   async setupDatabase() {
     const client = await this.pool.connect();
     try {
+      // Step 1: Ensure the table schema is what we expect.
       await client.query(`
         CREATE TABLE IF NOT EXISTS player_state (
           instance_id TEXT PRIMARY KEY,
@@ -32,9 +33,35 @@ class App{
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
       `);
-      console.log('Database table "player_state" is ready.');
+      console.log('Database table "player_state" schema ensured.');
+
+      // Step 2: Verify the table is actually queryable.
+      try {
+        await client.query('SELECT 1 FROM player_state LIMIT 1;');
+        console.log('Database table "player_state" successfully verified.');
+      } catch (verifyError) {
+        // If verification fails, the table might be corrupt.
+        console.warn('Could not verify "player_state" table. It might be corrupted. Attempting to recover...', verifyError.code);
+        
+        // Step 3: Attempt recovery by dropping and recreating the table.
+        // This is a destructive operation but can fix a corrupted state.
+        await client.query('DROP TABLE IF EXISTS player_state CASCADE;');
+        console.log('Dropped potentially corrupted "player_state" table.');
+        
+        await client.query(`
+          CREATE TABLE player_state (
+            instance_id TEXT PRIMARY KEY,
+            player_data JSONB NOT NULL,
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+          );
+        `);
+        console.log('Successfully recreated "player_state" table.');
+      }
+
     } catch (err) {
-      console.error('Error creating database table:', err);
+      console.error('CRITICAL: Database setup failed and could not recover.', err);
+      // Re-throw the error to ensure the main startup process catches it and aborts.
+      throw err;
     } finally {
       client.release();
     }
