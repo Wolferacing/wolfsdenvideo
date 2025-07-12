@@ -19,11 +19,16 @@ class App{
         rejectUnauthorized: false
       } : false
     });
-    this.setupDatabase();
+  }
+
+  async init() {
+    // By awaiting setupDatabase, we ensure the table exists before we start the webserver.
+    await this.setupDatabase();
     this.setupWebserver();
     // A single, unified loop is much more efficient than one timer per instance.
     this.mainLoop = setInterval(() => this.tickAllInstances(), 1000);
   }
+
   async setupDatabase() {
     const client = await this.pool.connect();
     try {
@@ -285,6 +290,9 @@ class App{
       case Commands.ADD_AND_PLAY_NEXT:
         await this.addAndPlayNext(msg.data, ws);
         break;
+      case Commands.MOVE_SINGER:
+        await this.moveSinger(msg.data, ws);
+        break;
       case Commands.VIDEO_UNAVAILABLE:
         await this.handleVideoUnavailable(msg.data, ws);
         break;
@@ -362,6 +370,38 @@ class App{
 
     console.log(`${ws.u.name} was added to the singer list with video: ${video.title}`);
     this.updateClients(ws.i, "add-to-players", { includePlaylist: false });
+  }
+  async moveSinger({ userId, direction }, ws) {
+    this.onlyIfHost(ws, async () => {
+        const player = this.videoPlayers[ws.i];
+        if (!player) return;
+
+        // Get a sorted list of current singers from the sockets
+        const singers = player.sockets.filter(s => s.p).sort((a, b) => a.p - b.p);
+        
+        const oldIndex = singers.findIndex(s => s.u.id === userId);
+
+        if (oldIndex === -1) {
+            return; // Singer not found
+        }
+
+        let newIndex;
+        if (direction === 'up' && oldIndex > 0) {
+            newIndex = oldIndex - 1;
+        } else if (direction === 'down' && oldIndex < singers.length - 1) {
+            newIndex = oldIndex + 1;
+        } else {
+            return; // Invalid move
+        }
+
+        // The sockets to be swapped
+        const singerToMoveSocket = singers[oldIndex];
+        const otherSingerSocket = singers[newIndex];
+
+        // Swap their 'p' (timestamp) values to change their order, then update clients
+        [singerToMoveSocket.p, otherSingerSocket.p] = [otherSingerSocket.p, singerToMoveSocket.p];
+        this.updateClients(ws.i, 'singers-reordered', { includePlaylist: false });
+    });
   }
   async toggleVote(ws) {
     if (this.videoPlayers[ws.i]) {
@@ -899,4 +939,10 @@ class App{
     }
   }
 }
-module.exports = new App();
+
+const app = new App();
+app.init().catch(err => {
+  console.error("Failed to initialize application:", err);
+  process.exit(1);
+});
+module.exports = app;
