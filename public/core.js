@@ -499,7 +499,13 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
       case Commands.STOP:
       case Commands.PLAYBACK_UPDATE:
         this.player = json.data.video;
-        this.player.players.sort((a, b) => a.p - b.p);
+        break;
+      case Commands.SINGER_LIST_UPDATED:
+        if (this.player) {
+          this.player.players = json.data.players;
+          // The box trigger logic relies on the list being sorted.
+          this.player.players.sort((a, b) => a.p - b.p);
+        }
         break;
       case Commands.SYNC_TIME:
         json.volume = this.tempVolume;
