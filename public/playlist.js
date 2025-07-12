@@ -1,4 +1,4 @@
-class PlaylistPlayer {
+var PlaylistPlayer = class {
   constructor() {
     this.currentScript = document.currentScript;
     this.init();
@@ -37,4 +37,4 @@ class PlaylistPlayer {
     });
   }
 }
-new PlaylistPlayer();
+window.playlistPlayerInstance = new PlaylistPlayer();

@@ -1,4 +1,4 @@
-class KaraokePlayer {
+var KaraokePlayer = class {
   constructor() {
     this.currentScript = document.currentScript;
     this.init();
@@ -44,4 +44,4 @@ class KaraokePlayer {
     });
   }
 }
-new KaraokePlayer();
+window.karaokePlayerInstance = new KaraokePlayer();

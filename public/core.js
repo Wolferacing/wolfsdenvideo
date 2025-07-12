@@ -379,6 +379,9 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
   parseParams(currentScript) {
     this.currentScript = currentScript;
     this.params = {};
+    if (this.currentScript) {
+      this.createdElements.push(this.currentScript);
+    }
     this.setOrDefault("position", "0 0 0");
     this.setOrDefault("rotation", "0 0 0");
     this.setOrDefault("scale", "1 1 1");
@@ -624,6 +627,12 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
     this.playlistContainer = null;
     this.handControlsContainer = null;
     this.ws = null;
+    if (window.playlistPlayerInstance) {
+      window.playlistPlayerInstance = null;
+    }
+    if (window.karaokePlayerInstance) {
+      window.karaokePlayerInstance = null;
+    }
     window.videoPlayerCore = null;
 
     // Remove event listeners from the window, if any were added directly.
