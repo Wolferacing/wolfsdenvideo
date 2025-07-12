@@ -257,7 +257,7 @@ class Playlist {
       }, videoTitle);
 
       videoAuthor.className = "currentTimeAuthor";
-      videoAuthor.innerText = "Added By: " + v.user;
+      videoAuthor.innerText = "Added By: " + (v.user ? v.user.name : 'Unknown');
       
       if(player.currentTrack !== i) {
         if(isMe) {

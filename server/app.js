@@ -70,21 +70,39 @@ class App{
     const player = this.videoPlayers[instanceId];
     if (!player) return;
 
-    // Create a clean, serializable object for storage.
-    // We don't want to save sockets, intervals, timeouts, or the host object.
+    // Build a map of all unique users to avoid storing redundant names.
+    const userMap = {};
+    if (player.host) {
+      userMap[player.host.id] = player.host.name;
+    }
+
+    // Create a lean version of the playlist for storage.
+    const leanPlaylist = player.playlist.map(video => {
+      if (video.user && video.user.id) {
+        userMap[video.user.id] = video.user.name;
+      }
+      return {
+        title: video.title,
+        duration: video.duration,
+        link: video.link,
+        userId: video.user ? video.user.id : null
+      };
+    });
+
     const stateToSave = {
-      playlist: player.playlist,
+      playlist: leanPlaylist,
+      userMap: userMap,
       currentTrack: player.currentTrack,
       lastStartTime: player.lastStartTime,
       locked: player.locked,
       canTakeOver: player.canTakeOver,
       canVote: player.canVote,
-      host: player.host,
-      // We don't save votes as they are tied to connected sockets.
+      hostId: player.host ? player.host.id : null,
     };
 
     const client = await this.pool.connect();
     try {
+      // This query uses ON CONFLICT to perform an "upsert": update if exists, insert if not.
       await client.query(
         `INSERT INTO player_state (instance_id, player_data, updated_at)
          VALUES ($1, $2, NOW())
@@ -191,11 +209,16 @@ class App{
     if (ws.u) {
       const voteCount = videoPlayer.votes.length;
       videoPlayer.votes = videoPlayer.votes.filter(vote => vote.u.id !== ws.u.id);
+      // If the disconnected user had active votes, we need to update the clients.
       if (voteCount > videoPlayer.votes.length) {
-        this.updateVotes(instanceId);
+        this.updateVotes(instanceId); // Recalculate vote counts on each video.
+        // Broadcast the updated playlist to all clients in the instance.
+        videoPlayer.sockets.forEach(socket => {
+            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: videoPlayer.playlist, currentTrack: videoPlayer.currentTrack });
+        });
       }
     }
-    this.updateClients(instanceId, 'user-left', { includePlaylist: false });
+    this.updateClients(instanceId, 'user-left', { includePlaylist: false }); // This lightweight message can remain.
 
     // If the instance is now empty, schedule it for cleanup.
     if (videoPlayer.sockets.length === 0) {
@@ -215,7 +238,9 @@ class App{
      socket.send(payload);
   }
   async parseMessage(msg, ws){
-    console.log(`[RECV] user: ${ws.u ? ws.u.name : 'N/A'}, instance: ${ws.i || 'N/A'}, type: ${ws.type || 'N/A'}, path: ${msg.path}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[RECV] user: ${ws.u ? ws.u.name : 'N/A'}, instance: ${ws.i || 'N/A'}, type: ${ws.type || 'N/A'}, path: ${msg.path}`);
+    }
     switch(msg.path) {
       case Commands.INSTANCE:
         if(msg.u) { 
@@ -255,7 +280,7 @@ class App{
         await this.toggleCanTakeOver(msg.data, ws);
         break;
       case Commands.TAKE_OVER:
-        await this.takeOver(ws);
+        await this.takeOver(ws); 
         break;
       case Commands.ADD_TO_PLAYLIST:
         await this.addToPlaylist(msg.data, msg.skipUpdate, msg.isYoutubeWebsite, ws);
@@ -323,7 +348,7 @@ class App{
         break;
     }
   }
-  _createVideoObject(videoData, userName, source, isYoutubeWebsite = false) {
+  _createVideoObject(videoData, userObject, source, isYoutubeWebsite = false) {
     // Standardizes video objects from different sources (ytfps, scraper)
     if (source === 'ytfps') {
       return {
@@ -332,7 +357,7 @@ class App{
         duration: videoData.milis_length,
         link: videoData.url,
         votes: 0,
-        user: userName,
+        user: userObject,
         is_youtube_website: isYoutubeWebsite
       };
     }
@@ -348,7 +373,7 @@ class App{
       duration: durationMs,
       link: videoData.link,
       votes: 0,
-      user: userName,
+      user: userObject,
       is_youtube_website: isYoutubeWebsite
     };
   }
@@ -522,7 +547,7 @@ class App{
         let playlist = await ytfps(data.id, { limit: 100 });
         this.resetPlaylist(ws); // Resets playlist, currentTime, currentTrack
         playlist.videos.forEach(v => {
-          player.playlist.push(this._createVideoObject(v, ws.u.name, 'ytfps'));
+          player.playlist.push(this._createVideoObject(v, ws.u, 'ytfps'));
         });
         if (player.playlist.length > 0) {
           player.lastStartTime = new Date().getTime() / 1000;
@@ -559,7 +584,7 @@ class App{
     if (this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
-        const newVideo = this._createVideoObject(v, ws.u.name, 'scraper');
+        const newVideo = this._createVideoObject(v, ws.u, 'scraper');
         player.playlist.push(newVideo);
 
         // Set it as the current track
@@ -580,7 +605,7 @@ class App{
     if (this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
-        const newVideo = this._createVideoObject(v, ws.u.name, 'scraper');
+        const newVideo = this._createVideoObject(v, ws.u, 'scraper');
         const nextIndex = player.currentTrack + 1;
         player.playlist.splice(nextIndex, 0, newVideo);
         this.updateClients(ws.i);
@@ -613,7 +638,7 @@ class App{
           this.videoPlayers[ws.i].currentTime = 0;
           this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
         }
-        const newVideo = this._createVideoObject(v, ws.u.name, 'scraper', isYoutubeWebsite);
+        const newVideo = this._createVideoObject(v, ws.u, 'scraper', isYoutubeWebsite);
         this.videoPlayers[ws.i].playlist.push(newVideo);
         if(!skipUpdate) {
           this.updateClients(ws.i);
@@ -859,6 +884,12 @@ class App{
       }
     });
   }
+  getYoutubeId(url){
+    // Extracts the 11-character YouTube video ID from a URL.
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    var match = url.match(regExp);
+    return (match&&match[7].length==11)? match[7] : false;
+  }
   async createVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {
       const client = await this.pool.connect();
@@ -867,6 +898,45 @@ class App{
         const res = await client.query('SELECT player_data FROM player_state WHERE instance_id = $1', [instanceId]);
         if (res.rows.length > 0) {
           existingState = res.rows[0].player_data;
+
+          // --- Data Re-hydration and Migration ---
+          // This logic handles both the new "lean" format and the old "fat" format,
+          // ensuring seamless migration of old data.
+          if (existingState.playlist && Array.isArray(existingState.playlist)) {
+            const userMap = existingState.userMap || {};
+
+            // If we loaded an old record, build the userMap from the fat data.
+            if (!existingState.userMap) {
+              if (existingState.host) userMap[existingState.host.id] = existingState.host.name;
+              existingState.playlist.forEach(video => {
+                if (video.user) userMap[video.user.id] = video.user.name;
+              });
+            }
+
+            existingState.playlist = existingState.playlist.map(video => {
+              // Re-hydrate thumbnail if missing (from lean format)
+              if (!video.thumbnail) {
+                const videoId = this.getYoutubeId(video.link);
+                video.thumbnail = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '';
+              }
+
+              // Re-hydrate user object if missing (from lean format)
+              if (!video.user && video.userId && userMap[video.userId]) {
+                video.user = { id: video.userId, name: userMap[video.userId] };
+              } else if (!video.user) {
+                video.user = { id: null, name: 'Unknown' };
+              }
+
+              // Always reset non-persistent state
+              video.votes = 0;
+              return video;
+            });
+
+            // Re-hydrate host object if missing (from lean format)
+            if (!existingState.host && existingState.hostId && userMap[existingState.hostId]) {
+              existingState.host = { id: existingState.hostId, name: userMap[existingState.hostId] };
+            }
+          }
           console.log(`Loaded state for instance: ${instanceId}`);
         }
       } catch (err) {
