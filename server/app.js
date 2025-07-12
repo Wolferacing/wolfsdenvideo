@@ -12,6 +12,7 @@ const { Pool } = require('pg');
 class App{
   constructor() {
     this.videoPlayers = {};
+    this.mainLoop = null;
     this.pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       // Render's Hobby plan requires SSL, but does not verify the certificate
@@ -19,14 +20,6 @@ class App{
         rejectUnauthorized: false
       } : false
     });
-  }
-
-  async init() {
-    // By awaiting setupDatabase, we ensure the table exists before we start the webserver.
-    await this.setupDatabase();
-    this.setupWebserver();
-    // A single, unified loop is much more efficient than one timer per instance.
-    this.mainLoop = setInterval(() => this.tickAllInstances(), 1000);
   }
 
   async setupDatabase() {
@@ -123,10 +116,6 @@ class App{
       clearInterval(interval);
     });
     this.app.use(express.static(path.join(__dirname, '..', 'public')));
-    const port = process.env.PORT || 3000;
-    this.server.listen( port, function listening(){
-        console.log("Video Player started."); 
-    });
   }
   handleClose(ws) {
     console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.', ws.type);
@@ -941,8 +930,25 @@ class App{
 }
 
 const app = new App();
-app.init().catch(err => {
-  console.error("Failed to initialize application:", err);
-  process.exit(1);
-});
+
+async function start() {
+  try {
+    console.log("Initializing database...");
+    await app.setupDatabase();
+    console.log("Database initialization complete.");
+
+    app.setupWebserver();
+    app.mainLoop = setInterval(() => app.tickAllInstances(), 1000);
+
+    const port = process.env.PORT || 3000;
+    app.server.listen(port, () => {
+      console.log(`Video Player started and listening on port ${port}.`);
+    });
+  } catch (err) {
+    console.error("Failed to start application:", err);
+    process.exit(1);
+  }
+}
+
+start();
 module.exports = app;
