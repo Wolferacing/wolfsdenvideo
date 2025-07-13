@@ -411,7 +411,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
     this.setOrDefault("geometry", "false");
     this.setOrDefault("spatial-min-distance", '5');
     this.setOrDefault("spatial-max-distance", '40');
-    this.setOrDefault("youtube", "https://www.youtube.com/watch?v=L_LUpnjgPso");
+    this.setOrDefault("youtube", "https://www.youtube.com/watch?v=GiwStUzx8fg");
     
     this.params.volume = Number(this.params.volume);
     this.params['mip-maps'] = Number(this.params['mip-maps']);

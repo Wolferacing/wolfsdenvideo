@@ -164,7 +164,7 @@ var Player = class {
         this.playerData = Object.assign(this.playerData || {}, json.data.video);
         // The specific 'set-track' logic is now handled by the TRACK_CHANGED command.
         if (json.data.type === "stop" && this.readyToPlay) {
-          this.player.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=_VUKfrA9oLQ"), 0);
+          this.player.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=GiwStUzx8fg"), 0);
         }
         // The initial sync is now handled by the onStateChange event when the player is ready.
         break;

@@ -464,7 +464,7 @@ var Karaoke = class {
     return new Date(seconds * 1000).toISOString().substring(11, 19);
   }
   setupYoutubePlayer() {
-    const youtubeUrl = 'https://www.youtube.com/watch?v=_VUKfrA9oLQ'; // Default video (Silence)
+    const youtubeUrl = 'https://www.youtube.com/watch?v=GiwStUzx8fg'; // Default video (Silence)
     new YT.Player('player', {
       height: '100%',
       width: '100%',
