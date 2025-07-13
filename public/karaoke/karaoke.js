@@ -111,13 +111,14 @@ var Karaoke = class {
     
     this.takeOver = document.querySelector('#takeOver');
 
-    // Dynamically set styles that depend on the host URL
-    document.querySelectorAll('.teal').forEach(el => {
-      // The background image for buttons is now loaded from the configured host.
-      // This ensures consistency if you ever change the theme or host.
-      el.style.background = `url(https://${window.APP_CONFIG.HOST_URL}/assets/Button_bg.png)`;
-      el.style.backgroundSize = '100% 100%';
-    });
+    // --- FIX for dynamically created buttons ---
+    // Instead of applying styles to existing elements, we inject a style rule
+    // into the document head. This ensures that any element with the '.teal' class,
+    // including ones created later, will get the correct background style.
+    const style = document.createElement('style');
+    style.innerHTML = `.teal { background: url(https://${window.APP_CONFIG.HOST_URL}/assets/Button_bg.png); background-size: 100% 100%; }`;
+    document.head.appendChild(style);
+    // --- End of FIX ---
     
     this.takeOver.addEventListener('click', () => {
         if(this.core.player.host.id === window.user.id) {

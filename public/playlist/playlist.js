@@ -578,11 +578,14 @@ var Playlist = class {
     this.replaceDismissButton = document.querySelector('#replaceDismiss');
     this.replaceDismissButton.addEventListener('click', () => this.hideReplacePrompt());
 
-    // Dynamically set styles that depend on the host URL
-    document.querySelectorAll('.teal').forEach(el => {
-      el.style.background = `url(https://${window.APP_CONFIG.HOST_URL}/assets/Button_bg.png)`;
-      el.style.backgroundSize = '100% 100%';
-    });
+    // --- FIX for dynamically created buttons ---
+    // Instead of applying styles to existing elements, we inject a style rule
+    // into the document head. This ensures that any element with the '.teal' class,
+    // including ones created later like the move up/down buttons, will get the style.
+    const style = document.createElement('style');
+    style.innerHTML = `.teal { background: url(https://${window.APP_CONFIG.HOST_URL}/assets/Button_bg.png); background-size: 100% 100%; }`;
+    document.head.appendChild(style);
+    // --- End of FIX ---
   }
 }
 window.playlistUiInstance = new Playlist();
