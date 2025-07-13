@@ -293,7 +293,7 @@ var Karaoke = class {
       const contentWrapper = this.core.makeAndAddElement('div', {
         display: 'flex',
         alignItems: 'center',
-        padding: '5px'
+        padding: '1px'
       }, videoItemContainer);
       const videoThumbnail = this.core.makeAndAddElement('img', { height: '80px', width: '142px', flexShrink: '0' }, contentWrapper);
       videoThumbnail.src = video.thumbnail;

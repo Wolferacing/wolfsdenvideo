@@ -256,7 +256,7 @@ var Playlist = class {
       const contentWrapper = this.core.makeAndAddElement('div', {
         display: 'flex',
         alignItems: 'center', // This is the key to vertical alignment
-        padding: '5px'
+        padding: '1px'
       }, videoItemContainer);
       
       const videoThumbnail = this.core.makeAndAddElement('img',{height: '80px', width: '142px', flexShrink: '0'}, contentWrapper);
