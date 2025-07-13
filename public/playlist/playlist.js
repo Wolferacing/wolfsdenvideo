@@ -10,9 +10,9 @@ var Playlist = class {
     await this.setupCoreScript();
     this.core = window.videoPlayerCore;
     this.core.parseParams(this.currentScript);
+    await this.core.setupCommandsScript(); // Load Commands before UI setup and core.init
     this.setupPlaylistUI();
     await this.core.init(window.APP_CONFIG.HOST_URL);
-    await this.core.setupCommandsScript();
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
     }, ()=>{
