@@ -333,7 +333,15 @@ var Karaoke = class {
         const videoItemContainer = this.core.makeAndAddElement('div', { background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f' }, this.videoPlaylistContainer);
         const videoTitleAndAction = this.core.makeAndAddElement('div', { float: 'left', width: '100%' }, videoItemContainer);
         const videoTitle = this.core.makeAndAddElement('div', { padding: '10px 7px 10px 15px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '1.4em' }, videoTitleAndAction);
-        videoTitle.innerHTML = `${(i + 1) + "."} ${"<b>" + p.name + " </b>will sing<b> " + p.v.title + "</b>"} `;
+        
+        // Build the title safely to prevent HTML injection
+        videoTitle.textContent = `${i + 1}. `;
+        const nameBold = document.createElement('b');
+        nameBold.textContent = p.name;
+        const titleBold = document.createElement('b');
+        titleBold.textContent = p.v.title;
+        videoTitle.append(nameBold, ' will sing ', titleBold);
+
         this.core.makeAndAddElement('div', { clear: 'both' }, videoItemContainer);
         if (p.id === window.user.id || isMe) {
           const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitle);

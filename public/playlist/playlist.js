@@ -264,8 +264,16 @@ var Playlist = class {
       
       videoThumbnail.src = v.thumbnail;
       
-      videoTitle.innerHTML = (player.canVote && player.currentTrack !== i ? "<b>(" + player.playlist[i].votes + ")</b> " : "") + v.title;
-        
+      // Build the title safely to prevent HTML injection
+      videoTitle.innerHTML = ''; // Clear it first
+      if (player.canVote && player.currentTrack !== i) {
+        const voteBold = document.createElement('b');
+        voteBold.textContent = `(${player.playlist[i].votes})`;
+        videoTitle.appendChild(voteBold);
+        videoTitle.append(' ');
+      }
+      videoTitle.append(v.title);
+
       const videoAuthor = this.core.makeAndAddElement('div',{
         padding: '0 10 5 7', 
         textOverflow: 'ellipsis', 
