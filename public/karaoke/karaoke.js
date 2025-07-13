@@ -11,7 +11,6 @@ var Karaoke = class {
     this.core.parseParams(this.currentScript);
     this.setupKaraokeUI();
     await this.core.init(window.APP_CONFIG.HOST_URL);
-    await this.core.setupCommandsScript();
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
     }, () => {
