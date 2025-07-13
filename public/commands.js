@@ -58,7 +58,8 @@ var Commands = {
   AUTO_SYNC_STATE_CHANGED: 'auto-sync-state-changed',
   HOST_SKIP_BACK: 'host-skip-back',
   HOST_SKIP_FORWARD: 'host-skip-forward',
-  HOST_SEEK: 'host-seek'
+  HOST_SEEK: 'host-seek',
+  SET_INSTANCE_MODE: 'set-instance-mode'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

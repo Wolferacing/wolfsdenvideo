@@ -13,6 +13,7 @@ var KaraokePlayer = class {
     await this.core.setupCommandsScript();
     await this.core.setupWebsocket("space", null, () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+      this.core.sendMessage({path: Commands.SET_INSTANCE_MODE, data: 'karaoke'});
     });
     const url = `https://${window.APP_CONFIG.HOST_URL}/?youtube=${
     encodeURIComponent(this.core.params.youtube)

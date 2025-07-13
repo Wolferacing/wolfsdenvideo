@@ -99,7 +99,8 @@ class App{
       canTakeOver: player.canTakeOver,
       canVote: player.canVote,
       hostId: player.host ? player.host.id : null,
-      autoAdvance: player.autoAdvance
+      autoAdvance: player.autoAdvance,
+      isKaraoke: player.isKaraoke
     };
 
     const client = await this.pool.connect();
@@ -369,6 +370,14 @@ class App{
         break;
       case Commands.HOST_SKIP_FORWARD:
         await this.hostSkip(ws, true);
+        break;
+      case Commands.SET_INSTANCE_MODE:
+        const playerInstanceForMode = this.videoPlayers[ws.i];
+        if (playerInstanceForMode) {
+          // This flag determines how track advancement is handled.
+          playerInstanceForMode.isKaraoke = msg.data === 'karaoke';
+          await this.savePlayerState(ws.i);
+        }
         break;
       case Commands.VIDEO_UNAVAILABLE:
         await this.handleVideoUnavailable(msg.data, ws);
@@ -922,9 +931,7 @@ class App{
 
         if (track && trackDuration > 0 && player.currentTime > trackDuration) {
           // A track has finished.
-          const isKaraokeContext = Array.isArray(player.singers);
-
-          if (isKaraokeContext) {
+          if (player.isKaraoke) {
             // In a karaoke context, a song ending means we either stop or auto-advance.
             if (player.autoAdvance && player.singers.length > 0) {
               await this._playNextKaraokeSong(instanceId);
@@ -1120,6 +1127,7 @@ class App{
         hostConnected: false, // Default to false. Will be set true upon "space" connection.
         sockets: [ws],
         autoAdvance: false,
+        isKaraoke: false, // Default to playlist mode. Will be set by the client.
         canTakeOver: true,
         canVote: false,
         currentPlayerUrl: "",
