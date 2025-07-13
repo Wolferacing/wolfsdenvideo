@@ -20,7 +20,7 @@ body{
   margin: auto;
   background: #3f3f3f;
   color: white;
-  height: 45px;
+  min-height: 45px; /* Allow the container to grow vertically when buttons wrap */
   padding: 1px 15px;
 }
 .singerListTitle{
