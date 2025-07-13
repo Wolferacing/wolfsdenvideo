@@ -59,7 +59,7 @@ var Core = class {
             var userStr = this.urlParams.get("user").split("-_-");
             window.user = {
               id: userStr[0],
-              name: userStr[1]
+              name: decodeURIComponent(userStr[1])
             }
           }else{
             this.generateGuestUser();
