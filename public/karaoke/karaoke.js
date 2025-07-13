@@ -287,9 +287,17 @@ var Karaoke = class {
         return;
       }
       const videoItemContainer = this.core.makeAndAddElement('div', { background: '#4f4f4f' }, this.videoPlaylistContainer);
-      const videoThumbnail = this.core.makeAndAddElement('img', { height: '80px', width: '142px', float: 'left' }, videoItemContainer);
+      
+      // --- FIX for thumbnail alignment ---
+      // Create a content wrapper and use flexbox to vertically center the thumbnail and the info panel.
+      const contentWrapper = this.core.makeAndAddElement('div', {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '5px'
+      }, videoItemContainer);
+      const videoThumbnail = this.core.makeAndAddElement('img', { height: '80px', width: '142px', flexShrink: '0' }, contentWrapper);
       videoThumbnail.src = video.thumbnail;
-      const videoTitleAndAction = this.core.makeAndAddElement('div', { float: 'left', width: 'calc(100% - 180px)' }, videoItemContainer);
+      const videoTitleAndAction = this.core.makeAndAddElement('div', { flexGrow: '1', paddingLeft: '10px' }, contentWrapper);
       const videoTitle = this.core.makeAndAddElement('div', { padding: '10px 7px 10px 15px', fontSize: '1.4em' }, videoTitleAndAction);
       videoTitle.innerHTML = `<b>Now Singing:</b> ${video.user.name} - ${video.title}`;
       
@@ -302,8 +310,6 @@ var Karaoke = class {
       currentTimeText.className = "currentTimeText";
       currentTimeText.innerText = `${this.timeCode(player.currentTime)} / ${this.timeCode(player.duration)}`;
 
-      this.core.makeAndAddElement('div', { clear: 'both' }, videoItemContainer);
-      
       const isCurrentSinger = video.user.id === window.user.id;
       // Add a stop button for the host or the current singer.
       if (isMe || isCurrentSinger) {

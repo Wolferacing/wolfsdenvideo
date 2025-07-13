@@ -251,9 +251,16 @@ var Playlist = class {
     player.playlist.forEach((v, i) => {
       const videoItemContainer = this.core.makeAndAddElement('div', {background: player.currentTrack === i ? '#4f4f4f' : i % 2 === 0 ? '#8f8f8f' : '#9f9f9f'}, this.videoPlaylistContainer);
       
-      const videoThumbnail = this.core.makeAndAddElement('img',{height: '80px', width: '142px', float: 'left'}, videoItemContainer);
+      // --- FIX for thumbnail alignment ---
+      // Create a content wrapper and use flexbox to vertically center the thumbnail and the info panel.
+      const contentWrapper = this.core.makeAndAddElement('div', {
+        display: 'flex',
+        alignItems: 'center', // This is the key to vertical alignment
+        padding: '5px'
+      }, videoItemContainer);
       
-      const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
+      const videoThumbnail = this.core.makeAndAddElement('img',{height: '80px', width: '142px', flexShrink: '0'}, contentWrapper);
+      const videoTitleAndAction = this.core.makeAndAddElement('div',{flexGrow: '1', paddingLeft: '10px'}, contentWrapper);
       
       const videoTitle = this.core.makeAndAddElement('div',{
         padding: '7 10 10 7', 
@@ -360,7 +367,8 @@ var Playlist = class {
         currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
       }
         
-      this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
+      // The 'clear: both' div is no longer needed with the flexbox layout.
+      // this.core.makeAndAddElement('div',{clear: 'both'}, videoItemContainer);
       
       if(player.currentTrack === i) {
         const currentTime = this.core.makeAndAddElement('div', {
