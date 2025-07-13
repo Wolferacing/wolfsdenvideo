@@ -10,6 +10,7 @@ var PlaylistPlayer = class {
     this.core.parseParams(this.currentScript);
     // this.core.setupBrowserElement();
     await this.core.init(window.APP_CONFIG.HOST_URL);
+    await this.core.setupCommandsScript();
     await this.core.setupWebsocket("space", null, () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
       this.core.sendMessage({path: Commands.SET_INSTANCE_MODE, data: 'playlist'});

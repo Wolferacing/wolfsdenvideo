@@ -17,6 +17,7 @@ var Player = class {
      this.core = window.videoPlayerCore;
      this.core.parseParams(this.currentScript);
      await this.core.init(window.APP_CONFIG.HOST_URL);
+     await this.core.setupCommandsScript();
      await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
        this.setupYoutubeScript();
        this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});

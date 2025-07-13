@@ -5,10 +5,6 @@ var Core = class {
         this.createdElements = [];
     }
   async init(hostUrl) {
-    // Load essential scripts first to ensure dependencies like 'Commands' are available.
-    // This prevents race conditions where callbacks are set up before their dependencies are loaded.
-    await this.setupCommandsScript();
-
     await this.setupToastify();
     this.imIn = false;
     this.hostUrl = hostUrl;

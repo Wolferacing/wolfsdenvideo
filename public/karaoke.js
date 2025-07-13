@@ -10,6 +10,7 @@ var KaraokePlayer = class {
     this.core.isKaraoke = true;
     this.core.parseParams(this.currentScript);
     await this.core.init(window.APP_CONFIG.HOST_URL);
+    await this.core.setupCommandsScript();
     await this.core.setupWebsocket("space", null, () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
       this.core.sendMessage({path: Commands.SET_INSTANCE_MODE, data: 'karaoke'});
