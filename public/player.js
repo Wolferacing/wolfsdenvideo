@@ -1,3 +1,6 @@
+const SkipJumpTimePlaylist = 5;
+const SkipJumpTimeKaraoke = 0.5;
+
 var Player = class {
   constructor(){
     this.currentScript = document.currentScript;
@@ -139,14 +142,14 @@ var Player = class {
         break;
       case Commands.SKIP_BACK:
         this.disableAutoSync(true); // Disable auto-sync on manual skip
-        const skipAmountBack = this.core.isKaraoke ? 1 : 5;
+        const skipAmountBack = this.core.isKaraoke ? SkipJumpTimeKaraoke : SkipJumpTimePlaylist;
         const time = this.player.getCurrentTime() - skipAmountBack;
         this.player.seekTo(time);
         this.core.showToast(`-${skipAmountBack}s`);
         break;
       case Commands.SKIP_FORWARD:
         this.disableAutoSync(true); // Disable auto-sync on manual skip
-        const skipAmountForward = this.core.isKaraoke ? 1 : 5;
+        const skipAmountForward = this.core.isKaraoke ? SkipJumpTimeKaraoke : SkipJumpTimePlaylist;
         const timeForward = this.player.getCurrentTime() + skipAmountForward;
         this.player.seekTo(timeForward);
         this.core.showToast(`+${skipAmountForward}s`);
@@ -196,7 +199,7 @@ var Player = class {
           this.playerData.lastStartTime = json.data.newLastStartTime;
 
           // Show a toast indicating the skip direction and amount.
-          const skipAmount = this.core.isKaraoke ? 1 : 5;
+          const skipAmount = this.core.isKaraoke ? SkipJumpTimeKaraoke : SkipJumpTimePlaylist;
           const direction = diff > 0 ? '+' : '-';
           this.core.showToast(`Host skip: ${direction}${skipAmount}s`);
           this.disableAutoSync(true);

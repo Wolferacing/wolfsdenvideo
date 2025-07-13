@@ -8,6 +8,8 @@ const ytfps = require('ytfps');
 const fetch = require('node-fetch');
 const Commands = require('../public/commands.js');
 const { Pool } = require('pg');
+const SkipJumpTimePlaylist = 5;
+const SkipJumpTimeKaraoke = 0.5;
 
 class App{
   constructor() {
@@ -591,8 +593,8 @@ class App{
       const player = this.videoPlayers[ws.i];
       if (!player || !player.playlist.length) return;
 
-      const isKaraokeContext = Array.isArray(player.singers);
-      const skipAmount = isKaraokeContext ? 1 : 5;
+      // Use the explicit isKaraoke flag for a more reliable check.
+      const skipAmount = player.isKaraoke ? SkipJumpTimeKaraoke : SkipJumpTimePlaylist;
 
       // To skip forward in time, we subtract from the start timestamp.
       // To skip backward, we add to it.
