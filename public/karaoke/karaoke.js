@@ -88,6 +88,20 @@ var Karaoke = class {
     
     this.lockPlayer = document.querySelector('#lockPlayer');
 
+    // --- FIX for button overflow ---
+    // By applying flexbox with wrapping to the container of the top-row buttons,
+    // we ensure they stack vertically on smaller screens instead of overflowing.
+    if (this.lockPlayer && this.lockPlayer.parentNode) {
+      const buttonContainer = this.lockPlayer.parentNode;
+      Object.assign(buttonContainer.style, {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '5px', // Adds a small space between buttons
+        paddingBottom: '10px' // Ensures space below the buttons if they wrap
+      });
+    }
+    // --- End of FIX ---
+
     // Set the spinner's src from the config, making it consistent with other UIs.
     this.loadingSpinner.src = `https://${window.APP_CONFIG.HOST_URL}/assets/3-dots-move.svg`;
     

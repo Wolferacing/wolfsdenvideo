@@ -492,6 +492,20 @@ var Playlist = class {
     
     this.lockPlayer = document.querySelector('#lockPlayer');
     
+    // --- FIX for button overflow ---
+    // By applying flexbox with wrapping to the container of the top-row buttons,
+    // we ensure they stack vertically on smaller screens instead of overflowing.
+    if (this.lockPlayer && this.lockPlayer.parentNode) {
+      const buttonContainer = this.lockPlayer.parentNode;
+      Object.assign(buttonContainer.style, {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '5px', // Adds a small space between buttons
+        paddingBottom: '10px' // Ensures space below the buttons if they wrap
+      });
+    }
+    // --- End of FIX ---
+    
     this.lockPlayer.addEventListener('click', () => {
         this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.core.player.locked });
     });
