@@ -109,17 +109,22 @@ var Karaoke = class {
     
     this.lockPlayer = document.querySelector('#lockPlayer');
 
-    // --- FIX for button overflow ---
-    // By applying flexbox with wrapping to the container of the top-row buttons,
-    // we ensure they stack vertically on smaller screens instead of overflowing.
-    if (this.lockPlayer && this.lockPlayer.parentNode) {
-      const buttonContainer = this.lockPlayer.parentNode;
-      Object.assign(buttonContainer.style, {
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '5px', // Adds a small space between buttons
-        paddingBottom: '10px' // Ensures space below the buttons if they wrap
-      });
+    // --- FIX for top bar layout ---
+    // Use flexbox to control the top bar layout. This provides vertical alignment
+    // and allows the search bar to be pushed to the right.
+    const topBarContainer = document.querySelector('.playlistContainer');
+    const searchContainer = document.querySelector('.searchContainer');
+
+    Object.assign(topBarContainer.style, {
+      display: 'flex',
+      alignItems: 'center', // Vertically align title and buttons
+      flexWrap: 'wrap',     // Allow items to wrap to the next line
+      gap: '5px'            // Add a small space between all items
+    });
+
+    // By setting the left margin to auto, the search container is pushed to the far right.
+    if (searchContainer) {
+      searchContainer.style.marginLeft = 'auto';
     }
     // --- End of FIX ---
 
