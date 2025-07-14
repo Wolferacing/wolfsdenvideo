@@ -254,6 +254,11 @@ var Karaoke = class {
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
 
+    // Update the Auto Advance button state regardless of the singer queue.
+    this.autoAdvance.innerText = player.autoAdvance ? 'Auto Advance: On' : 'Auto Advance: Off';
+    this.autoAdvance.className = player.autoAdvance ? 'button teal red' : 'button teal';
+
+
     // --- Securely build the host title ---
     this.hostTitle.innerHTML = ''; // Clear previous content
 
@@ -356,9 +361,6 @@ var Karaoke = class {
     // --- Render Singer Queue ---
     if (player.players && player.players.length > 0) {
       contentRendered = true;
-      // Update the Auto Advance button text based on the current state
-      this.autoAdvance.innerText = player.autoAdvance ? 'Auto Advance: On' : 'Auto Advance: Off';
-      this.autoAdvance.className = player.autoAdvance ? 'button teal red' : 'button teal';
       if (player.players && Array.isArray(player.players)) {
         player.players.forEach((p, i) => {
           const videoItemContainer = this.core.makeAndAddElement('div', { background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f' }, this.videoPlaylistContainer);

@@ -1257,7 +1257,8 @@ class App{
         canTakeOver: player.canTakeOver,
         canVote: player.canVote,
         host: player.host,
-        duration: player.playlist.length && player.playlist[player.currentTrack] ? player.playlist[player.currentTrack].duration / 1000 : 0
+        duration: player.playlist.length && player.playlist[player.currentTrack] ? player.playlist[player.currentTrack].duration / 1000 : 0,
+        autoAdvance: player.autoAdvance // Ensure autoAdvance state is always included
       };
 
       if (includePlaylist) {
