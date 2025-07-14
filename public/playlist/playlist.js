@@ -530,27 +530,6 @@ var Playlist = class {
     
     this.lockPlayer = document.querySelector('#lockPlayer');
     
-    // --- REMOVED flexbox layout from top bar ---
-    // This restores the layout to the original structure, without flexbox on the main container.
-    const topBarContainer = document.querySelector('.playlistContainer'); // Select the top bar container
-    if (topBarContainer) {
-      topBarContainer.style.display = '';         // Reset display property
-      topBarContainer.style.alignItems = '';      // Reset vertical alignment
-      topBarContainer.style.justifyContent = '';  // Reset horizontal alignment
-      topBarContainer.style.flexWrap = '';        // Prevent wrapping
-    }
-    const searchContainer = document.querySelector('.searchContainer'); // Select the search container
-    if (searchContainer) {
-      searchContainer.style.marginLeft = '';      // Remove any forced margin
-    }
-
-    // --- FIX for scrollable playlist (part 2) ---
-    Object.assign(this.videoPlaylistContainer.style, {
-      flexGrow: '1',
-      overflowY: 'auto' // Enable vertical scrolling when content overflows
-    });
-    // --- End of FIX ---
-    
     this.lockPlayer.addEventListener('click', () => {
         this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.core.player.locked });
     });
