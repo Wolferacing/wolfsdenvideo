@@ -373,7 +373,7 @@ var Karaoke = class {
           const videoTitleAndAction = this.core.makeAndAddElement('div', { flexGrow: '1', paddingLeft: '10px' }, contentWrapper);
           
           const videoTitle = this.core.makeAndAddElement('div', {
-              padding: '10px 7px 10px 15px',
+              padding: '10px 7px 5px 15px',
               textOverflow: 'ellipsis',
               overflow: 'hidden',
               whiteSpace: 'nowrap',
@@ -389,7 +389,7 @@ var Karaoke = class {
           videoTitle.append(nameBold, ' will sing ', titleBold);
 
           // Create a container for the buttons
-          const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitleAndAction);
+          const buttons = this.core.makeAndAddElement('div', { marginTop: "5px" }, videoTitleAndAction);
           const isTheSinger = p.id === window.user.id;
 
           // The host can play any singer. A singer can play themselves if they are up next.
