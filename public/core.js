@@ -41,7 +41,12 @@ var Core = class {
             lastSendTime = now;
             const roundedVolume = Math.round(this.params.volume * volume);
             if(this.tempVolume != roundedVolume) {
-              this.sendBrowserMessage({path: Commands.SET_VOLUME, data: roundedVolume, type: 'spatial'});
+              // Add a .catch() to handle cases where the browser isn't ready yet.
+              // This prevents an "Uncaught (in promise)" error when the pose callback
+              // fires before the browser element has been initialized. The rejection is
+              // expected in this scenario, so we can safely ignore it.
+              this.sendBrowserMessage({path: Commands.SET_VOLUME, data: roundedVolume, type: 'spatial'})
+                .catch(() => { /* Browser not ready, ignore rejection */ });
             }
             this.tempVolume = roundedVolume; 
           }
@@ -481,7 +486,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
         this.browserAcks[msg.id] = resolve;
         this.browser.components['sq-browser'].runActions([{actionType: "postmessage", strParam1: JSON.stringify(msg)}]);
       }else{
-        reject();
+        reject(new Error("Browser element not initialized. Cannot send message."));
       }
     });
   }
