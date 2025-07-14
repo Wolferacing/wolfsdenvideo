@@ -550,22 +550,18 @@ var Playlist = class {
     
     this.lockPlayer = document.querySelector('#lockPlayer');
     
-    // --- FIX for top bar layout ---
-    // Use flexbox to control the top bar layout. This provides vertical alignment
-    // and allows the search bar to be pushed to the right.
-    const topBarContainer = document.querySelector('.playlistContainer');
-    const searchContainer = document.querySelector('.searchContainer');
-
-    Object.assign(topBarContainer.style, {
-      display: 'flex',
-      alignItems: 'center', // Vertically align title and buttons
-      flexWrap: 'wrap',     // Allow items to wrap to the next line
-      gap: '5px'            // Add a small space between all items
-    });
-
-    // By setting the left margin to auto, the search container is pushed to the far right.
+    // --- REMOVED flexbox layout from top bar ---
+    // This restores the layout to the original structure, without flexbox on the main container.
+    const topBarContainer = document.querySelector('.playlistContainer'); // Select the top bar container
+    if (topBarContainer) {
+      topBarContainer.style.display = '';         // Reset display property
+      topBarContainer.style.alignItems = '';      // Reset vertical alignment
+      topBarContainer.style.justifyContent = '';  // Reset horizontal alignment
+      topBarContainer.style.flexWrap = '';        // Prevent wrapping
+    }
+    const searchContainer = document.querySelector('.searchContainer'); // Select the search container
     if (searchContainer) {
-      searchContainer.style.marginLeft = 'auto';
+      searchContainer.style.marginLeft = '';      // Remove any forced margin
     }
     // --- End of FIX ---
     
