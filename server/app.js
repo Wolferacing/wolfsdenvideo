@@ -648,8 +648,13 @@ class App{
         const player = this.videoPlayers[ws.i];
         player.canVote = !player.canVote;
         // When turning voting on, clear all existing votes to start fresh.
+        // Also, broadcast a playlist update to ensure clients' UIs reflect the cleared votes.
         if (player.canVote) {
           player.votes = [];
+          this.updateVotes(ws.i); // This resets the vote counts on the video objects to 0.
+          player.sockets.forEach(socket => {
+            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: player.playlist, currentTrack: player.currentTrack });
+          });
         }
         player.sockets.forEach(socket => {
           this.send(socket, Commands.VOTING_STATE_CHANGED, { canVote: player.canVote });
