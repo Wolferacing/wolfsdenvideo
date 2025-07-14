@@ -283,18 +283,19 @@ var Karaoke = class {
     }
     // --- End of secure host title build ---
 
-    // --- Intelligent Rendering Logic ---
-    // If a song is playing (playlist has items), show it. Otherwise, show the singer queue.
+    this.videoPlaylistContainer.innerHTML = '';
+    let contentRendered = false;
+
+    // --- Render Currently Playing Song ---
     if (player.playlist && player.playlist.length > 0) {
-      // A song is currently playing. Render the main playlist view.
-      this.videoPlaylistContainer.innerHTML = '';
+      contentRendered = true;
       const video = player.playlist[player.currentTrack];
       // This is a defensive check to prevent errors if the player state is ever inconsistent.
       if (!video) {
         this.videoPlaylistContainer.innerHTML = '<h2 style="color: grey; margin-top: 100px; text-align: center;">Error: Could not display current song.</h2>';
         return;
       }
-      const videoItemContainer = this.core.makeAndAddElement('div', { background: '#4f4f4f' }, this.videoPlaylistContainer);
+      const videoItemContainer = this.core.makeAndAddElement('div', { background: '#4f4f4f', marginBottom: '10px' }, this.videoPlaylistContainer);
       
       // --- FIX for thumbnail alignment ---
       // Create a content wrapper and use flexbox to vertically center the thumbnail and the info panel.
@@ -350,13 +351,14 @@ var Karaoke = class {
         width: `${(player.currentTime / player.duration) * 100}%`,
       }, currentTime);
       currentTimeInner.className = "currentTime";
-    } else if (player.players && player.players.length > 0) {
+    }
+
+    // --- Render Singer Queue ---
+    if (player.players && player.players.length > 0) {
+      contentRendered = true;
       // Update the Auto Advance button text based on the current state
       this.autoAdvance.innerText = player.autoAdvance ? 'Auto Advance: On' : 'Auto Advance: Off';
       this.autoAdvance.className = player.autoAdvance ? 'button teal red' : 'button teal';
-
-      // No song is playing, render the singer queue.
-      this.videoPlaylistContainer.innerHTML = '';
       if (player.players && Array.isArray(player.players)) {
         player.players.forEach((p, i) => {
           const videoItemContainer = this.core.makeAndAddElement('div', { background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f' }, this.videoPlaylistContainer);
@@ -428,8 +430,10 @@ var Karaoke = class {
           }
         });
       }
-    } else {
-      // No song playing and no singers in queue.
+    }
+
+    // --- Render Empty State ---
+    if (!contentRendered) {
       this.videoPlaylistContainer.innerHTML = '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!<br><br><div style="color: red;">DONT FORGET TO TAKE OVER THE KARAOKE PLAYER BEFORE YOU START!!<br>IF SOMEONE ELSE TOOK OVER, BAN THEM AND WAIT 45s THEN TAKE OVER</div></h2>';
     }
   }
