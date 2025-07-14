@@ -145,7 +145,7 @@ body{
   font-size: 2em;
 }
 .button{
-  padding: 10 10;
+  padding: 10px;
   display: inline-block;
   color: white;
   cursor: pointer;
@@ -155,7 +155,7 @@ body{
   font-size: 1.4em;
 }
 .slim{
-  padding: 10 10;
+  padding: 10px;
   font-size: 1em;
   margin-top: -3px;
 }
@@ -166,7 +166,7 @@ body{
   background: green;
 }
 .extra-padding{
-  padding: 5 10;
+  padding: 5px 10px;
 }
 .notification-area {
   padding: 10px 15px;
