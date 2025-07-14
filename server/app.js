@@ -645,7 +645,11 @@ class App{
     this.onlyIfHost(ws, async () => {
       const player = this.videoPlayers[ws.i];
       player.autoAdvance = !player.autoAdvance;
-      this.updateClients(ws.i, Commands.AUTO_ADVANCE_STATE_CHANGED, { autoAdvance: player.autoAdvance });
+      // Send a specific, granular message instead of a full playback update.
+      // This ensures the client UI updates correctly without needing a full state refresh.
+      player.sockets.forEach(socket => {
+        this.send(socket, Commands.AUTO_ADVANCE_STATE_CHANGED, { autoAdvance: player.autoAdvance });
+      });
       await this.savePlayerState(ws.i);
     });
   }
