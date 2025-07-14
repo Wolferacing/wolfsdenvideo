@@ -510,7 +510,9 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
         break;
       case Commands.STOP:
       case Commands.PLAYBACK_UPDATE:
-        this.player = json.data.video;
+        // Merge new data into the existing player state.
+        // This is crucial because the in-world script shares this state object with the UI.
+        this.player = Object.assign(this.player || {}, json.data.video);
         break;
       case Commands.SINGER_LIST_UPDATED:
         if (this.player) {
