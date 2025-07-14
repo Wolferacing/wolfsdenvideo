@@ -15,6 +15,7 @@ class App{
   constructor() {
     this.videoPlayers = {};
     this.mainLoop = null;
+    this.cleanupLoop = null;
     this.pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       // Render's Hobby plan requires SSL, but does not verify the certificate
@@ -121,6 +122,27 @@ class App{
       client.release();
     }
   }
+  async cleanupInactiveInstances() {
+    const cleanupThreshold = '7 days'; // The inactivity period before an instance is purged.
+    console.log(`Running cleanup for instances inactive for more than ${cleanupThreshold}...`);
+    const client = await this.pool.connect();
+    try {
+      const query = `
+        DELETE FROM player_state
+        WHERE updated_at < NOW() - INTERVAL '${cleanupThreshold}'
+      `;
+      const result = await client.query(query);
+      if (result.rowCount > 0) {
+        console.log(`Database cleanup: Removed ${result.rowCount} inactive instance(s).`);
+      } else {
+        console.log('Database cleanup: No inactive instances to remove.');
+      }
+    } catch (err) {
+      console.error('Error during database cleanup of inactive instances:', err);
+    } finally {
+      client.release();
+    }
+  }
   setupWebserver() { 
     this.app = express();
     this.server = http.createServer( this.app ); 
@@ -171,6 +193,7 @@ class App{
     this.server.on('close', () => {
       clearInterval(this.mainLoop);
       clearInterval(interval);
+      clearInterval(this.cleanupLoop);
     });
   }
   handleClose(ws, code, reason) {
@@ -1250,6 +1273,15 @@ async function start() {
     console.log("Initializing database...");
     await app.setupDatabase();
     console.log("Database initialization complete.");
+
+    // --- Database Cleanup ---
+    // Run cleanup once on startup to immediately clear out old records.
+    await app.cleanupInactiveInstances();
+    // Schedule the cleanup to run periodically (e.g., every 24 hours).
+    const cleanupIntervalMs = 24 * 60 * 60 * 1000;
+    app.cleanupLoop = setInterval(() => app.cleanupInactiveInstances(), cleanupIntervalMs);
+    console.log(`Scheduled periodic database cleanup every ${cleanupIntervalMs / (60 * 60 * 1000)} hours.`);
+    // --- End of Cleanup ---
 
     app.setupWebserver();
     app.mainLoop = setInterval(() => app.tickAllInstances(), 1000);
