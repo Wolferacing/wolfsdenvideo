@@ -578,16 +578,23 @@ class App{
     
     console.log(`Karaoke track started for ${nextSinger.user.name} in instance ${instanceId}`);
 
-    // Explicitly notify all UIs that the singer list has changed.
-    this.broadcastSingerList(instanceId);
+    // Create the updated singer list payload to send along with the track change.
+    const singersPayload = player.singers.map(s => ({
+      name: s.user.name,
+      p: s.timestamp,
+      id: s.user.id,
+      v: s.video
+    }));
 
     // Notify ALL clients that the track has changed. This is the authoritative message
-    // that forces all UIs and the in-world player to sync to the new state.
+    // that forces all UIs and the in-world player to sync to the new state. We include
+    // the updated singer list in this single message for maximum efficiency.
     player.sockets.forEach(socket => {
         this.send(socket, Commands.TRACK_CHANGED, {
             newTrackIndex: 0,
             newLastStartTime: player.lastStartTime,
-            playlist: player.playlist // Send the new one-song playlist
+            playlist: player.playlist, // Send the new one-song playlist
+            singers: singersPayload
         });
     });
     await this.savePlayerState(instanceId);

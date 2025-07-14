@@ -205,6 +205,10 @@ var Karaoke = class {
           if (this.core.player.playlist[this.core.player.currentTrack]) {
               this.core.player.duration = this.core.player.playlist[this.core.player.currentTrack].duration / 1000;
           }
+          // If the message also contains an updated singer list, apply it.
+          if (json.data.singers) {
+            this.core.player.players = json.data.singers;
+          }
           this.updatePlaylist(this.core.player);
           this.startUiUpdater();
         }
