@@ -155,14 +155,14 @@ class App{
         }
       });
       ws.on('close', (code, reason) => {
-        this.handleClose(ws);
+        this.handleClose(ws, code, reason);
       });
     });
 
     // The ping/pong interval should also start only when the server is live.
     const interval = setInterval(() => {
       this.wss.clients.forEach(function each(ws) {
-        if (ws.isAlive === false) return ws.terminate();
+        if (ws.isAlive === false) return ws.terminate(); // This triggers the 'close' event
         ws.isAlive = false;
         ws.ping();
       });
@@ -173,8 +173,10 @@ class App{
       clearInterval(interval);
     });
   }
-  handleClose(ws) {
-    console.log(ws.u ? ws.u.name : 'Unknown', 'disconnected.', ws.type);
+  handleClose(ws, code, reason) {
+    // Convert the reason buffer to a string for readable logging.
+    const reasonString = reason ? reason.toString() : 'No reason given';
+    console.log(`${ws.u ? ws.u.name : 'Unknown'} disconnected from ${ws.type || 'N/A'}. Code: ${code}, Reason: ${reasonString}`);
     const instanceId = ws.i;
     if (!instanceId || !this.videoPlayers[instanceId]) {
       return; // Socket was not in an instance, nothing to do.
