@@ -634,9 +634,13 @@ class App{
     const isCurrentSinger = currentVideo.user.id === ws.u.id;
 
     if (isHost || isCurrentSinger) {
+      // Reset the start time to now and the current time to 0.
       player.lastStartTime = new Date().getTime() / 1000;
+      player.currentTime = 0;
+      // Broadcast a TRACK_CHANGED message with the new time. Sending newCurrentTime ensures
+      // the player client seeks to the beginning immediately, avoiding sync issues.
       player.sockets.forEach(socket => {
-        this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime });
+        this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, newCurrentTime: 0 });
       });
       await this.savePlayerState(ws.i);
     }
