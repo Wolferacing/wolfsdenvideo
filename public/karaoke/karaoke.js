@@ -371,33 +371,54 @@ var Karaoke = class {
 
       // No song is playing, render the singer queue.
       this.videoPlaylistContainer.innerHTML = '';
-      player.players.sort((a, b) => a.p - b.p);
-      player.players.forEach((p, i) => {
-        const videoItemContainer = this.core.makeAndAddElement('div', { background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f' }, this.videoPlaylistContainer);
-        const videoTitleAndAction = this.core.makeAndAddElement('div', { float: 'left', width: '100%' }, videoItemContainer);
-        const videoTitle = this.core.makeAndAddElement('div', { padding: '10px 7px 10px 15px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '1.4em' }, videoTitleAndAction);
-        
-        // Build the title safely to prevent HTML injection
-        videoTitle.textContent = `${i + 1}. `;
-        const nameBold = document.createElement('b');
-        nameBold.textContent = p.name;
-        const titleBold = document.createElement('b');
-        titleBold.textContent = p.v.title;
-        videoTitle.append(nameBold, ' will sing ', titleBold);
+      if (player.players && Array.isArray(player.players)) {
+        player.players.sort((a, b) => a.p - b.p);
+        player.players.forEach((p, i) => {
+          const videoItemContainer = this.core.makeAndAddElement('div', { background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f' }, this.videoPlaylistContainer);
+          
+          // --- FIX for DOM Exception and layout consistency ---
+          // Use a modern flexbox layout, consistent with the playlist UI, to prevent rendering errors.
+          const contentWrapper = this.core.makeAndAddElement('div', { display: 'flex', alignItems: 'center', padding: '10px' }, videoItemContainer);
 
-        this.core.makeAndAddElement('div', { clear: 'both' }, videoItemContainer);
-        if (p.id === window.user.id || isMe) {
-          const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitle);
-          if (i == 0) {
+          const videoThumbnail = this.core.makeAndAddElement('img', { height: '80px', width: '142px', flexShrink: '0' }, contentWrapper);
+          videoThumbnail.src = p.v.thumbnail;
+
+          const videoTitleAndAction = this.core.makeAndAddElement('div', { flexGrow: '1', paddingLeft: '10px' }, contentWrapper);
+          
+          const videoTitle = this.core.makeAndAddElement('div', {
+              padding: '10px 7px 10px 15px',
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              fontSize: '1.4em'
+          }, videoTitleAndAction);
+
+          // Build the title safely to prevent HTML injection
+          videoTitle.textContent = `${i + 1}. `;
+          const nameBold = document.createElement('b');
+          nameBold.textContent = p.name;
+          const titleBold = document.createElement('b');
+          titleBold.textContent = p.v.title;
+          videoTitle.append(nameBold, ' will sing ', titleBold);
+
+          // Create a container for the buttons
+          const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitleAndAction);
+          const isTheSinger = p.id === window.user.id;
+
+          if (i === 0 && (isMe || isTheSinger)) {
             const playButton = this.core.makeAndAddElement('div', null, buttons);
             playButton.className = 'button slim teal';
             playButton.innerText = "Play & Sing";
             playButton.addEventListener('click', () => this.core.sendMessage({ path: Commands.PLAY_KARAOKE_TRACK }));
           }
-          const removeButton = this.core.makeAndAddElement('div', null, buttons);
-          removeButton.className = 'button slim red extra-margin-left';
-          removeButton.innerText = "Remove Me";
-          removeButton.addEventListener('click', () => this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS, data: p.id }));
+
+          if (isMe || isTheSinger) {
+            const removeButton = this.core.makeAndAddElement('div', null, buttons);
+            removeButton.className = 'button slim red extra-margin-left';
+            removeButton.innerText = "Remove Me";
+            removeButton.addEventListener('click', () => this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS, data: p.id }));
+          }
+
           if (isMe) {
             if (i > 0) {
               const moveUp = this.core.makeAndAddElement('div', null, buttons);
@@ -412,8 +433,8 @@ var Karaoke = class {
               moveDown.addEventListener('click', () => this.core.sendMessage({ path: Commands.MOVE_SINGER, data: { userId: p.id, direction: 'down' } }));
             }
           }
-        }
-      });
+        });
+      }
     } else {
       // No song playing and no singers in queue.
       this.videoPlaylistContainer.innerHTML = '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!<br><br><div style="color: red;">DONT FORGET TO TAKE OVER THE KARAOKE PLAYER BEFORE YOU START!!<br>IF SOMEONE ELSE TOOK OVER, BAN THEM AND WAIT 45s THEN TAKE OVER</div></h2>';
