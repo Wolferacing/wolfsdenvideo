@@ -41,7 +41,8 @@ var Playlist = class {
         this.loadVideos(json.data);
         break;
       case Commands.ERROR:
-        alert("I cant let you do that...");
+        const errorMessage = json.data && json.data.message ? json.data.message : "I can't let you do that...";
+        this.core.showToast(errorMessage, 4000);
         break;
       case Commands.LOCK_STATE_CHANGED:
         if (this.core.player) {
