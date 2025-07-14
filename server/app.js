@@ -174,8 +174,8 @@ class App{
     });
   }
   handleClose(ws, code, reason) {
-    // Convert the reason buffer to a string for readable logging.
-    const reasonString = reason ? reason.toString() : 'No reason given';
+    // Convert the reason buffer to a string for readable logging, handling empty reasons.
+    const reasonString = reason && reason.length > 0 ? reason.toString() : 'No reason given';
     console.log(`${ws.u ? ws.u.name : 'Unknown'} disconnected from ${ws.type || 'N/A'}. Code: ${code}, Reason: ${reasonString}`);
     const instanceId = ws.i;
     if (!instanceId || !this.videoPlayers[instanceId]) {
