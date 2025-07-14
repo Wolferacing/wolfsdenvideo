@@ -58,9 +58,10 @@ var Karaoke = class {
     this.singIt = document.querySelector('#singIt');
     
     this.singIt.addEventListener('click', () => {
+      // Hide the preview immediately on click to prevent double-adds.
+      this.videoPreviewContainer.style.display = "none";
       this.core.sendMessage({ path: Commands.ADD_TO_PLAYERS, data: this.selectedVideo }); // : Commands.REMOVE_FROM_PLAYERS 
       this.YtPlayer.pauseVideo();
-      this.videoPreviewContainer.style.display = "none";
       this.hideSearch();
     });
     
@@ -76,6 +77,8 @@ var Karaoke = class {
     this.videoPlayer = document.querySelector('#videoPlayer');
     
     this.videoPreviewContainer = document.querySelector('.videoPreviewContainer');
+
+    this.alreadyInQueueMessage = document.querySelector('#alreadyInQueueMessage');
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
 
@@ -149,7 +152,8 @@ var Karaoke = class {
         this.loadVideos(json.data);
         break;
       case Commands.ERROR:
-        alert("I cant let you do that...");
+        const errorMessage = json.data && json.data.message ? json.data.message : "I can't let you do that...";
+        this.core.showToast(errorMessage, 4000);
         break;
       // --- Add more granular message handlers to keep the UI responsive ---
       case Commands.LOCK_STATE_CHANGED:
@@ -464,6 +468,17 @@ var Karaoke = class {
       preview.addEventListener('click', () => {
         this.selectedVideo = v;
         this.videoPreviewContainer.style.display = "block";
+
+        // Check if the user is already in the singer list.
+        const isAlreadyInQueue = this.core.player && this.core.player.players && this.core.player.players.some(p => p.id === window.user.id);
+
+        if (isAlreadyInQueue) {
+          this.singIt.style.display = 'none';
+          this.alreadyInQueueMessage.style.display = 'inline-block';
+        } else {
+          this.singIt.style.display = 'inline-block';
+          this.alreadyInQueueMessage.style.display = 'none';
+        }
         this.YtPlayer.loadVideoById(this.core.getId(v.link), 0);
       });
       
