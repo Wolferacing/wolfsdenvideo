@@ -286,7 +286,7 @@ var Karaoke = class {
         const takeoverActionSpan = document.createElement('span');
         takeoverActionSpan.style.color = 'red';
         takeoverActionSpan.textContent = 'to take over ASAP!!!';
-        takeoverActionSpan.appendChild(takeoverActionSpan);
+        takeoverSpan.appendChild(takeoverActionSpan);
       }
       takeoverSpan.append(' )!');
       this.hostTitle.appendChild(takeoverSpan);
