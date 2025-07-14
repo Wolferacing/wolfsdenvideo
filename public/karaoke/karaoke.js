@@ -189,7 +189,10 @@ var Karaoke = class {
         if (this.core.player) {
           // This is the authoritative message that a new song is playing.
           // It contains the new one-song playlist for the karaoke player.
-          this.core.player.playlist = json.data.playlist;
+          // A restart command won't include a new playlist, so we must check for it.
+          if (json.data.playlist) {
+            this.core.player.playlist = json.data.playlist;
+          }
           this.core.player.currentTrack = json.data.newTrackIndex;
           this.core.player.lastStartTime = json.data.newLastStartTime;
           if (this.core.player.playlist[this.core.player.currentTrack]) {
