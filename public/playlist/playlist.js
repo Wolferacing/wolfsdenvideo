@@ -88,6 +88,20 @@ var Playlist = class {
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.ITEM_APPENDED:
+        if (this.core.player && this.core.player.playlist) {
+          this.core.player.playlist.push(json.data.video);
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.ITEM_INSERTED:
+        if (this.core.player && this.core.player.playlist) {
+          // Insert the new video at the specified index.
+          this.core.player.playlist.splice(json.data.index, 0, json.data.video);
+          // The currentTrack index does not change when inserting an item after it.
+          this.updatePlaylist(this.core.player);
+        }
+        break;
       case Commands.TRACK_CHANGED:
         if (this.core.player) {
           // If the message includes a new playlist (e.g., from add-and-play), update it.

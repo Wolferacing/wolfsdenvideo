@@ -772,7 +772,10 @@ class App{
         const newVideo = this._createVideoObject(v, ws.u, 'scraper');
         const nextIndex = player.currentTrack + 1;
         player.playlist.splice(nextIndex, 0, newVideo);
-        this.updateClients(ws.i);
+        // Send a granular ITEM_INSERTED command for efficiency.
+        player.sockets.forEach(socket => {
+          this.send(socket, Commands.ITEM_INSERTED, { video: newVideo, index: nextIndex });
+        });
         await this.savePlayerState(ws.i);
       }, this.videoPlayers[ws.i].locked);
     }
@@ -795,20 +798,24 @@ class App{
     }
   }
   async addToPlaylist(v, skipUpdate, isYoutubeWebsite, ws) {
-    if(this.videoPlayers[ws.i]) {
+    const player = this.videoPlayers[ws.i];
+    if(player) {
       this.onlyIfHost(ws, async () => {
-        if(!this.videoPlayers[ws.i].playlist.length) {
-          this.videoPlayers[ws.i].currentTrack = 0;
-          this.videoPlayers[ws.i].currentTime = 0;
-          this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
+        if(!player.playlist.length) {
+          player.currentTrack = 0;
+          player.currentTime = 0;
+          player.lastStartTime = new Date().getTime() / 1000;
         }
         const newVideo = this._createVideoObject(v, ws.u, 'scraper', isYoutubeWebsite);
-        this.videoPlayers[ws.i].playlist.push(newVideo);
+        player.playlist.push(newVideo);
         if(!skipUpdate) {
-          this.updateClients(ws.i);
+          // Send a granular ITEM_APPENDED command for efficiency.
+          player.sockets.forEach(socket => {
+            this.send(socket, Commands.ITEM_APPENDED, { video: newVideo });
+          });
         }
         await this.savePlayerState(ws.i);
-      }, this.videoPlayers[ws.i].locked);
+      }, player.locked);
     }
   }
   async removePlaylistItem(index, ws) {
