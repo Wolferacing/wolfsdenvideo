@@ -322,7 +322,7 @@ var Playlist = class {
       videoAuthor.innerText = "Added By: " + (v.user ? v.user.name : 'Unknown');
       
       // A dedicated container for all buttons and the time display.
-      const buttonContainer = this.core.makeAndAddElement('div', { padding: '0 7px 7px 7px' }, videoTitleAndAction);
+      const buttonContainer = this.core.makeAndAddElement('div', { padding: '0 7px 7px 1px' }, videoTitleAndAction);
 
       if(player.currentTrack !== i) {
         if(isMe) {

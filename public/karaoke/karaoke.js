@@ -322,7 +322,7 @@ var Karaoke = class {
       const isCurrentSinger = video.user.id === window.user.id;
       // Add a stop button for the host or the current singer.
       if (isMe || isCurrentSinger) {
-        const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitleAndAction);
+        const buttons = this.core.makeAndAddElement('div', null, videoTitleAndAction);
         
         const restartButton = this.core.makeAndAddElement('div', null, buttons);
         restartButton.className = 'button slim teal';
