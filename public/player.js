@@ -172,6 +172,15 @@ var Player = class {
         }
         // The initial sync is now handled by the onStateChange event when the player is ready.
         break;
+      case Commands.PLAYLIST_UPDATED:
+        // This message is sent when the playlist order changes (e.g., move up/down).
+        // We need to update the player's internal copy of the playlist and current track index
+        // to stay in sync, even if the video itself doesn't change.
+        if (this.playerData) {
+          this.playerData.playlist = json.data.playlist;
+          this.playerData.currentTrack = json.data.currentTrack;
+        }
+        break;
       case Commands.TRACK_CHANGED:
         // This is the new authoritative command for changing tracks.
         if (this.playerData && this.readyToPlay) { // Player is ready, apply immediately.
