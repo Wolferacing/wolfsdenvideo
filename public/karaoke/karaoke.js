@@ -27,6 +27,19 @@ var Karaoke = class {
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   }
   setupKaraokeUI() {
+    // --- FIX for scrollable playlist ---
+    // By making the body a flex container and allowing the playlist to grow,
+    // we ensure that it fills the available space and becomes scrollable
+    // when its content overflows, without pushing other elements off-screen.
+    const body = document.body;
+    Object.assign(body.style, {
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh', // Use the full viewport height
+      margin: '0' // Remove default body margin
+    });
+    // --- End of FIX ---
+
     this.searchInput = document.querySelector('.searchInput');
     this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
     
@@ -78,6 +91,13 @@ var Karaoke = class {
     this.videoPreviewContainer = document.querySelector('.videoPreviewContainer');
     
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
+
+    // --- FIX for scrollable playlist (part 2) ---
+    Object.assign(this.videoPlaylistContainer.style, {
+      flexGrow: '1',
+      overflowY: 'auto' // Enable vertical scrolling when content overflows
+    });
+    // --- End of FIX ---
     
     this.searchBackDrop = document.querySelector('.searchBackDrop');
       
