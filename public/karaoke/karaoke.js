@@ -404,11 +404,17 @@ var Karaoke = class {
           const buttons = this.core.makeAndAddElement('div', { marginTop: "10px" }, videoTitleAndAction);
           const isTheSinger = p.id === window.user.id;
 
-          if (i === 0 && (isMe || isTheSinger)) {
+          // The host can play any singer. A singer can play themselves if they are up next.
+          if (isMe || (i === 0 && isTheSinger)) {
             const playButton = this.core.makeAndAddElement('div', null, buttons);
             playButton.className = 'button slim teal';
             playButton.innerText = "Play & Sing";
-            playButton.addEventListener('click', () => this.core.sendMessage({ path: Commands.PLAY_KARAOKE_TRACK }));
+            playButton.addEventListener('click', () => {
+              // If the host clicks on a singer who is not first, send their ID.
+              // Otherwise, send no data, and the server will play the person at the top.
+              const payload = (i > 0 && isMe) ? { userId: p.id } : null;
+              this.core.sendMessage({ path: Commands.PLAY_KARAOKE_TRACK, data: payload });
+            });
           }
 
           if (isMe || isTheSinger) {

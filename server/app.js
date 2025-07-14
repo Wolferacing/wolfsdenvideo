@@ -371,7 +371,7 @@ class App{
         await this.moveSinger(msg.data, ws);
         break;
       case Commands.PLAY_KARAOKE_TRACK:
-        await this.playKaraokeTrack(ws);
+        await this.playKaraokeTrack(ws, msg.data);
         break;
       case Commands.RESTART_SONG:
         await this.restartSong(ws);
@@ -543,18 +543,44 @@ class App{
     console.log(`${ws.u.name} was added to the singer list. Broadcasting SINGER_ADDED.`);
     await this.savePlayerState(ws.i);
   }
-  async playKaraokeTrack(ws) {
-    // The person initiating must be the host, or the singer whose turn it is.
+  async playKaraokeTrack(ws, data) {
     const player = this.videoPlayers[ws.i];
-    const nextSinger = player && player.singers.length > 0 ? player.singers[0] : null;
+    if (!player) return;
+
     const isHost = player.host.id === ws.u.id;
-    const isTheSinger = nextSinger && nextSinger.user.id === ws.u.id;
+    const singerToPlayId = data ? data.userId : null;
 
-    if (!isHost && !isTheSinger) {
-        this.send(ws, Commands.ERROR, { message: "Only the host or the current singer can start the song." });
+    if (singerToPlayId) {
+      // A specific singer was requested. Only the host can do this.
+      if (!isHost) {
+        this.send(ws, Commands.ERROR, { message: "Only the host can play a specific singer." });
         return;
-    }
+      }
 
+      const singerIndex = player.singers.findIndex(s => s.user.id === singerToPlayId);
+      if (singerIndex === -1) {
+        this.send(ws, Commands.ERROR, { message: "Singer not found." });
+        return;
+      }
+
+      // Move the selected singer to the front of the queue.
+      if (singerIndex > 0) {
+        const [singerToPlay] = player.singers.splice(singerIndex, 1);
+        player.singers.unshift(singerToPlay);
+      }
+    } else {
+      // No specific singer, play the one at the top.
+      // The person initiating must be the host, or the singer whose turn it is.
+      const nextSinger = player.singers.length > 0 ? player.singers[0] : null;
+      if (!nextSinger) return; // No one to play
+      const isTheSinger = nextSinger.user.id === ws.u.id;
+
+      if (!isHost && !isTheSinger) {
+          this.send(ws, Commands.ERROR, { message: "Only the host or the current singer can start the song." });
+          return;
+      }
+    }
+    // Now that the correct singer is at the front, play the song.
     await this._playNextKaraokeSong(ws.i);
   }
   async _playNextKaraokeSong(instanceId) {
