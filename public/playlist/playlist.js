@@ -271,8 +271,7 @@ var Playlist = class {
       const contentWrapper = this.core.makeAndAddElement('div', {
         display: 'flex',
         // By stretching the items, we allow the inner flex container to distribute space.
-        alignItems: 'stretch',
-        padding: '1px'
+        alignItems: 'stretch'
       }, videoItemContainer);
       
       const videoThumbnail = this.core.makeAndAddElement('img',{height: '80px', width: '142px', flexShrink: '0'}, contentWrapper);
