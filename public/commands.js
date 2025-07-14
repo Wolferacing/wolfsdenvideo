@@ -22,6 +22,8 @@ var Commands = {
   USER_VIDEO_PLAYER: 'user-video-player',
   ADD_TO_PLAYERS: 'add-to-players',
   REMOVE_FROM_PLAYERS: 'remove-from-players',
+  SINGER_ADDED: 'singer-added',
+  SINGER_REMOVED: 'singer-removed',
   SET_VOLUME: 'set-volume',
   MUTE: 'mute',
   AUTO_SYNC: 'auto-sync',

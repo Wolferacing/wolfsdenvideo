@@ -232,6 +232,23 @@ var Karaoke = class {
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.SINGER_ADDED:
+        if (this.core.player && this.core.player.players) {
+          // Add the new singer to the local list and re-render.
+          this.core.player.players.push(json.data.player);
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.SINGER_REMOVED:
+        if (this.core.player && this.core.player.players) {
+          // Find and remove the singer by their ID and re-render.
+          const index = this.core.player.players.findIndex(p => p.id === json.data.userId);
+          if (index > -1) {
+            this.core.player.players.splice(index, 1);
+          }
+          this.updatePlaylist(this.core.player);
+        }
+        break;
     }
   }
   search(data) {

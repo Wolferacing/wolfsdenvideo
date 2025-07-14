@@ -443,6 +443,34 @@ class App{
       is_youtube_website: isYoutubeWebsite
     };
   }
+  async moveSinger({ userId, direction }, ws) {
+    this.onlyIfHost(ws, async () => {
+        const player = this.videoPlayers[ws.i];
+        if (!player) return;
+        
+        const oldIndex = player.singers.findIndex(s => s.user.id === userId);
+
+        if (oldIndex === -1) {
+            return; // Singer not found
+        }
+
+        let newIndex;
+        if (direction === 'up' && oldIndex > 0) {
+            newIndex = oldIndex - 1;
+        } else if (direction === 'down' && oldIndex < player.singers.length - 1) {
+            newIndex = oldIndex + 1;
+        } else {
+            return; // Invalid move
+        }
+
+        // Swap the singers by removing the item and re-inserting it at the new position.
+        const [singerToMove] = player.singers.splice(oldIndex, 1);
+        player.singers.splice(newIndex, 0, singerToMove);
+
+        this.broadcastSingerList(ws.i);
+        await this.savePlayerState(ws.i);
+    });
+  }
   async removeFromPlayers(uid, ws) {
     const player = this.videoPlayers[ws.i];
     if (!player) return;
@@ -464,7 +492,9 @@ class App{
           console.log(`Current singer was removed. Stopping player for instance ${ws.i}.`);
           this.updateClients(ws.i, "stop");
         }
-        this.broadcastSingerList(ws.i);
+        // Send a granular update for efficiency.
+        player.sockets.forEach(socket => this.send(socket, Commands.SINGER_REMOVED, { userId: uid }));
+        console.log(`Broadcasting SINGER_REMOVED for user ${uid}.`);
         await this.savePlayerState(ws.i);
       }
     } else {
@@ -507,38 +537,11 @@ class App{
       timestamp: new Date().getTime()
     });
     
-    console.log(`${ws.u.name} was added to the singer list with video: ${video.title}`);
-    this.broadcastSingerList(ws.i);
+    // Send a granular update instead of the whole list for efficiency.
+    const newSingerPayload = { name: ws.u.name, p: player.singers[player.singers.length - 1].timestamp, id: ws.u.id, v: video };
+    player.sockets.forEach(socket => this.send(socket, Commands.SINGER_ADDED, { player: newSingerPayload }));
+    console.log(`${ws.u.name} was added to the singer list. Broadcasting SINGER_ADDED.`);
     await this.savePlayerState(ws.i);
-  }
-  async moveSinger({ userId, direction }, ws) {
-    this.onlyIfHost(ws, async () => {
-        const player = this.videoPlayers[ws.i];
-        if (!player) return;
-        
-        const oldIndex = player.singers.findIndex(s => s.user.id === userId);
-
-        if (oldIndex === -1) {
-            return; // Singer not found
-        }
-
-        let newIndex;
-        if (direction === 'up' && oldIndex > 0) {
-            newIndex = oldIndex - 1;
-        } else if (direction === 'down' && oldIndex < player.singers.length - 1) {
-            newIndex = oldIndex + 1;
-        } else {
-            return; // Invalid move
-        }
-
-        // Swap the singers directly in the persistent array
-        const temp = player.singers[oldIndex];
-        player.singers[oldIndex] = player.singers[newIndex];
-        player.singers[newIndex] = temp;
-
-        this.broadcastSingerList(ws.i);
-        await this.savePlayerState(ws.i);
-    });
   }
   async playKaraokeTrack(ws) {
     // The person initiating must be the host, or the singer whose turn it is.
@@ -1193,20 +1196,14 @@ class App{
       }
     } 
     this.syncWsTime(ws, instanceId);
-    this.send(ws, Commands.PLAYBACK_UPDATE, {video: this.getVideoObject(instanceId), type: 'initial-sync'});
-    // Explicitly send the current singer list to the newly connected client.
-    const player = this.videoPlayers[instanceId];
-    if (player && player.singers.length > 0) {
-        const singers = player.singers.map(s => ({
-            name: s.user.name,
-            p: s.timestamp,
-            id: s.user.id,
-            v: s.video
-        }));
-        this.send(ws, Commands.SINGER_LIST_UPDATED, { players: singers });
-    }
+    // Send a single, comprehensive update including the singer list for karaoke mode.
+    // This prevents race conditions on the client and ensures all data is available on connect.
+    this.send(ws, Commands.PLAYBACK_UPDATE, {
+      video: this.getVideoObject(instanceId, { includePlaylist: true, includeSingers: true }),
+      type: 'initial-sync'
+    });
   }
-  getVideoObject(instanceId, { includePlaylist = true } = {}) {
+  getVideoObject(instanceId, { includePlaylist = true, includeSingers = false } = {}) {
     if(this.videoPlayers[instanceId]) {
       const player = this.videoPlayers[instanceId];
       
@@ -1223,6 +1220,17 @@ class App{
 
       if (includePlaylist) {
         videoObject.playlist = player.playlist;
+      }
+
+      // Optionally include the singer list for karaoke mode.
+      if (includeSingers && player.singers) {
+        // The client expects the list under the key 'players'
+        videoObject.players = player.singers.map(s => ({
+            name: s.user.name,
+            p: s.timestamp,
+            id: s.user.id,
+            v: s.video
+        }));
       }
 
       return videoObject;
