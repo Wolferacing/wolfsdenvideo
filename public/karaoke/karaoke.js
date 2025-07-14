@@ -420,7 +420,9 @@ var Karaoke = class {
           if (isMe || isTheSinger) {
             const removeButton = this.core.makeAndAddElement('div', null, buttons);
             removeButton.className = 'button slim red extra-margin-left';
-            removeButton.innerText = "Remove Me";
+            // The host sees "Remove Song" for others, "Remove Me" for themselves.
+            // A user sees "Remove Me" only for themselves.
+            removeButton.innerText = (isMe && !isTheSinger) ? "Remove Song" : "Remove Me";
             removeButton.addEventListener('click', () => this.core.sendMessage({ path: Commands.REMOVE_FROM_PLAYERS, data: p.id }));
           }
 
