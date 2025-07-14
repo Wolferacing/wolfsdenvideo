@@ -530,34 +530,25 @@ var Playlist = class {
     
     this.lockPlayer = document.querySelector('#lockPlayer');
     
-    // --- FIX for top bar layout ---
-    // Use flexbox to correctly align the title/buttons to the left and the search bar to the right.
-    const topBarContainer = document.querySelector('.playlistContainer');
-    const searchContainer = document.querySelector('.searchContainer');
-    const titleAndButtonsContainer = document.querySelector('.playlistTitle');
-
-    // 1. Make the main top bar a flex container.
-    Object.assign(topBarContainer.style, {
-      display: 'flex',
-      alignItems: 'center', // Vertically center its children (.searchContainer and .playlistTitle)
-      width: '100%'
-    });
-
-    // 2. Push the search container to the far right.
+    // --- REMOVED flexbox layout from top bar ---
+    // This restores the layout to the original structure, without flexbox on the main container.
+    const topBarContainer = document.querySelector('.playlistContainer'); // Select the top bar container
+    if (topBarContainer) {
+      topBarContainer.style.display = '';         // Reset display property
+      topBarContainer.style.alignItems = '';      // Reset vertical alignment
+      topBarContainer.style.justifyContent = '';  // Reset horizontal alignment
+      topBarContainer.style.flexWrap = '';        // Prevent wrapping
+    }
+    const searchContainer = document.querySelector('.searchContainer'); // Select the search container
     if (searchContainer) {
-      searchContainer.style.marginLeft = 'auto';
+      searchContainer.style.marginLeft = '';      // Remove any forced margin
     }
 
-    // 3. Make the container for the title and buttons a flex container as well.
-    // This allows the buttons inside it to wrap nicely on smaller screens.
-    if (titleAndButtonsContainer) {
-      Object.assign(titleAndButtonsContainer.style, {
-        display: 'flex',
-        alignItems: 'center', // Vertically center the title and buttons with each other
-        flexWrap: 'wrap',     // Allow buttons to wrap to the next line
-        gap: '5px'            // Add a small space between the title and buttons
-      });
-    }
+    // --- FIX for scrollable playlist (part 2) ---
+    Object.assign(this.videoPlaylistContainer.style, {
+      flexGrow: '1',
+      overflowY: 'auto' // Enable vertical scrolling when content overflows
+    });
     // --- End of FIX ---
     
     this.lockPlayer.addEventListener('click', () => {
