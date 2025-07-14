@@ -4,10 +4,9 @@ var Core = class {
         this.isKaraoke = false;
         this.createdElements = [];
     }
-  async init(hostUrl) {
+  async init() {
     await this.setupToastify();
     this.imIn = false;
-    this.hostUrl = hostUrl;
     // Set defaults for parameters that depend on the host URL.
     // This runs after parseParams, so this.hostUrl is available.
     this.setOrDefault("data-playlist-icon-url", `https://${this.hostUrl}/assets/Playlist.png`);
