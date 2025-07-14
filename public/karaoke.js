@@ -45,38 +45,5 @@ var KaraokePlayer = class {
       document.body.appendChild(myScript);
     });
   }
-  setupYoutubePlayer() {
-    const youtubeUrl = 'https://www.youtube.com/watch?v=GiwStUzx8fg'; // Default video (Silence)
-    new YT.Player('player', {
-      height: '100%',
-      width: '100%',
-      videoId: this.core.getId(decodeURIComponent(youtubeUrl)),
-      playerVars: {
-        'playsinline': 1,
-        'mute': 1,
-        'autoplay': 1,
-        'disablekb': 1,
-        'controls': 0,
-        'modestbranding': true,
-        'cc_load_policy': 1,
-        'cc_lang_pref': 'en',
-        'iv_load_policy': 3,
-        'origin': window.location.origin,
-        'start': this.start ? Number(this.start) : 0
-      },
-      events: {
-        'onReady': (event) => {
-          this.YtPlayer = event.target;
-          this.YtPlayer.setVolume(0);
-        }
-      }
-    });
-  }
 }
 window.karaokePlayerInstance = new KaraokePlayer();
-
-function onYouTubeIframeAPIReady() {
-  if (window.karaokeUiInstance) {
-    window.karaokeUiInstance.setupYoutubePlayer();
-  }
-}
