@@ -634,11 +634,16 @@ class App{
     const isCurrentSinger = currentVideo.user.id === ws.u.id;
 
     if (isHost || isCurrentSinger) {
-      // Reset the start time to now and the current time to 0.
-      player.lastStartTime = new Date().getTime() / 1000;
+      // To ensure all clients sync perfectly at the beginning, we introduce a "settling" period.
+      // By setting the start time 2 seconds in the future, the server's calculated `currentTime`
+      // will be negative for 2 seconds. This gives all player clients time to load and buffer
+      // the video at 0s. The sync mechanism will keep them at 0 until the server time becomes positive.
+      const settleTime = 2; // 2 seconds
+      player.lastStartTime = (new Date().getTime() / 1000) + settleTime;
+
+      // We still tell the client that the current time is 0 so it seeks there immediately.
       player.currentTime = 0;
-      // Broadcast a TRACK_CHANGED message with the new time. Sending newCurrentTime ensures
-      // the player client seeks to the beginning immediately, avoiding sync issues.
+
       player.sockets.forEach(socket => {
         this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, newCurrentTime: 0 });
       });
