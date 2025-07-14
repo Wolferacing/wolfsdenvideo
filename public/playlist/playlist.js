@@ -290,7 +290,7 @@ var Playlist = class {
       
       const titleContainer = this.core.makeAndAddElement('div', null, videoTitleAndAction);
       const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '7px 10px 0 7px',
+        padding: '4px 0px 0px 0px',
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
