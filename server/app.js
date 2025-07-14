@@ -1256,8 +1256,15 @@ class App{
   }
   updateClients(instanceId, type, options = {}) {
     if(this.videoPlayers[instanceId]) {
+      const player = this.videoPlayers[instanceId];
+      // For Karaoke mode, we should always include the singer list in general updates
+      // to ensure the UI stays in sync, as it's the primary view.
+      // This prevents the list from disappearing on a non-host's UI after a generic event.
+      if (player.isKaraoke && options.includeSingers === undefined) {
+        options.includeSingers = true;
+      }
       const video = this.getVideoObject(instanceId, options);
-      this.videoPlayers[instanceId].sockets.forEach(socket => {
+      player.sockets.forEach(socket => {
         this.send(socket, Commands.PLAYBACK_UPDATE, {video, type});
       });
     }
