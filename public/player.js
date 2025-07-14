@@ -1,10 +1,15 @@
 const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.5;
 
+// --- Adaptive Sync Intervals (in milliseconds) ---
+const SYNC_INTERVAL_FAST = 1000;   // For high drift or after a song change.
+const SYNC_INTERVAL_NORMAL = 3000; // For moderate drift.
+const SYNC_INTERVAL_SLOW = 7000;   // For when the player is well-synced.
+// --- End of Sync Intervals ---
+
 var Player = class {
   constructor(){
     this.currentScript = document.currentScript;
-    this.autoSyncInterval = null;
     this.pendingTrackChange = null;
     this.init();
   }
@@ -13,6 +18,8 @@ var Player = class {
      await this.setupBrowserMessaging();
      this.initialSyncComplete = false;
      this.currentTime = 0;
+     this.syncTimeout = null;
+     this.syncIntervalMs = SYNC_INTERVAL_SLOW; // Default to the slowest interval.
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
      this.core.hostUrl = window.APP_CONFIG.HOST_URL;
@@ -83,10 +90,20 @@ var Player = class {
                 this.playVidya(this.playerData.currentTrack, startTime, true);
                 this.initialSyncComplete = true;
                 this.pendingTrackChange = null; // Clear the cached message
+                // A track change occurred, so we should start with a fast sync.
+                if (this.autoSync) {
+                  this.syncIntervalMs = SYNC_INTERVAL_FAST;
+                  this.scheduleNextSync();
+                }
               } else if (this.playerData && this.playerData.playlist && this.playerData.playlist.length > 0 && !this.initialSyncComplete) {
                 // This handles rejoining an instance that already has a playlist.
                 this.playVidya(this.playerData.currentTrack, this.playerData.currentTime, true);
                 this.initialSyncComplete = true;
+                // This is the first sync, so we should start with a fast interval.
+                if (this.autoSync) {
+                  this.syncIntervalMs = SYNC_INTERVAL_FAST;
+                  this.scheduleNextSync();
+                }
               }
             }
           } else if (this.readyToPlay && event.data !== YT.PlayerState.PLAYING) {
@@ -193,6 +210,13 @@ var Player = class {
           // The server now provides the definitive start time.
           const startTime = json.data.newCurrentTime || 0;
           this.playVidya(this.playerData.currentTrack, startTime, true);
+
+          // When a track changes, reset the sync interval to be fast to ensure
+          // the new song starts off perfectly in sync.
+          if (this.autoSync) {
+            this.syncIntervalMs = SYNC_INTERVAL_FAST;
+            this.scheduleNextSync();
+          }
           this.initialSyncComplete = true; // A track change is a definitive sync.
         } else {
           // Player isn't ready. Cache the track change data to be applied when it is.
@@ -242,16 +266,24 @@ var Player = class {
               this.core.showToast(`Resyncing: ${Math.round(timediff * 100) / 100}s`);
               this.player.seekTo(serverTime);
               this.player.setPlaybackRate(1.0); // Ensure rate is normal after a seek.
+              // High drift, so we should check again very soon.
+              this.syncIntervalMs = SYNC_INTERVAL_FAST;
             } else if (Math.abs(timediff) > smallDriftThreshold) {
               // Small drift, adjust playback speed for a smooth, unnoticeable correction.
               // If we are behind (timediff > 0), speed up. If we are ahead (timediff < 0), slow down.
               this.player.setPlaybackRate(timediff > 0 ? 1.05 : 0.95);
+              // Moderate drift, check again at a normal rate.
+              this.syncIntervalMs = SYNC_INTERVAL_NORMAL;
             } else {
               // We are in sync, ensure playback rate is normal.
               if (this.player.getPlaybackRate() !== 1.0) {
                 this.player.setPlaybackRate(1.0);
               }
+              // Low drift, we can afford to check less frequently.
+              this.syncIntervalMs = SYNC_INTERVAL_SLOW;
             }
+            // Schedule the next sync with the newly determined interval.
+            this.scheduleNextSync();
           }
         }
         break;
@@ -271,24 +303,31 @@ var Player = class {
       console.log("No player data!");
     }
   }
+  scheduleNextSync() {
+    // Clear any pending timeout to avoid duplicates.
+    clearTimeout(this.syncTimeout);
+
+    // Only schedule if autoSync is enabled.
+    if (!this.autoSync) return;
+
+    this.syncTimeout = setTimeout(() => {
+      this.core.sendMessage({ path: Commands.REQUEST_SYNC, data: { clientTimestamp: Date.now() } });
+    }, this.syncIntervalMs);
+  }
   enableAutoSync() {
     if (!this.autoSync) {
       this.autoSync = true;
-      if (!this.autoSyncInterval) {
-        this.core.showToast("AutoSync has been enabled.");
-        this.autoSyncInterval = setInterval(() => {
-          this.core.sendMessage({ path: Commands.REQUEST_SYNC, data: { clientTimestamp: Date.now() } });
-        }, 5000);
-      }
+      this.core.showToast("AutoSync has been enabled.");
+      // Start with a fast interval to get in sync quickly.
+      this.syncIntervalMs = SYNC_INTERVAL_FAST;
+      this.scheduleNextSync();
     }
   }
   disableAutoSync(fromManualSkip = false) {
     if (this.autoSync) {
       this.autoSync = false;
-      if (this.autoSyncInterval) {
-        clearInterval(this.autoSyncInterval);
-        this.autoSyncInterval = null;
-      }
+      clearTimeout(this.syncTimeout);
+      this.syncTimeout = null;
       this.core.showToast(fromManualSkip ? "AutoSync disabled by manual skip." : "AutoSync has been disabled.");
       if (fromManualSkip) {
         this.core.sendMessage({ path: Commands.AUTO_SYNC_STATE_CHANGED, data: { enabled: false } });
