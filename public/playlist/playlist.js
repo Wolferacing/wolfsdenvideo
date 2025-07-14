@@ -282,7 +282,11 @@ var Playlist = class {
         paddingLeft: '10px',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        // This is a flexbox fix to prevent the container from overflowing when its
+        // content (like a long title) resists shrinking. It allows the
+        // text-overflow:ellipsis style on the title element to work correctly.
+        minWidth: '0'
       }, contentWrapper);
       
       const titleContainer = this.core.makeAndAddElement('div', null, videoTitleAndAction);
