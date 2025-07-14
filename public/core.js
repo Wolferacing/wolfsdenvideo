@@ -517,8 +517,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
       case Commands.SINGER_LIST_UPDATED:
         if (this.player) {
           this.player.players = json.data.players;
-          // The box trigger logic relies on the list being sorted.
-          this.player.players.sort((a, b) => a.p - b.p);
+          // The server now sends the list pre-sorted. The client should not re-sort it.
         }
         break;
       case Commands.SYNC_TIME:

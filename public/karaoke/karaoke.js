@@ -372,7 +372,6 @@ var Karaoke = class {
       // No song is playing, render the singer queue.
       this.videoPlaylistContainer.innerHTML = '';
       if (player.players && Array.isArray(player.players)) {
-        player.players.sort((a, b) => a.p - b.p);
         player.players.forEach((p, i) => {
           const videoItemContainer = this.core.makeAndAddElement('div', { background: i % 2 === 0 ? '#8f8f8f' : '#9f9f9f' }, this.videoPlaylistContainer);
           
