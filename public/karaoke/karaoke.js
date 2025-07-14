@@ -305,8 +305,8 @@ var Karaoke = class {
       }, videoItemContainer);
       const videoThumbnail = this.core.makeAndAddElement('img', { height: '80px', width: '142px', flexShrink: '0' }, contentWrapper);
       videoThumbnail.src = video.thumbnail;
-      const videoTitleAndAction = this.core.makeAndAddElement('div', { flexGrow: '1', paddingLeft: '10px' }, contentWrapper);
-      const videoTitle = this.core.makeAndAddElement('div', { padding: '10px 7px 10px 15px', fontSize: '1.4em' }, videoTitleAndAction);
+      const videoTitleAndAction = this.core.makeAndAddElement('div', { flexGrow: '1', paddingLeft: '3px' }, contentWrapper);
+      const videoTitle = this.core.makeAndAddElement('div', { padding: '5px 1px 1px 5px', fontSize: '1.4em' }, videoTitleAndAction);
       videoTitle.innerHTML = `<b>Now Singing:</b> ${video.user.name} - ${video.title}`;
       
       const currentTimeText = this.core.makeAndAddElement('div',{
@@ -363,7 +363,7 @@ var Karaoke = class {
           
           // --- FIX for DOM Exception and layout consistency ---
           // Use a modern flexbox layout, consistent with the playlist UI, to prevent rendering errors.
-          const contentWrapper = this.core.makeAndAddElement('div', { display: 'flex', alignItems: 'center', padding: '10px' }, videoItemContainer);
+          const contentWrapper = this.core.makeAndAddElement('div', { display: 'flex', alignItems: 'center', padding: '1px' }, videoItemContainer);
 
           const videoThumbnail = this.core.makeAndAddElement('img', { height: '80px', width: '142px', flexShrink: '0' }, contentWrapper);
           videoThumbnail.src = p.v.thumbnail;
