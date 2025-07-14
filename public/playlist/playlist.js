@@ -270,19 +270,28 @@ var Playlist = class {
       // Create a content wrapper and use flexbox to vertically center the thumbnail and the info panel.
       const contentWrapper = this.core.makeAndAddElement('div', {
         display: 'flex',
-        alignItems: 'center', // This is the key to vertical alignment
+        // By stretching the items, we allow the inner flex container to distribute space.
+        alignItems: 'stretch',
         padding: '1px'
       }, videoItemContainer);
       
       const videoThumbnail = this.core.makeAndAddElement('img',{height: '80px', width: '142px', flexShrink: '0'}, contentWrapper);
-      const videoTitleAndAction = this.core.makeAndAddElement('div',{flexGrow: '1', paddingLeft: '10px'}, contentWrapper);
+      // This container will hold the title at the top and buttons at the bottom.
+      const videoTitleAndAction = this.core.makeAndAddElement('div',{
+        flexGrow: '1',
+        paddingLeft: '10px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+      }, contentWrapper);
       
+      const titleContainer = this.core.makeAndAddElement('div', null, videoTitleAndAction);
       const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '7 10 10 7', 
+        padding: '7px 10px 0 7px',
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
-      }, videoTitleAndAction);
+      }, titleContainer);
       
       videoThumbnail.src = v.thumbnail;
       
@@ -297,22 +306,24 @@ var Playlist = class {
       videoTitle.append(v.title);
 
       const videoAuthor = this.core.makeAndAddElement('div',{
-        padding: '0 10 5 7', 
+        padding: '0 10px 5px 7px',
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         fontSize: '0.8rem',
         color: '#cfcfcf',
-        float: 'right',
         whiteSpace: 'nowrap'
-      }, videoTitle);
+      }, titleContainer);
 
       videoAuthor.className = "currentTimeAuthor";
       videoAuthor.innerText = "Added By: " + (v.user ? v.user.name : 'Unknown');
       
+      // A dedicated container for all buttons and the time display.
+      const buttonContainer = this.core.makeAndAddElement('div', { padding: '0 7px 7px 7px' }, videoTitleAndAction);
+
       if(player.currentTrack !== i) {
         if(isMe) {
           if(isMe || (!player.locked && !player.canVote)) {
-            const playTrack = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+            const playTrack = this.core.makeAndAddElement('div',null, buttonContainer);
 
             playTrack.className = 'button slim green';
             playTrack.innerText = "Play Now.";
@@ -323,7 +334,7 @@ var Playlist = class {
           };    
         };
         if(player.canVote) {
-          const voteDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+          const voteDown = this.core.makeAndAddElement('div',null, buttonContainer);
 
           voteDown.className = 'button slim teal';
           voteDown.innerText = "Down Vote";
@@ -332,7 +343,7 @@ var Playlist = class {
             this.core.sendMessage({path: Commands.DOWN_VOTE, data: v.link });
           });
 
-          const voteUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+          const voteUp = this.core.makeAndAddElement('div',null, buttonContainer);
           voteUp.className = 'button slim teal';
           voteUp.innerText = "Up Vote";
 
@@ -341,7 +352,7 @@ var Playlist = class {
           });
         }else{
           if(this.core.player.host.id === window.user.id) {
-            const moveDown = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+            const moveDown = this.core.makeAndAddElement('div',null, buttonContainer);
 
             moveDown.className = 'button slim teal';
             moveDown.innerText = "Move Down";
@@ -350,7 +361,7 @@ var Playlist = class {
               this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
             });
 
-            const moveUp = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+            const moveUp = this.core.makeAndAddElement('div',null, buttonContainer);
             moveUp.className = 'button slim teal';
             moveUp.innerText = "Move Up";
 
@@ -358,7 +369,7 @@ var Playlist = class {
               this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
             });
             if(isMe || (!player.locked && !player.canVote)) {
-              const remove = this.core.makeAndAddElement('div',null, videoTitleAndAction);
+              const remove = this.core.makeAndAddElement('div',null, buttonContainer);
 
               remove.className = 'button slim red';
               remove.innerText = "Remove";
@@ -372,11 +383,11 @@ var Playlist = class {
       }else{
         
         const currentTimeText = this.core.makeAndAddElement('div',{
-          padding: '7 10 0 7', 
+          padding: '7px 10px 0 7px',
           textOverflow: 'ellipsis', 
           overflow: 'hidden', 
           whiteSpace: 'nowrap'
-        }, videoTitleAndAction);
+        }, buttonContainer);
         
         currentTimeText.className = "currentTimeText";
         currentTimeText.innerText = this.timeCode(player.currentTime) + " / " + this.timeCode(player.duration);
