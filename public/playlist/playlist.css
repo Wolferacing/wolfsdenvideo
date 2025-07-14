@@ -150,6 +150,7 @@ body{
   cursor: pointer;
   border-radius: 3px;
   margin-left: 5px;
+  margin-bottom: 3px;
   user-select: none;
   font-size: 1.4em;
 }
