@@ -265,7 +265,11 @@ var Core = class {
   }
 
   openPlaylist() {
-    window.openPage("https://" + this.hostUrl + "/" + (this.isKaraoke ? 'karaoke' : 'playlist') + "/?instance=" + this.params.instance + ( this.params.playlist ? "&playlist=" + this.params.playlist : "") + "&user=" + window.user.id +"-_-"+encodeURIComponent(window.user.name));
+    // Determine the mode ('karaoke' or 'playlist') based on the in-world script's setting.
+    const mode = this.isKaraoke ? 'karaoke' : 'playlist';
+    const playlistParam = this.params.playlist ? `&playlist=${this.params.playlist}` : "";
+    // Pass the mode as a URL parameter so the UI page knows its context.
+    window.openPage(`https://${this.hostUrl}/${mode}/?instance=${this.params.instance}${playlistParam}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}&mode=${mode}`);
   }
   setupVolButton(scene, isUp, playlistContainer) {
   const volIconUrl = isUp ? this.params["data-vol-up-icon-url"] : this.params["data-vol-down-icon-url"];
