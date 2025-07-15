@@ -14,6 +14,7 @@ var Playlist = class {
     this.core.parseParams(this.currentScript);
     await this.core.setupCommandsScript(); // Load Commands before UI setup and core.init
     this.setupPlaylistUI();
+    this.setupSearchOverlay();
     await this.core.init();
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
@@ -229,6 +230,42 @@ var Playlist = class {
         currentTimeText.innerText = `${this.timeCode(calculatedTime)} / ${this.timeCode(duration)}`;
       }
     }, 1000); // Update every second
+  }
+  // --- New Search Overlay Functions ---
+  showSearchOverlay() {
+    this.searchOverlay.style.display = 'flex';
+    this.searchInputOverlay.focus();  // Focus the input for immediate typing
+  }
+
+  hideSearchOverlay() {
+    this.searchOverlay.style.display = 'none';
+    this.searchInputOverlay.value = '';  // Clear the input when closing
+  }
+
+  submitSearch() {
+    const query = this.searchInputOverlay.value;
+    if (query.trim() !== "") { // Check for non-empty input
+      this.hideSearchOverlay(); // Close the overlay before searching
+      this.debounceSearch(query);
+    }
+  }
+
+  // --- Initialize Overlay ---
+  setupSearchOverlay() {
+    this.searchOverlay = document.querySelector('.search-overlay');
+    this.openSearchButton = document.querySelector('#open-search-overlay-btn');
+    this.searchInputOverlay = document.querySelector('.search-overlay-box .searchInput');
+    this.clearSearchButton = document.querySelector('#clear-search-btn');
+    this.closeSearchButton = document.querySelector('#close-search-btn');
+    this.submitSearchButton = document.querySelector('#submit-search-btn');
+
+    this.openSearchButton.addEventListener('click', () => this.showSearchOverlay());
+    this.closeSearchButton.addEventListener('click', () => this.hideSearchOverlay());
+    this.submitSearchButton.addEventListener('click', () => this.submitSearch());
+    this.clearSearchButton.addEventListener('click', () => {
+      this.searchInputOverlay.value = '';
+      this.searchInputOverlay.focus();
+    });
   }
   setupCoreScript() {
     return new Promise(resolve => {

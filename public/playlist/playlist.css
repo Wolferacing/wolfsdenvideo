@@ -177,3 +177,55 @@ body{
   border-bottom: 1px solid #4e4e4e;
   display: none; /* Hidden by default */
 }
+
+/* --- Search Overlay --- */
+/* This will be the full-page container for the new search interface */
+.search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85); /* A dark, semi-transparent backdrop */
+  z-index: 100;
+  display: none; /* Initially hidden. Will be shown via JavaScript. */
+  justify-content: center; /* Center the search box horizontally */
+  align-items: flex-start; /* Place the search box near the top */
+  padding-top: 10vh; /* Give it some space from the top of the viewport */
+}
+
+/* The main "box" containing the input and buttons */
+.search-overlay-box {
+  background: #3f3f3f; /* Same as the header for consistency */
+  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Provides space between the input row and the button row */
+}
+
+/* A flex container to hold the search input field and the 'Clear' button */
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* This specifically targets the searchInput when it's inside our new overlay box to make it larger. */
+.search-overlay-box .searchInput {
+  flex-grow: 1; /* Allows the input to expand and fill the available space */
+  height: 48px; /* Taller for easier clicking/tapping */
+  font-size: 1.8em; /* Much larger text */
+  width: auto; /* Reset width to allow flex-grow to work */
+  margin: 0; /* Reset margin */
+}
+
+/* A flex container to align the 'Close' and 'Submit' buttons to the right */
+.search-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
