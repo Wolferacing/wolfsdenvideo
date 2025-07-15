@@ -530,6 +530,20 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
           console.log(`In-world player updated: Removed item at index ${json.data.index}, new current track ${json.data.newCurrentTrack}`);
         }
         break;
+      case Commands.ITEM_APPENDED:
+        if (this.player && this.player.playlist) {
+          this.player.playlist.push(json.data.video);
+          console.log(`In-world player updated: Appended item "${json.data.video.title}"`);
+        }
+        break;
+      case Commands.ITEM_INSERTED:
+        if (this.player && this.player.playlist) {
+          // Insert the new video at the specified index.
+          this.player.playlist.splice(json.data.index, 0, json.data.video);
+          // The currentTrack index is not affected when inserting after the current song.
+          console.log(`In-world player updated: Inserted item at index ${json.data.index}`);
+        }
+        break;
       case Commands.ITEM_MOVED:
         if (this.player && this.player.playlist) {
           const { oldIndex, newIndex, newCurrentTrack } = json.data;
