@@ -73,6 +73,7 @@ var Player = class {
       display: 'none', // Initially hidden
       flexDirection: 'column',
       gap: '5px'
+      // Removed the fixed height to prevent it from extending to the bottom.
     });
 
     // Text display for current values
@@ -85,10 +86,10 @@ var Player = class {
     Object.assign(graphsContainer.style, {
         display: 'flex',
         gap: '10px',
-        alignItems: 'flex-end', // Align bars to the bottom
-        height: '50px', // Max height for the graph area
+        flexDirection: 'column', // Stack graphs vertically
     });
     statusContainer.appendChild(graphsContainer);
+
 
     // Drift Graph
     const driftGraphContainer = document.createElement('div');
@@ -100,7 +101,7 @@ var Player = class {
         borderLeft: '1px solid #888',
         borderBottom: '1px solid #888',
         padding: '2px',
-        height: '100%'
+        height: '50px', // Set a fixed height for the graph
     });
     graphsContainer.appendChild(driftGraphContainer);
 
@@ -114,7 +115,7 @@ var Player = class {
         borderLeft: '1px solid #888',
         borderBottom: '1px solid #888',
         padding: '2px',
-        height: '100%'
+        height: '50px', // Set a fixed height for the graph
     });
     graphsContainer.appendChild(latencyGraphContainer);
 
@@ -336,7 +337,7 @@ var Player = class {
           const timediff = serverTime - localTime;
           
           // Store history for the graph
-          this.driftHistory.push(timediff * 1000); // Store in ms
+          this.driftHistory.push(timediff * 1000);  // Store in ms
           this.latencyHistory.push(latency * 1000); // Store in ms
           if (this.driftHistory.length > this.maxHistoryPoints) this.driftHistory.shift();
           if (this.latencyHistory.length > this.maxHistoryPoints) this.latencyHistory.shift();
