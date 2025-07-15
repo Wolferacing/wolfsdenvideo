@@ -184,6 +184,18 @@ var Karaoke = class {
     this.closeSearchButton = document.querySelector('#close-search-btn');
     this.submitSearchButton = document.querySelector('#submit-search-btn');
 
+    // Add event listeners to the new "karaoke" and "zoom karaoke" buttons
+    const karaokeButton = document.querySelector('.karaoke-search-btn');
+    const zoomKaraokeButton = document.querySelector('.zoom-search-btn');
+
+    karaokeButton.addEventListener('click', () => {
+        this.searchInputOverlay.value += ' karaoke ';
+    });
+
+    zoomKaraokeButton.addEventListener('click', () => {
+        this.searchInputOverlay.value += ' zoom karaoke ';
+    });
+
     this.openSearchButton.addEventListener('click', () => this.showSearchOverlay());
     this.closeSearchButton.addEventListener('click', () => this.hideSearchOverlay());
     this.searchOverlay.addEventListener('click', (event) => {
