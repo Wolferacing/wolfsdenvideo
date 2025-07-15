@@ -1,5 +1,5 @@
 const SkipJumpTimePlaylist = 5;
-const SkipJumpTimeKaraoke = 0.5;
+const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
 
 // --- Adaptive Sync Constants ---
 const SYNC_INTERVAL_FAST = 1000;   // For high drift or after a song change.

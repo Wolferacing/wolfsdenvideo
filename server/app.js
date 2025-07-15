@@ -9,7 +9,7 @@ const fetch = require('node-fetch');
 const Commands = require('../public/commands.js');
 const { Pool } = require('pg');
 const SkipJumpTimePlaylist = 5;
-const SkipJumpTimeKaraoke = 0.5;
+const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
 
 class App{
   constructor() {
