@@ -522,6 +522,15 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
           this.browser.setAttribute("sq-browser", {"url": this.initialUrl});
         }
         break;
+      case Commands.ITEM_REMOVED:
+        // Apply the removal directly to the in-world player's playlist state.
+        if (this.player && this.player.playlist) {
+          this.player.playlist.splice(json.data.index, 1);
+          this.player.currentTrack = json.data.newCurrentTrack;
+          console.log(`In-world player updated: Removed item at index ${json.data.index}, new current track ${json.data.newCurrentTrack}`);
+        }
+        break;
+
       case Commands.STOP:
       case Commands.PLAYBACK_UPDATE:
         // Merge new data into the existing player state.

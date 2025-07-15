@@ -974,6 +974,12 @@ class App{
           this.send(socket, Commands.ITEM_REMOVED, { index: index, newCurrentTrack: player.currentTrack });
         });
         await this.savePlayerState(ws.i);
+        // --- Send a targeted update to the in-world player ---
+        player.sockets.forEach(socket => {
+            if (socket.type === 'space') {
+                this.send(socket, Commands.ITEM_REMOVED, { index: index, newCurrentTrack: player.currentTrack });
+            }
+        });
       }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
     }
   }
