@@ -553,7 +553,7 @@ var Karaoke = class {
       const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '7px 10px', 
+        padding: '5px 5px', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
