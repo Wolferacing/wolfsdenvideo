@@ -2,14 +2,14 @@ const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
 
 // --- Adaptive Sync Constants ---
-const SYNC_INTERVAL_FAST = 1000;   // For high drift or after a song change.
-const SYNC_INTERVAL_NORMAL = 3000; // For moderate drift.
-const SYNC_INTERVAL_SLOW = 7000;   // For when the player is well-synced.
+const SYNC_INTERVAL_FAST = 800;    // Sync every 0.8s when drift is high or after a change.
+const SYNC_INTERVAL_NORMAL = 2000;   // Sync every 2s for moderate drift.
+const SYNC_INTERVAL_SLOW = 4000;   // Sync every 4s when well-synced.
 
-const LARGE_DRIFT_THRESHOLD = 0.5;  // Above this (500ms), we do a hard seek.
-const SMALL_DRIFT_THRESHOLD = 0.05; // Below this (50ms), we are considered in-sync.
-const PROPORTIONAL_GAIN = 0.1;      // How aggressively to correct small drifts.
-const MAX_SPEED_ADJUSTMENT = 0.075; // Max speed change (e.g., 1.0 +/- 0.075 for 0.925x to 1.075x).
+const LARGE_DRIFT_THRESHOLD = 0.25; // Above 250ms, do a hard seek. This should be rare.
+const SMALL_DRIFT_THRESHOLD = 0.03; // Below 30ms, we are considered perfectly in-sync.
+const PROPORTIONAL_GAIN = 0.2;      // More aggressively correct small drifts to prevent them from accumulating.
+const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05x), making it less noticeable.
 // --- End of Sync Constants ---
 
 var Player = class {
