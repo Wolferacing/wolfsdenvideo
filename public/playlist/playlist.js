@@ -3,7 +3,7 @@ var Playlist = class {
     this.currentScript = document.currentScript;
     this.uiUpdateInterval = null;
     this.pendingReplacement = null;
-    this.clientTimeOffset = 0.5; // Add a small offset (0.5 seconds)
+    this.clockSkew = 0; // The estimated difference between client and server clocks.
     this.init();
   }
   async init() {
@@ -34,7 +34,17 @@ var Playlist = class {
       case Commands.PLAYBACK_UPDATE:
         // Merge new data into the existing player state.
         // This prevents the playlist from being wiped out on updates that don't include it.
+        const isFirstUpdate = !this.core.player;
         this.core.player = Object.assign(this.core.player || {}, json.data.video);
+        // On the first full update, calculate the clock skew. This is the most reliable time
+        // to do it, as we have a full state from the server (lastStartTime and currentTime).
+        // A non-zero duration ensures we're calculating against an actively playing track.
+        if (isFirstUpdate && this.core.player.lastStartTime && this.core.player.duration > 0) {
+            const serverNow = this.core.player.lastStartTime + this.core.player.currentTime;
+            const clientNow = Date.now() / 1000;
+            this.clockSkew = clientNow - serverNow;
+            console.log(`Playlist UI clock skew estimated: ${this.clockSkew.toFixed(3)}s`);
+        }
         this.updatePlaylist(this.core.player);
         this.startUiUpdater();
         break;
@@ -195,16 +205,21 @@ var Playlist = class {
 
     let updateCount = 0;
     this.uiUpdateInterval = setInterval(() => {
-      const { lastStartTime, duration } = this.core.player;
+      let { lastStartTime, duration } = this.core.player;
       if (duration <= 0) return;
 
-      // Calculate the elapsed time since the track started, accounting for the client-side offset.
-      let calculatedTime = (Date.now() / 1000) - lastStartTime - this.clientTimeOffset;
+      // Adjust lastStartTime by the expected settling time (2 seconds)
+      // By subtracting the estimated clock skew, we align the client's 'now' with the server's 'now'.
+      let calculatedTime = ((Date.now() / 1000) - this.clockSkew) - lastStartTime;
 
       // Add logging to inspect the values
+      let updateCount = 0;
       updateCount++;
       if (updateCount <= 5 || updateCount % 10 === 0) { // Log the first 5 updates and then every 10th update
         console.log(`UI Update #${updateCount}: lastStartTime=${lastStartTime}, duration=${duration}, clientTimeOffset=${this.clientTimeOffset}, calculatedTime=${calculatedTime}`);
+        if (updateCount <= 5) {
+          console.log(`UI Update #${updateCount}: clockSkew=${this.clockSkew.toFixed(3)}s, calculatedTime=${calculatedTime.toFixed(3)}s`);
+        }
       }
 
       // Clamp the calculated time to ensure it's within the valid range.
@@ -644,6 +659,6 @@ var Playlist = class {
     style.innerHTML = `.teal { background: url(https://${window.APP_CONFIG.HOST_URL}/assets/Button_bg.png); background-size: 100% 100%; }`;
     document.head.appendChild(style);
     // --- End of FIX ---
-  }
+}
 }
 window.playlistUiInstance = new Playlist();
