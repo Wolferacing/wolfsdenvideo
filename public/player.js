@@ -21,6 +21,7 @@ var Player = class {
   async init() {
      await this.setupConfigScript();
      await this.setupBrowserMessaging();
+     this.setupStatusDisplay();
      this.initialSyncComplete = false;
      this.currentTime = 0;
      this.syncTimeout = null;
@@ -50,6 +51,27 @@ var Player = class {
     } else {
       window.bantermessage(JSON.stringify(msg));
     }
+  }  
+  setupStatusDisplay() {
+    // This creates a small, non-intrusive element to display sync status for debugging.
+    // It's only shown when auto-sync is active.
+    const statusDiv = document.createElement('div');
+    statusDiv.id = 'status';
+    Object.assign(statusDiv.style, {
+      position: 'fixed',
+      bottom: '10px',
+      left: '10px',
+      background: 'rgba(0, 0, 0, 0.7)',
+      color: 'white',
+      padding: '5px 10px',
+      borderRadius: '5px',
+      fontFamily: 'monospace',
+      fontSize: '14px',
+      zIndex: '9999',
+      display: 'none' // Initially hidden
+    });
+    document.body.appendChild(statusDiv);
+    this.statusElement = statusDiv;
   }
   waitFor(seconds) {
     return new Promise(resolve => {
@@ -111,10 +133,9 @@ var Player = class {
                 }
               }
             }
-          } else if (this.readyToPlay && event.data !== YT.PlayerState.PLAYING) {
-            // This logic tries to force the video to keep playing.
-            this.player.playVideo();
-          }
+          } // The aggressive `playVideo()` call on non-playing states has been removed.
+            // The auto-sync logic is the robust way to handle unexpected pauses or buffering
+            // by correcting the resulting time drift.
         },
         onError: event => {
           // Error 150: The video owner has not made this video available in your country.
@@ -260,7 +281,10 @@ var Player = class {
           const localTime = this.player.getCurrentTime();
           // Positive timediff means client is BEHIND server. Negative means client is AHEAD.
           const timediff = serverTime - localTime;
-          document.getElementById('status').innerHTML = `Drift: ${Math.round(timediff * 1000)}ms | Latency: ${Math.round(latency * 1000)}ms`;
+          // Update the status display if it exists.
+          if (this.statusElement) {
+            this.statusElement.innerHTML = `Drift: ${Math.round(timediff * 1000)}ms | Latency: ${Math.round(latency * 1000)}ms`;
+          }
 
           if (this.autoSync) {
             if (Math.abs(timediff) > LARGE_DRIFT_THRESHOLD) {
@@ -324,6 +348,7 @@ var Player = class {
   enableAutoSync() {
     if (!this.autoSync) {
       this.autoSync = true;
+      if (this.statusElement) this.statusElement.style.display = 'block';
       this.core.showToast("AutoSync has been enabled.");
       // Start with a fast interval to get in sync quickly.
       this.syncIntervalMs = SYNC_INTERVAL_FAST;
@@ -335,6 +360,7 @@ var Player = class {
       this.autoSync = false;
       clearTimeout(this.syncTimeout);
       this.syncTimeout = null;
+      if (this.statusElement) this.statusElement.style.display = 'none';
       this.core.showToast(fromManualSkip ? "AutoSync disabled by manual skip." : "AutoSync has been disabled.");
       if (fromManualSkip) {
         this.core.sendMessage({ path: Commands.AUTO_SYNC_STATE_CHANGED, data: { enabled: false } });
