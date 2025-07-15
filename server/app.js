@@ -443,6 +443,13 @@ class App{
       is_youtube_website: isYoutubeWebsite
     };
   }
+
+  _isDuplicateVideo(player, videoLink) {
+    const newVideoId = this.getYoutubeId(videoLink);
+    if (!newVideoId) return false; // Can't check if we can't get an ID
+    return player.playlist.some(existingVideo => this.getYoutubeId(existingVideo.link) === newVideoId);
+  }
+
   async moveSinger({ userId, direction }, ws) {
     this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
@@ -794,9 +801,22 @@ class App{
         const player = this.videoPlayers[ws.i];
         let playlist = await ytfps(data.id, { limit: 100 });
         this.resetPlaylist(ws); // Resets playlist, currentTime, currentTrack
+        // --- Duplicate Video Check for bulk add ---
+        const existingVideoIds = new Set();
+        let addedCount = 0;
         playlist.videos.forEach(v => {
-          player.playlist.push(this._createVideoObject(v, ws.u, 'ytfps'));
+          const newVideoId = this.getYoutubeId(v.url);
+          if (newVideoId && !existingVideoIds.has(newVideoId)) {
+            player.playlist.push(this._createVideoObject(v, ws.u, 'ytfps'));
+            existingVideoIds.add(newVideoId); // Add to set to prevent duplicates within the same playlist import
+            addedCount++;
+          }
         });
+        const duplicateCount = playlist.videos.length - addedCount;
+        if (duplicateCount > 0) {
+            this.send(ws, Commands.ERROR, { message: `Added ${addedCount} videos. ${duplicateCount} duplicate(s) were skipped.` });
+        }
+        // --- End of Check ---
         if (player.playlist.length > 0) {
           player.lastStartTime = new Date().getTime() / 1000;
           player.sockets.forEach(socket => {
@@ -832,6 +852,10 @@ class App{
     if (this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
+        if (this._isDuplicateVideo(player, v.link)) {
+          this.send(ws, Commands.ERROR, { message: "This video is already in the playlist." });
+          return;
+        }
         const newVideo = this._createVideoObject(v, ws.u, 'scraper');
         player.playlist.push(newVideo);
 
@@ -853,6 +877,10 @@ class App{
     if (this.videoPlayers[ws.i]) {
       this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
+        if (this._isDuplicateVideo(player, v.link)) {
+          this.send(ws, Commands.ERROR, { message: "This video is already in the playlist." });
+          return;
+        }
         const newVideo = this._createVideoObject(v, ws.u, 'scraper');
         const nextIndex = player.currentTrack + 1;
         player.playlist.splice(nextIndex, 0, newVideo);
@@ -885,6 +913,12 @@ class App{
     const player = this.videoPlayers[ws.i];
     if(player) {
       this.onlyIfHost(ws, async () => {
+        // --- Duplicate Video Check ---
+        if (this._isDuplicateVideo(player, v.link)) {
+          this.send(ws, Commands.ERROR, { message: "This video is already in the playlist." });
+          return;
+        }
+        // --- End of Check ---
         if(!player.playlist.length) {
           player.currentTrack = 0;
           player.currentTime = 0;
