@@ -421,7 +421,7 @@ var Playlist = class {
       videoTitle.append(v.title);
 
       const videoAuthor = this.core.makeAndAddElement('div',{
-        padding: '0 10px 5px 7px',
+        padding: '0px 10px 5px 7px',
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         fontSize: '0.8rem',
@@ -498,7 +498,7 @@ var Playlist = class {
       }else{
         
         const currentTimeText = this.core.makeAndAddElement('div',{
-          padding: '7px 10px 0 7px',
+          padding: '7px 10px 0px 7px',
           textOverflow: 'ellipsis', 
           overflow: 'hidden', 
           whiteSpace: 'nowrap'
@@ -542,7 +542,7 @@ var Playlist = class {
       const videoTitleAndAction = this.core.makeAndAddElement('div',{float: 'left', width: 'calc(100% - 180px)'}, videoItemContainer);
       
       const videoTitle = this.core.makeAndAddElement('div',{
-        padding: '7 10', 
+        padding: '7px 10px', 
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         whiteSpace: 'nowrap'
