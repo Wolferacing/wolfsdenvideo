@@ -1353,11 +1353,18 @@ class App{
     // The playlist/UI pages use the lastStartTime from PLAYBACK_UPDATE to calculate time.
     // Therefore, we only send this to the 'player' type socket.
     if(this.videoPlayers[key] && this.videoPlayers[key].playlist.length && socket.type === "player") {
+      // --- FIX: Calculate current time on-demand for accuracy ---
+      // The server's main loop updates currentTime only once per second.
+      // For an accurate sync, we must calculate the exact time at the moment of sending.
+      const player = this.videoPlayers[key];
+      const now = new Date().getTime() / 1000;
+      const preciseCurrentTime = now - player.lastStartTime;
+
       this.send(socket, Commands.SYNC_TIME, {
-        currentTrack: this.videoPlayers[key].currentTrack,
+        currentTrack: player.currentTrack,
         clientTimestamp: data.clientTimestamp,
-        currentTime: this.videoPlayers[key].currentTime,
-        duration: this.videoPlayers[key].playlist.length && this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack] ? this.videoPlayers[key].playlist[this.videoPlayers[key].currentTrack].duration / 1000 : 0
+        currentTime: preciseCurrentTime, // Use the precise time
+        duration: player.playlist.length && player.playlist[player.currentTrack] ? player.playlist[player.currentTrack].duration / 1000 : 0
       });
     }
   }
