@@ -130,7 +130,8 @@ var Playlist = class {
           }
           this.core.player.currentTrack = json.data.newTrackIndex;
           this.core.player.lastStartTime = json.data.newLastStartTime;
-          // The playlist UI also needs the duration of the new track for the progress bar.
+          // The UI also needs the duration and current time of the new track.
+          this.core.player.currentTime = json.data.newCurrentTime || 0;
           if (this.core.player.playlist[this.core.player.currentTrack]) {
               this.core.player.duration = this.core.player.playlist[this.core.player.currentTrack].duration / 1000;
           }
@@ -196,12 +197,14 @@ var Playlist = class {
 
       if (duration <= 0) return;
 
-      // Calculate the current time based on when the track started
-      let calculatedTime = (Date.now() / 1000) - lastStartTime;
+      // Calculate the elapsed time since the track started, accounting for server time and a bit of estimated latency.
+      let calculatedTime = (Date.now() / 1000) - lastStartTime; // Basic elapsed time calculation
+      // The server sends the newCurrentTime with the TRACK_CHANGED command now.
+      // It represents the accurate start time of the track, as known by the server.
+      // We can just use this value directly to set the position of the progress bar.
+      calculatedTime = Math.max(0, Math.min(calculatedTime, duration)); // Clamp to valid range.
 
-      // Clamp the time to be within the video's bounds [0, duration]
-      calculatedTime = Math.max(0, Math.min(calculatedTime, duration));
-
+      // Update the progress bar width.
       const currentTimeBar = document.querySelector('.currentTime');
       if (currentTimeBar) {
         currentTimeBar.style.width = `${(calculatedTime / duration) * 100}%`;
