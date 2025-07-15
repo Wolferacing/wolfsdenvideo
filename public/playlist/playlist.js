@@ -208,7 +208,6 @@ var Playlist = class {
       let { lastStartTime, duration } = this.core.player;
       if (duration <= 0) return;
 
-      // Adjust lastStartTime by the expected settling time (2 seconds)
       // By subtracting the estimated clock skew, we align the client's 'now' with the server's 'now'.
       let calculatedTime = ((Date.now() / 1000) - this.clockSkew) - lastStartTime;
       updateCount++;

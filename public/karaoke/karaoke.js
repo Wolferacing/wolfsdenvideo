@@ -2,6 +2,7 @@ var Karaoke = class {
   constructor() {
     this.currentScript = document.currentScript;
     this.uiUpdateInterval = null;
+    this.clockSkew = 0; // The estimated difference between client and server clocks.
     this.init();
   }
   async init() {
@@ -519,18 +520,23 @@ var Karaoke = class {
     if (!this.core.player || !this.core.player.playlist || this.core.player.playlist.length === 0 || !this.core.player.lastStartTime) {
       return;
     }
-
+    let updateCount = 0;
     this.uiUpdateInterval = setInterval(() => {
-      const { lastStartTime, duration } = this.core.player;
-
+      let { lastStartTime, duration } = this.core.player;
       if (duration <= 0) return;
 
-      // Calculate the current time based on when the track started
-      let calculatedTime = (Date.now() / 1000) - lastStartTime;
+      // By subtracting the estimated clock skew, we align the client's 'now' with the server's 'now'.
+      let calculatedTime = ((Date.now() / 1000) - this.clockSkew) - lastStartTime;
+      updateCount++;
+      if (updateCount <= 5) { // Log the first 5 updates
+        console.log(`UI Update #${updateCount}: lastStartTime=${lastStartTime}, duration=${duration}, calculatedTime=${calculatedTime}`);
+        console.log(`UI Update #${updateCount}: clockSkew=${this.clockSkew.toFixed(3)}s, calculatedTime=${calculatedTime.toFixed(3)}s`);
+      }
 
-      // Clamp the time to be within the video's bounds [0, duration]
-      calculatedTime = Math.max(0, Math.min(calculatedTime, duration));
+      // Clamp the calculated time to ensure it's within the valid range.
+      calculatedTime = Math.max(0, Math.min(calculatedTime, duration)); // Clamp to valid range.
 
+      // Update the progress bar width.
       const currentTimeBar = document.querySelector('.currentTime');
       if (currentTimeBar) {
         currentTimeBar.style.width = `${(calculatedTime / duration) * 100}%`;
@@ -570,6 +576,17 @@ var Karaoke = class {
         }
       }
     });
+  }
+   /**
+     * Estimates the difference between the client's clock and the server's clock.
+     * This value is used to align the UI time with the server's time.
+     */
+    estimateClockSkew() {
+      if (this.core.player.lastStartTime && this.core.player.duration > 0) {
+        const serverNow = this.core.player.lastStartTime + this.core.player.currentTime;
+        const clientNow = Date.now() / 1000;
+        this.clockSkew = clientNow - serverNow;
+      }
   }
 }
 window.karaokeUiInstance = new Karaoke();
