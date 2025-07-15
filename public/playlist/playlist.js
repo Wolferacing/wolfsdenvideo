@@ -421,7 +421,7 @@ var Playlist = class {
       videoTitle.append(v.title);
 
       const videoAuthor = this.core.makeAndAddElement('div',{
-        padding: '0px 10px 5px 7px',
+        padding: '0px 0px 0px 10px',
         textOverflow: 'ellipsis', 
         overflow: 'hidden', 
         fontSize: '0.8rem',
