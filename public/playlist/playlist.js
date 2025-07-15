@@ -3,6 +3,7 @@ var Playlist = class {
     this.currentScript = document.currentScript;
     this.uiUpdateInterval = null;
     this.pendingReplacement = null;
+    this.clientTimeOffset = 0.5; // Add a small offset (0.5 seconds)
     this.init();
   }
   async init() {
@@ -194,14 +195,12 @@ var Playlist = class {
 
     this.uiUpdateInterval = setInterval(() => {
       const { lastStartTime, duration } = this.core.player;
-
       if (duration <= 0) return;
 
-      // Calculate the elapsed time since the track started, accounting for server time and a bit of estimated latency.
-      let calculatedTime = (Date.now() / 1000) - lastStartTime; // Basic elapsed time calculation
-      // The server sends the newCurrentTime with the TRACK_CHANGED command now.
-      // It represents the accurate start time of the track, as known by the server.
-      // We can just use this value directly to set the position of the progress bar.
+      // Calculate the elapsed time since the track started, accounting for the client-side offset.
+      let calculatedTime = (Date.now() / 1000) - lastStartTime - this.clientTimeOffset;
+
+      // Clamp the calculated time to ensure it's within the valid range.
       calculatedTime = Math.max(0, Math.min(calculatedTime, duration)); // Clamp to valid range.
 
       // Update the progress bar width.
