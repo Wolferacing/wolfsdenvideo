@@ -277,6 +277,40 @@ var Player = class {
           this.playerData.currentTrack = json.data.currentTrack;
         }
         break;
+      // --- Add granular playlist management to keep the player's state in sync ---
+      case Commands.ITEM_REMOVED:
+        if (this.playerData && this.playerData.playlist) {
+          this.playerData.playlist.splice(json.data.index, 1);
+          this.playerData.currentTrack = json.data.newCurrentTrack;
+        }
+        break;
+      case Commands.ITEM_APPENDED:
+        if (this.playerData && this.playerData.playlist) {
+          this.playerData.playlist.push(json.data.video);
+        }
+        break;
+      case Commands.ITEM_INSERTED:
+        if (this.playerData && this.playerData.playlist) {
+          this.playerData.playlist.splice(json.data.index, 0, json.data.video);
+          // Note: currentTrack is not affected when inserting after the current song.
+        }
+        break;
+      case Commands.ITEM_MOVED:
+        if (this.playerData && this.playerData.playlist) {
+          const { oldIndex, newIndex, newCurrentTrack } = json.data;
+          const [itemToMove] = this.playerData.playlist.splice(oldIndex, 1);
+          this.playerData.playlist.splice(newIndex, 0, itemToMove);
+          this.playerData.currentTrack = newCurrentTrack;
+        }
+        break;
+      case Commands.ITEM_REPLACED:
+        if (this.playerData && this.playerData.playlist) {
+          const { index, newVideo } = json.data;
+          if (this.playerData.playlist[index]) {
+            this.playerData.playlist[index] = newVideo;
+          }
+        }
+        break;
       case Commands.TRACK_CHANGED:
         // This is the new authoritative command for changing tracks.
         if (this.playerData && this.readyToPlay) { // Player is ready, apply immediately.
