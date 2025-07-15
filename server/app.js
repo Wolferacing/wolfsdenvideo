@@ -1087,7 +1087,7 @@ class App{
               await this._stop(instanceId);
             }
             break; // Exit the while loop for this instance.
-          } else if (!player.autoAdvance){
+          } else if (!player.autoAdvance && player.isKaraoke){
              // The "else" condition means the current singer's track is over.
              await this._stop(instanceId);
           } else {
