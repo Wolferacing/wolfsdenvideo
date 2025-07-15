@@ -25,6 +25,9 @@ var Player = class {
      this.initialSyncComplete = false;
      this.currentTime = 0;
      this.syncTimeout = null;
+     this.driftHistory = [];
+     this.latencyHistory = [];
+     this.maxHistoryPoints = 100; // Number of data points for the graph
      this.syncIntervalMs = SYNC_INTERVAL_SLOW; // Default to the slowest interval.
      await this.setupCoreScript();
      this.core = window.videoPlayerCore;
@@ -53,11 +56,10 @@ var Player = class {
     }
   }  
   setupStatusDisplay() {
-    // This creates a small, non-intrusive element to display sync status for debugging.
-    // It's only shown when auto-sync is active.
-    const statusDiv = document.createElement('div');
-    statusDiv.id = 'status';
-    Object.assign(statusDiv.style, {
+    // Main container for the entire status display
+    const statusContainer = document.createElement('div');
+    statusContainer.id = 'status';
+    Object.assign(statusContainer.style, {
       position: 'fixed',
       bottom: '10px',
       left: '10px',
@@ -68,10 +70,61 @@ var Player = class {
       fontFamily: 'monospace',
       fontSize: '14px',
       zIndex: '9999',
-      display: 'none' // Initially hidden
+      display: 'none', // Initially hidden
+      flexDirection: 'column',
+      gap: '5px'
     });
-    document.body.appendChild(statusDiv);
-    this.statusElement = statusDiv;
+
+    // Text display for current values
+    const textDisplay = document.createElement('div');
+    textDisplay.id = 'status-text';
+    statusContainer.appendChild(textDisplay);
+
+    // Container for the graphs
+    const graphsContainer = document.createElement('div');
+    Object.assign(graphsContainer.style, {
+        display: 'flex',
+        gap: '10px',
+        alignItems: 'flex-end', // Align bars to the bottom
+        height: '50px', // Max height for the graph area
+    });
+    statusContainer.appendChild(graphsContainer);
+
+    // Drift Graph
+    const driftGraphContainer = document.createElement('div');
+    driftGraphContainer.id = 'drift-graph';
+    Object.assign(driftGraphContainer.style, {
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '1px',
+        borderLeft: '1px solid #888',
+        borderBottom: '1px solid #888',
+        padding: '2px',
+        height: '100%'
+    });
+    graphsContainer.appendChild(driftGraphContainer);
+
+    // Latency Graph
+    const latencyGraphContainer = document.createElement('div');
+    latencyGraphContainer.id = 'latency-graph';
+    Object.assign(latencyGraphContainer.style, {
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '1px',
+        borderLeft: '1px solid #888',
+        borderBottom: '1px solid #888',
+        padding: '2px',
+        height: '100%'
+    });
+    graphsContainer.appendChild(latencyGraphContainer);
+
+    document.body.appendChild(statusContainer);
+    
+    // Store references to the elements we'll need to update
+    this.statusElement = statusContainer;
+    this.statusTextElement = textDisplay;
+    this.driftGraphElement = driftGraphContainer;
+    this.latencyGraphElement = latencyGraphContainer;
   }
   waitFor(seconds) {
     return new Promise(resolve => {
@@ -281,11 +334,17 @@ var Player = class {
           const localTime = this.player.getCurrentTime();
           // Positive timediff means client is BEHIND server. Negative means client is AHEAD.
           const timediff = serverTime - localTime;
-          // Update the status display if it exists.
-          if (this.statusElement) {
-            this.statusElement.innerHTML = `Drift: ${Math.round(timediff * 1000)}ms | Latency: ${Math.round(latency * 1000)}ms`;
-          }
+          
+          // Store history for the graph
+          this.driftHistory.push(timediff * 1000); // Store in ms
+          this.latencyHistory.push(latency * 1000); // Store in ms
+          if (this.driftHistory.length > this.maxHistoryPoints) this.driftHistory.shift();
+          if (this.latencyHistory.length > this.maxHistoryPoints) this.latencyHistory.shift();
 
+          // Update the status display graph if it exists.
+          if (this.statusElement) {
+            this.updateGraphDisplay(timediff, latency);
+          }
           if (this.autoSync) {
             if (Math.abs(timediff) > LARGE_DRIFT_THRESHOLD) {
               // Large drift, a hard seek is necessary for a quick correction.
@@ -320,6 +379,51 @@ var Player = class {
         break;
     }
   }
+  updateGraphDisplay(currentDrift, currentLatency) {
+    // Update the text part of the display
+    this.statusTextElement.innerHTML = `Drift: ${Math.round(currentDrift * 1000)}ms | Latency: ${Math.round(currentLatency * 1000)}ms`;
+
+    // --- Render Drift Graph ---
+    this.driftGraphElement.innerHTML = ''; // Clear previous bars
+    this.driftHistory.forEach(driftMs => {
+      const bar = document.createElement('div');
+      // Scale the height: 1px per 5ms of drift, capped at 50px.
+      const height = Math.min(50, Math.abs(driftMs) * 0.2); 
+      let color = '#4caf50'; // Green for good sync (<40ms)
+      
+      if (Math.abs(driftMs) > SMALL_DRIFT_THRESHOLD * 1000) {
+        // Yellow if we are behind, Blue if we are ahead.
+        color = driftMs > 0 ? '#ffeb3b' : '#03a9f4'; 
+      }
+      if (Math.abs(driftMs) > LARGE_DRIFT_THRESHOLD * 1000) {
+        color = '#f44336'; // Red for large drift that will cause a hard seek.
+      }
+      Object.assign(bar.style, {
+        width: '2px',
+        height: `${height}px`,
+        backgroundColor: color
+      });
+      this.driftGraphElement.appendChild(bar);
+    });
+
+    // --- Render Latency Graph ---
+    this.latencyGraphElement.innerHTML = ''; // Clear previous bars
+    this.latencyHistory.forEach(latencyMs => {
+      const bar = document.createElement('div');
+      // Scale the height: 1px per 5ms of latency, capped at 50px.
+      const height = Math.min(50, latencyMs * 0.2);
+      let color = '#4caf50'; // Green for low latency (<100ms)
+      if (latencyMs > 100) color = '#ffeb3b'; // Yellow
+      if (latencyMs > 200) color = '#ff9800'; // Orange
+      if (latencyMs > 300) color = '#f44336'; // Red
+      Object.assign(bar.style, {
+        width: '2px',
+        height: `${height}px`,
+        backgroundColor: color
+      });
+      this.latencyGraphElement.appendChild(bar);
+    });
+  }
   playVidya(currentTrack, currentTime, force, volume) {
     if(this.playerData) {
       if(this.lastUrl !== this.playerData.playlist[currentTrack].link || force) {
@@ -348,7 +452,7 @@ var Player = class {
   enableAutoSync() {
     if (!this.autoSync) {
       this.autoSync = true;
-      if (this.statusElement) this.statusElement.style.display = 'block';
+      if (this.statusElement) this.statusElement.style.display = 'flex';
       this.core.showToast("AutoSync has been enabled.");
       // Start with a fast interval to get in sync quickly.
       this.syncIntervalMs = SYNC_INTERVAL_FAST;
