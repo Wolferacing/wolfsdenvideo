@@ -623,17 +623,21 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
   }
   back() {
     const isHost = this.player && this.player.host && this.player.host.id === window.user.id;
-    if (isHost) {
+    // The host can only perform a global skip in playlist mode.
+    // In karaoke mode, their skip is local, just like any other user.
+    if (isHost && !this.isKaraoke) {
       // If the host skips, send a command to the server to sync everyone.
       this.sendMessage({ path: Commands.HOST_SKIP_BACK });
     } else {
-      // If a regular user skips, it's a local-only adjustment.
+      // If a regular user skips, or if the host is in karaoke mode, it's a local-only adjustment.
       this.sendBrowserMessage({ path: Commands.SKIP_BACK });
     }
   }
   forward() {
     const isHost = this.player && this.player.host && this.player.host.id === window.user.id;
-    if (isHost) {
+    // The host can only perform a global skip in playlist mode.
+    // In karaoke mode, their skip is local, just like any other user.
+    if (isHost && !this.isKaraoke) {
       this.sendMessage({ path: Commands.HOST_SKIP_FORWARD });
     } else {
       this.sendBrowserMessage({ path: Commands.SKIP_FORWARD });
