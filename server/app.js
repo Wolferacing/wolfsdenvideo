@@ -1085,11 +1085,11 @@ class App{
               await this._playNextKaraokeSong(instanceId);
             } else {
               await this._stop(instanceId);
-              // Remove the song now that it has finished, to avoid repeats.
-              player.playlist.shift();
-              await this.savePlayerState(instanceId);
             }
             break; // Exit the while loop for this instance.
+          } else if (!player.autoAdvance){
+             // The "else" condition means the current singer's track is over.
+             await this._stop(instanceId);
           } else {
             // In a regular playlist context, loop to the next song.
             player.currentTime -= trackDuration;
