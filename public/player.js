@@ -347,7 +347,7 @@ var Player = class {
 
           // Show a toast indicating the skip direction and amount.
           const skipAmount = this.core.isKaraoke ? SkipJumpTimeKaraoke : SkipJumpTimePlaylist;
-          const direction = diff > 0 ? '+' : '-';
+          const direction = diff > 0 ? 'FORWARDS +' : 'BACKWARDS -';
           this.core.showToast(`Host skip: ${direction}${skipAmount}s`);
           this.disableAutoSync(true);
         }
