@@ -727,6 +727,29 @@ var Playlist = class {
     style.innerHTML = `.teal { background: url(https://${window.APP_CONFIG.HOST_URL}/assets/Button_bg.png); background-size: 100% 100%; }`;
     document.head.appendChild(style);
     // --- End of FIX ---
+
+    // --- Dynamic Height Adjustment for Playlist ---
+    const headerContainer = document.querySelector('.playlistContainer');
+    const adjustPlaylistHeight = () => {
+      // Get the live heights of all elements above the playlist.
+      const headerHeight = headerContainer.offsetHeight;
+      const hostTitleHeight = this.hostTitle.offsetHeight;
+      // Get notification height only if it's visible.
+      const notificationHeight = this.notificationArea.style.display !== 'none' ? this.notificationArea.offsetHeight : 0;
+      const totalHeaderHeight = headerHeight + hostTitleHeight + notificationHeight;
+      
+      // Use 100vh to calculate height against the full viewport, minus the headers.
+      this.videoPlaylistContainer.style.height = `calc(100vh - ${totalHeaderHeight}px)`;
+    };
+    // A ResizeObserver is the most robust way to detect size changes. It automatically
+    // handles elements appearing/disappearing or wrapping.
+    const resizeObserver = new ResizeObserver(adjustPlaylistHeight);
+    resizeObserver.observe(headerContainer);
+    resizeObserver.observe(this.hostTitle);
+    resizeObserver.observe(this.notificationArea);
+    // Initial calculation on load.
+    adjustPlaylistHeight();
+    // --- End of Dynamic Height ---
 }
 }
 window.playlistUiInstance = new Playlist();
