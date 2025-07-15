@@ -443,7 +443,7 @@ var Karaoke = class {
 
     // --- Render Empty State ---
     if (!contentRendered) {
-      this.videoPlaylistContainer.innerHTML = '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!<br><br><div style="color: red;">DONT FORGET TO TAKE OVER THE KARAOKE PLAYER BEFORE YOU START!!<br>IF SOMEONE ELSE TOOK OVER, BAN THEM AND WAIT 45s THEN TAKE OVER</div></h2>';
+      this.videoPlaylistContainer.innerHTML = '<h2 style="color: grey; margin-top: 100px; text-align: center;">No singers added yet!<br><br><div style="color: red;">DON\'T FORGET TO TAKE OVER THE KARAOKE PLAYER BEFORE YOU START!!</div></h2>';
     }
   }
   loadVideos(videos) {
