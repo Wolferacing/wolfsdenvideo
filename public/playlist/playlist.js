@@ -103,6 +103,25 @@ var Playlist = class {
           this.updatePlaylist(this.core.player);
         }
         break;
+      case Commands.ITEM_MOVED:
+        if (this.core.player && this.core.player.playlist) {
+          const { oldIndex, newIndex, newCurrentTrack } = json.data;
+          // Move the item in the local array to match the server
+          const [itemToMove] = this.core.player.playlist.splice(oldIndex, 1);
+          this.core.player.playlist.splice(newIndex, 0, itemToMove);
+          this.core.player.currentTrack = newCurrentTrack;
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.ITEM_REPLACED:
+        if (this.core.player && this.core.player.playlist) {
+          const { index, newVideo } = json.data;
+          if (this.core.player.playlist[index]) {
+            this.core.player.playlist[index] = newVideo;
+            this.updatePlaylist(this.core.player);
+          }
+        }
+        break;
       case Commands.TRACK_CHANGED:
         if (this.core.player) {
           // If the message includes a new playlist (e.g., from add-and-play), update it.

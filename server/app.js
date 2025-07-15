@@ -974,12 +974,6 @@ class App{
           this.send(socket, Commands.ITEM_REMOVED, { index: index, newCurrentTrack: player.currentTrack });
         });
         await this.savePlayerState(ws.i);
-        // --- Send a targeted update to the in-world player ---
-        player.sockets.forEach(socket => {
-            if (socket.type === 'space') {
-                this.send(socket, Commands.ITEM_REMOVED, { index: index, newCurrentTrack: player.currentTrack });
-            }
-        });
       }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
     }
   }
@@ -1001,9 +995,9 @@ class App{
           // Find the new index of the (potentially shifted) current track
           player.currentTrack = playlist.findIndex(v => v.link === currentTrackLink);
 
-          // Broadcast the updated playlist and current track index
+          // Send a granular update for efficiency instead of the whole playlist.
           player.sockets.forEach(socket => {
-            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: player.playlist, currentTrack: player.currentTrack });
+            this.send(socket, Commands.ITEM_MOVED, { oldIndex, newIndex: index, newCurrentTrack: player.currentTrack });
           });
           await this.savePlayerState(ws.i);
         }else{
@@ -1200,7 +1194,8 @@ class App{
           });
         } else {
           player.sockets.forEach(socket => {
-            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: player.playlist, currentTrack: player.currentTrack });
+            // Send a granular ITEM_REPLACED message instead of the whole playlist.
+            this.send(socket, Commands.ITEM_REPLACED, { index: videoIndex, newVideo: newVideo });
           });
         }
         await this.savePlayerState(ws.i);

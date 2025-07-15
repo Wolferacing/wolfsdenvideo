@@ -530,6 +530,24 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
           console.log(`In-world player updated: Removed item at index ${json.data.index}, new current track ${json.data.newCurrentTrack}`);
         }
         break;
+      case Commands.ITEM_MOVED:
+        if (this.player && this.player.playlist) {
+          const { oldIndex, newIndex, newCurrentTrack } = json.data;
+          const [itemToMove] = this.player.playlist.splice(oldIndex, 1);
+          this.player.playlist.splice(newIndex, 0, itemToMove);
+          this.player.currentTrack = newCurrentTrack;
+          console.log(`In-world player updated: Moved item from ${oldIndex} to ${newIndex}, new current track ${newCurrentTrack}`);
+        }
+        break;
+      case Commands.ITEM_REPLACED:
+        if (this.player && this.player.playlist) {
+          const { index, newVideo } = json.data;
+          if (this.player.playlist[index]) {
+            this.player.playlist[index] = newVideo;
+            console.log(`In-world player updated: Replaced item at index ${index}`);
+          }
+        }
+        break;
 
       case Commands.STOP:
       case Commands.PLAYBACK_UPDATE:
