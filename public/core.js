@@ -6,6 +6,8 @@ var Core = class {
     }
   async init() {
     await this.setupToastify();
+    // Check the URL for the 'mode' parameter to determine behavior (e.g., skip times).
+    this.isKaraoke = this.urlParams.get('mode') === 'karaoke';
     this.imIn = false;
     // Set defaults for parameters that depend on the host URL.
     // This runs after parseParams, so this.hostUrl is available.
