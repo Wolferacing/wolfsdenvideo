@@ -87,7 +87,6 @@ body{
   background: linear-gradient(to right, #1e181f, #2b313e);
   color: white;
   overflow: auto;
-  height: calc(100% - 50px);
   width: 100%;
 }
 .searchBackDrop,.addItemBackDrop{

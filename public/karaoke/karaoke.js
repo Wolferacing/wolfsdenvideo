@@ -120,6 +120,24 @@ var Karaoke = class {
         }
     });
     this.hostTitle = document.querySelector('.hostTitle');
+
+    // --- Dynamic Height Adjustment for Singer List ---
+    const headerContainer = document.querySelector('.playlistContainer');
+    const adjustSingerListHeight = () => {
+      // Get the live heights of all elements above the singer list.
+      const headerHeight = headerContainer.offsetHeight;
+      const hostTitleHeight = this.hostTitle.offsetHeight;
+      const totalHeaderHeight = headerHeight + hostTitleHeight;
+      // Use 100vh to calculate height against the full viewport, minus the headers.
+      this.videoPlaylistContainer.style.height = `calc(100vh - ${totalHeaderHeight}px)`;
+    };
+    // A ResizeObserver is the most robust way to detect size changes.
+    const resizeObserver = new ResizeObserver(adjustSingerListHeight);
+    resizeObserver.observe(headerContainer);
+    resizeObserver.observe(this.hostTitle);
+    // Initial calculation on load.
+    adjustSingerListHeight();
+    // --- End of Dynamic Height ---
   }
   // --- New Search Overlay Functions ---
   showSearchOverlay() {
