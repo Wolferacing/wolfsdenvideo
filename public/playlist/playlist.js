@@ -193,12 +193,19 @@ var Playlist = class {
       return;
     }
 
+    let updateCount = 0;
     this.uiUpdateInterval = setInterval(() => {
       const { lastStartTime, duration } = this.core.player;
       if (duration <= 0) return;
 
       // Calculate the elapsed time since the track started, accounting for the client-side offset.
       let calculatedTime = (Date.now() / 1000) - lastStartTime - this.clientTimeOffset;
+
+      // Add logging to inspect the values
+      updateCount++;
+      if (updateCount <= 5 || updateCount % 10 === 0) { // Log the first 5 updates and then every 10th update
+        console.log(`UI Update #${updateCount}: lastStartTime=${lastStartTime}, duration=${duration}, clientTimeOffset=${this.clientTimeOffset}, calculatedTime=${calculatedTime}`);
+      }
 
       // Clamp the calculated time to ensure it's within the valid range.
       calculatedTime = Math.max(0, Math.min(calculatedTime, duration)); // Clamp to valid range.
