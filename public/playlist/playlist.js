@@ -259,9 +259,10 @@ var Playlist = class {
     }
   }
 
-  hideSearchOverlay() {
+  hideSearchOverlay() {    
     this.searchOverlay.style.display = 'none';
-    this.searchInputOverlay.value = '';  // Clear the input when closing
+    // Persist the search term even when closing without submitting
+    localStorage.setItem('lastPlaylistSearch', this.searchInputOverlay.value);
   }
 
   submitSearch() {

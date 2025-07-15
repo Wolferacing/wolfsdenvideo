@@ -150,15 +150,16 @@ var Karaoke = class {
     }
   }
 
-  hideSearchOverlay() {
+  hideSearchOverlay() {    
     this.searchOverlay.style.display = 'none';
-    this.searchInputOverlay.value = '';  // Clear the input when closing
+    // Persist the search term even when closing without submitting
+    localStorage.setItem('lastKaraokeSearch', this.searchInputOverlay.value);
   }
 
   submitSearch() {
     const query = this.searchInputOverlay.value;
     if (query.trim() !== "") { // Check for non-empty input
-      this.hideSearchOverlay(); // Close the overlay before searching
+      // this.hideSearchOverlay(); // Close the overlay before searching
 
       // Save the search term for next time
       localStorage.setItem('lastKaraokeSearch', query);
@@ -168,7 +169,8 @@ var Karaoke = class {
       recentSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5); // Add to the beginning, remove duplicates, limit to 5
       localStorage.setItem('recentKaraokeSearches', JSON.stringify(recentSearches));
 
-      this.populateRecentSearches(); // Update the UI
+      this.populateRecentSearches(); // Update the UI     
+      this.searchOverlay.style.display = 'none';
       this.debounceSearch(query);
     }
   }
@@ -184,6 +186,11 @@ var Karaoke = class {
 
     this.openSearchButton.addEventListener('click', () => this.showSearchOverlay());
     this.closeSearchButton.addEventListener('click', () => this.hideSearchOverlay());
+    this.searchOverlay.addEventListener('click', (event) => {
+      if (event.target === this.searchOverlay) {
+        this.hideSearchOverlay();
+      }
+    });  
     this.submitSearchButton.addEventListener('click', () => this.submitSearch());
     this.clearSearchButton.addEventListener('click', () => {
       this.searchInputOverlay.value = '';
