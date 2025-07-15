@@ -1,11 +1,16 @@
 const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.5;
 
-// --- Adaptive Sync Intervals (in milliseconds) ---
+// --- Adaptive Sync Constants ---
 const SYNC_INTERVAL_FAST = 1000;   // For high drift or after a song change.
 const SYNC_INTERVAL_NORMAL = 3000; // For moderate drift.
 const SYNC_INTERVAL_SLOW = 7000;   // For when the player is well-synced.
-// --- End of Sync Intervals ---
+
+const LARGE_DRIFT_THRESHOLD = 0.5;  // Above this (500ms), we do a hard seek.
+const SMALL_DRIFT_THRESHOLD = 0.05; // Below this (50ms), we are considered in-sync.
+const PROPORTIONAL_GAIN = 0.1;      // How aggressively to correct small drifts.
+const MAX_SPEED_ADJUSTMENT = 0.075; // Max speed change (e.g., 1.0 +/- 0.075 for 0.925x to 1.075x).
+// --- End of Sync Constants ---
 
 var Player = class {
   constructor(){
@@ -258,20 +263,22 @@ var Player = class {
           document.getElementById('status').innerHTML = `Drift: ${Math.round(timediff * 1000)}ms | Latency: ${Math.round(latency * 1000)}ms`;
 
           if (this.autoSync) {
-            const largeDriftThreshold = 0.5; // Over this, we do a hard seek.
-            const smallDriftThreshold = 0.1; // Under this, we are considered in-sync.
-
-            if (Math.abs(timediff) > largeDriftThreshold) {
+            if (Math.abs(timediff) > LARGE_DRIFT_THRESHOLD) {
               // Large drift, a hard seek is necessary for a quick correction.
               this.core.showToast(`Resyncing: ${Math.round(timediff * 100) / 100}s`);
               this.player.seekTo(serverTime);
               this.player.setPlaybackRate(1.0); // Ensure rate is normal after a seek.
               // High drift, so we should check again very soon.
               this.syncIntervalMs = SYNC_INTERVAL_FAST;
-            } else if (Math.abs(timediff) > smallDriftThreshold) {
+            } else if (Math.abs(timediff) > SMALL_DRIFT_THRESHOLD) {
               // Small drift, adjust playback speed for a smooth, unnoticeable correction.
-              // If we are behind (timediff > 0), speed up. If we are ahead (timediff < 0), slow down.
-              this.player.setPlaybackRate(timediff > 0 ? 1.05 : 0.95);
+              // The adjustment is proportional to the drift. A positive drift means we are
+              // behind, so we need to speed up (newRate > 1.0).
+              let adjustment = timediff * PROPORTIONAL_GAIN;
+              // Clamp the adjustment to prevent extreme (and noticeable) speed changes.
+              adjustment = Math.max(-MAX_SPEED_ADJUSTMENT, Math.min(MAX_SPEED_ADJUSTMENT, adjustment));
+              const newRate = 1.0 + adjustment;
+              this.player.setPlaybackRate(newRate);
               // Moderate drift, check again at a normal rate.
               this.syncIntervalMs = SYNC_INTERVAL_NORMAL;
             } else {
