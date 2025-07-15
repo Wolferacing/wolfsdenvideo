@@ -579,9 +579,15 @@ var Playlist = class {
         this.addItemSubmit.removeEventListener('click', this.addPlaylistHandler);
       }
       this.addPlaylistHandler = () => {
-        this.playlistId = this.addItemInput.value;
-        this.playPlaylist(true);
-        this.hideAddItem();
+        const input = this.addItemInput.value;
+        const playlistId = this.core.getPlaylistId(input);
+        if (playlistId) {
+          this.playlistId = playlistId;
+          this.playPlaylist(true);
+          this.hideAddItem();
+        } else {
+          this.core.showToast("Invalid Playlist URL or ID.", 4000);
+        }
       };
       this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
     });

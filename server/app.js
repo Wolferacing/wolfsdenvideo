@@ -450,6 +450,25 @@ class App{
     return player.playlist.some(existingVideo => this.getYoutubeId(existingVideo.link) === newVideoId);
   }
 
+  _getPlaylistId(urlOrId) {
+    if (!urlOrId) {
+      return null;
+    }
+    // First, check if the input is just a valid playlist ID.
+    if (urlOrId.startsWith('PL') && !urlOrId.includes('/') && !urlOrId.includes('?')) {
+        return urlOrId;
+    }
+
+    // If it's a URL, try to extract the 'list' parameter.
+    const regex = /[?&]list=([^#&?]+)/;
+    const match = urlOrId.match(regex);
+
+    if (match && match[1] && match[1].startsWith('PL')) {
+        return match[1];
+    }
+
+    return null;
+  }
   async moveSinger({ userId, direction }, ws) {
     this.onlyIfHost(ws, async () => {
         const player = this.videoPlayers[ws.i];
@@ -792,14 +811,16 @@ class App{
     }
   }
   async fromPlaylist(data, ws) {
-    if(!data.id || !data.id.startsWith("PL")) {
+    const playlistId = this._getPlaylistId(data.id);
+    if (!playlistId) {
+      this.send(ws, Commands.ERROR, { message: "Invalid Playlist URL or ID provided." });
       return;
     }
-        console.log("fromPlaylist", ws.i, ws.u, data);
+    console.log(`fromPlaylist: user=${ws.u.name}, instance=${ws.i}, id=${playlistId}`);
     this.onlyIfHost(ws, async () => {
       if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
         const player = this.videoPlayers[ws.i];
-        let playlist = await ytfps(data.id, { limit: 100 });
+        let playlist = await ytfps(playlistId, { limit: 100 });
         this.resetPlaylist(ws); // Resets playlist, currentTime, currentTrack
         // --- Duplicate Video Check for bulk add ---
         const existingVideoIds = new Set();

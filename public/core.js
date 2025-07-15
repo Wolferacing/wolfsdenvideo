@@ -423,6 +423,14 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
     this.setOrDefault("spatial-max-distance", '40');
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=GiwStUzx8fg");
     
+    if (this.params.playlist) {
+      const extractedId = this.getPlaylistId(this.params.playlist);
+      if (!extractedId) {
+        console.warn(`Could not extract a valid playlist ID from provided playlist parameter: "${this.params.playlist}". It will be ignored.`);
+      }
+      this.params.playlist = extractedId || "";
+    }
+    
     this.params.volume = Number(this.params.volume);
     this.params['mip-maps'] = Number(this.params['mip-maps']);
     this.tempVolume = this.params.volume;
@@ -551,6 +559,24 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     var match = url.match(regExp);
     return (match&&match[7].length==11)? match[7] : false;
+  }
+  getPlaylistId(urlOrId) {
+    // First, check if the input is just a valid playlist ID.
+    // A simple check is to see if it starts with PL and contains no URL characters.
+    if (urlOrId.startsWith('PL') && !urlOrId.includes('/') && !urlOrId.includes('?')) {
+        return urlOrId;
+    }
+
+    // If it's a URL, try to extract the 'list' parameter.
+    const regex = /[?&]list=([^#&?]+)/;
+    const match = urlOrId.match(regex);
+
+    if (match && match[1] && match[1].startsWith('PL')) {
+        return match[1];
+    }
+
+    // Return null if no valid ID could be extracted.
+    return null;
   }
   async setupToastify() {
     if (typeof Toastify === 'undefined') {
