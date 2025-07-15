@@ -145,6 +145,7 @@ var Karaoke = class {
         const item = document.createElement('div');
         item.textContent = search;
         item.classList.add('recent-search-item');
+        item.addEventListener('click', () => this.setSearchAndSubmit(search)); // Populate input and trigger search        
         recentSearchesContainer.appendChild(item);
       });
     }
@@ -173,6 +174,11 @@ var Karaoke = class {
       this.searchOverlay.style.display = 'none';
       this.debounceSearch(query);
     }
+  }
+
+  setSearchAndSubmit(searchTerm) {
+    this.searchInputOverlay.value = searchTerm;
+    this.submitSearch(); // Re-use existing submit logic
   }
 
   // --- Initialize Overlay ---
