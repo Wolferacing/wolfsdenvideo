@@ -382,7 +382,9 @@ var Player = class {
           if (this.autoSync) {
             if (Math.abs(timediff) > LARGE_DRIFT_THRESHOLD) {
               // Large drift, a hard seek is necessary for a quick correction.
-              this.core.showToast(`Resyncing: ${Math.round(timediff * 100) / 100}s`);
+              const direction = timediff > 0 ? 'FORWARDS +' : 'BACKWARDS -';
+              const amount = Math.abs(Math.round(timediff * 100) / 100);
+              this.core.showToast(`Resyncing: ${direction}${amount}s`);
               this.player.seekTo(serverTime);
               this.player.setPlaybackRate(1.0); // Ensure rate is normal after a seek.
               // High drift, so we should check again very soon.

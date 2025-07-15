@@ -627,8 +627,8 @@ class App{
     // Apply the same "settling period" logic as the restart button to ensure a smooth start.
     // By setting the start time 2 seconds in the future, we give all clients time to load
     // and buffer the video at 0s before the timer starts counting up.
-    const settleTime = 2; // 2 seconds
-    player.lastStartTime = (new Date().getTime() / 1000) + settleTime;
+    //const settleTime = 2; // 2 seconds
+    player.lastStartTime = (new Date().getTime() / 1000); // + settleTime;
     
     // Remove the singer from the queue now that their turn has started.
     player.singers.shift();
@@ -669,8 +669,8 @@ class App{
       // By setting the start time 2 seconds in the future, the server's calculated `currentTime`
       // will be negative for 2 seconds. This gives all player clients time to load and buffer
       // the video at 0s. The sync mechanism will keep them at 0 until the server time becomes positive.
-      const settleTime = 2; // 2 seconds
-      player.lastStartTime = (new Date().getTime() / 1000) + settleTime;
+      // const settleTime = 2; // 2 seconds
+      player.lastStartTime = (new Date().getTime() / 1000); // + settleTime;
 
       // We still tell the client that the current time is 0 so it seeks there immediately.
       player.currentTime = 0;
