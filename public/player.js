@@ -61,7 +61,6 @@ var Player = class {
     statusContainer.id = 'status';
     Object.assign(statusContainer.style, {
       position: 'fixed',
-      bottom: '10px',
       left: '10px',
       background: 'rgba(0, 0, 0, 0.7)',
       color: 'white',
