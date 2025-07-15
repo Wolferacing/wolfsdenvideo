@@ -211,15 +211,10 @@ var Playlist = class {
       // Adjust lastStartTime by the expected settling time (2 seconds)
       // By subtracting the estimated clock skew, we align the client's 'now' with the server's 'now'.
       let calculatedTime = ((Date.now() / 1000) - this.clockSkew) - lastStartTime;
-
-      // Add logging to inspect the values
-      let updateCount = 0;
       updateCount++;
-      if (updateCount <= 5 || updateCount % 10 === 0) { // Log the first 5 updates and then every 10th update
+      if (updateCount <= 5) { // Log the first 5 updates
         console.log(`UI Update #${updateCount}: lastStartTime=${lastStartTime}, duration=${duration}, clientTimeOffset=${this.clientTimeOffset}, calculatedTime=${calculatedTime}`);
-        if (updateCount <= 5) {
-          console.log(`UI Update #${updateCount}: clockSkew=${this.clockSkew.toFixed(3)}s, calculatedTime=${calculatedTime.toFixed(3)}s`);
-        }
+        console.log(`UI Update #${updateCount}: clockSkew=${this.clockSkew.toFixed(3)}s, calculatedTime=${calculatedTime.toFixed(3)}s`);
       }
 
       // Clamp the calculated time to ensure it's within the valid range.
