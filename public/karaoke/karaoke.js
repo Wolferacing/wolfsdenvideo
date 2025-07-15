@@ -125,6 +125,29 @@ var Karaoke = class {
   showSearchOverlay() {
     this.searchOverlay.style.display = 'flex';
     this.searchInputOverlay.focus();  // Focus the input for immediate typing
+
+    // Load the last search term
+    const lastSearch = localStorage.getItem('lastKaraokeSearch');
+    if (lastSearch) {
+      this.searchInputOverlay.value = lastSearch;
+    }
+
+    this.populateRecentSearches();
+  }
+  populateRecentSearches() {
+    const recentSearches = JSON.parse(localStorage.getItem('recentKaraokeSearches') || '[]');
+    const recentSearchesContainer = document.querySelector('.recent-searches');
+    if (!recentSearchesContainer) return; // If container doesn't exist, skip
+
+    recentSearchesContainer.innerHTML = ''; // Clear previous entries
+    if (recentSearches.length > 0) {
+      recentSearches.forEach(search => {
+        const item = document.createElement('div');
+        item.textContent = search;
+        item.classList.add('recent-search-item');
+        recentSearchesContainer.appendChild(item);
+      });
+    }
   }
 
   hideSearchOverlay() {
@@ -136,6 +159,16 @@ var Karaoke = class {
     const query = this.searchInputOverlay.value;
     if (query.trim() !== "") { // Check for non-empty input
       this.hideSearchOverlay(); // Close the overlay before searching
+
+      // Save the search term for next time
+      localStorage.setItem('lastKaraokeSearch', query);
+
+      // Update recent searches
+      let recentSearches = JSON.parse(localStorage.getItem('recentKaraokeSearches') || '[]');
+      recentSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5); // Add to the beginning, remove duplicates, limit to 5
+      localStorage.setItem('recentKaraokeSearches', JSON.stringify(recentSearches));
+
+      this.populateRecentSearches(); // Update the UI
       this.debounceSearch(query);
     }
   }
