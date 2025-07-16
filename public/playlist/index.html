@@ -35,14 +35,28 @@
       <span class="material-icons pointer closeSearch">close</span>
     </div>
     <div class="addItemContainer">
-      <div class="addItemTitle">
-        Add youtube playlist by URL OR the playlist ID (will clear the existing playlist!)
+      <!-- New structure mirroring the search overlay -->
+      <div class="search-overlay-box">
+        <div class="search-input-wrapper">
+          <input type="text" id="addItemInput" class="searchInput" placeholder="Playlist URL or ID...">
+          <div class="button red slim" id="clear-add-item-btn">Clear</div>
+        </div>
+        <div class="search-button-wrapper">
+          <div class="button grey" id="close-add-item-btn">Close</div>
+          <div class="button teal" id="submit-add-item-btn">Load Playlist</div>
+        </div>
       </div>
-      <div class="addItemContent">
-        <input id="addItemInput" placeholder="Playlist ID..."/>
-      </div>
-      <div class="button slim teal" id="addItemSubmit">Load Playlist</div>
     </div>
+
+    <script>
+      // Basic script to close the overlay when clicking outside the box
+      document.querySelector('.addItemBackDrop').addEventListener('click', function(event) {
+        if (event.target === this) {
+          document.querySelector('.addItemContainer').style.display = 'none';
+          this.style.display = 'none';
+        }
+      });
+    </script>
 
     <!-- The new full-screen search overlay -->
     <div class="search-overlay">

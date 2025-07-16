@@ -242,3 +242,28 @@ body{
   border-radius: 5px;
   cursor: pointer;
 }
+/* --- Add Item Overlay --- */
+/* Apply Search Overlay styles to Add Item overlay as well */
+.addItemContainer .search-overlay-box {
+  background: #3f3f3f;
+  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.addItemContainer .search-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.addItemContainer .search-overlay-box .searchInput {
+  flex-grow: 1;
+  height: 48px;
+  font-size: 1.8em;
+}
