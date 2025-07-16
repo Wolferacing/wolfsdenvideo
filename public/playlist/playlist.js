@@ -602,10 +602,6 @@ var Playlist = class {
     this.videoSearchContainer.innerHTML = '';
     this.searchBackDrop.style.display = 'none';
   }
-  hideAddItem() {
-      this.addItemContainer.style.display = 'none';
-      this.addItemBackDrop.style.display = 'none';
-  }
   hideReplacePrompt() {
     this.pendingReplacement = null;
     this.notificationArea.style.display = 'none';
@@ -669,56 +665,47 @@ var Playlist = class {
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
     });
     
-    this.addItemContainer = document.querySelector('.addItemContainer');
-    
-    this.addItemBackDrop = document.querySelector('.addItemBackDrop');
-      
-    this.addItemBackDrop.addEventListener('click', () => this.hideAddItem());
-    
-    this.addItemTitle = document.querySelector('.addItemTitle');
-    
+    this.addPlaylistOverlay = document.querySelector('.add-playlist-overlay');
     this.addItemInput = document.querySelector('#addItemInput');
-    
     this.addItemSubmit = document.querySelector('#load-playlist-url-btn');
-    
+    this.clearPlaylistUrlButton = document.querySelector('#clear-playlist-url-btn');
+    this.closePlaylistUrlButton = document.querySelector('#close-playlist-url-btn');
     this.addPlaylist = document.querySelector('#addPlaylist');
     
     this.addPlaylist.addEventListener('click', () => {
-      this.addItemContainer.style.display = 'block';
-      this.addItemBackDrop.style.display = 'block';
-      if(this.addPlaylistHandler) {
-        this.addItemSubmit.removeEventListener('click', this.addPlaylistHandler);
-      }
-      this.addPlaylistHandler = () => {
-        const input = this.addItemInput.value;
-        const playlistId = this.core.getPlaylistId(input);
-        if (playlistId) {
-          this.playlistId = playlistId;
-          this.playPlaylist(true);
-          this.hideAddItem();
-        } else {
-          this.core.showToast("Invalid Playlist URL or ID.", 4000);
-        }
-      };
-      this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
+      this.addPlaylistOverlay.style.display = 'flex';
+      this.addItemInput.value = '';
+      this.addItemInput.focus();
     });
 
-    // --- Add Playlist Overlay: Clear Button ---
-    this.clearPlaylistUrlButton = document.querySelector('#clear-playlist-url-btn');
-    this.clearPlaylistUrlButton.addEventListener('click', () => {
-      this.addItemInput.value = ''; // Clear the input field
-      this.addItemInput.focus();      // Optionally, refocus the input
-    });
-
-    // --- Add Playlist Overlay: Close Button ---
-    this.closePlaylistUrlButton = document.querySelector('#close-playlist-url-btn');
     this.closePlaylistUrlButton.addEventListener('click', () => {
-      this.hideAddItem(); // Use the existing hide function
+      this.addPlaylistOverlay.style.display = 'none';
     });
 
+    this.clearPlaylistUrlButton.addEventListener('click', () => {
+      this.addItemInput.value = '';
+      this.addItemInput.focus();
+    });
 
+    this.addItemSubmit.addEventListener('click', () => {
+      const input = this.addItemInput.value;
+      const playlistId = this.core.getPlaylistId(input);
+      if (playlistId) {
+        this.playlistId = playlistId;
+        this.playPlaylist(true);
+        this.addPlaylistOverlay.style.display = 'none';
+      } else {
+        this.core.showToast("Invalid Playlist URL or ID.", 4000);
+      }
+    });
 
-    
+    this.addItemInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.addItemSubmit.click();
+      }
+    });
+
     this.loadDefaultPlaylistButton = document.querySelector('#loadDefaultPlaylist');
     
     this.loadDefaultPlaylistButton.addEventListener('click', () => {
