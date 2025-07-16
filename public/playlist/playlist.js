@@ -14,13 +14,13 @@ var Playlist = class {
     this.core.parseParams(this.currentScript);
     await this.core.setupCommandsScript(); // Load Commands before UI setup and core.init
     this.setupPlaylistUI();
-    this.setupSearchOverlay();
     await this.core.init();
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
     }, ()=>{
         this.core.showToast("Reconnecting...");
     });
+    this.setupSearchOverlay();
   }
   playPlaylist(shouldClear) {
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.playlistId || this.core.params.playlist, shouldClear, fromPlaylist: true}});
@@ -713,6 +713,7 @@ var Playlist = class {
     adjustPlaylistHeight();
     // --- End of Dynamic Height ---
 
+    this.addItemBackDrop = document.querySelector('.addItemBackDrop');
     // --- Add Playlist Overlay ---
     this.addPlaylistOverlay = document.querySelector('.add-playlist-overlay-box');
     this.addPlaylistButton = document.querySelector('#addPlaylist');
