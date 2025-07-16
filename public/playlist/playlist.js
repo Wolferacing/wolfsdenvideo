@@ -717,10 +717,17 @@ var Playlist = class {
     // --- Add Playlist Overlay ---
     this.addPlaylistOverlay = document.querySelector('.add-playlist-overlay-box');
     this.addPlaylistButton = document.querySelector('#addPlaylist');
-    this.addPlaylistInput = document.querySelector('.add-playlist-overlay-box'); // Get the input inside the overlay
+    this.addPlaylistInput = this.addPlaylistOverlay.querySelector('input[type="text"], input'); // More robust
     this.addPlaylistSubmitButton = document.querySelector('.add-playlist-button-wrapper .button'); // Get the submit button inside the overlay
 
     this.addPlaylistButton.addEventListener('click', () => this.showAddPlaylistOverlay());
+
+    this.addPlaylistInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.submitAddPlaylist();
+      }
+    });
 
     this.setupAddPlaylistOverlayCloseEvents();
   }
