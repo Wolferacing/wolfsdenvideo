@@ -679,7 +679,7 @@ var Playlist = class {
     
     this.addItemInput = document.querySelector('#addItemInput');
     
-    this.addItemSubmit = document.querySelector('#addItemSubmit');
+    this.addItemSubmit = document.querySelector('#load-playlist-url-btn');
     
     this.addPlaylist = document.querySelector('#addPlaylist');
     
