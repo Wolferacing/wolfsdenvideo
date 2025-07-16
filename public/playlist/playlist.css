@@ -249,7 +249,7 @@ body{
   padding: 25px;
   border-radius: 8px;
   width: 90%;
-  max-width: 800px;
+  max-width: 1200px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
@@ -268,7 +268,7 @@ body{
   border: 1px solid white;
   font-size: 20px;
   color: white;
-  width: 600px;
+  width: 1200px;
   margin: 5px;
 }
 .addItemContainer .addPlaylistInput {
