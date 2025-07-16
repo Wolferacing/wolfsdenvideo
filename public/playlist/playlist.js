@@ -702,6 +702,22 @@ var Playlist = class {
       };
       this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
     });
+
+    // --- Add Playlist Overlay: Clear Button ---
+    this.clearPlaylistUrlButton = document.querySelector('#clear-playlist-url-btn');
+    this.clearPlaylistUrlButton.addEventListener('click', () => {
+      this.addItemInput.value = ''; // Clear the input field
+      this.addItemInput.focus();      // Optionally, refocus the input
+    });
+
+    // --- Add Playlist Overlay: Close Button ---
+    this.closePlaylistUrlButton = document.querySelector('#close-playlist-url-btn');
+    this.closePlaylistUrlButton.addEventListener('click', () => {
+      this.hideAddItem(); // Use the existing hide function
+    });
+
+
+
     
     this.loadDefaultPlaylistButton = document.querySelector('#loadDefaultPlaylist');
     
