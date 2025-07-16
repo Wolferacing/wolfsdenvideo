@@ -266,6 +266,8 @@ body{
   flex-grow: 1;
   height: 48px;
   font-size: 1.8em;
+  width: auto; /* Reset width to allow flex-grow to work */
+  margin: 0; /* Reset margin */
 }
 .add-playlist-overlay {
   position: fixed;
