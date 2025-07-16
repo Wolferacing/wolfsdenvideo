@@ -261,7 +261,16 @@ body{
   align-items: center;
   gap: 15px;
 }
-
+.addPlaylistInput {
+  background: rgba(0,0,0,0.2);
+  margin: 12px;
+  height: 32px;
+  border: 1px solid white;
+  font-size: 20px;
+  color: white;
+  width: 130px;
+  margin: 5px;
+}
 .addItemContainer .addPlaylistInput {
   flex-grow: 1;
   height: 48px;
