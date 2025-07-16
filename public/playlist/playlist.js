@@ -743,12 +743,7 @@ var Playlist = class {
     this.closeAddPlaylistButton.addEventListener('click', () => this.hideAddPlaylistOverlay());
 
     // Also, make the submit button close the overlay on success
-    this.addPlaylistSubmitButton.addEventListener('click', () => this.submitAddPlaylist());
-  }
-
-  submitAddPlaylist() {
-    // This is a separate function so it can be called programmatically, e.g. from an "Enter" keypress listener.
-    (async () => {
+    this.addPlaylistSubmitButton.addEventListener('click', async () => {
       const input = this.addPlaylistInput.value;
       const playlistId = this.core.getPlaylistId(input);
       if (playlistId) {
@@ -759,7 +754,7 @@ var Playlist = class {
         this.core.showToast("Invalid Playlist URL or ID.", 4000);
         // Don't close the overlay if the input is invalid
       }
-    })();
+    });
   }
 
 }
