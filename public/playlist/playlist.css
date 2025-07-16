@@ -54,7 +54,7 @@ body{
   overflow: auto;
   width: 100%;
 }
-.searchBackDrop {
+.searchBackDrop,.addItemBackDrop{
   background: rgba(0,0,0,0.8);
   position: absolute;
   top: 50px;
@@ -63,19 +63,7 @@ body{
   width: 100%;
   display: none;
 }
-
-/* This will be the full-page container for the add playlist interface */
-.addItemBackDrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85); /* Match search overlay backdrop */
-  z-index: 100;
-  display: none;
-}
-.videoSearchContainer {
+.videoSearchContainer, .addItemContainer{
   position: absolute;
   top: 0;
   margin-top: 50px;
@@ -206,8 +194,7 @@ body{
 }
 
 /* The main "box" containing the input and buttons */
-.search-overlay-box,
-.add-playlist-overlay-box {
+.search-overlay-box {
   background: #3f3f3f; /* Same as the header for consistency */
   padding: 25px;
   border-radius: 8px;
@@ -219,27 +206,15 @@ body{
   gap: 20px; /* Provides space between the input row and the button row */
 }
 
-/* Positioning for the Add Playlist box. It's not inside a full-screen flex container like the search box, so it needs its own positioning rules. */
-.add-playlist-overlay-box {
-  position: fixed;
-  top: 10vh; /* Align with search box vertical position */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 101; /* Must be higher than the backdrop */
-  display: none; /* Hidden by default, toggled by JS */
-}
-
 /* A flex container to hold the search input field and the 'Clear' button */
-.search-input-wrapper,
-.add-playlist-input-wrapper {
+.search-input-wrapper {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
 /* This specifically targets the searchInput when it's inside our new overlay box to make it larger. */
-.search-overlay-box .searchInput,
-.add-playlist-overlay-box .searchInput {
+.search-overlay-box .searchInput {
   flex-grow: 1; /* Allows the input to expand and fill the available space */
   height: 48px; /* Taller for easier clicking/tapping */
   font-size: 1.8em; /* Much larger text */
@@ -248,8 +223,7 @@ body{
 }
 
 /* A flex container to align the 'Close' and 'Submit' buttons to the right */
-.search-button-wrapper,
-.add-playlist-button-wrapper {
+.search-button-wrapper {
   display: flex;
   justify-content: flex-end;
   gap: 15px;

@@ -31,15 +31,17 @@
     <div class="videoSearchContainer">
       
     </div>
-    <div class="add-playlist-overlay-box">
-        <div class="add-playlist-input-wrapper">
-            <input type="text" id="addItemInput" class="searchInput" placeholder="Enter YouTube Playlist URL or ID">
-            <div class="button red slim" id="clear-add-playlist-btn">Clear</div>
-        </div>
-        <div class="add-playlist-button-wrapper">
-            <div class="button grey" id="close-add-playlist-btn">Close</div>
-            <div class="button teal" id="addItemSubmit">Load Playlist</div>
-        </div>
+    <div class="addItemBackDrop">
+      <span class="material-icons pointer closeSearch">close</span>
+    </div>
+    <div class="addItemContainer">
+      <div class="addItemTitle">
+        Add youtube playlist by URL OR the playlist ID (will clear the existing playlist!)
+      </div>
+      <div class="addItemContent">
+        <input id="addItemInput" placeholder="Playlist ID..."/>
+      </div>
+      <div class="button slim teal" id="addItemSubmit">Load Playlist</div>
     </div>
 
     <!-- The new full-screen search overlay -->

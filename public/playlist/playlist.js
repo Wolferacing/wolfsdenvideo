@@ -602,6 +602,10 @@ var Playlist = class {
     this.videoSearchContainer.innerHTML = '';
     this.searchBackDrop.style.display = 'none';
   }
+  hideAddItem() {
+      this.addItemContainer.style.display = 'none';
+      this.addItemBackDrop.style.display = 'none';
+  }
   hideReplacePrompt() {
     this.pendingReplacement = null;
     this.notificationArea.style.display = 'none';
@@ -665,6 +669,40 @@ var Playlist = class {
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
     });
     
+    this.addItemContainer = document.querySelector('.addItemContainer');
+    
+    this.addItemBackDrop = document.querySelector('.addItemBackDrop');
+      
+    this.addItemBackDrop.addEventListener('click', () => this.hideAddItem());
+    
+    this.addItemTitle = document.querySelector('.addItemTitle');
+    
+    this.addItemInput = document.querySelector('#addItemInput');
+    
+    this.addItemSubmit = document.querySelector('#addItemSubmit');
+    
+    this.addPlaylist = document.querySelector('#addPlaylist');
+    
+    this.addPlaylist.addEventListener('click', () => {
+      this.addItemContainer.style.display = 'block';
+      this.addItemBackDrop.style.display = 'block';
+      if(this.addPlaylistHandler) {
+        this.addItemSubmit.removeEventListener('click', this.addPlaylistHandler);
+      }
+      this.addPlaylistHandler = () => {
+        const input = this.addItemInput.value;
+        const playlistId = this.core.getPlaylistId(input);
+        if (playlistId) {
+          this.playlistId = playlistId;
+          this.playPlaylist(true);
+          this.hideAddItem();
+        } else {
+          this.core.showToast("Invalid Playlist URL or ID.", 4000);
+        }
+      };
+      this.addItemSubmit.addEventListener('click', this.addPlaylistHandler);
+    });
+    
     this.loadDefaultPlaylistButton = document.querySelector('#loadDefaultPlaylist');
     
     this.loadDefaultPlaylistButton.addEventListener('click', () => {
@@ -712,49 +750,6 @@ var Playlist = class {
     // Initial calculation on load.
     adjustPlaylistHeight();
     // --- End of Dynamic Height ---
-
-    // --- Add Playlist Overlay ---
-    this.addPlaylistOverlay = document.querySelector('.add-playlist-overlay-box');
-    this.addPlaylistButton = document.querySelector('#addPlaylist');
-    this.addPlaylistInput = document.querySelector('.add-playlist-overlay-box .searchInput'); // Get the input inside the overlay
-    this.addPlaylistSubmitButton = document.querySelector('.add-playlist-button-wrapper .button'); // Get the submit button inside the overlay
-
-    this.addPlaylistButton.addEventListener('click', () => this.showAddPlaylistOverlay());
-
-    this.setupAddPlaylistOverlayCloseEvents();
-  }
-  
-  showAddPlaylistOverlay() {
-    this.addItemBackDrop.style.display = 'block';
-    this.addPlaylistOverlay.style.display = 'flex'; // Use 'flex' to match the element's internal layout type
-    this.addPlaylistInput.focus(); // Set focus to the input field
-  }
-
-  hideAddPlaylistOverlay() {
-    this.addItemBackDrop.style.display = 'none';
-    this.addPlaylistOverlay.style.display = 'none';
-    this.addPlaylistInput.value = ''; // Clear the input for next time
-  }
-  
-  setupAddPlaylistOverlayCloseEvents() {
-    this.addItemBackDrop.addEventListener('click', () => this.hideAddPlaylistOverlay());
-    this.closeAddPlaylistButton = document.querySelector('#close-add-playlist-btn');
-    this.closeAddPlaylistButton.addEventListener('click', () => this.hideAddPlaylistOverlay());
-
-    // Also, make the submit button close the overlay on success
-    this.addPlaylistSubmitButton.addEventListener('click', () => {
-      const input = this.addPlaylistInput.value;
-      const playlistId = this.core.getPlaylistId(input);
-      if (playlistId) {
-        this.playlistId = playlistId; // Store the ID
-        this.playPlaylist(true);      // Send the command to load the playlist (true clears the existing one)
-        this.hideAddPlaylistOverlay();  // Close the overlay on success
-      } else {
-        this.core.showToast("Invalid Playlist URL or ID.", 4000);
-        // Don't close the overlay if the input is invalid
-      }
-    });
-  }
-
+}
 }
 window.playlistUiInstance = new Playlist();
