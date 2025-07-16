@@ -333,7 +333,7 @@ var Playlist = class {
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.clearPlaylistButton.style.display = !isMe ? 'none' :  'inline-block';
     this.loadDefaultPlaylistButton.style.display = (isMe && player.playlist.length === 0 && this.core.params.playlist) ? 'inline-block' : 'none';
-    // this.addPlaylist.style.display = !isMe ? 'none' :  'inline-block';
+    this.addPlaylist.style.display = !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
