@@ -743,7 +743,7 @@ var Playlist = class {
     this.closeAddPlaylistButton.addEventListener('click', () => this.hideAddPlaylistOverlay());
 
     // Also, make the submit button close the overlay on success
-    this.addPlaylistSubmitButton.addEventListener('click', async () => {
+    this.addPlaylistSubmitButton.addEventListener('click', () => {
       const input = this.addPlaylistInput.value;
       const playlistId = this.core.getPlaylistId(input);
       if (playlistId) {
