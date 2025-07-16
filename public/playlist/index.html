@@ -34,23 +34,21 @@
     <div class="addItemBackDrop">
       <span class="material-icons pointer closeSearch">close</span>
     </div>
-    <div class="addItemContainer">
-      <!-- New structure mirroring the search overlay -->
-      <div class="search-overlay-box">
-        <div class="search-input-wrapper">
-          <input type="text" id="addItemInput" class="addPlaylistInput" placeholder="Playlist URL or ID...">
-          <div class="button red slim" id="clear-playlist-url-btn">Clear</div>
-        </div>
-        <div class="search-button-wrapper">
-          <div class="button grey" id="close-playlist-url-btn">Close</div>
-          <div class="button teal" id="load-playlist-url-btn">Load Playlist</div>
-        </div>
+    <!-- Moved content of addItemContainer directly into addItemBackdrop -->
+    <div class="addItemBackDrop search-overlay-box">
+      <div class="search-input-wrapper">
+        <input type="text" id="addItemInput" class="addPlaylistInput" placeholder="Playlist URL or ID...">
+        <div class="button red slim" id="clear-playlist-url-btn">Clear</div>
+      </div>
+      <div class="search-button-wrapper">
+        <div class="button grey" id="close-playlist-url-btn">Close</div>
+        <div class="button teal" id="load-playlist-url-btn">Load Playlist</div>
       </div>
     </div>
 
     <script>
       // Basic script to close the overlay when clicking outside the box
-      document.querySelector('.addItemBackDrop').addEventListener('click', function(event) {
+      document.querySelector('.addItemBackDrop').addEventListener('click', function(event) { // Now targets the backdrop directly
         if (event.target === this) {
           document.querySelector('.addItemContainer').style.display = 'none';
           this.style.display = 'none';
