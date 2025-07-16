@@ -717,7 +717,7 @@ var Playlist = class {
     // --- Add Playlist Overlay ---
     this.addPlaylistOverlay = document.querySelector('.add-playlist-overlay-box');
     this.addPlaylistButton = document.querySelector('#addPlaylist');
-    this.addPlaylistInput = document.querySelector('.add-playlist-overlay-box .searchInput'); // Get the input inside the overlay
+    this.addPlaylistInput = document.querySelector('.add-playlist-overlay-box'); // Get the input inside the overlay
     this.addPlaylistSubmitButton = document.querySelector('.add-playlist-button-wrapper .button'); // Get the submit button inside the overlay
 
     this.addPlaylistButton.addEventListener('click', () => this.showAddPlaylistOverlay());
