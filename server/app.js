@@ -1009,6 +1009,14 @@ class App{
   async toggleCanTakeOver(canTakeOver, ws) {
     this.onlyIfHost(ws, async () => {
       const player = this.videoPlayers[ws.i];
+
+      // To prevent a stuck state, only a host who is "present" in the 3D space
+      // can disable the takeover functionality. A host can always enable it.
+      if (canTakeOver === false && !player.hostConnected) {
+        this.send(ws, Commands.ERROR, { message: "You must be in the 3D space to disable takeover." });
+        return;
+      }
+
       player.canTakeOver = canTakeOver;
       player.sockets.forEach(socket => {
         this.send(socket, Commands.CAN_TAKE_OVER_STATE_CHANGED, { canTakeOver: player.canTakeOver });
@@ -1019,10 +1027,30 @@ class App{
   async takeOver(ws) {
     const player = this.videoPlayers[ws.i];
     if(player && player.canTakeOver) {
+      const oldHostName = player.host ? player.host.name : 'nobody';
       player.host = ws.u;
-      player.sockets.forEach(socket => {
-        this.send(socket, Commands.HOST_CHANGED, { host: player.host });
-      });
+
+      // If a takeover timeout was running, clear it.
+      if (player.takeoverTimeout) {
+        clearTimeout(player.takeoverTimeout);
+        player.takeoverTimeout = null;
+      }
+
+      // Check if the NEW host has a "space" connection. This determines if they
+      // have "presence" and can lock down the takeover capability.
+      const newHostHasSpaceConnection = player.sockets.some(
+        s => s.u && s.u.id === player.host.id && s.type === "space"
+      );
+
+      // A host must be in the 3D space to disable takeover.
+      // If the new host is only on a UI, takeover remains enabled.
+      player.canTakeOver = !newHostHasSpaceConnection;
+      player.hostConnected = newHostHasSpaceConnection;
+
+      console.log(`User ${ws.u.name} took over from ${oldHostName}. New host has space connection: ${player.hostConnected}. Can Take Over is now: ${player.canTakeOver}`);
+
+      // Broadcast the new state to all clients. A full playback update is best.
+      this.updateClients(ws.i, 'host-changed');
       await this.savePlayerState(ws.i);
     }else{
       this.send(ws, Commands.ERROR);
