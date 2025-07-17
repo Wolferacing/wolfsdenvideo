@@ -148,7 +148,7 @@ var Player = class {
         'cc_load_policy': 1,
         'cc_lang_pref': 'en',
         'iv_load_policy': 3,
-        'origin': 'https://www.youtube.com',
+        'origin': window.location.origin,
         'start': this.start ? Number(this.start) : 0,
          'vq': 'hd1080'
       },
