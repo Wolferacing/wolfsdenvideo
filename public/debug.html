@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D Space Connection Simulator</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            // Default to 'playlist' mode if not specified.
+            const mode = urlParams.get('mode') || 'playlist'; 
+            
+            // The script to load depends on the mode.
+            // 'playlist.js' is the PlaylistPlayer, 'karaoke.js' is the KaraokePlayer.
+            const scriptSrc = mode === 'karaoke' ? 'karaoke.js' : 'playlist.js';
+
+            const scriptTag = document.createElement('script');
+            scriptTag.src = scriptSrc;
+
+            // Pass all URL parameters as attributes on the script tag.
+            // This is how core.js's parseParams() function reads them.
+            for (const [key, value] of urlParams.entries()) {
+                scriptTag.setAttribute(key, value);
+            }
+
+            document.body.appendChild(scriptTag);
+        });
+    </script>
+</head>
+<body>
+    <h1>Simulating a 3D Space Connection</h1>
+    <p>This page loads the 'in-world' script (e.g., <code>playlist.js</code>) which establishes the critical <strong>'space'</strong> websocket connection to the server.</p>
+    <p>Because no A-Frame <code>&lt;a-scene&gt;</code> is present, <code>core.js</code> will create a fallback 2D iframe player below, which establishes the 'player' connection.</p>
+</body>
+</html>
