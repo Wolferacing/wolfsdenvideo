@@ -1322,6 +1322,28 @@ class App{
         }
       }
 
+      const player = this.videoPlayers[instanceId];
+
+      // --- FIX for stuck takeover state on load ---
+      // If an instance is loaded from the database with an absent host and takeover disabled,
+      // there is no automatic trigger to re -enable it. This check fixes that.
+      if (existingState && player.canTakeOver === false) {
+        // We assume the host is not connected because the instance was dormant. The `hostConnected`
+        // flag is already correctly `false` by default. We start  the same 42-second timer that
+        // `handleClose` uses. If the host joins the space within this time, the `SET_WS_TYPE`
+        // handler will correctly cancel this timeout.
+        if (player.host) {
+          console.log(`Instance ${instanceId} loaded with takeover disabled. Starting 42s timer for host ${player.host.name}.`);
+          player.takeoverTimeout = setTimeout(async () => {
+            if (!player.hostConnected) {
+              console.log(`Host for ${instanceId} did not return. Enabling takeover.`);
+              player.canTakeOver = true;
+              this.updateClients(instanceId, 'takeover-enabled');
+              await this.savePlayerState(instanceId);
+            }
+          }, 42 * 1000);
+        }
+      }
       // For a brand new instance (no state loaded from DB), the creator is the host and is connected.
       if (!existingState) {
         this.videoPlayers[instanceId].hostConnected = true;
