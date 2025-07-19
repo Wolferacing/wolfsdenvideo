@@ -465,7 +465,12 @@ var Karaoke = class {
       videoThumbnail.src = video.thumbnail;
       const videoTitleAndAction = this.core.makeAndAddElement('div', { flexGrow: '1', paddingLeft: '3px' }, contentWrapper);
       const videoTitle = this.core.makeAndAddElement('div', { padding: '5px 1px 1px 5px', fontSize: '1.4em' }, videoTitleAndAction);
-      videoTitle.innerHTML = `<b>Now Singing:</b> ${video.user.name} - ${video.title}`;
+      // Securely build the title to prevent XSS from user names or video titles.
+      videoTitle.innerHTML = ''; // Clear existing content
+      const nowSingingBold = document.createElement('b');
+      nowSingingBold.textContent = 'Now Singing:';
+      videoTitle.appendChild(nowSingingBold);
+      videoTitle.append(` ${video.user.name} - ${video.title}`);
       
       const currentTimeText = this.core.makeAndAddElement('div',{
         padding: '7px 10px 0px 7px',
