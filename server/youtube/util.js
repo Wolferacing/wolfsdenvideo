@@ -95,7 +95,10 @@ const getWatching = (vRender) => {
 }
 
 const idToThumbnail = function(id) {
-    return 'https://i.ytimg.com/vi/'+ id +'/maxresdefault.jpg';
+    // Use hqdefault.jpg as it is more reliable and guaranteed to exist for public videos.
+    // maxresdefault.jpg is not always available, which can lead to broken thumbnail images.
+    // This also makes it consistent with the database re-hydration logic in app.js.
+    return 'https://i.ytimg.com/vi/'+ id +'/hqdefault.jpg';
 }
 
 const parseDuration = (vRender) => {
