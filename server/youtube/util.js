@@ -21,9 +21,13 @@ const getChannelData = (vRender) => {
         verified: false
     };
 
+    // Safely access the URL. YouTube's data structure for this can be inconsistent.
+    const channelUrlPath = channel.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url;
+    const channelLink = channelUrlPath ? 'https://www.youtube.com' + channelUrlPath : null;
+
     return {
         name: channel.text,
-        link: 'https://www.youtube.com'+ channel['navigationEndpoint']['commandMetadata']['webCommandMetadata']['url'],
+        link: channelLink,
         verified: isChannelVerified(vRender)
     };
 }
