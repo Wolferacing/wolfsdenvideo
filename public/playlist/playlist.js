@@ -239,8 +239,8 @@ var Playlist = class {
   }
   setupConfigScript() {
     // Use the script's own src attribute to reliably find the config file.
-    const scriptUrl = new URL(this.currentScript.src);
-    const configUrl = `${scriptUrl.origin}/config.js`;
+    const currentScriptUrl = new URL(this.currentScript.src);
+    const configUrl = `${currentScriptUrl.origin}/config.js`;
     return new Promise(resolve => {
       let myScript = document.createElement("script");
       myScript.setAttribute("src", configUrl);

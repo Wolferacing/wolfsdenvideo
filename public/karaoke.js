@@ -3,8 +3,8 @@ const karaokePlayerScript = document.currentScript;
 
 // Dynamically load the base player script.
 const baseScript = document.createElement("script");
-const scriptUrl = new URL(karaokePlayerScript.src);
-baseScript.setAttribute("src", `${scriptUrl.origin}/base-player.js`);
+const currentScriptUrl = new URL(karaokePlayerScript.src);
+baseScript.setAttribute("src", `${currentScriptUrl.origin}/base-player.js`);
 
 // Once the base player script is loaded, define and instantiate our specific player.
 baseScript.addEventListener("load", () => {

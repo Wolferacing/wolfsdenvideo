@@ -15,8 +15,8 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
 const playerScript = document.currentScript;
 
 const baseScript = document.createElement("script");
-const scriptUrl = new URL(playerScript.src);
-baseScript.setAttribute("src", `${scriptUrl.origin}/base-player.js`);
+const currentScriptUrl = new URL(playerScript.src);
+baseScript.setAttribute("src", `${currentScriptUrl.origin}/base-player.js`);
 
 baseScript.addEventListener("load", () => {
   var Player = class extends BasePlayer {
