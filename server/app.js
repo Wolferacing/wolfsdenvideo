@@ -1057,7 +1057,8 @@ class App{
 
       // A host must be in the 3D space to disable takeover.
       // If the new host is only on a UI, takeover remains enabled.
-      player.canTakeOver = !newHostHasSpaceConnection;
+      // After a takeover, leave it enabled. The new host must explicitly disable it.
+      player.canTakeOver = true;
       player.hostConnected = newHostHasSpaceConnection;
 
       console.log(`User ${ws.u.name} took over from ${oldHostName}. New host has space connection: ${player.hostConnected}. Can Take Over is now: ${player.canTakeOver}`);
