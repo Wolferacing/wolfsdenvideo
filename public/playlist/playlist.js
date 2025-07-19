@@ -679,6 +679,18 @@ var Playlist = class {
         this.core.sendMessage({ path: Commands.LOCAL_SKIP_FORWARD });
     });
     
+    this.skipBackwards = document.querySelector('#skipBackwards');
+    
+    this.skipBackwards.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.HOST_SKIP_BACK });
+    });
+    
+    this.skipForward = document.querySelector('#skipForward');
+    
+    this.skipForward.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.HOST_SKIP_FORWARD });
+    });
+    
     this.addPlaylistOverlay = document.querySelector('.add-playlist-overlay');
     this.addItemInput = document.querySelector('#addItemInput');
     this.addItemSubmit = document.querySelector('#load-playlist-url-btn');

@@ -54,6 +54,18 @@ var Karaoke = class {
         this.core.sendMessage({ path: Commands.LOCAL_SKIP_FORWARD });
     });
     
+    this.skipBackwards = document.querySelector('#skipBackwards');
+    
+    this.skipBackwards.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.HOST_SKIP_BACK });
+    });
+    
+    this.skipForward = document.querySelector('#skipForward');
+    
+    this.skipForward.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.HOST_SKIP_FORWARD });
+    });
+    
     this.autoAdvance = document.querySelector('#autoAdvance');
     this.autoAdvance.addEventListener('click', () => {
       if (this.core.player && this.core.player.host.id === window.user.id) {
