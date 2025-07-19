@@ -18,6 +18,7 @@ var Playlist = class {
     await this.core.init();
     await this.core.setupWebsocket("playlist", d => this.parseMessage(d), () => {
       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+      this.core.sendMessage({path: Commands.SET_INSTANCE_MODE, data: 'playlist'});
     }, ()=>{
         this.core.showToast("Reconnecting...");
     });
