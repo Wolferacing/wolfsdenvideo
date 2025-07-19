@@ -338,6 +338,7 @@ var Playlist = class {
     this.skipBackwards.style.display = isMe ? 'inline-block' : 'none';
     this.skipForward.style.display = isMe ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
+    this.seekVideoBtn.style.display = (isMe && player.playlist.length > 0) ? 'block' : 'none';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
     this.voting.style.display = !isMe ? 'none' : 'inline-block';
     this.voting.innerText = player.canVote ? 'Voting: On' : 'Voting: Off';
@@ -469,22 +470,25 @@ var Playlist = class {
           });
         }else{
           if(this.core.player.host.id === window.user.id) {
-            const moveDown = this.core.makeAndAddElement('div',null, buttonContainer);
+            // Only show "Move Down" if it's not the last item in the playlist.
+            if (i < player.playlist.length - 1) {
+              const moveDown = this.core.makeAndAddElement('div',null, buttonContainer);
+              moveDown.className = 'button slim teal';
+              moveDown.innerText = "Move Down";
+              moveDown.addEventListener('click', () => {
+                this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
+              });
+            }
 
-            moveDown.className = 'button slim teal';
-            moveDown.innerText = "Move Down";
-
-            moveDown.addEventListener('click', () => {
-              this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i + 1}  });
-            });
-
-            const moveUp = this.core.makeAndAddElement('div',null, buttonContainer);
-            moveUp.className = 'button slim teal';
-            moveUp.innerText = "Move Up";
-
-            moveUp.addEventListener('click', () => {
-              this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
-            });
+            // Only show "Move Up" if it's not the first item in the playlist.
+            if (i > 0) {
+              const moveUp = this.core.makeAndAddElement('div',null, buttonContainer);
+              moveUp.className = 'button slim teal';
+              moveUp.innerText = "Move Up";
+              moveUp.addEventListener('click', () => {
+                this.core.sendMessage({path: Commands.MOVE_PLAYLIST_ITEM, data: {url: v.link , index: i - 1} });
+              });
+            }
             if(isMe || (!player.locked && !player.canVote)) {
               const remove = this.core.makeAndAddElement('div',null, buttonContainer);
 
@@ -529,6 +533,27 @@ var Playlist = class {
         currentTimeInner.className = "currentTime";
       }
     })
+  }  
+  parseTimeToSeconds(timeString) {
+    if (!timeString) return null;
+    timeString = timeString.trim();
+
+    if (timeString.includes(':')) {
+        const parts = timeString.split(':');
+        if (parts.length === 2) {
+            const minutes = parseInt(parts[0], 10);
+            const seconds = parseInt(parts[1], 10);
+            if (!isNaN(minutes) && !isNaN(seconds)) {
+                return (minutes * 60) + seconds;
+            }
+        }
+    } else {
+        const seconds = parseInt(timeString, 10);
+        if (!isNaN(seconds)) {
+            return seconds;
+        }
+    }
+    return null; // Return null for invalid formats
   }
   timeCode(seconds) {
     return new Date(seconds * 1000).toISOString().substring(11, 19);
@@ -806,6 +831,43 @@ var Playlist = class {
         }
       });
     }
-}
+
+    // --- Seek Video Overlay Logic ---
+    this.seekVideoBtn = document.querySelector('#seek-video-btn');
+    this.seekOverlay = document.querySelector('#seek-overlay');
+    this.seekTimeInput = document.querySelector('#seek-time-input');
+    this.submitSeekBtn = document.querySelector('#submit-seek-btn');
+    this.closeSeekBtn = document.querySelector('#close-seek-btn');
+
+    this.seekVideoBtn.addEventListener('click', () => {
+      this.seekOverlay.style.display = 'flex';
+      this.seekTimeInput.value = '';
+      this.seekTimeInput.focus();
+    });
+
+    const closeSeekOverlay = () => this.seekOverlay.style.display = 'none';
+
+    this.closeSeekBtn.addEventListener('click', closeSeekOverlay);
+    this.seekOverlay.addEventListener('click', (event) => {
+      if (event.target === this.seekOverlay) closeSeekOverlay();
+    });
+
+    this.submitSeekBtn.addEventListener('click', () => {
+      const timeInSeconds = this.parseTimeToSeconds(this.seekTimeInput.value);
+      if (timeInSeconds !== null) {
+        this.core.sendMessage({ path: Commands.SET_TIME, data: timeInSeconds });
+        closeSeekOverlay();
+      } else {
+        this.core.showToast("Invalid time format. Use seconds (e.g., 95) or mm:ss (e.g., 1:35).", 4000);
+      }
+    });
+
+    this.seekTimeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.submitSeekBtn.click();
+      }
+    });
+  }
 }
 window.playlistUiInstance = new Playlist();

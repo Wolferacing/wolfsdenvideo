@@ -1176,8 +1176,23 @@ class App{
   }
   async setVideoTime(time, ws) {
     this.onlyIfHost(ws, async () => {
-      this.videoPlayers[ws.i].currentTime = time;
-      this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
+      const player = this.videoPlayers[ws.i];
+      if (!player || !player.playlist.length) return;
+
+      const trackDuration = (player.playlist[player.currentTrack].duration || 0) / 1000;
+      // Clamp the time to be within the video's duration
+      const newTime = Math.max(0, Math.min(time, trackDuration));
+
+      player.lastStartTime = (new Date().getTime() / 1000) - newTime;
+      player.currentTime = newTime;
+
+      // Broadcast a seek command to all clients. This is the same command used by host skip.
+      player.sockets.forEach(socket => {
+        this.send(socket, Commands.HOST_SEEK, {
+          newCurrentTime: newTime,
+          newLastStartTime: player.lastStartTime
+        });
+      });
       await this.savePlayerState(ws.i);
     }, this.videoPlayers[ws.i].locked);
   }

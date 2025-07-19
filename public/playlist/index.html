@@ -31,6 +31,9 @@
             <div class="dropdown-button-row">
               <div class="button teal" id="skipBackwards" style="display: none;">Host &lt;&lt;</div><div class="button teal" id="skipForward" style="display: none;">Host &gt;&gt;</div>
             </div>
+            <div class="dropdown-button-row">
+              <div class="button teal" id="seek-video-btn" style="display: none;">Seek Video</div>
+            </div>
           </div>
         </div>
         <!-- These are for a specific prompt, keep them visible when needed -->
@@ -80,6 +83,21 @@
            <div class="button grey" id="close-search-btn">Close</div>
            <div class="button teal" id="submit-search-btn">Search</div>
         </div>
+      </div>
+    </div>
+
+    <!-- The new overlay for seeking to a specific time -->
+    <div id="seek-overlay" class="search-overlay" style="display: none;">
+      <div class="search-overlay-box">
+        <h3 style="margin-top: 0; text-align: center;">Seek to Time</h3>
+        <div class="search-input-wrapper">
+          <input type="text" id="seek-time-input" class="searchInput" placeholder="e.g., 1:35 or 95">
+        </div>
+        <div class="search-button-wrapper">
+          <div class="button grey" id="close-seek-btn">Close</div>
+          <div class="button teal" id="submit-seek-btn">Seek</div>
+        </div>
+        <div style="text-align: center; font-size: 0.9em; color: #ccc;">Enter time in seconds (e.g., 95) or minutes:seconds (e.g., 1:35).</div>
       </div>
     </div>
 
