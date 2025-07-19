@@ -317,3 +317,18 @@ body{
   text-align: left;
   margin-bottom: 5px;
 }
+
+.dropdown-button-row {
+  display: flex;
+  gap: 5px; /* Space between buttons in the row */
+  margin-bottom: 5px; /* Space between this row and the next element */
+}
+
+/* Override the default dropdown button style for buttons inside a row */
+.dropdown-button-row .button {
+  flex: 1; /* Make buttons in a row share space equally */
+  width: auto; /* Reset width to allow flex to work */
+  text-align: center; /* Center the text for skip buttons */
+  margin-bottom: 0; /* Remove bottom margin as the row has it */
+  margin-left: 0; /* Remove left margin as the gap property handles spacing */
+}

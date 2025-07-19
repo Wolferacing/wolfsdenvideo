@@ -785,14 +785,11 @@ var Playlist = class {
     const moreActionsContent = document.querySelector('#more-actions-content');
 
     if (moreActionsBtn && moreActionsContent) {
-      moreActionsBtn.addEventListener('click', (event) => {
-        event.stopPropagation(); // Prevent the document click listener from firing immediately
-        moreActionsContent.style.display = moreActionsContent.style.display === 'block' ? 'none' : 'block';
-      });
-
-      // Close the dropdown if the user clicks outside of it
-      document.addEventListener('click', () => {
-        moreActionsContent.style.display = 'none';
+      moreActionsBtn.addEventListener('click', () => {
+        // Toggle visibility and button text
+        const isVisible = moreActionsContent.style.display === 'block';
+        moreActionsContent.style.display = isVisible ? 'none' : 'block';
+        moreActionsBtn.innerText = isVisible ? 'More...' : 'Less';
       });
     }
 }
