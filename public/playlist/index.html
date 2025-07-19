@@ -15,9 +15,18 @@
       </div>
       <div class="playlistTitle"><div class="title">
           Video Playlist
-        </div><div class="button teal " id="lockPlayer">Unlock</div><div class="button teal " id="takeOver">TakeOver: Off</div><div class="button teal " id="voting">Voting: Off</div><div class="button teal" id="clearPlaylist">Clear List</div><div class="button teal" id="loadDefaultPlaylist" style="display: none;">Load Default</div><div class="button teal" id="addPlaylist">Add Playlist</div><div class="button teal " id="autoSync">Auto Sync: Off</div><div class="button green" id="replaceConfirm" style="display: none;">Confirm Replace</div><div class="button red" id="replaceDismiss" style="display: none;">Dismiss</div>
-        <div class="button teal" id="localSkipBack"><<</div><div class="button teal" id="localSkipForward">>></div>
-        <div class="button teal" id="skipBackwards" style="display: none;">Host <<</div><div class="button teal" id="skipForward" style="display: none;">Host >></div>
+        </div><div class="button teal " id="lockPlayer">Unlock</div><div class="button teal " id="takeOver">TakeOver: Off</div>
+        <!-- Dropdown for additional actions -->
+        <div class="dropdown-container">
+          <div class="button teal" id="more-actions-btn">More...</div>
+          <div class="dropdown-content" id="more-actions-content">
+            <div class="button teal " id="voting">Voting: Off</div><div class="button teal" id="clearPlaylist">Clear List</div><div class="button teal" id="loadDefaultPlaylist" style="display: none;">Load Default</div><div class="button teal" id="addPlaylist">Add Playlist</div><div class="button teal " id="autoSync">Auto Sync: Off</div>
+            <div class="button teal" id="localSkipBack"><<</div><div class="button teal" id="localSkipForward">>></div>
+            <div class="button teal" id="skipBackwards" style="display: none;">Host <<</div><div class="button teal" id="skipForward" style="display: none;">Host >></div>
+          </div>
+        </div>
+        <!-- These are for a specific prompt, keep them visible when needed -->
+        <div class="button green" id="replaceConfirm" style="display: none;">Confirm Replace</div><div class="button red" id="replaceDismiss" style="display: none;">Dismiss</div>
       </div>
     </div>
     <div class="hostTitle">

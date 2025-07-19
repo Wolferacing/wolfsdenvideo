@@ -291,3 +291,29 @@ body{
   align-items: flex-start; /* Place the search box near the top */
   padding-top: 10vh; /* Give it some space from the top of the viewport */
 }
+
+/* --- Dropdown Menu for Header Actions --- */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #3f3f3f; /* Match header background */
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 10; /* Ensure it's above other content */
+  border-radius: 3px;
+  padding: 10px;
+  right: 0; /* Align to the right of the 'More' button */
+}
+
+/* Style for buttons inside the dropdown */
+.dropdown-content .button {
+  display: block; /* Stack them vertically */
+  width: calc(100% - 20px); /* Account for padding */
+  text-align: left;
+  margin-bottom: 5px;
+}

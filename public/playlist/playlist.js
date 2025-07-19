@@ -779,6 +779,22 @@ var Playlist = class {
     // Initial calculation on load.
     adjustPlaylistHeight();
     // --- End of Dynamic Height ---
+
+    // --- Dropdown Menu Logic for Header Actions ---
+    const moreActionsBtn = document.querySelector('#more-actions-btn');
+    const moreActionsContent = document.querySelector('#more-actions-content');
+
+    if (moreActionsBtn && moreActionsContent) {
+      moreActionsBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent the document click listener from firing immediately
+        moreActionsContent.style.display = moreActionsContent.style.display === 'block' ? 'none' : 'block';
+      });
+
+      // Close the dropdown if the user clicks outside of it
+      document.addEventListener('click', () => {
+        moreActionsContent.style.display = 'none';
+      });
+    }
 }
 }
 window.playlistUiInstance = new Playlist();
