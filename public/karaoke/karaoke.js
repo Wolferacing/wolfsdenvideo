@@ -110,8 +110,10 @@ var Karaoke = class {
     this.loadingSpinner.src = `https://${window.APP_CONFIG.HOST_URL}/assets/3-dots-move.svg`;
     
     this.lockPlayer.addEventListener('click', () => {
+      if (this.core.player) {
         this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.core.player.locked });
-    });
+      }
+    }); 
     
     this.takeOver = document.querySelector('#takeOver');
 
@@ -125,7 +127,7 @@ var Karaoke = class {
     // --- End of FIX ---
     
     this.takeOver.addEventListener('click', () => {
-        if(this.core.player.host.id === window.user.id) {
+        if(this.core.player && this.core.player.host.id === window.user.id) {
           this.core.sendMessage({ path: Commands.TOGGLE_CAN_TAKE_OVER, data: !this.core.player.canTakeOver });
         }else{
           this.core.sendMessage({ path: Commands.TAKE_OVER });

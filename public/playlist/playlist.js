@@ -555,6 +555,10 @@ var Playlist = class {
     this.videoSearchContainer.innerHTML = '';
     this.searchBackDrop.style.display = 'none';
   }
+  setupSearchOverlay() {
+    // Use the new core function for all the standard search overlay logic.
+    this.core.setupSearchOverlay(query => this.debounceSearch(query), 'Playlist');
+  }
   hideReplacePrompt() {
     this.pendingReplacement = null;
     this.notificationArea.style.display = 'none';
@@ -579,8 +583,6 @@ var Playlist = class {
     
     this.searchBackDrop = document.querySelector('.searchBackDrop');
       
-    this.core.setupSearchOverlay(query => this.debounceSearch(query), 'Playlist');
-      
     this.searchBackDrop.addEventListener('click', () => this.hideSearch());
     
     this.videoSearchContainer = document.querySelector('.videoSearchContainer');
@@ -593,8 +595,10 @@ var Playlist = class {
     this.lockPlayer = document.querySelector('#lockPlayer');
     
     this.lockPlayer.addEventListener('click', () => {
+      if (this.core.player) {
         this.core.sendMessage({ path: Commands.TOGGLE_LOCK, data: !this.core.player.locked });
-    });
+      }
+    }); 
     
     this.takeOver = document.querySelector('#takeOver');
     
