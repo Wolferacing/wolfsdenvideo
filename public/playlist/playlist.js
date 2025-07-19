@@ -838,13 +838,42 @@ var Playlist = class {
     this.seekTimeInput = document.querySelector('#seek-time-input');
     this.submitSeekBtn = document.querySelector('#submit-seek-btn');
     this.closeSeekBtn = document.querySelector('#close-seek-btn');
+    this.seekSliderContainer = document.querySelector('#seek-slider-container');
+    this.seekSliderProgress = document.querySelector('#seek-slider-progress');
+    this.seekSliderThumb = document.querySelector('#seek-slider-thumb');
 
     this.seekVideoBtn.addEventListener('click', () => {
       this.seekOverlay.style.display = 'flex';
-      this.seekTimeInput.value = '';
       this.seekTimeInput.focus();
+
+      // Update the slider and input to reflect the current video time
+      if (this.core.player && this.core.player.duration > 0) {
+        const { currentTime, duration } = this.core.player;
+        const progressPercent = (currentTime / duration) * 100;
+        this.seekSliderProgress.style.width = `${progressPercent}%`;
+        this.seekSliderThumb.style.left = `${progressPercent}%`;
+        this.seekTimeInput.value = this.timeCode(currentTime);
+      } else {
+        // Reset slider and input if no video is playing
+        this.seekSliderProgress.style.width = '0%';
+        this.seekSliderThumb.style.left = '0%';
+        this.seekTimeInput.value = '';
+      }
     });
 
+    // Clicking the slider updates the time input without seeking.
+    this.seekSliderContainer.addEventListener('click', (event) => {
+      if (this.core.player && this.core.player.duration > 0) {
+        const sliderWidth = this.seekSliderContainer.clientWidth;
+        const clickPosition = event.offsetX;
+        const seekRatio = clickPosition / sliderWidth;
+        const newTime = seekRatio * this.core.player.duration;
+        // Update the input field with the new time.
+        this.seekTimeInput.value = this.timeCode(newTime);
+        // Trigger the input event to update the slider's visual state.
+        this.seekTimeInput.dispatchEvent(new Event('input'));
+      }
+    });
     const closeSeekOverlay = () => this.seekOverlay.style.display = 'none';
 
     this.closeSeekBtn.addEventListener('click', closeSeekOverlay);
@@ -866,6 +895,19 @@ var Playlist = class {
       if (e.key === 'Enter') {
         e.preventDefault();
         this.submitSeekBtn.click();
+      }
+    });
+
+    // Update the slider position as the user types in the input box.
+    this.seekTimeInput.addEventListener('input', () => {
+      if (this.core.player && this.core.player.duration > 0) {
+        const timeInSeconds = this.parseTimeToSeconds(this.seekTimeInput.value);
+        if (timeInSeconds !== null) {
+          const progressPercent = (timeInSeconds / this.core.player.duration) * 100;
+          const clampedPercent = Math.max(0, Math.min(100, progressPercent));
+          this.seekSliderProgress.style.width = `${clampedPercent}%`;
+          this.seekSliderThumb.style.left = `${clampedPercent}%`;
+        }
       }
     });
   }

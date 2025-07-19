@@ -89,7 +89,13 @@
     <!-- The new overlay for seeking to a specific time -->
     <div id="seek-overlay" class="search-overlay" style="display: none;">
       <div class="search-overlay-box">
-        <h3 style="margin-top: 0; text-align: center;">Seek to Time</h3>
+        <h3 style="margin-top: 0; margin-bottom: 0; text-align: center; color: #ccc;">Seek to Time</h3>
+        <div style="text-align: center; font-size: 0.9em; color: #ccc;">Enter time in seconds (e.g., 95) or minutes:seconds (e.g., 1:35).</div>
+        <!-- The new clickable seek slider -->
+        <div id="seek-slider-container">
+          <div id="seek-slider-progress"></div>
+          <div id="seek-slider-thumb"></div>
+        </div>
         <div class="search-input-wrapper">
           <input type="text" id="seek-time-input" class="searchInput" placeholder="e.g., 1:35 or 95">
         </div>
@@ -97,7 +103,6 @@
           <div class="button grey" id="close-seek-btn">Close</div>
           <div class="button teal" id="submit-seek-btn">Seek</div>
         </div>
-        <div style="text-align: center; font-size: 0.9em; color: #ccc;">Enter time in seconds (e.g., 95) or minutes:seconds (e.g., 1:35).</div>
       </div>
     </div>
 
