@@ -538,22 +538,23 @@ var Playlist = class {
     if (!timeString) return null;
     timeString = timeString.trim();
 
-    if (timeString.includes(':')) {
-        const parts = timeString.split(':');
-        if (parts.length === 2) {
-            const minutes = parseInt(parts[0], 10);
-            const seconds = parseInt(parts[1], 10);
-            if (!isNaN(minutes) && !isNaN(seconds)) {
-                return (minutes * 60) + seconds;
-            }
-        }
+    const parts = timeString.split(':').map(p => parseInt(p, 10));
+
+    // If any part of the split is not a number, it's invalid.
+    if (parts.some(isNaN)) return null;
+
+    let totalSeconds = 0;
+    if (parts.length === 3) { // HH:MM:SS format
+      totalSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    } else if (parts.length === 2) { // MM:SS format
+      totalSeconds = parts[0] * 60 + parts[1];
+    } else if (parts.length === 1 && !timeString.includes(':')) { // Seconds-only format
+      totalSeconds = parts[0];
     } else {
-        const seconds = parseInt(timeString, 10);
-        if (!isNaN(seconds)) {
-            return seconds;
-        }
+      return null; // Invalid format (e.g., "1:2:3:4" or "1:a")
     }
-    return null; // Return null for invalid formats
+
+    return totalSeconds;
   }
   timeCode(seconds) {
     return new Date(seconds * 1000).toISOString().substring(11, 19);
