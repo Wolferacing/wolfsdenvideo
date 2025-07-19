@@ -65,7 +65,9 @@ var Commands = {
   HOST_SKIP_BACK: 'host-skip-back',
   HOST_SKIP_FORWARD: 'host-skip-forward',
   HOST_SEEK: 'host-seek',
-  SET_INSTANCE_MODE: 'set-instance-mode'
+  SET_INSTANCE_MODE: 'set-instance-mode',
+  LOCAL_SKIP_BACK: 'local-skip-back',
+  LOCAL_SKIP_FORWARD: 'local-skip-forward'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

@@ -335,6 +335,8 @@ var Playlist = class {
     this.loadDefaultPlaylistButton.style.display = (isMe && player.playlist.length === 0 && this.core.params.playlist) ? 'inline-block' : 'none';
     this.addPlaylist.style.display = !isMe ? 'none' :  'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
+    this.skipBackwards.style.display = isMe ? 'inline-block' : 'none';
+    this.skipForward.style.display = isMe ? 'inline-block' : 'none';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';
     this.voting.style.display = !isMe ? 'none' : 'inline-block';
@@ -663,6 +665,18 @@ var Playlist = class {
       this.autoSyncEnabled = !this.autoSyncEnabled;
       this.autoSync.innerText = this.autoSyncEnabled ? "Auto Sync: On" : "Auto Sync: Off";
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
+    });
+    
+    this.localSkipBack = document.querySelector('#localSkipBack');
+    
+    this.localSkipBack.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.LOCAL_SKIP_BACK });
+    });
+    
+    this.localSkipForward = document.querySelector('#localSkipForward');
+    
+    this.localSkipForward.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.LOCAL_SKIP_FORWARD });
     });
     
     this.addPlaylistOverlay = document.querySelector('.add-playlist-overlay');

@@ -41,7 +41,19 @@ var Karaoke = class {
       this.autoSync.innerText = this.autoSyncEnabled ? "Auto Sync: On" : "Auto Sync: Off";
       this.core.sendMessage({ path: Commands.AUTO_SYNC, data: this.autoSyncEnabled});
     });
-
+    
+    this.localSkipBack = document.querySelector('#localSkipBack');
+    
+    this.localSkipBack.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.LOCAL_SKIP_BACK });
+    });
+    
+    this.localSkipForward = document.querySelector('#localSkipForward');
+    
+    this.localSkipForward.addEventListener('click', () => {
+        this.core.sendMessage({ path: Commands.LOCAL_SKIP_FORWARD });
+    });
+    
     this.autoAdvance = document.querySelector('#autoAdvance');
     this.autoAdvance.addEventListener('click', () => {
       if (this.core.player && this.core.player.host.id === window.user.id) {
@@ -209,8 +221,13 @@ var Karaoke = class {
     this.submitSearchButton = document.querySelector('#submit-search-btn');
 
     // Add event listeners to the new "karaoke" and "zoom karaoke" buttons
+    const lyricsButton = document.querySelector('.lyrics-search-btn');
     const karaokeButton = document.querySelector('.karaoke-search-btn');
     const zoomKaraokeButton = document.querySelector('.zoom-search-btn');
+
+    lyricsButton.addEventListener('click', () => {
+        this.searchInputOverlay.value += ' lyrics ';
+    });
 
     karaokeButton.addEventListener('click', () => {
         this.searchInputOverlay.value += ' karaoke ';
@@ -371,6 +388,8 @@ var Karaoke = class {
     this.lockPlayer.className = player.locked ? 'button teal' : 'button red';
     this.lockPlayer.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.style.display = (player.canTakeOver || isMe) ? 'inline-block' : 'none';
+    this.skipBackwards.style.display = isMe ? 'inline-block' : 'none';
+    this.skipForward.style.display = isMe ? 'inline-block' : 'none';
     this.autoAdvance.style.display = !isMe ? 'none' : 'inline-block';
     this.takeOver.innerText = player.canTakeOver ? (isMe ? 'Take Over: On' : 'Take Over') : 'Take Over: Off';
     this.takeOver.className = player.canTakeOver ? (isMe ? 'button red' : 'button teal') : 'button teal';

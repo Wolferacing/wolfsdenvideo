@@ -398,6 +398,12 @@ class App{
       case Commands.HOST_SKIP_FORWARD:
         await this.hostSkip(ws, true);
         break;
+      case Commands.LOCAL_SKIP_BACK:
+        this.localSkip(ws, false);
+        break;
+      case Commands.LOCAL_SKIP_FORWARD:
+        this.localSkip(ws, true);
+        break;
       case Commands.SET_INSTANCE_MODE:
         const playerInstanceForMode = this.videoPlayers[ws.i];
         if (playerInstanceForMode) {
@@ -496,6 +502,13 @@ class App{
         this.broadcastSingerList(ws.i);
         await this.savePlayerState(ws.i);
     });
+  }
+  localSkip(ws, isForward) {
+    // This function relays a skip command from a UI to that user's specific player instance.
+    if (ws.user_video) {
+      const command = isForward ? Commands.SKIP_FORWARD : Commands.SKIP_BACK;
+      this.send(ws.user_video, command);
+    }
   }
   async removeFromPlayers(uid, ws) {
     const player = this.videoPlayers[ws.i];
