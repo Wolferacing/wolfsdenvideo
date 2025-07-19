@@ -7,6 +7,9 @@ const youtube = new Youtube();
 const ytfps = require('ytfps');
 const fetch = require('node-fetch');
 const Commands = require('../public/commands.js');
+const playlistHandler = require('./handlers/playlistHandler.js');
+const karaokeHandler = require('./handlers/karaokeHandler.js');
+const hostHandler = require('./handlers/hostHandler.js');
 const { Pool } = require('pg');
 const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
@@ -298,44 +301,44 @@ class App{
         }
         break;
       case Commands.SET_TIME:
-        await this.setVideoTime(msg.data, ws);
+        await hostHandler.setVideoTime(this, ws, msg.data);
         break;
       case Commands.SET_TRACK:
-        await this.setVideoTrack(msg.data, ws);
+        await hostHandler.setVideoTrack(this, ws, msg.data);
         break;
       case Commands.TOGGLE_LOCK:
-        await this.toggleLock(msg.data, ws);
+        await hostHandler.toggleLock(this, ws, msg.data);
         break;
       case Commands.TOGGLE_CAN_TAKE_OVER:
-        await this.toggleCanTakeOver(msg.data, ws);
+        await hostHandler.toggleCanTakeOver(this, ws, msg.data);
         break;
       case Commands.TAKE_OVER:
-        await this.takeOver(ws); 
+        await hostHandler.takeOver(this, ws); 
         break;
       case Commands.ADD_TO_PLAYLIST:
-        await this.addToPlaylist(msg.data, msg.skipUpdate, msg.isYoutubeWebsite, ws);
+        await playlistHandler.addToPlaylist(this, ws, msg.data, msg.skipUpdate, msg.isYoutubeWebsite);
         break;
       case Commands.MOVE_PLAYLIST_ITEM:
-        await this.movePlaylistItem(msg.data, ws);
+        await playlistHandler.movePlaylistItem(this, ws, msg.data);
         break;
       case Commands.REMOVE_PLAYLIST_ITEM:
-        await this.removePlaylistItem(msg.data, ws);
+        await playlistHandler.removePlaylistItem(this, ws, msg.data);
         break;
       case Commands.SEARCH:
         this.search(msg.data, ws);
         break;
       case Commands.FROM_PLAYLIST:
-        await this.fromPlaylist(msg.data, ws);
+        await playlistHandler.fromPlaylist(this, ws, msg.data);
         break;
       case Commands.CLEAR_PLAYLIST:
-        await this.clearPlaylist(msg.skipUpdate, ws);
+        await playlistHandler.clearPlaylist(this, ws, msg.skipUpdate);
         break;
       case Commands.USER_VIDEO_PLAYER:
         ws.is_video_player = true;
         this.setUserVideoPlayer(msg.data, ws);
         break;
       case Commands.STOP:
-        this.stop(ws);
+        await hostHandler.stop(this, ws);
         break;
       case Commands.AUTO_SYNC:
         this.setAutoSync(msg.data, ws);
@@ -347,37 +350,37 @@ class App{
         this.sendBrowserClick(msg.data, ws)
         break;
       case Commands.TOGGLE_VOTE:
-        await this.toggleVote(ws)
+        await hostHandler.toggleVote(this, ws)
         break; 
       case Commands.DOWN_VOTE:
-        this.setVote(msg.data, true, ws);
+        await playlistHandler.setVote(this, ws, msg.data, true);
         break;
       case Commands.UP_VOTE:
-        this.setVote(msg.data, false, ws);
+        await playlistHandler.setVote(this, ws, msg.data, false);
         break;
       case Commands.ADD_TO_PLAYERS:
-        await this.addToPlayers(msg.data, ws);
+        await karaokeHandler.addToPlayers(this, ws, msg.data);
         break;
       case Commands.REMOVE_FROM_PLAYERS:
-        await this.removeFromPlayers(msg.data, ws);
+        await karaokeHandler.removeFromPlayers(this, ws, msg.data);
         break;
       case Commands.ADD_AND_PLAY:
-        await this.addAndPlay(msg.data, ws);
+        await playlistHandler.addAndPlay(this, ws, msg.data);
         break;
       case Commands.ADD_AND_PLAY_NEXT:
-        await this.addAndPlayNext(msg.data, ws);
+        await playlistHandler.addAndPlayNext(this, ws, msg.data);
         break;
       case Commands.MOVE_SINGER:
-        await this.moveSinger(msg.data, ws);
+        await karaokeHandler.moveSinger(this, ws, msg.data);
         break;
       case Commands.PLAY_KARAOKE_TRACK:
-        await this.playKaraokeTrack(ws, msg.data);
+        await karaokeHandler.playKaraokeTrack(this, ws, msg.data);
         break;
       case Commands.RESTART_SONG:
-        await this.restartSong(ws);
+        await karaokeHandler.restartSong(this, ws);
         break;
       case Commands.TOGGLE_AUTO_ADVANCE:
-        await this.toggleAutoAdvance(ws);
+        await karaokeHandler.toggleAutoAdvance(this, ws);
         break;
       case Commands.AUTO_SYNC_STATE_CHANGED:
         // This message comes from the player when it disables auto-sync internally.
@@ -393,10 +396,10 @@ class App{
         }
         break;
       case Commands.HOST_SKIP_BACK:
-        await this.hostSkip(ws, false);
+        await hostHandler.hostSkip(this, ws, false);
         break;
       case Commands.HOST_SKIP_FORWARD:
-        await this.hostSkip(ws, true);
+        await hostHandler.hostSkip(this, ws, true);
         break;
       case Commands.LOCAL_SKIP_BACK:
         this.localSkip(ws, false);
@@ -475,34 +478,6 @@ class App{
 
     return null;
   }
-  async moveSinger({ userId, direction }, ws) {
-    this.onlyIfHost(ws, async () => {
-        const player = this.videoPlayers[ws.i];
-        if (!player) return;
-        
-        const oldIndex = player.singers.findIndex(s => s.user.id === userId);
-
-        if (oldIndex === -1) {
-            return; // Singer not found
-        }
-
-        let newIndex;
-        if (direction === 'up' && oldIndex > 0) {
-            newIndex = oldIndex - 1;
-        } else if (direction === 'down' && oldIndex < player.singers.length - 1) {
-            newIndex = oldIndex + 1;
-        } else {
-            return; // Invalid move
-        }
-
-        // Swap the singers by removing the item and re-inserting it at the new position.
-        const [singerToMove] = player.singers.splice(oldIndex, 1);
-        player.singers.splice(newIndex, 0, singerToMove);
-
-        this.broadcastSingerList(ws.i);
-        await this.savePlayerState(ws.i);
-    });
-  }
   localSkip(ws, isForward) {
     // This function relays a skip command from a UI to that user's specific player instance.
     if (ws.user_video) {
@@ -510,247 +485,9 @@ class App{
       this.send(ws.user_video, command);
     }
   }
-  async removeFromPlayers(uid, ws) {
-    const player = this.videoPlayers[ws.i];
-    if (!player) return;
-
-    const isHost = player.host.id === ws.u.id;
-    const isSelf = uid === ws.u.id;
-
-    // A user can remove themselves, or the host can remove anyone.
-    if (isHost || isSelf) {
-      const singerIndex = player.singers.findIndex(s => s.user.id === uid);
-
-      if (singerIndex > -1) {
-        const wasCurrentSinger = singerIndex === 0;
-        const removedSinger = player.singers.splice(singerIndex, 1)[0];
-        console.log(`${ws.u.name} removed ${removedSinger.user.name} from the singer list.`);
-
-        // If the person removed was the one currently singing, stop the main player.
-        if (wasCurrentSinger) {
-          console.log(`Current singer was removed. Stopping player for instance ${ws.i}.`);
-          this.updateClients(ws.i, "stop");
-        }
-        // Send a granular update for efficiency.
-        player.sockets.forEach(socket => this.send(socket, Commands.SINGER_REMOVED, { userId: uid }));
-        console.log(`Broadcasting SINGER_REMOVED for user ${uid}.`);
-        await this.savePlayerState(ws.i);
-      }
-    } else {
-      this.send(ws, Commands.ERROR);
-    }
-  }
-  stop(ws) {
-    this.onlyIfHost(ws, async () => this._stop(ws.i), this.videoPlayers[ws.i].locked);
-  }
-  async _stop(instanceId) {
-    const player = this.videoPlayers[instanceId];
-    if (!player) return;
-    // When stopping, we clear the main playlist. This is especially important for karaoke
-    // to return the UI to the singer list view.
-    player.playlist = [];
-    player.currentTrack = 0;
-    player.currentTime = 0;
-    this.updateClients(instanceId, "stop");
-    await this.savePlayerState(instanceId);
-  }
   setAutoSync(autoSync, ws) {
     if(ws.user_video) {
       this.send(ws.user_video, Commands.AUTO_SYNC, autoSync);
-    }
-  }
-  async addToPlayers(video, ws){
-    const player = this.videoPlayers[ws.i];
-    if (!player) return;
-
-    // Prevent a user from adding themselves to the queue more than once.
-    if (player.singers.some(singer => singer.user.id === ws.u.id)) {
-      this.send(ws, Commands.ERROR, { message: "You are already in the singer list." });
-      return;
-    }
-
-    // Add a singer object to the persistent queue.
-    player.singers.push({
-      user: ws.u,
-      video: video,
-      timestamp: new Date().getTime()
-    });
-    
-    // Send a granular update instead of the whole list for efficiency.
-    const newSingerPayload = { name: ws.u.name, p: player.singers[player.singers.length - 1].timestamp, id: ws.u.id, v: video };
-    player.sockets.forEach(socket => this.send(socket, Commands.SINGER_ADDED, { player: newSingerPayload }));
-    console.log(`${ws.u.name} was added to the singer list. Broadcasting SINGER_ADDED.`);
-    await this.savePlayerState(ws.i);
-  }
-  async playKaraokeTrack(ws, data) {
-    const player = this.videoPlayers[ws.i];
-    if (!player) return;
-
-    const isHost = player.host.id === ws.u.id;
-    const singerToPlayId = data ? data.userId : null;
-
-    if (singerToPlayId) {
-      // A specific singer was requested. Only the host can do this.
-      if (!isHost) {
-        this.send(ws, Commands.ERROR, { message: "Only the host can play a specific singer." });
-        return;
-      }
-
-      const singerIndex = player.singers.findIndex(s => s.user.id === singerToPlayId);
-      if (singerIndex === -1) {
-        this.send(ws, Commands.ERROR, { message: "Singer not found." });
-        return;
-      }
-
-      // Move the selected singer to the front of the queue.
-      if (singerIndex > 0) {
-        const [singerToPlay] = player.singers.splice(singerIndex, 1);
-        player.singers.unshift(singerToPlay);
-      }
-    } else {
-      // No specific singer, play the one at the top.
-      // The person initiating must be the host, or the singer whose turn it is.
-      const nextSinger = player.singers.length > 0 ? player.singers[0] : null;
-      if (!nextSinger) return; // No one to play
-      const isTheSinger = nextSinger.user.id === ws.u.id;
-
-      if (!isHost && !isTheSinger) {
-          this.send(ws, Commands.ERROR, { message: "Only the host or the current singer can start the song." });
-          return;
-      }
-    }
-    // Now that the correct singer is at the front, play the song.
-    await this._playNextKaraokeSong(ws.i);
-  }
-  async _playNextKaraokeSong(instanceId) {
-    const player = this.videoPlayers[instanceId];
-    if (!player || player.singers.length === 0) return;
-
-    const nextSinger = player.singers[0];
-    const videoToPlay = nextSinger.video;
-    if (!videoToPlay) return;
-
-    // Atomically update the player state
-    player.playlist = [];
-    player.currentTrack = 0;
-    player.currentTime = 0;
-    const newVideo = this._createVideoObject(videoToPlay, nextSinger.user, 'scraper');
-    player.playlist.push(newVideo);
-    
-    // Apply the same "settling period" logic as the restart button to ensure a smooth start.
-    // By setting the start time 2 seconds in the future, we give all clients time to load
-    // and buffer the video at 0s before the timer starts counting up.
-    //const settleTime = 2; // 2 seconds
-    player.lastStartTime = (new Date().getTime() / 1000); // + settleTime;
-    
-    // Remove the singer from the queue now that their turn has started.
-    player.singers.shift();
-    
-    console.log(`Karaoke track started for ${nextSinger.user.name} in instance ${instanceId}`);
-
-    // Create the updated singer list payload to send along with the track change.
-    const singersPayload = player.singers.map(s => ({
-      name: s.user.name,
-      p: s.timestamp,
-      id: s.user.id,
-      v: s.video
-    }));
-
-    // Notify ALL clients that the track has changed. This is the authoritative message
-    // that forces all UIs and the in-world player to sync to the new state. We include
-    // the updated singer list in this single message for maximum efficiency.
-    player.sockets.forEach(socket => {
-        this.send(socket, Commands.TRACK_CHANGED, {
-            newTrackIndex: 0,
-            newLastStartTime: player.lastStartTime,
-            playlist: player.playlist, // Send the new one-song playlist
-            singers: singersPayload
-        });
-    });
-    await this.savePlayerState(instanceId);
-  }
-  async restartSong(ws) {
-    const player = this.videoPlayers[ws.i];
-    if (!player || !player.playlist.length) return;
-
-    const currentVideo = player.playlist[player.currentTrack];
-    const isHost = player.host.id === ws.u.id;
-    const isCurrentSinger = currentVideo.user.id === ws.u.id;
-
-    if (isHost || isCurrentSinger) {
-      // To ensure all clients sync perfectly at the beginning, we introduce a "settling" period.
-      // By setting the start time 2 seconds in the future, the server's calculated `currentTime`
-      // will be negative for 2 seconds. This gives all player clients time to load and buffer
-      // the video at 0s. The sync mechanism will keep them at 0 until the server time becomes positive.
-      // const settleTime = 2; // 2 seconds
-      player.lastStartTime = (new Date().getTime() / 1000); // + settleTime;
-
-      // We still tell the client that the current time is 0 so it seeks there immediately.
-      player.currentTime = 0;
-
-      player.sockets.forEach(socket => {
-        this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, newCurrentTime: 0 });
-      });
-      await this.savePlayerState(ws.i);
-    }
-  }
-  async toggleAutoAdvance(ws) {
-    this.onlyIfHost(ws, async () => {
-      const player = this.videoPlayers[ws.i];
-      player.autoAdvance = !player.autoAdvance;
-      // Send a specific, granular message instead of a full playback update.
-      // This ensures the client UI updates correctly without needing a full state refresh.
-      player.sockets.forEach(socket => {
-        this.send(socket, Commands.AUTO_ADVANCE_STATE_CHANGED, { autoAdvance: player.autoAdvance });
-      });
-      await this.savePlayerState(ws.i);
-    });
-  }
-  async hostSkip(ws, isForward) {
-    this.onlyIfHost(ws, async () => {
-      const player = this.videoPlayers[ws.i];
-      if (!player || !player.playlist.length) return;
-
-      // Use the explicit isKaraoke flag for a more reliable check.
-      const skipAmount = player.isKaraoke ? SkipJumpTimeKaraoke : SkipJumpTimePlaylist;
-
-      // To skip forward in time, we subtract from the start timestamp.
-      // To skip backward, we add to it.
-      player.lastStartTime += isForward ? -skipAmount : skipAmount;
-
-      // Calculate the new current time to send to clients for an immediate seek.
-      const newCurrentTime = (new Date().getTime() / 1000) - player.lastStartTime;
-      player.currentTime = newCurrentTime; // Keep server state consistent.
-
-      // Broadcast a seek command to all clients.
-      player.sockets.forEach(socket => {
-        this.send(socket, Commands.HOST_SEEK, {
-          newCurrentTime: newCurrentTime,
-          newLastStartTime: player.lastStartTime
-        });
-      });
-      await this.savePlayerState(ws.i);
-    });
-  }
-  async toggleVote(ws) {
-    if (this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, async () => {
-        const player = this.videoPlayers[ws.i];
-        player.canVote = !player.canVote;
-        // When turning voting on, clear all existing votes to start fresh.
-        // Also, broadcast a playlist update to ensure clients' UIs reflect the cleared votes.
-        if (player.canVote) {
-          player.votes = [];
-          this.updateVotes(ws.i); // This resets the vote counts on the video objects to 0.
-          player.sockets.forEach(socket => {
-            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: player.playlist, currentTrack: player.currentTrack });
-          });
-        }
-        player.sockets.forEach(socket => {
-          this.send(socket, Commands.VOTING_STATE_CHANGED, { canVote: player.canVote });
-        });
-        await this.savePlayerState(ws.i);
-      });
     }
   } 
   sendBrowserClick(click, video_ws) {
@@ -781,150 +518,13 @@ class App{
     }
   }
   updateVotes(instanceId) {
-    const player = this.videoPlayers[instanceId];
-    // Only sort if voting is on and there's something to sort.
-    if (player && player.canVote && player.playlist.length > 1) {
-      // Identify and temporarily remove the currently playing track.
-      const currentTrackObject = player.playlist.splice(player.currentTrack, 1)[0];
-
-      // Calculate votes for the rest of the playlist.
-      player.playlist.forEach(d => {
-        const downVotes = player.votes.filter(v => v.video === d && v.isDown).length;
-        const upVotes = player.votes.filter(v => v.video === d && !v.isDown).length;
-        d.votes = upVotes - downVotes;
-      });
-
-      // Sort the rest of the playlist based on votes.
-      player.playlist.sort((a, b) => b.votes - a.votes);
-
-      // Add the currently playing track back to the top.
-      player.playlist.unshift(currentTrackObject);
-
-      // The current track is now always at index 0.
-      player.currentTrack = 0;
-    }
-  }
-  setVote(link, isDown, ws) {
-    const player = this.videoPlayers[ws.i];
-    const videoObject = player ? player.playlist.find(v => v.link === link) : null;
-
-    if (player && videoObject && player.canVote) {
-      // Prevent voting on the currently playing track
-      if (player.playlist[player.currentTrack].link === link) {
-        return;
-      }
-      // Remove any previous vote from this user for this video
-      player.votes = player.votes.filter(d => !(d.u.id === ws.u.id && d.video.link === link));
-      // Add the new vote
-      player.votes.push({u: ws.u, isDown, video: videoObject});
-      this.updateVotes(ws.i);
-      player.sockets.forEach(socket => {
-        this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: player.playlist, currentTrack: player.currentTrack });
-      });
-    }
-  }
-  async fromPlaylist(data, ws) {
-    const playlistId = this._getPlaylistId(data.id);
-    if (!playlistId) {
-      this.send(ws, Commands.ERROR, { message: "Invalid Playlist URL or ID provided." });
-      return;
-    }
-    console.log(`fromPlaylist: user=${ws.u.name}, instance=${ws.i}, id=${playlistId}`);
-    this.onlyIfHost(ws, async () => {
-      if(this.videoPlayers[ws.i] && (this.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
-        const player = this.videoPlayers[ws.i];
-        let playlist = await ytfps(playlistId, { limit: 100 });
-        this.resetPlaylist(ws); // Resets playlist, currentTime, currentTrack
-        // --- Duplicate Video Check for bulk add ---
-        const existingVideoIds = new Set();
-        let addedCount = 0;
-        playlist.videos.forEach(v => {
-          const newVideoId = this.getYoutubeId(v.url);
-          if (newVideoId && !existingVideoIds.has(newVideoId)) {
-            player.playlist.push(this._createVideoObject(v, ws.u, 'ytfps'));
-            existingVideoIds.add(newVideoId); // Add to set to prevent duplicates within the same playlist import
-            addedCount++;
-          }
-        });
-        const duplicateCount = playlist.videos.length - addedCount;
-        if (duplicateCount > 0) {
-            this.send(ws, Commands.ERROR, { message: `Added ${addedCount} videos. ${duplicateCount} duplicate(s) were skipped.` });
-        }
-        // --- End of Check ---
-        if (player.playlist.length > 0) {
-          player.lastStartTime = new Date().getTime() / 1000;
-          player.sockets.forEach(socket => {
-            this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, playlist: player.playlist });
-          });
-        } else {
-          this.updateClients(ws.i); // This is fine, sends an empty playlist.
-        }
-        await this.savePlayerState(ws.i);
-      }
-    });
+    // This is now a proxy to the real logic inside the playlist handler.
+    playlistHandler.updateVotes(this, instanceId);
   }
   resetPlaylist(ws) {
     this.videoPlayers[ws.i].playlist.length = 0;
     this.videoPlayers[ws.i].currentTrack = 0;
     this.videoPlayers[ws.i].currentTime = 0;
-  }
-  async clearPlaylist(skipUpdate, ws) {
-    if(this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, async () => {
-        console.log("clearPlaylist", ws.i, ws.u);
-        this.resetPlaylist(ws);
-        if(!skipUpdate) {
-          this.videoPlayers[ws.i].sockets.forEach(socket => {
-            this.send(socket, Commands.PLAYLIST_UPDATED, { playlist: [], currentTrack: 0 });
-          });
-        }
-        await this.savePlayerState(ws.i);
-      }, this.videoPlayers[ws.i].locked);
-    }
-  }
-  async addAndPlay(v, ws) {
-    if (this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, async () => {
-        const player = this.videoPlayers[ws.i];
-        if (this._isDuplicateVideo(player, v.link)) {
-          this.send(ws, Commands.ERROR, { message: "This video is already in the playlist." });
-          return;
-        }
-        const newVideo = this._createVideoObject(v, ws.u, 'scraper');
-        player.playlist.push(newVideo);
-
-        // Set it as the current track
-        const newIndex = player.playlist.length - 1;
-        player.currentTrack = newIndex;
-        player.currentTime = 0;
-        player.lastStartTime = new Date().getTime() / 1000;
-        this.resetBrowserIfNeedBe(player, newIndex);
-        this.updateVotes(ws.i);
-        player.sockets.forEach(socket => {
-          this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, playlist: player.playlist });
-        });
-        await this.savePlayerState(ws.i);
-      }, this.videoPlayers[ws.i].locked);
-    }
-  }
-  async addAndPlayNext(v, ws) {
-    if (this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, async () => {
-        const player = this.videoPlayers[ws.i];
-        if (this._isDuplicateVideo(player, v.link)) {
-          this.send(ws, Commands.ERROR, { message: "This video is already in the playlist." });
-          return;
-        }
-        const newVideo = this._createVideoObject(v, ws.u, 'scraper');
-        const nextIndex = player.currentTrack + 1;
-        player.playlist.splice(nextIndex, 0, newVideo);
-        // Send a granular ITEM_INSERTED command for efficiency.
-        player.sockets.forEach(socket => {
-          this.send(socket, Commands.ITEM_INSERTED, { video: newVideo, index: nextIndex });
-        });
-        await this.savePlayerState(ws.i);
-      }, this.videoPlayers[ws.i].locked);
-    }
   }
   async search(term, ws) {
     const results = await youtube.search(term, {
@@ -942,166 +542,6 @@ class App{
         this.send(ws, Commands.ERROR);
       }
     }
-  }
-  async addToPlaylist(v, skipUpdate, isYoutubeWebsite, ws) {
-    const player = this.videoPlayers[ws.i];
-    if(player) {
-      this.onlyIfHost(ws, async () => {
-        // --- Duplicate Video Check ---
-        if (this._isDuplicateVideo(player, v.link)) {
-          this.send(ws, Commands.ERROR, { message: "This video is already in the playlist." });
-          return;
-        }
-        // --- End of Check ---
-        if(!player.playlist.length) {
-          player.currentTrack = 0;
-          player.currentTime = 0;
-          player.lastStartTime = new Date().getTime() / 1000;
-        }
-        const newVideo = this._createVideoObject(v, ws.u, 'scraper', isYoutubeWebsite);
-        player.playlist.push(newVideo);
-        if(!skipUpdate) {
-          // Send a granular ITEM_APPENDED command for efficiency.
-          player.sockets.forEach(socket => {
-            this.send(socket, Commands.ITEM_APPENDED, { video: newVideo });
-          });
-        }
-        await this.savePlayerState(ws.i);
-      }, player.locked);
-    }
-  }
-  async removePlaylistItem(index, ws) {
-    if(this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, async () => {
-        const player = this.videoPlayers[ws.i];
-        if (index < 0 || index >= player.playlist.length) return; // Bounds check
-
-        player.playlist.splice(index, 1);
-
-        // Adjust currentTrack if an item before it was removed.
-        if (index < player.currentTrack) {
-          player.currentTrack--;
-        }
-        // Send a granular update: the index of the removed item and the new currentTrack index.
-        player.sockets.forEach(socket => {
-          this.send(socket, Commands.ITEM_REMOVED, { index: index, newCurrentTrack: player.currentTrack });
-        });
-        await this.savePlayerState(ws.i);
-      }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
-    }
-  }
-  async movePlaylistItem({url, index}, ws) {
-    if(this.videoPlayers[ws.i]) {
-      this.onlyIfHost(ws, async () => {
-        const player = this.videoPlayers[ws.i];
-        const playlist = player.playlist;
-        const oldIndex = playlist.findIndex(d => d.link === url);
-
-        if(oldIndex > -1) {
-          // Robustly track the current track to ensure its index is correct after the move.
-          const currentTrackLink = playlist[player.currentTrack].link;
-
-          // Move the item
-          const [itemToMove] = playlist.splice(oldIndex, 1);
-          playlist.splice(index, 0, itemToMove);
-
-          // Find the new index of the (potentially shifted) current track
-          player.currentTrack = playlist.findIndex(v => v.link === currentTrackLink);
-
-          // Send a granular update for efficiency instead of the whole playlist.
-          player.sockets.forEach(socket => {
-            this.send(socket, Commands.ITEM_MOVED, { oldIndex, newIndex: index, newCurrentTrack: player.currentTrack });
-          });
-          await this.savePlayerState(ws.i);
-        }else{
-          this.send(ws, Commands.DOES_NOT_EXIST);
-        }
-      }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
-    }
-  }
-  async toggleCanTakeOver(canTakeOver, ws) {
-    this.onlyIfHost(ws, async () => {
-      const player = this.videoPlayers[ws.i];
-
-      // To prevent a stuck state, only a host who is "present" in the 3D space
-      // can disable the takeover functionality. A host can always enable it.
-      if (canTakeOver === false && !player.hostConnected) {
-        this.send(ws, Commands.ERROR, { message: "You must be in the 3D space to disable takeover." });
-        return;
-      }
-
-      player.canTakeOver = canTakeOver;
-      player.sockets.forEach(socket => {
-        this.send(socket, Commands.CAN_TAKE_OVER_STATE_CHANGED, { canTakeOver: player.canTakeOver });
-      });
-      await this.savePlayerState(ws.i);
-    });
-  }
-  async takeOver(ws) {
-    const player = this.videoPlayers[ws.i];
-    if(player && player.canTakeOver) {
-      const oldHostName = player.host ? player.host.name : 'nobody';
-      player.host = ws.u;
-
-      // If a takeover timeout was running, clear it.
-      if (player.takeoverTimeout) {
-        clearTimeout(player.takeoverTimeout);
-        player.takeoverTimeout = null;
-      }
-
-      // Check if the NEW host has a "space" connection. This determines if they
-      // have "presence" and can lock down the takeover capability.
-      const newHostHasSpaceConnection = player.sockets.some(
-        s => s.u && s.u.id === player.host.id && s.type === "space"
-      );
-
-      // A host must be in the 3D space to disable takeover.
-      // If the new host is only on a UI, takeover remains enabled.
-      // After a takeover, leave it enabled. The new host must explicitly disable it.
-      player.canTakeOver = true;
-      player.hostConnected = newHostHasSpaceConnection;
-
-      console.log(`User ${ws.u.name} took over from ${oldHostName}. New host has space connection: ${player.hostConnected}. Can Take Over is now: ${player.canTakeOver}`);
-
-      // Broadcast the new state to all clients. A full playback update is best.
-      this.updateClients(ws.i, 'host-changed');
-      await this.savePlayerState(ws.i);
-    }else{
-      this.send(ws, Commands.ERROR);
-    }
-  }
-  async toggleLock(locked, ws) {
-    this.onlyIfHost(ws, async () => {
-      const player = this.videoPlayers[ws.i];
-      player.locked = locked;
-      // Instead of sending the whole state, broadcast a small, specific message.
-      player.sockets.forEach(socket => {
-        this.send(socket, Commands.LOCK_STATE_CHANGED, { locked: player.locked });
-      });
-      await this.savePlayerState(ws.i);
-    });
-  }
-  async setVideoTrack(index, ws) {
-    this.onlyIfHost(ws, async () => {
-      if(index < this.videoPlayers[ws.i].playlist.length && index > -1) {
-        if(this.videoPlayers[ws.i].canVote) {
-          const track = this.videoPlayers[ws.i].playlist[this.videoPlayers[ws.i].currentTrack];
-          this.videoPlayers[ws.i].votes = this.videoPlayers[ws.i].votes.filter(v => v.video !== track);
-        }
-        this.videoPlayers[ws.i].currentTrack = index;
-        this.videoPlayers[ws.i].currentTime = 0;
-        this.videoPlayers[ws.i].lastStartTime = new Date().getTime() / 1000;
-        this.resetBrowserIfNeedBe(this.videoPlayers[ws.i], index);
-        this.updateVotes(ws.i);
-        const player = this.videoPlayers[ws.i];
-        player.sockets.forEach(socket => {
-          this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime });
-        });
-        await this.savePlayerState(ws.i);
-      }else{
-        this.send(ws, Commands.OUT_OF_BOUNDS);
-      }
-    }, this.videoPlayers[ws.i].locked && !this.videoPlayers[ws.i].canVote);
   }
   async tickAllInstances() {
     for (const instanceId in this.videoPlayers) {
@@ -1124,10 +564,10 @@ class App{
           if (player.isKaraoke) {
             // In a karaoke context, a song ending means we either stop or auto-advance.
             if (player.autoAdvance && player.singers.length > 0) {
-              await this._playNextKaraokeSong(instanceId);
+              await karaokeHandler.playNextKaraokeSong(this, instanceId);
             } else {
               // If auto-advance is off, or the singer list is empty, stop the player.
-              await this._stop(instanceId);
+              await hostHandler.internalStop(this, instanceId);
             }
             break; // Exit the while loop for this instance.
           } else {
@@ -1171,28 +611,6 @@ class App{
           }
       });
     });
-  }
-  async setVideoTime(time, ws) {
-    this.onlyIfHost(ws, async () => {
-      const player = this.videoPlayers[ws.i];
-      if (!player || !player.playlist.length) return;
-
-      const trackDuration = (player.playlist[player.currentTrack].duration || 0) / 1000;
-      // Clamp the time to be within the video's duration
-      const newTime = Math.max(0, Math.min(time, trackDuration));
-
-      player.lastStartTime = (new Date().getTime() / 1000) - newTime;
-      player.currentTime = newTime;
-
-      // Broadcast a seek command to all clients. This is the same command used by host skip.
-      player.sockets.forEach(socket => {
-        this.send(socket, Commands.HOST_SEEK, {
-          newCurrentTime: newTime,
-          newLastStartTime: player.lastStartTime
-        });
-      });
-      await this.savePlayerState(ws.i);
-    }, this.videoPlayers[ws.i].locked);
   }
   async handleVideoUnavailable(data, ws) {
     const player = this.videoPlayers[ws.i];

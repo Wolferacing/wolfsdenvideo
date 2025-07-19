@@ -1,45 +1,36 @@
-var KaraokePlayer = class {
-  constructor() {
-    this.currentScript = document.currentScript;
-    this.init();
+// Capture the current script element immediately.
+const karaokePlayerScript = document.currentScript;
+
+// Dynamically load the base player script.
+const baseScript = document.createElement("script");
+const scriptUrl = new URL(karaokePlayerScript.src);
+baseScript.setAttribute("src", `${scriptUrl.origin}/base-player.js`);
+
+// Once the base player script is loaded, define and instantiate our specific player.
+baseScript.addEventListener("load", () => {
+  var KaraokePlayer = class extends BasePlayer {
+    constructor() {
+      // Pass the original script element to the base class.
+      super(karaokePlayerScript);
+      this.init();
+    }
+
+    async init() {
+      // Run the common initialization sequence from BasePlayer.
+      await super.init();
+
+      // Now run the karaoke-specific setup.
+      this.core.isKaraoke = true; // Set mode after core init
+      await this.core.setupWebsocket("space", null, () => {
+        this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+        this.core.sendMessage({path: Commands.SET_INSTANCE_MODE, data: 'karaoke'});
+      });
+      const url = `https://${window.APP_CONFIG.HOST_URL}/?youtube=${encodeURIComponent(this.core.params.youtube)}&start=0&playlist=${this.core.params.playlist}&mute=${this.core.params.mute}&volume=${this.core.tempVolume}&instance=${this.core.params.instance}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}&mode=karaoke`;
+      this.core.setupBrowserElement(url);
+      this.core.setupJoinLeaveButton();
+    }
   }
-  async init() {
-    await this.setupConfigScript();
-    await this.setupCoreScript();
-    this.core = window.videoPlayerCore;
-    this.core.hostUrl = window.APP_CONFIG.HOST_URL;
-    this.core.parseParams(this.currentScript);
-    await this.core.setupCommandsScript(); // Load Commands before core.init
-    await this.core.init();
-    // Set the mode *after* core.init() to prevent it from being overwritten by the URL check.
-    this.core.isKaraoke = true;
-    await this.core.setupWebsocket("space", null, () => {
-      this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-      this.core.sendMessage({path: Commands.SET_INSTANCE_MODE, data: 'karaoke'});
-    });
-    // Pass the mode to the player iframe so it knows which skip time to use.
-    const url = `https://${window.APP_CONFIG.HOST_URL}/?youtube=${encodeURIComponent(this.core.params.youtube)}&start=0&playlist=${this.core.params.playlist}&mute=${this.core.params.mute}&volume=${this.core.tempVolume}&instance=${this.core.params.instance}&user=${window.user.id}-_-${encodeURIComponent(window.user.name)}&mode=karaoke`;
-    this.core.setupBrowserElement(url);
-    this.core.setupJoinLeaveButton();
-  }
-  setupCoreScript() {
-    return new Promise(resolve => {
-      let myScript = document.createElement("script");
-      myScript.setAttribute("src", `https://${window.APP_CONFIG.HOST_URL}/core.js`);
-      myScript.addEventListener ("load", resolve, false);
-      document.body.appendChild(myScript);
-    });
-  }
-  setupConfigScript() {
-    // Use the script's own src attribute to reliably find the config file.
-    const scriptUrl = new URL(this.currentScript.src);
-    const configUrl = `${scriptUrl.origin}/config.js`;
-    return new Promise(resolve => {
-      let myScript = document.createElement("script");
-      myScript.setAttribute("src", configUrl);
-      myScript.addEventListener ("load", resolve, false);
-      document.body.appendChild(myScript);
-    });
-  }
-}
-window.karaokePlayerInstance = new KaraokePlayer();
+  window.karaokePlayerInstance = new KaraokePlayer();
+}, false);
+
+document.body.appendChild(baseScript);

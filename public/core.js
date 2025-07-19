@@ -734,6 +734,82 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
 
     console.log("Clean up complete.");
   }
+  
+  // This new method centralizes all the logic for the search overlay UI.
+  setupSearchOverlay(searchCallback, storageKey) {
+    this.searchOverlay = document.querySelector('.search-overlay');
+    if (!this.searchOverlay) return; // Don't run if the overlay isn't on the page
+
+    this.openSearchButton = document.querySelector('#open-search-overlay-btn');
+    this.searchInputOverlay = document.querySelector('.search-overlay-box .searchInput');
+    this.clearSearchButton = document.querySelector('#clear-search-btn');
+    this.closeSearchButton = document.querySelector('#close-search-btn');
+    this.submitSearchButton = document.querySelector('#submit-search-btn');
+
+    const populateRecentSearches = () => {
+        const recentSearches = JSON.parse(localStorage.getItem(`recent${storageKey}Searches`) || '[]');
+        const recentSearchesContainer = document.querySelector('.recent-searches');
+        if (!recentSearchesContainer) return;
+
+        recentSearchesContainer.innerHTML = '';
+        if (recentSearches.length > 0) {
+            recentSearches.forEach(search => {
+                const item = document.createElement('div');
+                item.textContent = search;
+                item.classList.add('recent-search-item');
+                item.addEventListener('click', () => setSearchAndSubmit(search));
+                recentSearchesContainer.appendChild(item);
+            });
+        }
+    };
+
+    const showSearchOverlay = () => {
+        this.searchOverlay.style.display = 'flex';
+        this.searchInputOverlay.focus();
+        const lastSearch = localStorage.getItem(`last${storageKey}Search`);
+        if (lastSearch) {
+            this.searchInputOverlay.value = lastSearch;
+        }
+        populateRecentSearches();
+    };
+
+    const hideSearchOverlay = () => {
+        this.searchOverlay.style.display = 'none';
+        localStorage.setItem(`last${storageKey}Search`, this.searchInputOverlay.value);
+    };
+
+    const submitSearch = () => {
+        const query = this.searchInputOverlay.value;
+        if (query.trim() !== "") {
+            hideSearchOverlay();
+            localStorage.setItem(`last${storageKey}Search`, query);
+            let recentSearches = JSON.parse(localStorage.getItem(`recent${storageKey}Searches`) || '[]');
+            recentSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
+            localStorage.setItem(`recent${storageKey}Searches`, JSON.stringify(recentSearches));
+            searchCallback(query);
+        }
+    };
+
+    const setSearchAndSubmit = (searchTerm) => {
+        this.searchInputOverlay.value = searchTerm;
+        submitSearch();
+    };
+
+    this.openSearchButton.addEventListener('click', showSearchOverlay);
+    this.closeSearchButton.addEventListener('click', hideSearchOverlay);
+    this.submitSearchButton.addEventListener('click', submitSearch);
+    this.clearSearchButton.addEventListener('click', () => {
+        this.searchInputOverlay.value = '';
+        this.searchInputOverlay.focus();
+    });
+
+    // Add a listener to close the overlay when clicking on the dark background.
+    this.searchOverlay.addEventListener('click', (event) => {
+      if (event.target === this.searchOverlay) {
+        hideSearchOverlay();
+      }
+    });
+  }
 }
 window.videoPlayerCore = new Core();
 window.cleanupVideoPlayer = () => {

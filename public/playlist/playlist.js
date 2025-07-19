@@ -228,79 +228,7 @@ var Playlist = class {
       }
     }, 1000); // Update every second
   }
-  // --- New Search Overlay Functions ---
-  showSearchOverlay() {
-    this.searchOverlay.style.display = 'flex';
-    this.searchInputOverlay.focus();  // Focus the input for immediate typing
-    // Load the last search term
-    const lastSearch = localStorage.getItem('lastPlaylistSearch');
-    if (lastSearch) {
-      this.searchInputOverlay.value = lastSearch;
-    }
-    this.populateRecentSearches();
-  }
-  populateRecentSearches() {
-    const recentSearches = JSON.parse(localStorage.getItem('recentPlaylistSearches') || '[]');
-    const recentSearchesContainer = document.querySelector('.recent-searches');
-    if (!recentSearchesContainer) return; // If container doesn't exist, skip
 
-    recentSearchesContainer.innerHTML = ''; // Clear previous entries
-    if (recentSearches.length > 0) {
-      recentSearches.forEach(search => {
-        const item = document.createElement('div');
-        item.textContent = search;
-        item.classList.add('recent-search-item');
-        item.addEventListener('click', () => this.setSearchAndSubmit(search)); // Populate input and trigger search
-        recentSearchesContainer.appendChild(item);
-      });
-    }
-  }
-
-  hideSearchOverlay() {    
-    this.searchOverlay.style.display = 'none';
-    // Persist the search term even when closing without submitting
-    localStorage.setItem('lastPlaylistSearch', this.searchInputOverlay.value);
-  }
-
-  submitSearch() {
-    const query = this.searchInputOverlay.value;
-    if (query.trim() !== "") { // Check for non-empty input
-      this.hideSearchOverlay(); // Close the overlay before searching
-
-       // Save the search term for next time
-       localStorage.setItem('lastPlaylistSearch', query);
-
-       // Update recent searches
-       let recentSearches = JSON.parse(localStorage.getItem('recentPlaylistSearches') || '[]');
-       recentSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5); // Add to the beginning, remove duplicates, limit to 5
-       localStorage.setItem('recentPlaylistSearches', JSON.stringify(recentSearches));
-
-       this.populateRecentSearches(); // Update the UI
-      this.debounceSearch(query);
-    }
-  }
-  setSearchAndSubmit(searchTerm) {
-    this.searchInputOverlay.value = searchTerm;
-    this.submitSearch(); // Re-use existing submit logic.
-  }
-
-  // --- Initialize Overlay ---
-  setupSearchOverlay() {
-    this.searchOverlay = document.querySelector('.search-overlay');
-    this.openSearchButton = document.querySelector('#open-search-overlay-btn');
-    this.searchInputOverlay = document.querySelector('.search-overlay-box .searchInput');
-    this.clearSearchButton = document.querySelector('#clear-search-btn');
-    this.closeSearchButton = document.querySelector('#close-search-btn');
-    this.submitSearchButton = document.querySelector('#submit-search-btn');
-
-    this.openSearchButton.addEventListener('click', () => this.showSearchOverlay());
-    this.closeSearchButton.addEventListener('click', () => this.hideSearchOverlay());
-    this.submitSearchButton.addEventListener('click', () => this.submitSearch());
-    this.clearSearchButton.addEventListener('click', () => {
-      this.searchInputOverlay.value = '';
-      this.searchInputOverlay.focus();
-    });
-  }
   setupCoreScript() {
     return new Promise(resolve => {
       let myScript = document.createElement("script");
@@ -650,6 +578,8 @@ var Playlist = class {
     this.videoPlaylistContainer = document.querySelector('.videoPlaylistContainer');
     
     this.searchBackDrop = document.querySelector('.searchBackDrop');
+      
+    this.core.setupSearchOverlay(query => this.debounceSearch(query), 'Playlist');
       
     this.searchBackDrop.addEventListener('click', () => this.hideSearch());
     

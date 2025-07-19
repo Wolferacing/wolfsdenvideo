@@ -12,39 +12,43 @@ const PROPORTIONAL_GAIN = 0.15;     // How aggressively to correct small drifts.
 const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05x), making it less noticeable.
 // --- End of Sync Constants ---
 
-var Player = class {
-  constructor(){
-    this.currentScript = document.currentScript;
-    this.pendingTrackChange = null;
-    this.init();
-  }
-  async init() {
-     await this.setupConfigScript();
-     await this.setupBrowserMessaging();
-     this.setupStatusDisplay();
-     this.initialSyncComplete = false;
-     this.currentTime = 0;
-     this.syncTimeout = null;
-     this.driftHistory = [];
-     this.latencyHistory = [];
-     this.maxHistoryPoints = 100; // Number of data points for the graph
-     this.syncIntervalMs = SYNC_INTERVAL_SLOW; // Default to the slowest interval.
-     await this.setupCoreScript();
-     this.core = window.videoPlayerCore;
-     this.core.hostUrl = window.APP_CONFIG.HOST_URL;
-     this.core.parseParams(this.currentScript);
-     await this.core.setupCommandsScript(); // Load Commands before core.init
-     await this.core.init();
-     await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
-       this.setupYoutubeScript();
-       this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
-       this.core.sendMessage({path: "user-video-player", data: window.user});
-     }, ()=>{
-        this.core.showToast("Reconnecting...");
-     });
-     this.playPlaylist();
-     window.seek = this.seek.bind(this);
-  }
+const playerScript = document.currentScript;
+
+const baseScript = document.createElement("script");
+const scriptUrl = new URL(playerScript.src);
+baseScript.setAttribute("src", `${scriptUrl.origin}/base-player.js`);
+
+baseScript.addEventListener("load", () => {
+  var Player = class extends BasePlayer {
+    constructor(){
+      super(playerScript);
+      this.pendingTrackChange = null;
+      this.init();
+    }
+    async init() {
+      await super.init(); // Run common setup from BasePlayer
+
+      // Now run the player-specific setup
+      await this.setupBrowserMessaging();
+      this.setupStatusDisplay();
+      this.initialSyncComplete = false;
+      this.currentTime = 0;
+      this.syncTimeout = null;
+      this.driftHistory = [];
+      this.latencyHistory = [];
+      this.maxHistoryPoints = 100;
+      this.syncIntervalMs = SYNC_INTERVAL_SLOW;
+
+      await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
+        this.setupYoutubeScript();
+        this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
+        this.core.sendMessage({path: "user-video-player", data: window.user});
+      }, ()=>{
+          this.core.showToast("Reconnecting...");
+      });
+      this.playPlaylist();
+      window.seek = this.seek.bind(this);
+    }
   setupBrowserMessaging() {
      window.addEventListener("bantermessage", (e) => this.parseMessage(e.detail.message));
   }
@@ -528,31 +532,22 @@ var Player = class {
       }
     }
   }
-  setupYoutubeScript() {
-    return this.setupScript("https://www.youtube.com/iframe_api");
+    setupYoutubeScript() {
+      return new Promise(resolve => {
+        let myScript = document.createElement("script");
+        myScript.setAttribute("src", "https://www.youtube.com/iframe_api");
+        myScript.addEventListener ("load", resolve, false);
+        document.body.appendChild(myScript);  
+      });
+    }
   }
-  setupCoreScript() {
-    return this.setupScript(`https://${window.APP_CONFIG.HOST_URL}/core.js`);
+  window.playerInstance = new Player();
+  function onYouTubeIframeAPIReady() {
+    // Check if the instance exists before calling, to prevent errors during cleanup.
+    if (window.playerInstance) {
+      window.playerInstance.onYouTubeIframeAPIReady();
+    }
   }
-  setupConfigScript() {
-    // Use the script's own src attribute to reliably find the config file.
-    const scriptUrl = new URL(this.currentScript.src);
-    const configUrl = `${scriptUrl.origin}/config.js`;
-    return this.setupScript(configUrl);
-  }
-  setupScript(script) {
-    return new Promise(resolve => {
-      let myScript = document.createElement("script");
-      myScript.setAttribute("src", script);
-      myScript.addEventListener ("load", resolve, false);
-      document.body.appendChild(myScript);  
-    });
-  }
-}
-window.playerInstance = new Player();
-function onYouTubeIframeAPIReady() {
-  // Check if the instance exists before calling, to prevent errors during cleanup.
-  if (window.playerInstance) {
-    window.playerInstance.onYouTubeIframeAPIReady();
-  }
-}
+}, false);
+
+document.body.appendChild(baseScript);

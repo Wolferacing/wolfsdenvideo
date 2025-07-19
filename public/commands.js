@@ -56,6 +56,7 @@ var Commands = {
   ADD_AND_PLAY: 'add-and-play',
   ADD_AND_PLAY_NEXT: 'add-and-play-next',
   MOVE_SINGER: 'move-singer',
+  SINGER_MOVED: 'singer-moved',
   PLAY_KARAOKE_TRACK: 'play-karaoke-track',
   SINGER_LIST_UPDATED: 'singer-list-updated',
   RESTART_SONG: 'restart-song',

@@ -29,9 +29,6 @@ var Karaoke = class {
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   }
   setupKaraokeUI() {
-    this.searchInput = document.querySelector('.searchInput');
-    this.searchInput.addEventListener('keyup', () => this.debounceSearch(this.searchInput.value));
-    
     this.autoSync = document.querySelector('#autoSync');
     
     this.autoSyncEnabled = false;
@@ -90,15 +87,6 @@ var Karaoke = class {
       this.YtPlayer.pauseVideo();
       this.hideSearch();
     });
-    
-    const searchButtons = document.querySelectorAll(".searchButtons > .button");
-    
-    for (let i = 0; i < searchButtons.length; i++) {
-       searchButtons[i].addEventListener("click", () => {
-         this.searchInput.value += " " + searchButtons[i].innerText;
-         this.debounceSearch(this.searchInput.value)
-       });
-    }
     
     this.videoPlayer = document.querySelector('#videoPlayer');
     
@@ -163,104 +151,38 @@ var Karaoke = class {
     adjustSingerListHeight();
     // --- End of Dynamic Height ---
   }
-  // --- New Search Overlay Functions ---
-  showSearchOverlay() {
-    this.searchOverlay.style.display = 'flex';
-    this.searchInputOverlay.focus();  // Focus the input for immediate typing
-
-    // Load the last search term
-    const lastSearch = localStorage.getItem('lastKaraokeSearch');
-    if (lastSearch) {
-      this.searchInputOverlay.value = lastSearch;
-    }
-
-    this.populateRecentSearches();
-  }
-  populateRecentSearches() {
-    const recentSearches = JSON.parse(localStorage.getItem('recentKaraokeSearches') || '[]');
-    const recentSearchesContainer = document.querySelector('.recent-searches');
-    if (!recentSearchesContainer) return; // If container doesn't exist, skip
-
-    recentSearchesContainer.innerHTML = ''; // Clear previous entries
-    if (recentSearches.length > 0) {
-      recentSearches.forEach(search => {
-        const item = document.createElement('div');
-        item.textContent = search;
-        item.classList.add('recent-search-item');
-        item.addEventListener('click', () => this.setSearchAndSubmit(search)); // Populate input and trigger search        
-        recentSearchesContainer.appendChild(item);
-      });
-    }
-  }
-
-  hideSearchOverlay() {    
-    this.searchOverlay.style.display = 'none';
-    // Persist the search term even when closing without submitting
-    localStorage.setItem('lastKaraokeSearch', this.searchInputOverlay.value);
-  }
-
-  submitSearch() {
-    const query = this.searchInputOverlay.value;
-    if (query.trim() !== "") { // Check for non-empty input
-      // this.hideSearchOverlay(); // Close the overlay before searching
-
-      // Save the search term for next time
-      localStorage.setItem('lastKaraokeSearch', query);
-
-      // Update recent searches
-      let recentSearches = JSON.parse(localStorage.getItem('recentKaraokeSearches') || '[]');
-      recentSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5); // Add to the beginning, remove duplicates, limit to 5
-      localStorage.setItem('recentKaraokeSearches', JSON.stringify(recentSearches));
-
-      this.populateRecentSearches(); // Update the UI     
-      this.searchOverlay.style.display = 'none';
-      this.debounceSearch(query);
-    }
-  }
-
-  setSearchAndSubmit(searchTerm) {
-    this.searchInputOverlay.value = searchTerm;
-    this.submitSearch(); // Re-use existing submit logic
-  }
 
   // --- Initialize Overlay ---
   setupSearchOverlay() {
-    this.searchOverlay = document.querySelector('.search-overlay');
-    this.openSearchButton = document.querySelector('#open-search-overlay-btn');
-    this.searchInputOverlay = document.querySelector('.search-overlay-box .searchInput');
-    this.clearSearchButton = document.querySelector('#clear-search-btn');
-    this.closeSearchButton = document.querySelector('#close-search-btn');
-    this.submitSearchButton = document.querySelector('#submit-search-btn');
+    // Use the new core function for all the standard search overlay logic.
+    this.core.setupSearchOverlay(query => this.debounceSearch(query), 'Karaoke');
 
-    // Add event listeners to the new "karaoke" and "zoom karaoke" buttons
+    // The core function already selected this, but we need it for the specific buttons.
+    this.searchInputOverlay = document.querySelector('.search-overlay-box .searchInput');
+
+    // Add event listeners for the karaoke-specific search buttons
     const lyricsButton = document.querySelector('.lyrics-search-btn');
     const karaokeButton = document.querySelector('.karaoke-search-btn');
     const zoomKaraokeButton = document.querySelector('.zoom-search-btn');
 
-    lyricsButton.addEventListener('click', () => {
-        this.searchInputOverlay.value += ' lyrics ';
-    });
-
-    karaokeButton.addEventListener('click', () => {
-        this.searchInputOverlay.value += ' karaoke ';
-    });
-
-    zoomKaraokeButton.addEventListener('click', () => {
-        this.searchInputOverlay.value += ' zoom karaoke ';
-    });
-
-    this.openSearchButton.addEventListener('click', () => this.showSearchOverlay());
-    this.closeSearchButton.addEventListener('click', () => this.hideSearchOverlay());
-    this.searchOverlay.addEventListener('click', (event) => {
-      if (event.target === this.searchOverlay) {
-        this.hideSearchOverlay();
-      }
-    });  
-    this.submitSearchButton.addEventListener('click', () => this.submitSearch());
-    this.clearSearchButton.addEventListener('click', () => {
-      this.searchInputOverlay.value = '';
-      this.searchInputOverlay.focus();
-    });
+    if (lyricsButton) {
+      lyricsButton.addEventListener('click', () => {
+          this.searchInputOverlay.value += ' lyrics ';
+          this.searchInputOverlay.focus();
+      });
+    }
+    if (karaokeButton) {
+      karaokeButton.addEventListener('click', () => {
+          this.searchInputOverlay.value += ' karaoke ';
+          this.searchInputOverlay.focus();
+      });
+    }
+    if (zoomKaraokeButton) {
+      zoomKaraokeButton.addEventListener('click', () => {
+          this.searchInputOverlay.value += ' zoom karaoke ';
+          this.searchInputOverlay.focus();
+      });
+    }
   }
   setupCoreScript() {
     return new Promise(resolve => {
@@ -386,6 +308,15 @@ var Karaoke = class {
           if (index > -1) {
             this.core.player.players.splice(index, 1);
           }
+          this.updatePlaylist(this.core.player);
+        }
+        break;
+      case Commands.SINGER_MOVED:
+        if (this.core.player && this.core.player.players) {
+          const { oldIndex, newIndex } = json.data;
+          // Move the item in the local array to match the server
+          const [itemToMove] = this.core.player.players.splice(oldIndex, 1);
+          this.core.player.players.splice(newIndex, 0, itemToMove);
           this.updatePlaylist(this.core.player);
         }
         break;
