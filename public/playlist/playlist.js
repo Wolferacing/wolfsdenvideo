@@ -35,16 +35,13 @@ var Playlist = class {
       case Commands.PLAYBACK_UPDATE:
         // Merge new data into the existing player state.
         // This prevents the playlist from being wiped out on updates that don't include it.
-        const isFirstUpdate = !this.core.player;
         this.core.player = Object.assign(this.core.player || {}, json.data.video);
-        // On the first full update, calculate the clock skew. This is the most reliable time
-        // to do it, as we have a full state from the server (lastStartTime and currentTime).
-        // A non-zero duration ensures we're calculating against an actively playing track.
-        if (isFirstUpdate && this.core.player.lastStartTime && this.core.player.duration > 0) {
+        // Estimate the clock skew whenever we get a full update with a playing track.
+        // This ensures the UI's timer is aligned with the server's time.
+        if (this.core.player.lastStartTime && this.core.player.duration > 0) {
             const serverNow = this.core.player.lastStartTime + this.core.player.currentTime;
             const clientNow = Date.now() / 1000;
             this.clockSkew = clientNow - serverNow;
-            console.log(`Playlist UI clock skew estimated: ${this.clockSkew.toFixed(3)}s`);
         }
         this.updatePlaylist(this.core.player);
         this.startUiUpdater();
@@ -213,8 +210,7 @@ var Playlist = class {
       let calculatedTime = ((Date.now() / 1000) - this.clockSkew) - lastStartTime;
       updateCount++;
       if (updateCount <= 5) { // Log the first 5 updates
-        console.log(`UI Update #${updateCount}: lastStartTime=${lastStartTime}, duration=${duration}, clientTimeOffset=${this.clientTimeOffset}, calculatedTime=${calculatedTime}`);
-        console.log(`UI Update #${updateCount}: clockSkew=${this.clockSkew.toFixed(3)}s, calculatedTime=${calculatedTime.toFixed(3)}s`);
+        console.log(`UI Update #${updateCount}: clockSkew=${this.clockSkew.toFixed(3)}s, calculatedTime=${calculatedTime.toFixed(3)}s, lastStartTime=${lastStartTime}, duration=${duration}`);
       }
 
       // Clamp the calculated time to ensure it's within the valid range.
