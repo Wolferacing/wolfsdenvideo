@@ -1126,12 +1126,10 @@ class App{
             if (player.autoAdvance && player.singers.length > 0) {
               await this._playNextKaraokeSong(instanceId);
             } else {
+              // If auto-advance is off, or the singer list is empty, stop the player.
               await this._stop(instanceId);
             }
             break; // Exit the while loop for this instance.
-          } else if (!player.autoAdvance && player.isKaraoke){
-             // The "else" condition means the current singer's track is over.
-             await this._stop(instanceId);
           } else {
             // In a regular playlist context, loop to the next song.
             player.currentTime -= trackDuration;
