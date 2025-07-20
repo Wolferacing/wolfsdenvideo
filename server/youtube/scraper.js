@@ -136,7 +136,9 @@ constructor(language = 'en') {
         try {
             // Use ytdl-core, a more specialized library for fetching video info,
             // which is generally more robust against YouTube's bot detection.
-            const videoInfo = await ytdl.getInfo(url);
+            const videoInfo = await ytdl.getInfo(url, {
+                requestOptions: this._getRequestHeaders()
+            });
             const details = videoInfo.videoDetails;
 
             if (!details) {
