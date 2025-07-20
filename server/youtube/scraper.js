@@ -7,7 +7,7 @@ class Scraper {
      */
     constructor(language = 'en') {
         this._lang = language;
-        this._apiKey = null; // Cache for the YouTube Internal API key.
+        this._innertubeContext = null; // Cache for the YouTube Internal API context.
     }
 
     /**
@@ -134,25 +134,37 @@ class Scraper {
     }
 
     /**
-     * Fetches the YouTube homepage to extract and cache the INNERTUBE_API_KEY.
-     * This key is necessary for making direct API calls.
+     * Fetches the YouTube homepage to extract and cache a complete Innertube context.
+     * This includes the API key, client version, and visitor data, which are all
+     * necessary to make the API request look like it's from a real browser.
      */
-    async _getInnertubeApiKey() {
-        if (this._apiKey) {
-            return this._apiKey;
+    async _getInnertubeContext() {
+        if (this._innertubeContext) {
+            return this._innertubeContext;
         }
         try {
             const homePage = await fetch('https://www.youtube.com', { headers: this._getRequestHeaders() }).then(res => res.text());
-            const key = homePage.match(/"INNERTUBE_API_KEY":"(.*?)"/);
-            if (key && key[1]) {
-                this._apiKey = key[1];
-                console.log("Successfully fetched and cached YouTube API key.");
-                return this._apiKey;
+            
+            const apiKey = homePage.match(/"INNERTUBE_API_KEY":"(.*?)"/);
+            const clientVersion = homePage.match(/"clientVersion":"(.*?)"/);
+            const visitorData = homePage.match(/"visitorData":"(.*?)"/);
+
+            if (apiKey && apiKey[1] && clientVersion && clientVersion[1]) {
+                this._innertubeContext = {
+                    apiKey: apiKey[1],
+                    client: {
+                        clientName: "WEB",
+                        clientVersion: clientVersion[1],
+                        visitorData: visitorData ? visitorData[1] : undefined
+                    }
+                };
+                console.log("Successfully fetched and cached YouTube Innertube context.");
+                return this._innertubeContext;
             }
-            throw new Error("Could not find INNERTUBE_API_KEY on YouTube homepage.");
+            throw new Error("Could not find all required Innertube context fields on YouTube homepage.");
         } catch (err) {
-            console.error("Failed to fetch YouTube API key:", err.message);
-            throw new Error("Could not obtain YouTube API key. The scraper may be blocked.");
+            console.error("Failed to fetch YouTube Innertube context:", err.message);
+            throw new Error("Could not obtain YouTube Innertube context. The scraper may be blocked.");
         }
     }
 
@@ -163,17 +175,13 @@ class Scraper {
      * @returns {Promise<object>} The raw video data object from the API.
      */
     async _getVideoDetailsFromApi(videoId) {
-        const apiKey = await this._getInnertubeApiKey();
-        const apiUrl = `https://www.youtube.com/youtubei/v1/player?key=${apiKey}`;
+        const innertube = await this._getInnertubeContext();
+        const apiUrl = `https://www.youtube.com/youtubei/v1/player?key=${innertube.apiKey}`;
 
         const requestBody = {
             videoId: videoId,
             context: {
-                client: {
-                    clientName: "WEB",
-                    // Using a modern client version is important for compatibility.
-                    clientVersion: "2.20240725.01.00"
-                }
+                client: innertube.client
             }
         };
 
@@ -206,6 +214,15 @@ class Scraper {
 
         // The API response should always contain videoDetails if the video is accessible.
         if (!data || !data.videoDetails) {
+            // --- Detailed logging for API response ---
+            console.error("--- YouTube API Diagnostics: Failed to find videoDetails ---");
+            console.error("The API call was successful, but the response object was missing the 'videoDetails' property.");
+            console.error("This usually means the request context was not sufficient to get a full response.");
+            console.error("Received data object keys:", data ? Object.keys(data) : 'null');
+            // Log a small, safe portion of the data for inspection.
+            const dataSnippet = data ? JSON.stringify(data, null, 2) : 'null';
+            console.error("Data snippet (first 1000 chars):", dataSnippet.substring(0, 1000));
+            console.error("--------------------------------------------------------------------------");
             throw new Error('Could not find video details in the page data.'); // This error is user-facing.
         }
 
