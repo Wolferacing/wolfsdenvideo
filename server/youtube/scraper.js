@@ -192,8 +192,15 @@ class Scraper {
         }
 
         if (!data || !data.videoDetails) {
-            // This can happen for various reasons, like a private video.
-            throw new Error('Could not find video details in the page data.');
+            // This can happen if the scraper gets a valid JSON object that isn't the player response.
+            // Add detailed logging here to diagnose what we *did* get.
+            console.error("--- YouTube Scraper Error: Failed to find videoDetails ---");
+            console.error("This usually means the scraper parsed a valid JSON object, but it didn't contain the expected video information.");
+            console.error("Received data object keys:", data ? Object.keys(data) : 'null');
+            // Log a small, safe portion of the data for inspection.
+            console.error("Data snippet (first 2000 chars):", JSON.stringify(data, null, 2).substring(0, 2000));
+            console.error("--------------------------------------------------------------------------");
+            throw new Error('Could not find video details in the page data.'); // This error is user-facing.
         }
 
         const videoDetails = data.videoDetails;
