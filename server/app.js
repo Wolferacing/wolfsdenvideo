@@ -536,13 +536,10 @@ class App{
         if (videoDetails) {
           // The client expects an array of videos.
           this.send(ws, Commands.SEARCH_RESULTS, [videoDetails]);
-        } else {
-          // Handle case where video details couldn't be fetched
-          this.send(ws, Commands.SEARCH_RESULTS, []);
         }
       } catch (error) {
-        console.error(`Error fetching video by URL (${term}):`, error);
-        this.send(ws, Commands.SEARCH_RESULTS, []);
+        console.error(`Error fetching video by URL (${term}):`, error.message);
+        this.send(ws, Commands.ERROR, { message: error.message });
       }
     } else {
       // It's a search term, perform a regular search

@@ -158,8 +158,14 @@ class Scraper {
      * @returns A standardized video object
      */
     _parseVideoData(data) {
+        if (data && data.playabilityStatus && data.playabilityStatus.status === 'ERROR') {
+            const reason = data.playabilityStatus.reason || 'Video is unavailable.';
+            throw new Error(reason);
+        }
+
         if (!data || !data.videoDetails) {
-            return null;
+            // This can happen for various reasons, like a private video.
+            throw new Error('Could not find video details in the page data.');
         }
 
         const videoDetails = data.videoDetails;
