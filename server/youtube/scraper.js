@@ -1,13 +1,14 @@
 const { SearchTypes, YouTubeURL } = require('./constants.js');
 const Util = require('./util.js');
 const fetch = require('node-fetch');
+const play = require('play-dl');
+
 class Scraper {
     /**
      * @param {string} [language = 'en'] An IANA Language Subtag, see => http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
      */
-    constructor(language = 'en') {
+constructor(language = 'en') {
         this._lang = language;
-        this._innertubeContext = null; // Cache for the YouTube Internal API context.
     }
 
     /**
@@ -44,8 +45,6 @@ class Scraper {
     _getRequestHeaders(requestedLang = this._lang) {
         return {
             'Accept-Language': requestedLang,
-            // Using a modern User-Agent is crucial. It makes our request look like it's from a real, up-to-date
-            // browser, which significantly reduces the chance of YouTube serving a minimal "bot" page.
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
             'Cookie': 'CONSENT=YES+yt.4000000000.en+FX+789' // Bypass YouTube's consent screen
         };
@@ -133,145 +132,31 @@ class Scraper {
         return parsed;
     }
 
-    /**
-     * Fetches the YouTube homepage to extract and cache a complete Innertube context.
-     * This includes the API key, client version, and visitor data, which are all
-     * necessary to make the API request look like it's from a real browser.
-     */
-    async _getInnertubeContext() {
-        if (this._innertubeContext) {
-            return this._innertubeContext;
-        }
-        try {
-            const homePage = await fetch('https://www.youtube.com', { headers: this._getRequestHeaders() }).then(res => res.text());
-            
-            const apiKey = homePage.match(/"INNERTUBE_API_KEY":"(.*?)"/);
-            const clientVersion = homePage.match(/"clientVersion":"(.*?)"/);
-            const visitorData = homePage.match(/"visitorData":"(.*?)"/);
-
-            if (apiKey && apiKey[1] && clientVersion && clientVersion[1]) {
-                this._innertubeContext = {
-                    apiKey: apiKey[1],
-                    client: {
-                        clientName: "WEB",
-                        clientVersion: clientVersion[1],
-                        visitorData: visitorData ? visitorData[1] : undefined
-                    }
-                };
-                console.log("Successfully fetched and cached YouTube Innertube context.");
-                return this._innertubeContext;
-            }
-            throw new Error("Could not find all required Innertube context fields on YouTube homepage.");
-        } catch (err) {
-            console.error("Failed to fetch YouTube Innertube context:", err.message);
-            throw new Error("Could not obtain YouTube Innertube context. The scraper may be blocked.");
-        }
-    }
-
-    /**
-     * Fetches video details directly from YouTube's internal API.
-     * This is more reliable than scraping the HTML page.
-     * @param {string} videoId The 11-character video ID.
-     * @returns {Promise<object>} The raw video data object from the API.
-     */
-    async _getVideoDetailsFromApi(videoId) {
-        const innertube = await this._getInnertubeContext();
-        const apiUrl = `https://www.youtube.com/youtubei/v1/player?key=${innertube.apiKey}`;
-
-        const requestBody = {
-            videoId: videoId,
-            context: {
-                client: innertube.client,
-                // Adding a richer context makes the request look more like a genuine browser call,
-                // which is necessary to receive the full video details from the API.
-                user: {},
-                request: {
-                    useSsl: true
-                }
-            },
-            // These additional parameters are often required by the player API.
-            playbackContext: {
-                contentPlaybackContext: {
-                    html5Preference: "HTML5_PREF_WANTS"
-                }
-            },
-            contentCheckOk: true,
-            racyCheckOk: true
-        };
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                ...this._getRequestHeaders(),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) {
-            throw new Error(`YouTube API request failed: ${response.status} ${response.statusText}`);
-        }
-
-        return response.json();
-    }
-
-    /**
-     * @private
-     * @param {object} data The parsed video data from _getVideoData
-     * @returns A standardized video object
-     */
-    _parseVideoData(data) {
-        if (data && data.playabilityStatus && data.playabilityStatus.status === 'ERROR') {
-            const reason = data.playabilityStatus.reason || 'Video is unavailable.';
-            throw new Error(reason);
-        }
-
-        // The API response should always contain videoDetails if the video is accessible.
-        if (!data || !data.videoDetails) {
-            // --- Detailed logging for API response ---
-            console.error("--- YouTube API Diagnostics: Failed to find videoDetails ---");
-            console.error("The API call was successful, but the response object was missing the 'videoDetails' property.");
-            console.error("This usually means the request context was not sufficient to get a full response.");
-            console.error("Received data object keys:", data ? Object.keys(data) : 'null');
-            // Log a small, safe portion of the data for inspection.
-            const dataSnippet = data ? JSON.stringify(data, null, 2) : 'null';
-            console.error("Data snippet (first 1000 chars):", dataSnippet.substring(0, 1000));
-            console.error("--------------------------------------------------------------------------");
-            throw new Error('Could not find video details in the page data.'); // This error is user-facing.
-        }
-
-        const videoDetails = data.videoDetails;
-        const thumbnails = videoDetails.thumbnail.thumbnails;
-
-        return {
-            title: videoDetails.title,
-            link: `https://www.youtube.com/watch?v=${videoDetails.videoId}`,
-            thumbnail: thumbnails[thumbnails.length - 1].url,
-            duration: parseInt(videoDetails.lengthSeconds, 10) * 1000,
-            id: videoDetails.videoId,
-            channel: {
-                name: videoDetails.author,
-                id: videoDetails.channelId,
-            }
-        };
-    }
-
     async getVideoByUrl(url) {
-        const videoId = Util.getYoutubeId(url);
-        if (!videoId) {
-            throw new Error("Invalid YouTube URL provided.");
-        }
-        // Use the new, reliable API method instead of HTML scraping.
-        const apiResponse = await this._getVideoDetailsFromApi(videoId);
-        const parsed = this._parseVideoData(apiResponse);
-        return parsed;
-    }
+        try {
+            const videoInfo = await play.video_info(url);
+            const details = videoInfo.video_details;
 
-    /**
-     * @param {string} [language='en']
-     */
-    setLang(language = 'en') {
-        this._lang = language;
+            if (!details) {
+                throw new Error("Could not retrieve video details from play-dl.");
+            }
+
+            return {
+                title: details.title,
+                link: details.url,
+                thumbnail: details.thumbnails[details.thumbnails.length - 1].url,
+                duration: details.durationInSec * 1000,
+                id: details.id,
+                channel: {
+                    name: details.channel.name,
+                    id: details.channel.id,
+                }
+            };
+        } catch (error) {
+            console.error(`Error fetching video with play-dl for URL (${url}):`, error.message);
+            // Re-throw a user-friendly error. play-dl errors can be verbose.
+            throw new Error("Video not found or is private/unavailable.");
+        }
     }
 }
 module.exports = Scraper;
