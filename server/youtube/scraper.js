@@ -1,7 +1,7 @@
 const { SearchTypes, YouTubeURL } = require('./constants.js');
 const Util = require('./util.js');
 const fetch = require('node-fetch');
-const play = require('play-dl');
+const ytdl = require('ytdl-core');
 
 class Scraper {
     /**
@@ -9,14 +9,6 @@ class Scraper {
      */
 constructor(language = 'en') {
         this._lang = language;
-        // Configure play-dl with the same consent cookie we use for the original search scraper.
-        // This is crucial for bypassing YouTube's "Before you continue" / bot-check screens.
-        play.setToken({
-            youtube: {
-                // The cookie from our standard request headers is sufficient.
-                cookie: this._getRequestHeaders().Cookie
-            }
-        });
     }
 
     /**
@@ -142,31 +134,32 @@ constructor(language = 'en') {
 
     async getVideoByUrl(url) {
         try {
-            const videoInfo = await play.video_info(url);
-            const details = videoInfo.video_details;
+            // Use ytdl-core, a more specialized library for fetching video info,
+            // which is generally more robust against YouTube's bot detection.
+            const videoInfo = await ytdl.getInfo(url);
+            const details = videoInfo.videoDetails;
 
             if (!details) {
-                throw new Error("Could not retrieve video details from play-dl.");
+                throw new Error("Could not retrieve video details from ytdl-core.");
             }
 
             return {
                 title: details.title,
-                link: details.url,
+                link: details.video_url,
                 thumbnail: details.thumbnails[details.thumbnails.length - 1].url,
-                duration: details.durationInSec * 1000,
-                id: details.id,
+                duration: parseInt(details.lengthSeconds, 10) * 1000,
+                id: details.videoId,
                 channel: {
-                    name: details.channel.name,
-                    id: details.channel.id,
+                    name: details.author.name,
+                    id: details.author.id,
                 }
             };
         } catch (error) {
-            // Restore detailed logging for play-dl errors.
-            console.error(`--- play-dl Error Diagnostics ---`);
+            // Keep detailed logging for any potential errors.
+            console.error(`--- ytdl-core Error Diagnostics ---`);
             console.error(`Failed to fetch video info for URL: ${url}`);
-            // The full error object often contains more context than just the message.
-            console.error("Full error from play-dl:", error);
-            console.error(`---------------------------------`);
+            console.error("Full error from ytdl-core:", error);
+            console.error(`-----------------------------------`);
             // Re-throw a user-friendly error. play-dl errors can be verbose.
             throw new Error("Video not found or is private/unavailable.");
         }
