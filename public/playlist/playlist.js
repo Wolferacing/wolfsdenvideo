@@ -507,7 +507,8 @@ var Playlist = class {
       addToPlaylist.innerText = "Add To Playlist";
       
       addToPlaylist.addEventListener('click', async () => {
-        this.core.sendMessage({path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.core.sendMessage({ path: Commands.ADD_TO_PLAYLIST, data: v });
+        this.core.showToast(`"${v.title}" was added to the playlist!`);
       }); 
       
       if(this.core.player && this.core.player.host.id === window.user.id) {
