@@ -151,14 +151,14 @@ class Scraper {
         try {
             // First, try the most direct method to find the player response.
             if (webPage.includes('var ytInitialPlayerResponse = ')) {
-                const data = webPage.split('var ytInitialPlayerResponse = ')[1].split(';</script>')[0];
+                const data = webPage.split('var ytInitialPlayerResponse = ')[1].split(';var meta')[0];
                 return JSON.parse(data);
             }
 
             // As a fallback, the player response is often embedded as a stringified JSON inside ytInitialData.
             // This makes the scraper more resilient to layout changes from YouTube.
             if (webPage.includes('var ytInitialData = ')) {
-                const initialDataRaw = webPage.split('var ytInitialData = ')[1].split(';</script>')[0];
+                const initialDataRaw = webPage.split('var ytInitialData = ')[1].split(';window.ytplayer')[0];
                 const initialData = JSON.parse(initialDataRaw);
 
                 const playerResponseRaw = initialData.contents?.twoColumnWatchNextResults?.player?.player?.args?.player_response;
