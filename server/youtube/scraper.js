@@ -9,6 +9,22 @@ class Scraper {
      */
 constructor(language = 'en') {
         this._lang = language;
+        // Prioritize using a full, authenticated cookie string from an environment variable.
+        // This is the most reliable way to bypass advanced bot-detection and CAPTCHAs.
+        // If the environment variable is not set, it falls back to the basic consent cookie.
+        const cookieString = process.env.YOUTUBE_COOKIE_STRING || this._getRequestHeaders().Cookie;
+
+        if (process.env.YOUTUBE_COOKIE_STRING) {
+            console.log("Found YOUTUBE_COOKIE_STRING. Creating ytdl-core agent with full authentication cookies.");
+        } else {
+            console.log("No YOUTUBE_COOKIE_STRING found. Creating ytdl-core agent with default consent cookie.");
+        }
+
+        const cookies = cookieString.split(';').map(c => {
+            const [name, ...valueParts] = c.split('=');
+            return { name: name.trim(), value: valueParts.join('=').trim() };
+        });
+        this._ytdlAgent = ytdl.createAgent(cookies);
     }
 
     /**
@@ -136,9 +152,8 @@ constructor(language = 'en') {
         try {
             // Use ytdl-core, a more specialized library for fetching video info,
             // which is generally more robust against YouTube's bot detection.
-            const videoInfo = await ytdl.getInfo(url, {
-                requestOptions: this._getRequestHeaders()
-            });
+            // Pass the pre-configured agent to handle cookies and session data correctly.
+            const videoInfo = await ytdl.getInfo(url, { agent: this._ytdlAgent });
             const details = videoInfo.videoDetails;
 
             if (!details) {
