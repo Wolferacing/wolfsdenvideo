@@ -422,6 +422,7 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
     this.setOrDefault("spatial-min-distance", '5');
     this.setOrDefault("spatial-max-distance", '40');
     this.setOrDefault("youtube", "https://www.youtube.com/watch?v=GiwStUzx8fg");
+    this.setOrDefault("start", '0');
     
     if (this.params.playlist) {
       const extractedId = this.getPlaylistId(this.params.playlist);

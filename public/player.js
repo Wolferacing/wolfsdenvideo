@@ -153,7 +153,7 @@ baseScript.addEventListener("load", () => {
         'cc_lang_pref': 'en',
         'iv_load_policy': 3,
         'origin': window.location.origin,
-        'start': this.start ? Number(this.start) : 0,
+        'start': this.core.params.start ? Number(this.core.params.start) : 0,
          'vq': 'hd1080'
       },
       events: {
@@ -212,6 +212,7 @@ baseScript.addEventListener("load", () => {
           this.player = event.target; 
           this.setVolume();
           this.setMute();
+          this.player.playVideo(); // Explicitly start playback.
           // setTimeout(() => this.startPlayerOrNot(), 500);
         }
       }
