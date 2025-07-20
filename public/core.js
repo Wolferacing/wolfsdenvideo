@@ -810,6 +810,14 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
         hideSearchOverlay();
       }
     });
+
+    // Add a listener for the Enter key on the input field.
+    this.searchInputOverlay.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent any default form submission behavior
+        submitSearch();
+      }
+    });
   }
 }
 window.videoPlayerCore = new Core();
