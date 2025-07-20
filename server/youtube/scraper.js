@@ -152,8 +152,9 @@ constructor(language = 'en') {
         try {
             // Use ytdl-core, a more specialized library for fetching video info,
             // which is generally more robust against YouTube's bot detection.
-            // Pass the pre-configured agent to handle cookies and session data correctly.
-            const videoInfo = await ytdl.getInfo(url, { agent: this._ytdlAgent });
+            // Use getBasicInfo as we only need metadata, not download formats. This is often
+            // less likely to be challenged by YouTube's bot detection.
+            const videoInfo = await ytdl.getBasicInfo(url, { agent: this._ytdlAgent });
             const details = videoInfo.videoDetails;
 
             if (!details) {
