@@ -149,9 +149,33 @@ class Scraper {
      */
     _getVideoData(webPage) {
         try {
-            const data = webPage.split('var ytInitialPlayerResponse = ')[1].split(';</script>')[0];
-            return JSON.parse(data);
+            // First, try the most direct method to find the player response.
+            if (webPage.includes('var ytInitialPlayerResponse = ')) {
+                const data = webPage.split('var ytInitialPlayerResponse = ')[1].split(';</script>')[0];
+                return JSON.parse(data);
+            }
+
+            // As a fallback, the player response is often embedded as a stringified JSON inside ytInitialData.
+            // This makes the scraper more resilient to layout changes from YouTube.
+            if (webPage.includes('var ytInitialData = ')) {
+                const initialDataRaw = webPage.split('var ytInitialData = ')[1].split(';</script>')[0];
+                const initialData = JSON.parse(initialDataRaw);
+
+                const playerResponseRaw = initialData.contents?.twoColumnWatchNextResults?.player?.player?.args?.player_response;
+                if (playerResponseRaw) {
+                    return JSON.parse(playerResponseRaw);
+                }
+            }
+
+            // If neither method works, we have to fail.
+            throw new Error("Could not find 'ytInitialPlayerResponse' or 'ytInitialData' with player response.");
         } catch (e) {
+            // Add detailed logging to diagnose why parsing failed, as requested.
+            console.error("--- YouTube Scraper Error: Failed to extract player data ---");
+            console.error("This usually means YouTube returned a different page (e.g., consent, captcha, or a new layout).");
+            console.error("Original error:", e.message);
+            console.error("Page snippet (first 2000 chars):", webPage.substring(0, 2000));
+            console.error("--------------------------------------------------------------------------");
             throw new Error('Failed to parse YouTube video data. YouTube might have updated their site or the video is unavailable.');
         }
     }
