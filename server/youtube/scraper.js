@@ -181,8 +181,22 @@ class Scraper {
         const requestBody = {
             videoId: videoId,
             context: {
-                client: innertube.client
-            }
+                client: innertube.client,
+                // Adding a richer context makes the request look more like a genuine browser call,
+                // which is necessary to receive the full video details from the API.
+                user: {},
+                request: {
+                    useSsl: true
+                }
+            },
+            // These additional parameters are often required by the player API.
+            playbackContext: {
+                contentPlaybackContext: {
+                    html5Preference: "HTML5_PREF_WANTS"
+                }
+            },
+            contentCheckOk: true,
+            racyCheckOk: true
         };
 
         const response = await fetch(apiUrl, {
