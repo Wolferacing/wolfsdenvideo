@@ -114,6 +114,18 @@ const shareLink = (id, short = true) => {
     return short ? 'https://youtu.be/'+ id : 'https://www.youtube.com/watch?v='+ id;
 }
 
+/**
+ * Extracts the 11-character YouTube video ID from a URL.
+ * @param {string} url The YouTube URL.
+ * @returns {string|false} The video ID or false if not found.
+ */
+exports.getYoutubeId = (url) => {
+    if (!url) return false;
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    var match = url.match(regExp);
+    return (match && match[7].length == 11) ? match[7] : false;
+};
+
 exports.getChannelData = (item) => {
     const cRender = item.channelRenderer;
     const id = cRender.channelId;
