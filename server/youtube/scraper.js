@@ -9,6 +9,14 @@ class Scraper {
      */
 constructor(language = 'en') {
         this._lang = language;
+        // Configure play-dl with the same consent cookie we use for the original search scraper.
+        // This is crucial for bypassing YouTube's "Before you continue" / bot-check screens.
+        play.setToken({
+            youtube: {
+                // The cookie from our standard request headers is sufficient.
+                cookie: this._getRequestHeaders().Cookie
+            }
+        });
     }
 
     /**
@@ -153,7 +161,12 @@ constructor(language = 'en') {
                 }
             };
         } catch (error) {
-            console.error(`Error fetching video with play-dl for URL (${url}):`, error.message);
+            // Restore detailed logging for play-dl errors.
+            console.error(`--- play-dl Error Diagnostics ---`);
+            console.error(`Failed to fetch video info for URL: ${url}`);
+            // The full error object often contains more context than just the message.
+            console.error("Full error from play-dl:", error);
+            console.error(`---------------------------------`);
             // Re-throw a user-friendly error. play-dl errors can be verbose.
             throw new Error("Video not found or is private/unavailable.");
         }
