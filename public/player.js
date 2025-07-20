@@ -12,13 +12,14 @@ const PROPORTIONAL_GAIN = 0.15;     // How aggressively to correct small drifts.
 const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05x), making it less noticeable.
 // --- End of Sync Constants ---
 
-const playerScript = document.currentScript;
+(() => {
+  const playerScript = document.currentScript;
 
-const baseScript = document.createElement("script");
-const currentScriptUrl = new URL(playerScript.src);
-baseScript.setAttribute("src", `${currentScriptUrl.origin}/base-player.js`);
+  const baseScript = document.createElement("script");
+  const currentScriptUrl = new URL(playerScript.src);
+  baseScript.setAttribute("src", `${currentScriptUrl.origin}/base-player.js`);
 
-baseScript.addEventListener("load", () => {
+  baseScript.addEventListener("load", () => {
   var Player = class extends BasePlayer {
     constructor(){
       super(playerScript);
@@ -554,6 +555,7 @@ baseScript.addEventListener("load", () => {
     }
   }
   window.playerInstance = new Player();
-}, false);
+  }, false);
 
-document.body.appendChild(baseScript);
+  document.body.appendChild(baseScript);
+})();
