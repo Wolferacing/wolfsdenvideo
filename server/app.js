@@ -527,11 +527,31 @@ class App{
     this.videoPlayers[ws.i].currentTime = 0;
   }
   async search(term, ws) {
-    const results = await youtube.search(term, {
-        language: 'en-US',
-        searchType: 'video'
-    });
-    this.send(ws, Commands.SEARCH_RESULTS, results.videos || []);
+    const videoId = this.getYoutubeId(term);
+
+    if (videoId) {
+      // It's a URL, fetch the single video details
+      try {
+        const videoDetails = await youtube.getVideoByUrl(term);
+        if (videoDetails) {
+          // The client expects an array of videos.
+          this.send(ws, Commands.SEARCH_RESULTS, [videoDetails]);
+        } else {
+          // Handle case where video details couldn't be fetched
+          this.send(ws, Commands.SEARCH_RESULTS, []);
+        }
+      } catch (error) {
+        console.error(`Error fetching video by URL (${term}):`, error);
+        this.send(ws, Commands.SEARCH_RESULTS, []);
+      }
+    } else {
+      // It's a search term, perform a regular search
+      const results = await youtube.search(term, {
+          language: 'en-US',
+          searchType: 'video'
+      });
+      this.send(ws, Commands.SEARCH_RESULTS, results.videos || []);
+    }
   }
   onlyIfHost(ws, callback, locked) {
     if(ws.u && ws.u.id && ws.i) {
