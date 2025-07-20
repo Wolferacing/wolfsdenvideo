@@ -1,7 +1,7 @@
 const { SearchTypes, YouTubeURL } = require('./constants.js');
 const Util = require('./util.js');
 const fetch = require('node-fetch');
-const ytdl = require('ytdl-core');
+const ytdl = require('@distube/ytdl-core');
 
 class Scraper {
     /**
