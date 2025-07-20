@@ -250,6 +250,7 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
         const skipAmountBack = this.core.isKaraoke ? SkipJumpTimeKaraoke : SkipJumpTimePlaylist;
         const time = this.player.getCurrentTime() - skipAmountBack;
         this.player.seekTo(time);
+        this.player.playVideo(); // Ensure playback continues after skip
         this.core.showToast(`-${skipAmountBack}s`);
         break;
       case Commands.SKIP_FORWARD:
@@ -257,6 +258,7 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
         const skipAmountForward = this.core.isKaraoke ? SkipJumpTimeKaraoke : SkipJumpTimePlaylist;
         const timeForward = this.player.getCurrentTime() + skipAmountForward;
         this.player.seekTo(timeForward);
+        this.player.playVideo(); // Ensure playback continues after skip
         this.core.showToast(`+${skipAmountForward}s`);
         break;
       case Commands.AUTO_SYNC:
@@ -351,6 +353,7 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
           const diff = newTime - oldTime;
 
           this.player.seekTo(newTime);
+          this.player.playVideo(); // Ensure playback continues after host seek
           this.playerData.lastStartTime = json.data.newLastStartTime;
 
           // Show a toast indicating the skip direction and amount.
@@ -388,6 +391,14 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
             this.updateGraphDisplay(timediff, latency);
           }
           if (this.autoSync) {
+            // If the player is paused but should be auto-syncing, play it.
+            // This handles accidental pauses from media keys, etc. A state of PAUSED (2)
+            // is the primary one to correct. BUFFERING (3) should be allowed to continue.
+            if (this.player.getPlayerState() === YT.PlayerState.PAUSED) {
+              this.core.showToast("Playback resumed by AutoSync.");
+              this.player.playVideo();
+            }
+
             if (Math.abs(timediff) > LARGE_DRIFT_THRESHOLD) {
               // Large drift, a hard seek is necessary for a quick correction.
               const direction = timediff > 0 ? 'FORWARDS +' : 'BACKWARDS -';
