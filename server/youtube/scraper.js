@@ -173,21 +173,23 @@ class Scraper {
             return null; // Matching brace not found
         };
 
+        let playerResponse, initialData; // To store what we find for logging
+
         try {
             // --- Attempt 1: Find the direct player response ---
             const playerResponseRaw = findJson(webPage, 'var ytInitialPlayerResponse = ');
             if (playerResponseRaw) {
-                const tempParsed = JSON.parse(playerResponseRaw);
+                playerResponse = JSON.parse(playerResponseRaw);
                 // This is the crucial check. Only return if we found the rich data object.
-                if (tempParsed.videoDetails) {
-                    return tempParsed; // Success! We found the rich data object.
+                if (playerResponse.videoDetails) {
+                    return playerResponse; // Success! We found the rich data object.
                 }
             }
 
             // --- Attempt 2 (Fallback): Find the embedded player response in the initial data ---
             const initialDataRaw = findJson(webPage, 'var ytInitialData = ');
             if (initialDataRaw) {
-                const initialData = JSON.parse(initialDataRaw);
+                initialData = JSON.parse(initialDataRaw);
                 const playerResponseFromData = initialData.contents?.twoColumnWatchNextResults?.player?.player?.args?.player_response;
                 if (playerResponseFromData) {
                     // The player_response is a stringified JSON within another JSON.
@@ -197,6 +199,25 @@ class Scraper {
                     }
                 }
             }
+
+            // If we are here, both attempts failed. Let's log what we found for diagnostics.
+            console.error("--- YouTube Scraper Diagnostics: Failed to find videoDetails ---");
+            if (playerResponse) {
+                console.error("Found 'ytInitialPlayerResponse' but it lacked 'videoDetails'. Keys found:", Object.keys(playerResponse));
+            } else {
+                console.error("Could not find 'ytInitialPlayerResponse' in the page.");
+            }
+            if (initialData) {
+                const playerResponseFromData = initialData.contents?.twoColumnWatchNextResults?.player?.player?.args?.player_response;
+                if (playerResponseFromData) {
+                    console.error("Found 'player_response' inside 'ytInitialData' but it also lacked 'videoDetails'.");
+                } else {
+                    console.error("Found 'ytInitialData' but it was missing the embedded 'player_response'.");
+                }
+            } else {
+                console.error("Could not find 'ytInitialData' in the page.");
+            }
+            console.error("--------------------------------------------------------------------------");
 
             // If neither method works, we have to fail.
             throw new Error("Could not find a valid player response object with videoDetails.");
