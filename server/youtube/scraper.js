@@ -37,6 +37,18 @@ class Scraper {
 
     /**
      * @private
+     * @param {string} [requestedLang=this._lang]
+     * @returns {object} The headers for a standard request to YouTube.
+     */
+    _getRequestHeaders(requestedLang = this._lang) {
+        return {
+            'Accept-Language': requestedLang,
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            'Cookie': 'CONSENT=YES+yt.4000000000.en+FX+789' // Bypass YouTube's consent screen
+        };
+    }
+    /**
+     * @private
      * @param {string} search_query
      * @param {string} [requestedLang=null]
      * @returns {Promise<string>} The entire YouTube webpage as a string
@@ -54,11 +66,7 @@ class Scraper {
         });
 
         const response = await fetch(YouTubeURL, {
-            headers: {
-                'Accept-Language': requestedLang,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-                'Cookie': 'CONSENT=YES+yt.4000000000.en+FX+789' // Bypass YouTube's consent screen
-            }
+            headers: this._getRequestHeaders(requestedLang)
         });
         if (!response.ok) {
             throw new Error(`Failed to fetch search results: ${response.statusText}`);
@@ -130,11 +138,7 @@ class Scraper {
      */
     async _fetchVideoPage(url, requestedLang = this._lang) {
         const response = await fetch(url, {
-            headers: {
-                'Accept-Language': requestedLang,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-                'Cookie': 'CONSENT=YES+yt.4000000000.en+FX+789' // Bypass YouTube's consent screen
-            }
+            headers: this._getRequestHeaders(requestedLang)
         });
         if (!response.ok) {
             throw new Error(`Failed to fetch video page: ${response.statusText}`);
@@ -170,34 +174,40 @@ class Scraper {
         };
 
         try {
-            let jsonData = findJson(webPage, 'var ytInitialPlayerResponse = ');
+            // --- Attempt 1: Find the direct player response ---
+            const playerResponseRaw = findJson(webPage, 'var ytInitialPlayerResponse = ');
+            if (playerResponseRaw) {
+                const tempParsed = JSON.parse(playerResponseRaw);
+                // This is the crucial check. Only return if we found the rich data object.
+                if (tempParsed.videoDetails) {
+                    return tempParsed; // Success! We found the rich data object.
+                }
+            }
 
-            // If the primary method fails, try the fallback.
-            if (!jsonData) {
-                const initialDataRaw = findJson(webPage, 'var ytInitialData = ');
-                if (initialDataRaw) {
-                    const initialData = JSON.parse(initialDataRaw);
-                    const playerResponseRaw = initialData.contents?.twoColumnWatchNextResults?.player?.player?.args?.player_response;
-                    if (playerResponseRaw) {
-                        // The player_response is a stringified JSON within another JSON.
-                        jsonData = playerResponseRaw;
+            // --- Attempt 2 (Fallback): Find the embedded player response in the initial data ---
+            const initialDataRaw = findJson(webPage, 'var ytInitialData = ');
+            if (initialDataRaw) {
+                const initialData = JSON.parse(initialDataRaw);
+                const playerResponseFromData = initialData.contents?.twoColumnWatchNextResults?.player?.player?.args?.player_response;
+                if (playerResponseFromData) {
+                    // The player_response is a stringified JSON within another JSON.
+                    const tempParsed = JSON.parse(playerResponseFromData);
+                    if (tempParsed.videoDetails) {
+                        return tempParsed; // Success on the fallback!
                     }
                 }
             }
 
-            if (jsonData) {
-                return JSON.parse(jsonData);
-            }
-
             // If neither method works, we have to fail.
-            throw new Error("Could not find 'ytInitialPlayerResponse' or 'ytInitialData' with player response.");
+            throw new Error("Could not find a valid player response object with videoDetails.");
         } catch (e) {
-            // Add detailed logging to diagnose why parsing failed, as requested.
-            console.error("--- YouTube Scraper Error: Failed to extract player data ---");
-            console.error("This usually means YouTube returned a different page (e.g., consent, captcha, or a new layout).");
-            console.error("Original error:", e.message);
-            console.error("Page snippet (first 2000 chars):", webPage.substring(0, 2000));
-            console.error("--------------------------------------------------------------------------");
+            // This improves the error logging to be less noisy if the error is one we threw on purpose from above.
+            if (!e.message.startsWith("Could not find")) {
+                console.error("--- YouTube Scraper Error: An unexpected error occurred during parsing ---");
+                console.error("Original error:", e.message);
+                console.error("Page snippet (first 2000 chars):", webPage.substring(0, 2000));
+                console.error("--------------------------------------------------------------------------");
+            }
             throw new Error('Failed to parse YouTube video data. YouTube might have updated their site or the video is unavailable.');
         }
     }
@@ -213,15 +223,9 @@ class Scraper {
             throw new Error(reason);
         }
 
+        // This check is now mostly for defense. The new _getVideoData guarantees
+        // that videoDetails will exist if we get this far.
         if (!data || !data.videoDetails) {
-            // This can happen if the scraper gets a valid JSON object that isn't the player response.
-            // Add detailed logging here to diagnose what we *did* get.
-            console.error("--- YouTube Scraper Error: Failed to find videoDetails ---");
-            console.error("This usually means the scraper parsed a valid JSON object, but it didn't contain the expected video information.");
-            console.error("Received data object keys:", data ? Object.keys(data) : 'null');
-            // Log a small, safe portion of the data for inspection.
-            console.error("Data snippet (first 2000 chars):", JSON.stringify(data, null, 2).substring(0, 2000));
-            console.error("--------------------------------------------------------------------------");
             throw new Error('Could not find video details in the page data.'); // This error is user-facing.
         }
 
