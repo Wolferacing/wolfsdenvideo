@@ -40,7 +40,10 @@ baseScript.addEventListener("load", () => {
       this.syncIntervalMs = SYNC_INTERVAL_SLOW;
 
       await this.core.setupWebsocket("player", () => this.parseMessage(event.data), () => {
-        this.setupYoutubeScript();
+        // The 'start' parameter is reliably available here after core.init() has run.
+        // We pass it to setupYoutubeScript to ensure it's used when the player is created.
+        const start = this.core.params.start || 0;
+        this.setupYoutubeScript(start);
         this.core.sendMessage({path: "instance", data: this.core.params.instance, u: window.user});
         this.core.sendMessage({path: "user-video-player", data: window.user});
       }, ()=>{
@@ -138,8 +141,8 @@ baseScript.addEventListener("load", () => {
   playPlaylist(shouldClear) {
     this.core.sendMessage({path: Commands.FROM_PLAYLIST, data: {id: this.core.params.playlist, shouldClear, fromPlayer: true}});
   }
-  onYouTubeIframeAPIReady() {
-    new YT.Player('player', {
+  onYouTubeIframeAPIReady(start) {
+    this.player = new YT.Player('player', {
       height: window.innerHeight,
       width: window.innerWidth,
       videoId: this.core.getId(decodeURIComponent(this.core.params.youtube)),
@@ -153,7 +156,7 @@ baseScript.addEventListener("load", () => {
         'cc_lang_pref': 'en',
         'iv_load_policy': 3,
         'origin': window.location.origin,
-        'start': this.core.params.start ? Number(this.core.params.start) : 0,
+        'start': Number(start),
          'vq': 'hd1080'
       },
       events: {
@@ -208,8 +211,7 @@ baseScript.addEventListener("load", () => {
         },
         onApiChange: async event => {
         },
-        onReady: async event => {
-          this.player = event.target; 
+        onReady: event => {
           this.setVolume();
           this.setMute();
           this.player.playVideo(); // Explicitly start playback.
@@ -533,7 +535,16 @@ baseScript.addEventListener("load", () => {
       }
     }
   }
-    setupYoutubeScript() {
+    setupYoutubeScript(start) {
+      // Redefine the global callback to ensure it passes the correct start time.
+      // This is necessary because the YouTube API calls a global function, and we need
+      // to bridge it to our instance method with the correct context.
+      window.onYouTubeIframeAPIReady = () => {
+        if (window.playerInstance) {
+          window.playerInstance.onYouTubeIframeAPIReady(start);
+        }
+      };
+
       return new Promise(resolve => {
         let myScript = document.createElement("script");
         myScript.setAttribute("src", "https://www.youtube.com/iframe_api");
@@ -543,12 +554,6 @@ baseScript.addEventListener("load", () => {
     }
   }
   window.playerInstance = new Player();
-  function onYouTubeIframeAPIReady() {
-    // Check if the instance exists before calling, to prevent errors during cleanup.
-    if (window.playerInstance) {
-      window.playerInstance.onYouTubeIframeAPIReady();
-    }
-  }
 }, false);
 
 document.body.appendChild(baseScript);

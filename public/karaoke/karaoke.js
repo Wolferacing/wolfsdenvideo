@@ -649,7 +649,7 @@ var Karaoke = class {
         'cc_lang_pref': 'en',
         'iv_load_policy': 3,
         'origin': window.location.origin,
-        'start': this.start ? Number(this.start) : 0
+        'start': 0 // The preview player always starts at 0.
       },
       events: {
         'onReady': (event) => {
