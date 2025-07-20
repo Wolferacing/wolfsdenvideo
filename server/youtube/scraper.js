@@ -148,23 +148,45 @@ class Scraper {
      * @returns The video data
      */
     _getVideoData(webPage) {
+        const findJson = (source, startString) => {
+            const startIndex = source.indexOf(startString);
+            if (startIndex === -1) return null;
+
+            const objectStart = source.indexOf('{', startIndex);
+            if (objectStart === -1) return null;
+
+            let openBraces = 1;
+            for (let i = objectStart + 1; i < source.length; i++) {
+                if (source[i] === '{') {
+                    openBraces++;
+                } else if (source[i] === '}') {
+                    openBraces--;
+                }
+                if (openBraces === 0) {
+                    return source.substring(objectStart, i + 1);
+                }
+            }
+            return null; // Matching brace not found
+        };
+
         try {
-            // First, try the most direct method to find the player response.
-            if (webPage.includes('var ytInitialPlayerResponse = ')) {
-                const data = webPage.split('var ytInitialPlayerResponse = ')[1].split(';var meta')[0];
-                return JSON.parse(data);
+            let jsonData = findJson(webPage, 'var ytInitialPlayerResponse = ');
+
+            // If the primary method fails, try the fallback.
+            if (!jsonData) {
+                const initialDataRaw = findJson(webPage, 'var ytInitialData = ');
+                if (initialDataRaw) {
+                    const initialData = JSON.parse(initialDataRaw);
+                    const playerResponseRaw = initialData.contents?.twoColumnWatchNextResults?.player?.player?.args?.player_response;
+                    if (playerResponseRaw) {
+                        // The player_response is a stringified JSON within another JSON.
+                        jsonData = playerResponseRaw;
+                    }
+                }
             }
 
-            // As a fallback, the player response is often embedded as a stringified JSON inside ytInitialData.
-            // This makes the scraper more resilient to layout changes from YouTube.
-            if (webPage.includes('var ytInitialData = ')) {
-                const initialDataRaw = webPage.split('var ytInitialData = ')[1].split(';window.ytplayer')[0];
-                const initialData = JSON.parse(initialDataRaw);
-
-                const playerResponseRaw = initialData.contents?.twoColumnWatchNextResults?.player?.player?.args?.player_response;
-                if (playerResponseRaw) {
-                    return JSON.parse(playerResponseRaw);
-                }
+            if (jsonData) {
+                return JSON.parse(jsonData);
             }
 
             // If neither method works, we have to fail.
