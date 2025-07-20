@@ -532,12 +532,15 @@ class App{
     if (videoId) {
       // It's a URL, fetch the single video details
       try {
-        const videoDetails = await youtube.getVideoByUrl(term);
+        // Reconstruct a full, canonical URL to ensure fetch works and to standardize the input.
+        const fullUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        const videoDetails = await youtube.getVideoByUrl(fullUrl);
         if (videoDetails) {
           // The client expects an array of videos.
           this.send(ws, Commands.SEARCH_RESULTS, [videoDetails]);
         }
       } catch (error) {
+        // The error message from the scraper is user-friendly enough to send to the client.
         console.error(`Error fetching video by URL (${term}):`, error.message);
         this.send(ws, Commands.ERROR, { message: error.message });
       }
