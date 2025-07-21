@@ -20,8 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'PlayerState',
     tableName: 'player_state',
-    updatedAt: 'updated_at',
-    createdAt: 'created_at',
+    underscored: true,
   });
   return PlayerState;
 };
