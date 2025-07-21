@@ -12,6 +12,7 @@ const karaokeHandler = require('./handlers/karaokeHandler.js');
 const hostHandler = require('./handlers/hostHandler.js');
 const { Pool } = require('pg');
 const { parse } = require('pg-connection-string');
+const { promises: dns } = require('dns');
 
 const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
@@ -21,23 +22,9 @@ class App{
     this.videoPlayers = {};
     this.mainLoop = null;
     this.cleanupLoop = null;
-
-    const dbUrl = process.env.DATABASE_URL;
-    let poolConfig;
-
-    if (dbUrl) {
-      // By parsing the URL and adding `family: 4`, we explicitly force the
-      // database connection to use IPv4, which is more robust in some
-      // cloud environments (like Render) that can have IPv6 routing issues.
-      poolConfig = parse(dbUrl);
-      poolConfig.ssl = { rejectUnauthorized: false };
-      poolConfig.family = 4; // Force IPv4 connection
-    } else {
-      // For local development without a DATABASE_URL
-      poolConfig = {};
-    }
-
-    this.pool = new Pool(poolConfig);
+    // The database pool is now initialized asynchronously in the start() function
+    // to allow for DNS lookups to enforce IPv4.
+    this.pool = null;
   }
 
   async setupDatabase() {
@@ -92,13 +79,27 @@ class App{
     console.log(`Source:      ${oldDbUrl.substring(0, 40)}...`);
     console.log(`Destination: ${newDbUrl.substring(0, 40)}...`);
 
-    const oldDbConfig = parse(oldDbUrl);
-    oldDbConfig.ssl = { rejectUnauthorized: false };
-    oldDbConfig.family = 4; // Force IPv4
+    let oldDbConfig = parse(oldDbUrl);
+    let newDbConfig = parse(newDbUrl);
 
-    const newDbConfig = parse(newDbUrl);
+    // Manually resolve hostnames to IPv4 addresses to bypass IPv6 issues in some cloud environments.
+    try {
+      console.log(`Resolving hostname for source DB: ${oldDbConfig.host}`);
+      const oldLookup = await dns.lookup(oldDbConfig.host, { family: 4 });
+      oldDbConfig.host = oldLookup.address;
+      console.log(`Resolved source DB host to IPv4: ${oldDbConfig.host}`);
+
+      console.log(`Resolving hostname for destination DB: ${newDbConfig.host}`);
+      const newLookup = await dns.lookup(newDbConfig.host, { family: 4 });
+      newDbConfig.host = newLookup.address;
+      console.log(`Resolved destination DB host to IPv4: ${newDbConfig.host}`);
+    } catch (dnsErr) {
+      console.error('XXX DATABASE MIGRATION FAILED: DNS LOOKUP ERROR XXX', dnsErr);
+      throw dnsErr;
+    }
+
+    oldDbConfig.ssl = { rejectUnauthorized: false };
     newDbConfig.ssl = { rejectUnauthorized: false };
-    newDbConfig.family = 4; // Force IPv4
 
     const oldPool = new Pool(oldDbConfig);
     const newPool = new Pool(newDbConfig);
@@ -1051,20 +1052,35 @@ async function start() {
     const oldDbUrl = process.env.DATABASE_URL;
     const newDbUrl = process.env.NEW_DATABASE_URL;
 
-    // --- Automated Database Migration Logic ---
     if (newDbUrl && newDbUrl.trim() !== '' && newDbUrl !== oldDbUrl) {
-      // A new database URL is provided, so we run the migration.
-      // The migration function returns the new pool on success, which we
-      // then assign as the application's primary pool.
+      // --- Automated Database Migration ---
+      // The migration function handles DNS lookups and returns the new, ready-to-use pool.
       const newPool = await app.migrateDatabase();
       app.pool = newPool;
     } else {
-      // Standard startup: initialize the database schema using the default pool.
-      console.log("Initializing database...");
-      await app.setupDatabase();
-      console.log("Database initialization complete.");
+      // --- Standard Startup ---
+      if (oldDbUrl) {
+        const poolConfig = parse(oldDbUrl);
+        try {
+          // Manually resolve hostname to IPv4 to prevent connection issues.
+          console.log(`Resolving hostname for primary DB: ${poolConfig.host}`);
+          const lookup = await dns.lookup(poolConfig.host, { family: 4 });
+          poolConfig.host = lookup.address;
+          console.log(`Resolved primary DB host to IPv4: ${poolConfig.host}`);
+        } catch (dnsErr) {
+          console.error('XXX DATABASE CONNECTION FAILED: DNS LOOKUP ERROR XXX', dnsErr);
+          throw dnsErr;
+        }
+        poolConfig.ssl = { rejectUnauthorized: false };
+        app.pool = new Pool(poolConfig);
+
+        console.log("Initializing database...");
+        await app.setupDatabase();
+        console.log("Database initialization complete.");
+      } else {
+        console.log("No DATABASE_URL provided. Skipping database setup.");
+      }
     }
-    // --- End of Migration Logic ---
 
     // --- Database Cleanup ---
     // Run cleanup once on startup to immediately clear out old records.
