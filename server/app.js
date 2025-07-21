@@ -11,6 +11,15 @@ const playlistHandler = require('./handlers/playlistHandler.js');
 const karaokeHandler = require('./handlers/karaokeHandler.js');
 const hostHandler = require('./handlers/hostHandler.js');
 const { Pool } = require('pg');
+
+// --- FIX for IPv6 connection issues in some environments ---
+// By default, Node.js might try to connect via IPv6 if available.
+// In environments like Render, this can lead to ENETUNREACH errors if the
+// network path to the database over IPv6 is not configured. This line
+// tells Node.js to prefer IPv4 addresses, which is more robust.
+require('dns').setDefaultResultOrder('ipv4first');
+// --- End of FIX ---
+
 const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
 
