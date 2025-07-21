@@ -12,10 +12,32 @@ const karaokeHandler = require('./handlers/karaokeHandler.js');
 const hostHandler = require('./handlers/hostHandler.js');
 const { Pool } = require('pg');
 const { parse } = require('pg-connection-string');
-const { promises: dns } = require('dns');
 
 const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
+
+/**
+ * Creates a robust database pool configuration object from a URL.
+ * - Forces IPv4 to prevent connection issues in some cloud environments (e.g., Render).
+ * - Automatically adds the required 'endpoint' option for Neon database URLs to support SNI.
+ * @param {string} dbUrl The database connection string.
+ * @returns {object} The configuration object for the pg Pool constructor.
+ */
+function createDbPoolConfig(dbUrl) {
+  if (!dbUrl) return {};
+
+  const config = parse(dbUrl);
+  config.ssl = { rejectUnauthorized: false };
+  config.family = 4; // Force IPv4
+
+  if (config.host && config.host.includes('.neon.tech')) {
+    const endpointId = config.host.split('.')[0];
+    config.options = `endpoint=${endpointId}`;
+    console.log(`Neon DB detected. Applying connection options: endpoint=${endpointId}`);
+  }
+
+  return config;
+}
 
 class App{
   constructor() {
@@ -24,7 +46,7 @@ class App{
     this.cleanupLoop = null;
     // The database pool is now initialized asynchronously in the start() function
     // to allow for DNS lookups to enforce IPv4.
-    this.pool = null;
+    this.pool = new Pool(createDbPoolConfig(process.env.DATABASE_URL));
   }
 
   async setupDatabase() {
@@ -79,35 +101,8 @@ class App{
     console.log(`Source:      ${oldDbUrl.substring(0, 40)}...`);
     console.log(`Destination: ${newDbUrl.substring(0, 40)}...`);
 
-    let oldDbConfig = parse(oldDbUrl);
-    let newDbConfig = parse(newDbUrl);
-
-    // Manually resolve hostnames to IPv4 addresses to bypass IPv6 issues in some cloud environments.
-    try {
-      console.log(`Resolving hostname for source DB: ${oldDbConfig.host}`);
-      const oldLookup = await dns.lookup(oldDbConfig.host, { family: 4 });
-      oldDbConfig.host = oldLookup.address;
-      console.log(`Resolved source DB host to IPv4: ${oldDbConfig.host}`);
-
-      console.log(`Resolving hostname for destination DB: ${newDbConfig.host}`);
-      const newLookup = await dns.lookup(newDbConfig.host, { family: 4 });
-      newDbConfig.host = newLookup.address;
-      console.log(`Resolved destination DB host to IPv4: ${newDbConfig.host}`);
-    } catch (dnsErr) {
-      if (dnsErr.code === 'ENOTFOUND') {
-        console.error(`\nXXX DATABASE MIGRATION FAILED: The hostname "${dnsErr.hostname}" could not be found. XXX`);
-        console.error('This usually means you are using an IPv6-only "Direct Connection" URL on an IPv4 network. Please use the "Session Pooler" connection string from your database provider (e.g., Supabase).\n');
-      } else {
-        console.error('XXX DATABASE MIGRATION FAILED: DNS LOOKUP ERROR XXX', dnsErr);
-      }
-      throw dnsErr;
-    }
-
-    oldDbConfig.ssl = { rejectUnauthorized: false };
-    newDbConfig.ssl = { rejectUnauthorized: false };
-
-    const oldPool = new Pool(oldDbConfig);
-    const newPool = new Pool(newDbConfig);
+    const oldPool = new Pool(createDbPoolConfig(oldDbUrl));
+    const newPool = new Pool(createDbPoolConfig(newDbUrl));
 
     let oldClient, newClient;
 
@@ -1060,30 +1055,12 @@ async function start() {
     if (newDbUrl && newDbUrl.trim() !== '' && newDbUrl !== oldDbUrl) {
       // --- Automated Database Migration ---
       // The migration function handles DNS lookups and returns the new, ready-to-use pool.
-      const newPool = await app.migrateDatabase();
-      app.pool = newPool;
+      app.pool = await app.migrateDatabase();
     } else {
       // --- Standard Startup ---
       if (oldDbUrl) {
-        const poolConfig = parse(oldDbUrl);
-        try {
-          // Manually resolve hostname to IPv4 to prevent connection issues.
-          console.log(`Resolving hostname for primary DB: ${poolConfig.host}`);
-          const lookup = await dns.lookup(poolConfig.host, { family: 4 });
-          poolConfig.host = lookup.address;
-          console.log(`Resolved primary DB host to IPv4: ${poolConfig.host}`);
-        } catch (dnsErr) {
-          if (dnsErr.code === 'ENOTFOUND') {
-            console.error(`\nXXX DATABASE CONNECTION FAILED: The hostname "${dnsErr.hostname}" could not be found. XXX`);
-            console.error('Please double-check that the DATABASE_URL environment variable is correct and that the database is active.\n');
-          } else {
-            console.error('XXX DATABASE CONNECTION FAILED: DNS LOOKUP ERROR XXX', dnsErr);
-          }
-          throw dnsErr;
-        }
-        poolConfig.ssl = { rejectUnauthorized: false };
-        app.pool = new Pool(poolConfig);
-
+        // Re-initialize the pool with the helper function to ensure correct options are set.
+        app.pool = new Pool(createDbPoolConfig(oldDbUrl));
         console.log("Initializing database...");
         await app.setupDatabase();
         console.log("Database initialization complete.");
