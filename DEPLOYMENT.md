@@ -45,6 +45,10 @@ This guide covers setting up a local development environment and deploying the a
     # .env file
     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
     
+    # To test the automated migration feature locally, you can add a second
+    # database URL. The server will copy data from DATABASE_URL to NEW_DATABASE_URL on startup.
+    # NEW_DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/firevplayer_new"
+
     # Example for a local setup:
     # DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/firevplayer"
     ```
@@ -98,3 +102,50 @@ This application is designed to be easily deployed on Render.
 ### Database Maintenance
 
 The application includes an automatic cleanup job that runs every 24 hours. It purges any player instances from the database that have been inactive for more than 7 days, keeping your database lean and performant.
+
+### Automated Database Migration
+
+The application includes a built-in, automated process to migrate your data from one PostgreSQL database to another with zero data loss and minimal downtime. This is particularly useful for moving from a temporary database (like Render's free-tier instances which expire after 90 days) to a permanent one (like Neon or Supabase).
+
+The migration is triggered by setting a `NEW_DATABASE_URL` environment variable.
+
+#### Migration Steps on Render
+
+1.  **Provision Your New Database:**
+    -   Create your new, permanent PostgreSQL database on a service like Neon.
+    -   Obtain its connection string (URL).
+
+2.  **Set the Migration Variable:**
+    -   In your Render Web Service settings, go to the "Environment" tab.
+    -   Click "Add Environment Variable".
+        -   **Key:** `NEW_DATABASE_URL`
+        -   **Value:** Paste the connection URL of your **new** database.
+
+3.  **Trigger the Migration:**
+    -   From the Render dashboard, manually restart your web service by going to the "Manual Deploy" menu and selecting "Restart service".
+    -   On startup, the application will detect both database URLs, pause normal operations, and copy all data from the old `DATABASE_URL` to the `NEW_DATABASE_URL`.
+
+4.  **Verify Success:**
+    -   Go to the "Logs" tab for your service. You should see log messages like `!!! DATABASE MIGRATION INITIATED !!!` followed by `✔✔✔ DATABASE MIGRATION SUCCESSFUL ✔✔✔`.
+
+5.  **Finalize the Switch:**
+    -   Once you've confirmed the migration was successful, go back to the "Environment" tab.
+    -   Update the value of the original `DATABASE_URL` variable, replacing it with your **new** database's URL.
+    -   **Delete** the `NEW_DATABASE_URL` environment variable.
+    -   The service will restart automatically. It will now run exclusively on your new, permanent database. Your old database is no longer used and can be safely deleted.
+
+### Advanced Configuration
+
+#### Improving YouTube Scraper Reliability
+
+YouTube can sometimes block requests from servers, which may cause video search or adding single videos by URL to fail. To make this more reliable, you can provide an authenticated cookie string as an environment variable.
+
+-   **Key:** `YOUTUBE_COOKIE_STRING`
+-   **Value:** The full `cookie` string from a browser session logged into YouTube.
+
+**How to get the cookie string:**
+1.  Open YouTube in your web browser and log in.
+2.  Open your browser's Developer Tools (usually F12).
+3.  Go to the "Network" tab, refresh the YouTube page, and click on the first request to `www.youtube.com`.
+4.  In the "Headers" section, find the `cookie` request header and copy its entire value.
+5.  Set this value for the `YOUTUBE_COOKIE_STRING` environment variable in Render.
