@@ -83,10 +83,14 @@ class App{
     const oldPool = new Pool({ connectionString: oldDbUrl, ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false });
     const newPool = new Pool({ connectionString: newDbUrl, ssl: process.env.NEW_DATABASE_URL ? { rejectUnauthorized: false } : false });
 
-    const oldClient = await oldPool.connect();
-    const newClient = await newPool.connect();
+    let oldClient, newClient;
 
     try {
+      console.log('Connecting to source and destination databases...');
+      oldClient = await oldPool.connect();
+      newClient = await newPool.connect();
+      console.log('Connections established.');
+
       // 1. Ensure schema exists on the new database.
       await newClient.query(`
           CREATE TABLE IF NOT EXISTS player_state (
@@ -134,12 +138,20 @@ class App{
     } catch (err) {
       console.error('XXX DATABASE MIGRATION FAILED XXX');
       console.error('Error during migration:', err);
-      await newClient.query('ROLLBACK');
-      console.error('Transaction has been rolled back. The application will not start.');
+      if (newClient) {
+        try {
+          await newClient.query('ROLLBACK');
+          console.error('Transaction has been rolled back.');
+        } catch (rollbackErr) {
+          console.error('Failed to rollback transaction:', rollbackErr);
+        }
+      }
+      console.error('The application will not start.');
       throw err; // Halt the application startup.
     } finally {
-      oldClient.release();
-      newClient.release();
+      // Release clients back to their pools if they were successfully acquired.
+      if (oldClient) oldClient.release();
+      if (newClient) newClient.release();
     }
   }
   async savePlayerState(instanceId) {
