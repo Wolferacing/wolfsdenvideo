@@ -8,13 +8,13 @@ This guide covers setting up a local development environment and deploying the a
 
 -   [Node.js](https://nodejs.org/) (v20.x or greater, as per `package.json`)
 -   npm
--   A running PostgreSQL instance (e.g., via local install or Docker).
+-   (Optional) A running PostgreSQL or MySQL instance for testing against a production-like environment.
 
 ### Steps
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/Fire-V-Player.git
+    git clone https://github.com/FireRat666/Fire-V-Player.git
     cd Fire-V-Player
     ```
 
@@ -23,41 +23,38 @@ This guide covers setting up a local development environment and deploying the a
     npm install
     ```
 
-3.  **Configure the Host URL:**
-    This is a critical step. The client-side scripts need to know the URL of your server.
+3.  **Configure Local Host URL:**
+    The client-side scripts need to know the URL of your local server.
     -   Open the file `public/config.js`.
     -   Change the `HOST_URL` to `localhost:3000` for local testing.
     ```javascript
-    // public/config.js
     window.APP_CONFIG = {
       HOST_URL: 'localhost:3000' // For local development
     };
     ```
 
 4.  **Set up the database:**
-    -   Create a new database in your PostgreSQL instance.
-    -   The application needs a database connection URL. You will set this as an environment variable.
+    By default, the application will automatically use a local `db.sqlite` file in the project root, requiring no setup.
 
-5.  **Configure Environment Variable:**
-    Create a file named `.env` in the root of the project. This file will store your local database connection string and is ignored by git.
-    Add the following line to your `.env` file, replacing the values with your own:
-    ```
-    # .env file
+5.  **(Optional) Configure for PostgreSQL/MySQL:**
+    If you want to test against a remote database locally, create a file named `.env` in the project root. This file is ignored by git. Add your database connection string to it:
+    ```bash
+    # .env
     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
-    
-    # To test the automated migration feature locally, you can add a second
-    # database URL. The server will copy data from DATABASE_URL to NEW_DATABASE_URL on startup.
-    # NEW_DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/firevplayer_new"
+    ```
+    When this file is present, the application will use the specified database instead of SQLite.
 
-    # Example for a local setup:
-    # DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/firevplayer"
+6.  **Apply Database Schema:**
+    Run the migration command to create the necessary tables in your database (either SQLite or the one from your `.env` file).
+    ```bash
+    npx sequelize-cli db:migrate
     ```
 
-6.  **Run the server:**
+7.  **Run the server:**
     ```bash
     npm start
     ```
-    The server will start, and you can access the application at `http://localhost:3000`. The server will automatically create the necessary `player_state` table in your database on its first run.
+    The server will start, and you can access the application at `http://localhost:3000`.
 
 ## Deployment to Render
 
@@ -75,7 +72,6 @@ This application is designed to be easily deployed on Render.
     -   Open the file `public/config.js`.
     -   Change the `HOST_URL` to your Render service's URL (e.g., `your-app-name.onrender.com`).
     ```javascript
-    // public/config.js
     window.APP_CONFIG = {
       HOST_URL: 'your-app-name.onrender.com' // Your public Render URL
     };
@@ -88,7 +84,7 @@ This application is designed to be easily deployed on Render.
         -   **Name:** `fire-v-player` (or your choice)
         -   **Region:** Choose the same region as your database for best performance.
         -   **Branch:** `main` (or your default branch)
-        -   **Build Command:** `npm install`
+        -   **Build Command:** `npm install && npx sequelize-cli db:migrate`
         -   **Start Command:** `npm start`
 
 5.  **Link the Environment Variable:**
@@ -97,7 +93,7 @@ This application is designed to be easily deployed on Render.
     -   **If using an External DB:** Click "Add Environment Variable". Set the `Key` to `DATABASE_URL` and paste the connection URL from your external provider into the `Value` field.
 
 6.  **Deploy:**
-    -   Click "Create Web Service". Render will build and deploy your application. The first time it starts, it will connect to the database and set up the required table.
+    -   Click "Create Web Service". Render will build your application, which includes running the database migration to set up the necessary tables. Once the build is complete, the service will start.
 
 ### Database Maintenance
 
@@ -105,14 +101,14 @@ The application includes an automatic cleanup job that runs every 24 hours. It p
 
 ### Automated Database Migration
 
-The application includes a built-in, automated process to migrate your data from one PostgreSQL database to another with zero data loss and minimal downtime. This is particularly useful for moving from a temporary database (like Render's free-tier instances which expire after 90 days) to a permanent one (like Neon or Supabase).
+The application includes a built-in, automated process to migrate your data from one database to another with zero data loss and minimal downtime. This is particularly useful for moving from a temporary database (like Render's free-tier instances which expire after 90 days) to a permanent one.
 
-The migration is triggered by setting a `NEW_DATABASE_URL` environment variable.
+The migration is triggered by setting both a `DATABASE_URL` (for the old DB) and a `NEW_DATABASE_URL` (for the new DB) environment variable.
 
 #### Migration Steps on Render
 
 1.  **Provision Your New Database:**
-    -   Create your new, permanent PostgreSQL database on a service like Neon.
+    -   Create your new, permanent database (e.g., on Neon, Supabase, or another Render PostgreSQL instance).
     -   Obtain its connection string (URL).
 
 2.  **Set the Migration Variable:**
@@ -123,10 +119,10 @@ The migration is triggered by setting a `NEW_DATABASE_URL` environment variable.
 
 3.  **Trigger the Migration:**
     -   From the Render dashboard, manually restart your web service by going to the "Manual Deploy" menu and selecting "Restart service".
-    -   On startup, the application will detect both database URLs, pause normal operations, and copy all data from the old `DATABASE_URL` to the `NEW_DATABASE_URL`.
+    -   On startup, the application will detect both database URLs, apply the schema to the new database, and copy all data from the old `DATABASE_URL` to the `NEW_DATABASE_URL`.
 
 4.  **Verify Success:**
-    -   Go to the "Logs" tab for your service. You should see log messages like `!!! DATABASE MIGRATION INITIATED !!!` followed by `✔✔✔ DATABASE MIGRATION SUCCESSFUL ✔✔✔`.
+    -   Go to the "Logs" tab for your service. You should see log messages like `!!! New database URL detected...` followed by `✔✔✔ Application will now use the new database. ✔✔✔`.
 
 5.  **Finalize the Switch:**
     -   Once you've confirmed the migration was successful, go back to the "Environment" tab.

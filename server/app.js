@@ -10,172 +10,105 @@ const Commands = require('../public/commands.js');
 const playlistHandler = require('./handlers/playlistHandler.js');
 const karaokeHandler = require('./handlers/karaokeHandler.js');
 const hostHandler = require('./handlers/hostHandler.js');
-const { Pool } = require('pg');
-const { parse } = require('pg-connection-string');
+const { Op, Sequelize, DataTypes } = require('sequelize');
+const { Umzug, SequelizeStorage } = require('umzug');
+const models = require('./models'); // Sequelize models
 
 const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
-
-/**
- * Creates a robust database pool configuration object from a URL.
- * - Forces IPv4 to prevent connection issues in some cloud environments (e.g., Render).
- * - Automatically adds the required 'endpoint' option for Neon database URLs to support SNI.
- * @param {string} dbUrl The database connection string.
- * @returns {object} The configuration object for the pg Pool constructor.
- */
-function createDbPoolConfig(dbUrl) {
-  if (!dbUrl) return {};
-
-  const config = parse(dbUrl);
-  config.ssl = { rejectUnauthorized: false };
-  config.family = 4; // Force IPv4
-
-  if (config.host && config.host.includes('.neon.tech')) {
-    const endpointId = config.host.split('.')[0];
-    config.options = `endpoint=${endpointId}`;
-    console.log(`Neon DB detected. Applying connection options: endpoint=${endpointId}`);
-  }
-
-  return config;
-}
 
 class App{
   constructor() {
     this.videoPlayers = {};
     this.mainLoop = null;
     this.cleanupLoop = null;
-    // The database pool is now initialized asynchronously in the start() function
-    // to allow for DNS lookups to enforce IPv4.
-    this.pool = new Pool(createDbPoolConfig(process.env.DATABASE_URL));
+    this.dbConnected = false;
+    // The sequelize instance is now set in start() after potential migration.
+    this.sequelize = models.sequelize;
   }
-
-  async setupDatabase() {
-    const client = await this.pool.connect();
-    try {
-      // Step 1: Ensure the table schema is what we expect.
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS player_state (
-          instance_id TEXT PRIMARY KEY,
-          player_data JSONB NOT NULL,
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-        );
-      `);
-      console.log('Database table "player_state" schema ensured.');
-
-      // Step 2: Verify the table is actually queryable.
-      try {
-        await client.query('SELECT 1 FROM player_state LIMIT 1;');
-        console.log('Database table "player_state" successfully verified.');
-      } catch (verifyError) {
-        // If verification fails, the table might be corrupt.
-        console.warn('Could not verify "player_state" table. It might be corrupted. Attempting to recover...', verifyError.code);
-        
-        // Step 3: Attempt recovery by dropping and recreating the table.
-        // This is a destructive operation but can fix a corrupted state.
-        await client.query('DROP TABLE IF EXISTS player_state CASCADE;');
-        console.log('Dropped potentially corrupted "player_state" table.');
-        
-        await client.query(`
-          CREATE TABLE player_state (
-            instance_id TEXT PRIMARY KEY,
-            player_data JSONB NOT NULL,
-            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-          );
-        `);
-        console.log('Successfully recreated "player_state" table.');
-      }
-
-    } catch (err) {
-      console.error('CRITICAL: Database setup failed and could not recover.', err);
-      // Re-throw the error to ensure the main startup process catches it and aborts.
-      throw err;
-    } finally {
-      client.release();
-    }
-  }
-  async migrateDatabase() {
+  async migrateDatabase(app, models) {
     const oldDbUrl = process.env.DATABASE_URL;
     const newDbUrl = process.env.NEW_DATABASE_URL;
 
-    console.log('!!! DATABASE MIGRATION INITIATED !!!');
     console.log(`Source:      ${oldDbUrl.substring(0, 40)}...`);
     console.log(`Destination: ${newDbUrl.substring(0, 40)}...`);
 
-    const oldPool = new Pool(createDbPoolConfig(oldDbUrl));
-    const newPool = new Pool(createDbPoolConfig(newDbUrl));
+    // Helper to create a sequelize instance from a URL
+    const createSequelizeInstance = (dbUrl) => {
+      const options = {
+        logging: false, // Don't log every single query during migration
+      };
+      if (dbUrl.startsWith('postgres')) {
+        options.dialect = 'postgres';
+        options.dialectOptions = { ssl: { require: true, rejectUnauthorized: false } };
+      } else if (dbUrl.startsWith('mysql')) {
+        options.dialect = 'mysql';
+      } else { // Assume sqlite file path
+        options.dialect = 'sqlite';
+        options.storage = dbUrl;
+        options.dialectModule = require('@libsql/client');
+      }
+      return new Sequelize(dbUrl, options);
+    };
 
-    let oldClient, newClient;
+    const oldSequelize = createSequelizeInstance(oldDbUrl);
+    const newSequelize = createSequelizeInstance(newDbUrl);
 
-    try {
-      console.log('Connecting to source and destination databases...');
-      oldClient = await oldPool.connect();
-      newClient = await newPool.connect();
-      console.log('Connections established.');
+    // 1. Run migrations on the new database to ensure the schema is ready.
+    console.log('Applying migrations to the new database...');
+    const umzug = new Umzug({
+      migrations: { glob: 'server/migrations/*.js' },
+      context: newSequelize.getQueryInterface(),
+      storage: new SequelizeStorage({ sequelize: newSequelize }),
+      logger: undefined, // Pass undefined to disable Umzug's verbose logging
+    });
+    await umzug.up();
+    console.log('Migrations applied successfully.');
 
-      // 1. Ensure schema exists on the new database.
-      await newClient.query(`
-          CREATE TABLE IF NOT EXISTS player_state (
-            instance_id TEXT PRIMARY KEY,
-            player_data JSONB NOT NULL,
-            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-          );
-      `);
-      console.log('Destination database schema ensured.');
+    // 2. Define the PlayerState model for both connections
+    const PlayerStateModel = require('./models/playerState');
+    const OldPlayerState = PlayerStateModel(oldSequelize, DataTypes);
+    const NewPlayerState = PlayerStateModel(newSequelize, DataTypes);
 
-      // 2. Get all data from the old database.
-      console.log('Fetching all data from the source database...');
-      const { rows } = await oldClient.query('SELECT instance_id, player_data, updated_at FROM player_state');
-      console.log(`Found ${rows.length} records to migrate.`);
+    // 3. Fetch all data from the old database
+    console.log('Fetching all data from the source database...');
+    const allStates = await OldPlayerState.findAll({ raw: true });
+    console.log(`Found ${allStates.length} records to migrate.`);
 
-      if (rows.length > 0) {
-        // 3. Copy data in a single transaction for safety.
-        await newClient.query('BEGIN');
+    if (allStates.length > 0) {
+      // 4. Copy data in a single transaction for safety.
+      const transaction = await newSequelize.transaction();
+      try {
         console.log('Starting transaction on destination database...');
-
         // Clear the destination table to ensure a clean, exact copy.
-        await newClient.query('TRUNCATE TABLE player_state;');
+        await NewPlayerState.destroy({ where: {}, truncate: true, transaction });
         console.log('Destination table truncated.');
 
-        // 4. Insert all rows. A loop is robust and clear.
-        for (const row of rows) {
-          await newClient.query(
-            'INSERT INTO player_state (instance_id, player_data, updated_at) VALUES ($1, $2, $3)',
-            [row.instance_id, row.player_data, row.updated_at]
-          );
-        }
+        // Insert all rows.
+        await NewPlayerState.bulkCreate(allStates, { transaction });
         console.log('All records inserted into destination database.');
 
-        await newClient.query('COMMIT');
+        await transaction.commit();
         console.log('Transaction committed.');
+      } catch (err) {
+        console.error('XXX DATABASE MIGRATION FAILED DURING TRANSACTION XXX');
+        await transaction.rollback();
+        console.error('Transaction has been rolled back.');
+        throw err; // Halt the application startup.
       }
-
-      console.log('✔✔✔ DATABASE MIGRATION SUCCESSFUL ✔✔✔');
-      console.log('The application will now use the new database.');
-
-      // 5. Close the old pool and return the new one for the app to use.
-      await oldPool.end();
-      return newPool;
-
-    } catch (err) {
-      console.error('XXX DATABASE MIGRATION FAILED XXX');
-      console.error('Error during migration:', err);
-      if (newClient) {
-        try {
-          await newClient.query('ROLLBACK');
-          console.error('Transaction has been rolled back.');
-        } catch (rollbackErr) {
-          console.error('Failed to rollback transaction:', rollbackErr);
-        }
-      }
-      console.error('The application will not start.');
-      throw err; // Halt the application startup.
-    } finally {
-      // Release clients back to their pools if they were successfully acquired.
-      if (oldClient) oldClient.release();
-      if (newClient) newClient.release();
     }
+
+    console.log('Data migration complete.');
+    // 5. Re-wire the application to use the new database connection.
+    app.sequelize = newSequelize;
+    models.sequelize = newSequelize;
+    models.PlayerState = require('./models/playerState')(newSequelize, DataTypes);
+
+    // 6. Close the old connection pool.
+    await oldSequelize.close();
   }
   async savePlayerState(instanceId) {
+    if (!this.dbConnected) return;
     const player = this.videoPlayers[instanceId];
     if (!player) return;
 
@@ -212,41 +145,32 @@ class App{
       isKaraoke: player.isKaraoke
     };
 
-    const client = await this.pool.connect();
     try {
-      // This query uses ON CONFLICT to perform an "upsert": update if exists, insert if not.
-      await client.query(
-        `INSERT INTO player_state (instance_id, player_data, updated_at)
-         VALUES ($1, $2, NOW())
-         ON CONFLICT (instance_id) DO UPDATE
-         SET player_data = EXCLUDED.player_data, updated_at = NOW();`,
-        [instanceId, stateToSave]
-      );
+      // Use Sequelize's "upsert" method to insert or update the record.
+      await models.PlayerState.upsert({
+        instanceId: instanceId,
+        playerData: stateToSave
+      });
     } catch (err) {
       console.error(`Error saving state for instance ${instanceId}:`, err);
-    } finally {
-      client.release();
     }
   }
   async cleanupInactiveInstances() {
+    if (!this.dbConnected) return;
     const cleanupThreshold = '7 days'; // The inactivity period before an instance is purged.
     console.log(`Running cleanup for instances inactive for more than ${cleanupThreshold}...`);
-    const client = await this.pool.connect();
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     try {
-      const query = `
-        DELETE FROM player_state
-        WHERE updated_at < NOW() - INTERVAL '${cleanupThreshold}'
-      `;
-      const result = await client.query(query);
-      if (result.rowCount > 0) {
-        console.log(`Database cleanup: Removed ${result.rowCount} inactive instance(s).`);
+      const result = await models.PlayerState.destroy({
+        where: { updatedAt: { [Op.lt]: sevenDaysAgo } }
+      });
+      if (result > 0) {
+        console.log(`Database cleanup: Removed ${result} inactive instance(s).`);
       } else {
         console.log('Database cleanup: No inactive instances to remove.');
       }
     } catch (err) {
       console.error('Error during database cleanup of inactive instances:', err);
-    } finally {
-      client.release();
     }
   }
   setupWebserver() { 
@@ -832,57 +756,56 @@ class App{
   }
   async createVideoPlayer(instanceId, user, ws) {
     if(!this.videoPlayers[instanceId]) {
-      const client = await this.pool.connect();
       let existingState = null;
-      try {
-        const res = await client.query('SELECT player_data FROM player_state WHERE instance_id = $1', [instanceId]);
-        if (res.rows.length > 0) {
-          existingState = res.rows[0].player_data;
+      if (this.dbConnected) {
+        try {
+          const result = await models.PlayerState.findByPk(instanceId);
+          if (result) {
+            existingState = result.playerData;
 
-          // --- Data Re-hydration and Migration ---
-          // This logic handles both the new "lean" format and the old "fat" format,
-          // ensuring seamless migration of old data.
-          if (existingState.playlist && Array.isArray(existingState.playlist)) {
-            const userMap = existingState.userMap || {};
+            // --- Data Re-hydration and Migration ---
+            // This logic handles both the new "lean" format and the old "fat" format,
+            // ensuring seamless migration of old data.
+            if (existingState.playlist && Array.isArray(existingState.playlist)) {
+              const userMap = existingState.userMap || {};
 
-            // If we loaded an old record, build the userMap from the fat data.
-            if (!existingState.userMap) {
-              if (existingState.host) userMap[existingState.host.id] = existingState.host.name;
-              existingState.playlist.forEach(video => {
-                if (video.user) userMap[video.user.id] = video.user.name;
+              // If we loaded an old record, build the userMap from the fat data.
+              if (!existingState.userMap) {
+                if (existingState.host) userMap[existingState.host.id] = existingState.host.name;
+                existingState.playlist.forEach(video => {
+                  if (video.user) userMap[video.user.id] = video.user.name;
+                });
+              }
+
+              existingState.playlist = existingState.playlist.map(video => {
+                // Re-hydrate thumbnail if missing (from lean format)
+                if (!video.thumbnail) {
+                  const videoId = this.getYoutubeId(video.link);
+                  video.thumbnail = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '';
+                }
+
+                // Re-hydrate user object if missing (from lean format)
+                if (!video.user && video.userId && userMap[video.userId]) {
+                  video.user = { id: video.userId, name: userMap[video.userId] };
+                } else if (!video.user) {
+                  video.user = { id: null, name: 'Unknown' };
+                }
+
+                // Always reset non-persistent state
+                video.votes = 0;
+                return video;
               });
-            }
 
-            existingState.playlist = existingState.playlist.map(video => {
-              // Re-hydrate thumbnail if missing (from lean format)
-              if (!video.thumbnail) {
-                const videoId = this.getYoutubeId(video.link);
-                video.thumbnail = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '';
+              // Re-hydrate host object if missing (from lean format)
+              if (!existingState.host && existingState.hostId && userMap[existingState.hostId]) {
+                existingState.host = { id: existingState.hostId, name: userMap[existingState.hostId] };
               }
-
-              // Re-hydrate user object if missing (from lean format)
-              if (!video.user && video.userId && userMap[video.userId]) {
-                video.user = { id: video.userId, name: userMap[video.userId] };
-              } else if (!video.user) {
-                video.user = { id: null, name: 'Unknown' };
-              }
-
-              // Always reset non-persistent state
-              video.votes = 0;
-              return video;
-            });
-
-            // Re-hydrate host object if missing (from lean format)
-            if (!existingState.host && existingState.hostId && userMap[existingState.hostId]) {
-              existingState.host = { id: existingState.hostId, name: userMap[existingState.hostId] };
             }
+            console.log(`Loaded state for instance: ${instanceId}`);
           }
-          console.log(`Loaded state for instance: ${instanceId}`);
+        } catch (err) {
+          console.error('Error loading player state:', err);
         }
-      } catch (err) {
-        console.error('Error loading player state:', err);
-      } finally {
-        client.release();
       }
 
       // Create the new player object, defaulting the connecting user as host.
@@ -1052,31 +975,39 @@ async function start() {
     const oldDbUrl = process.env.DATABASE_URL;
     const newDbUrl = process.env.NEW_DATABASE_URL;
 
-    if (newDbUrl && newDbUrl.trim() !== '' && newDbUrl !== oldDbUrl) {
-      // --- Automated Database Migration ---
-      // The migration function handles DNS lookups and returns the new, ready-to-use pool.
-      app.pool = await app.migrateDatabase();
-    } else {
-      // --- Standard Startup ---
-      if (oldDbUrl) {
-        // Re-initialize the pool with the helper function to ensure correct options are set.
-        app.pool = new Pool(createDbPoolConfig(oldDbUrl));
-        console.log("Initializing database...");
-        await app.setupDatabase();
-        console.log("Database initialization complete.");
-      } else {
-        console.log("No DATABASE_URL provided. Skipping database setup.");
+    if (newDbUrl && oldDbUrl && newDbUrl.trim() !== '' && newDbUrl !== oldDbUrl) {
+      try {
+        console.log('!!! New database URL detected. Starting automated data migration. !!!');
+        await app.migrateDatabase(app, models);
+        console.log('✔✔✔ Application will now use the new database. ✔✔✔');
+      } catch (migrationError) {
+        console.error('\nXXX --- DATABASE MIGRATION FAILED --- XXX');
+        console.error('The application will fall back to using the original database.');
+        console.error('Migration Error:', migrationError.message);
+        console.error('XXX --------------------------------- XXX\n');
       }
     }
+    
+    // --- Database Connection Attempt ---
+    try {
+      await app.sequelize.authenticate();
+      app.dbConnected = true;
+      console.log('Database connection established successfully.');
 
-    // --- Database Cleanup ---
-    // Run cleanup once on startup to immediately clear out old records.
-    await app.cleanupInactiveInstances();
-    // Schedule the cleanup to run periodically (e.g., every 24 hours).
-    const cleanupIntervalMs = 24 * 60 * 60 * 1000;
-    app.cleanupLoop = setInterval(() => app.cleanupInactiveInstances(), cleanupIntervalMs);
-    console.log(`Scheduled periodic database cleanup every ${cleanupIntervalMs / (60 * 60 * 1000)} hours.`);
-    // --- End of Cleanup ---
+      // --- Database Cleanup ---
+      // Run cleanup once on startup to immediately clear out old records.
+      await app.cleanupInactiveInstances();
+      // Schedule the cleanup to run periodically (e.g., every 24 hours).
+      const cleanupIntervalMs = 24 * 60 * 60 * 1000;
+      app.cleanupLoop = setInterval(() => app.cleanupInactiveInstances(), cleanupIntervalMs);
+      console.log(`Scheduled periodic database cleanup every ${cleanupIntervalMs / (60 * 60 * 1000)} hours.`);
+      // --- End of Cleanup ---
+    } catch (dbError) {
+      console.warn('!!! WARNING: Could not connect to the database. !!!');
+      console.warn(`!!! Application will run in-memory only. No data will be saved. !!!`);
+      console.warn('Database error:', dbError.message);
+      app.dbConnected = false;
+    }
 
     app.setupWebserver();
     app.mainLoop = setInterval(() => app.tickAllInstances(), 1000);
