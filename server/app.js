@@ -72,6 +72,76 @@ class App{
       client.release();
     }
   }
+  async migrateDatabase() {
+    const oldDbUrl = process.env.DATABASE_URL;
+    const newDbUrl = process.env.NEW_DATABASE_URL;
+
+    console.log('!!! DATABASE MIGRATION INITIATED !!!');
+    console.log(`Source:      ${oldDbUrl.substring(0, 40)}...`);
+    console.log(`Destination: ${newDbUrl.substring(0, 40)}...`);
+
+    const oldPool = new Pool({ connectionString: oldDbUrl, ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false });
+    const newPool = new Pool({ connectionString: newDbUrl, ssl: process.env.NEW_DATABASE_URL ? { rejectUnauthorized: false } : false });
+
+    const oldClient = await oldPool.connect();
+    const newClient = await newPool.connect();
+
+    try {
+      // 1. Ensure schema exists on the new database.
+      await newClient.query(`
+          CREATE TABLE IF NOT EXISTS player_state (
+            instance_id TEXT PRIMARY KEY,
+            player_data JSONB NOT NULL,
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+          );
+      `);
+      console.log('Destination database schema ensured.');
+
+      // 2. Get all data from the old database.
+      console.log('Fetching all data from the source database...');
+      const { rows } = await oldClient.query('SELECT instance_id, player_data, updated_at FROM player_state');
+      console.log(`Found ${rows.length} records to migrate.`);
+
+      if (rows.length > 0) {
+        // 3. Copy data in a single transaction for safety.
+        await newClient.query('BEGIN');
+        console.log('Starting transaction on destination database...');
+
+        // Clear the destination table to ensure a clean, exact copy.
+        await newClient.query('TRUNCATE TABLE player_state;');
+        console.log('Destination table truncated.');
+
+        // 4. Insert all rows. A loop is robust and clear.
+        for (const row of rows) {
+          await newClient.query(
+            'INSERT INTO player_state (instance_id, player_data, updated_at) VALUES ($1, $2, $3)',
+            [row.instance_id, row.player_data, row.updated_at]
+          );
+        }
+        console.log('All records inserted into destination database.');
+
+        await newClient.query('COMMIT');
+        console.log('Transaction committed.');
+      }
+
+      console.log('✔✔✔ DATABASE MIGRATION SUCCESSFUL ✔✔✔');
+      console.log('The application will now use the new database.');
+
+      // 5. Close the old pool and return the new one for the app to use.
+      await oldPool.end();
+      return newPool;
+
+    } catch (err) {
+      console.error('XXX DATABASE MIGRATION FAILED XXX');
+      console.error('Error during migration:', err);
+      await newClient.query('ROLLBACK');
+      console.error('Transaction has been rolled back. The application will not start.');
+      throw err; // Halt the application startup.
+    } finally {
+      oldClient.release();
+      newClient.release();
+    }
+  }
   async savePlayerState(instanceId) {
     const player = this.videoPlayers[instanceId];
     if (!player) return;
@@ -946,9 +1016,23 @@ const app = new App();
 
 async function start() {
   try {
-    console.log("Initializing database...");
-    await app.setupDatabase();
-    console.log("Database initialization complete.");
+    const oldDbUrl = process.env.DATABASE_URL;
+    const newDbUrl = process.env.NEW_DATABASE_URL;
+
+    // --- Automated Database Migration Logic ---
+    if (newDbUrl && newDbUrl.trim() !== '' && newDbUrl !== oldDbUrl) {
+      // A new database URL is provided, so we run the migration.
+      // The migration function returns the new pool on success, which we
+      // then assign as the application's primary pool.
+      const newPool = await app.migrateDatabase();
+      app.pool = newPool;
+    } else {
+      // Standard startup: initialize the database schema using the default pool.
+      console.log("Initializing database...");
+      await app.setupDatabase();
+      console.log("Database initialization complete.");
+    }
+    // --- End of Migration Logic ---
 
     // --- Database Cleanup ---
     // Run cleanup once on startup to immediately clear out old records.
