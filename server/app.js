@@ -576,38 +576,61 @@ class App{
         while (true) {
           if (!player.playlist.length) break;
 
-          const track = player.playlist[player.currentTrack];
-          const trackDuration = (track ? track.duration : 0) / 1000;
+			const track = player.playlist[player.currentTrack];
+			const trackDuration = (track ? track.duration : 0) / 1000;
 
-        if (track && trackDuration > 0 && player.currentTime > trackDuration) {
-          // A track has finished.
-          if (player.isKaraoke) {
-            // In a karaoke context, a song ending means we either stop or auto-advance.
-            if (player.autoAdvance && player.singers.length > 0) {
-              await karaokeHandler.playNextKaraokeSong(this, instanceId);
-            } else {
-              // If auto-advance is off, or the singer list is empty, stop the player.
-              await hostHandler.internalStop(this, instanceId);
-            }
-            break; // Exit the while loop for this instance.
-          } else {
-            // In a regular playlist context, loop to the next song.
-            player.currentTime -= trackDuration;
-            player.lastStartTime += trackDuration;
-            player.votes = player.votes.filter(v => v.video !== track);
-            player.currentTrack = (player.currentTrack + 1) % player.playlist.length;
-            this.updateVotes(instanceId);
-            this.resetBrowserIfNeedBe(player, player.currentTrack);
-            player.sockets.forEach(socket => {
-              this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime });
-            });
-            await this.savePlayerState(instanceId);
-            }
-          } else {
-          // Current time is within the track's duration, so we can exit the loop.
-          break; 
-          }
-        }
+			if (track && trackDuration > 0 && player.currentTime > trackDuration) {
+			// A track has finished.
+			if (player.isKaraoke) {
+				// In a karaoke context, a song ending means we either stop or auto-advance.
+				if (player.autoAdvance && player.singers.length > 0) {
+				await karaokeHandler.playNextKaraokeSong(this, instanceId);
+				} else {
+				// If auto-advance is off, or the singer list is empty, stop the player.
+				await hostHandler.internalStop(this, instanceId);
+				}
+				break; // Exit the while loop for this instance.
+			} else {
+				if (player.canVote) {
+				// --- Voting Mode: Track Advancement ---
+				// First, remove the song that just finished from the playlist.
+				const finishedTrackIndex = player.currentTrack;
+				player.playlist.splice(finishedTrackIndex, 1);
+
+              // After removing the finished song, check if the playlist is empty.
+              if (player.playlist.length === 0) {
+                // No more songs, stop the player.
+                await hostHandler.internalStop(this, instanceId);
+              } else {
+                // The playlist is assumed to be sorted by votes already.
+                // The next song to play is now at the top of the list.
+                player.currentTrack = 0;
+                player.lastStartTime = new Date().getTime() / 1000;
+                player.currentTime = 0; // Reset for the new track.
+
+                // Broadcast the change to all clients, including the updated playlist.
+                player.sockets.forEach(socket => {
+                  this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, playlist: player.playlist });
+                });
+                await this.savePlayerState(instanceId);
+              }
+				} else {
+				// --- Regular Playlist: Track Advancement ---
+				player.currentTime -= trackDuration;
+				player.lastStartTime += trackDuration;
+				player.currentTrack = (player.currentTrack + 1) % player.playlist.length;
+				this.resetBrowserIfNeedBe(player, player.currentTrack);
+				player.sockets.forEach(socket => {
+					this.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime });
+				});
+				await this.savePlayerState(instanceId);
+				}
+			}
+			} else {
+			// Current time is within the track's duration, so we can exit the loop.
+			break;
+			}
+      	}
       } else {
         player.currentTime = player.currentTrack = 0;
       }
