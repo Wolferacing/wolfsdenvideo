@@ -94,7 +94,12 @@ class App{
       newDbConfig.host = newLookup.address;
       console.log(`Resolved destination DB host to IPv4: ${newDbConfig.host}`);
     } catch (dnsErr) {
-      console.error('XXX DATABASE MIGRATION FAILED: DNS LOOKUP ERROR XXX', dnsErr);
+      if (dnsErr.code === 'ENOTFOUND') {
+        console.error(`\nXXX DATABASE MIGRATION FAILED: The hostname "${dnsErr.hostname}" could not be found. XXX`);
+        console.error('This usually means you are using an IPv6-only "Direct Connection" URL on an IPv4 network. Please use the "Session Pooler" connection string from your database provider (e.g., Supabase).\n');
+      } else {
+        console.error('XXX DATABASE MIGRATION FAILED: DNS LOOKUP ERROR XXX', dnsErr);
+      }
       throw dnsErr;
     }
 
@@ -1068,7 +1073,12 @@ async function start() {
           poolConfig.host = lookup.address;
           console.log(`Resolved primary DB host to IPv4: ${poolConfig.host}`);
         } catch (dnsErr) {
-          console.error('XXX DATABASE CONNECTION FAILED: DNS LOOKUP ERROR XXX', dnsErr);
+          if (dnsErr.code === 'ENOTFOUND') {
+            console.error(`\nXXX DATABASE CONNECTION FAILED: The hostname "${dnsErr.hostname}" could not be found. XXX`);
+            console.error('Please double-check that the DATABASE_URL environment variable is correct and that the database is active.\n');
+          } else {
+            console.error('XXX DATABASE CONNECTION FAILED: DNS LOOKUP ERROR XXX', dnsErr);
+          }
           throw dnsErr;
         }
         poolConfig.ssl = { rejectUnauthorized: false };
