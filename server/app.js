@@ -11,14 +11,7 @@ const playlistHandler = require('./handlers/playlistHandler.js');
 const karaokeHandler = require('./handlers/karaokeHandler.js');
 const hostHandler = require('./handlers/hostHandler.js');
 const { Pool } = require('pg');
-
-// --- FIX for IPv6 connection issues in some environments ---
-// By default, Node.js might try to connect via IPv6 if available.
-// In environments like Render, this can lead to ENETUNREACH errors if the
-// network path to the database over IPv6 is not configured. This line
-// tells Node.js to prefer IPv4 addresses, which is more robust.
-require('dns').setDefaultResultOrder('ipv4first');
-// --- End of FIX ---
+const { parse } = require('pg-connection-string');
 
 const SkipJumpTimePlaylist = 5;
 const SkipJumpTimeKaraoke = 0.25; // 250ms for karaoke, to allow for more precise timing.
@@ -28,13 +21,23 @@ class App{
     this.videoPlayers = {};
     this.mainLoop = null;
     this.cleanupLoop = null;
-    this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      // Render's Hobby plan requires SSL, but does not verify the certificate
-      ssl: process.env.DATABASE_URL ? {
-        rejectUnauthorized: false
-      } : false
-    });
+
+    const dbUrl = process.env.DATABASE_URL;
+    let poolConfig;
+
+    if (dbUrl) {
+      // By parsing the URL and adding `family: 4`, we explicitly force the
+      // database connection to use IPv4, which is more robust in some
+      // cloud environments (like Render) that can have IPv6 routing issues.
+      poolConfig = parse(dbUrl);
+      poolConfig.ssl = { rejectUnauthorized: false };
+      poolConfig.family = 4; // Force IPv4 connection
+    } else {
+      // For local development without a DATABASE_URL
+      poolConfig = {};
+    }
+
+    this.pool = new Pool(poolConfig);
   }
 
   async setupDatabase() {
@@ -89,8 +92,16 @@ class App{
     console.log(`Source:      ${oldDbUrl.substring(0, 40)}...`);
     console.log(`Destination: ${newDbUrl.substring(0, 40)}...`);
 
-    const oldPool = new Pool({ connectionString: oldDbUrl, ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false });
-    const newPool = new Pool({ connectionString: newDbUrl, ssl: process.env.NEW_DATABASE_URL ? { rejectUnauthorized: false } : false });
+    const oldDbConfig = parse(oldDbUrl);
+    oldDbConfig.ssl = { rejectUnauthorized: false };
+    oldDbConfig.family = 4; // Force IPv4
+
+    const newDbConfig = parse(newDbUrl);
+    newDbConfig.ssl = { rejectUnauthorized: false };
+    newDbConfig.family = 4; // Force IPv4
+
+    const oldPool = new Pool(oldDbConfig);
+    const newPool = new Pool(newDbConfig);
 
     let oldClient, newClient;
 
