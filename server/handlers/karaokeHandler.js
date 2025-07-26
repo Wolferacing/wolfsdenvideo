@@ -105,13 +105,14 @@ async function moveSinger(app, ws, { userId, direction }) {
 async function playNextKaraokeSong(app, instanceId) {
   const player = app.videoPlayers[instanceId];
   if (!player || player.singers.length === 0) return;
-
+  
+  // The singer at the top of the queue is next.
   const nextSinger = player.singers[0];
   const videoToPlay = nextSinger.video;
   if (!videoToPlay) return;
 
-  // Atomically update the player state
-  player.playlist = [];
+  // Atomically update the player state on the server
+  player.playlist = []; // Clear the main playlist
   player.currentTrack = 0;
   player.currentTime = 0;
   const newVideo = app._createVideoObject(videoToPlay, nextSinger.user, 'scraper');
@@ -119,26 +120,30 @@ async function playNextKaraokeSong(app, instanceId) {
   
   player.lastStartTime = (new Date().getTime() / 1000);
   
-  // Remove the singer from the queue now that their turn has started.
+  // Remove the singer from the upcoming queue *after* getting their info.
   player.singers.shift();
   
   console.log(`Karaoke track started for ${nextSinger.user.name} in instance ${instanceId}`);
 
-  const singersPayload = player.singers.map(s => ({
-    name: s.user.name,
-    p: s.timestamp,
-    id: s.user.id,
-    v: s.video
-  }));
-
+  // --- Granular WebSocket Updates ---
+  // 1. Send a TRACK_CHANGED message to start the new song on all clients.
+  //    This message only contains the new playlist, not the singer list.
   player.sockets.forEach(socket => {
       app.send(socket, Commands.TRACK_CHANGED, {
           newTrackIndex: 0,
           newLastStartTime: player.lastStartTime,
-          playlist: player.playlist,
-          singers: singersPayload
+          playlist: player.playlist
+          // The 'singers' payload is no longer bundled here.
       });
   });
+
+  // 2. Send a separate, specific SINGER_REMOVED message.
+  //    This tells all UIs to remove the user who is now singing from the queue.
+  player.sockets.forEach(socket => {
+    app.send(socket, Commands.SINGER_REMOVED, { userId: nextSinger.user.id });
+  });
+  console.log(`Broadcasting SINGER_REMOVED for user ${nextSinger.user.id} who is now singing.`);
+
   await app.savePlayerState(instanceId);
 }
 
