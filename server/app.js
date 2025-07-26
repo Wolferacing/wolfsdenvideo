@@ -173,6 +173,30 @@ class App{
       console.error('Error during database cleanup of inactive instances:', err);
     }
   }
+  async applyRlsPolicy(tableName) {
+    // This helper method encapsulates the logic for applying a "deny all" RLS policy.
+    // It should only be called after checking that the dialect is 'postgres'.
+    try {
+      console.log(`Applying RLS policy to "${tableName}" table for security...`);
+      await this.sequelize.query(`ALTER TABLE "${tableName}" ENABLE ROW LEVEL SECURITY;`);
+      // Use "DROP IF EXISTS" + "CREATE" to make this operation idempotent (safe to run multiple times).
+      await this.sequelize.query(`DROP POLICY IF EXISTS "Deny All on ${tableName}" ON "${tableName}";`);
+      await this.sequelize.query(`
+        CREATE POLICY "Deny All on ${tableName}" ON "${tableName}"
+        FOR ALL
+        USING (false)
+        WITH CHECK (false);
+      `);
+      console.log(`Successfully applied RLS policy to "${tableName}".`);
+    } catch (rlsError) {
+      // It's possible the table doesn't exist yet on a fresh DB. If so, that's okay.
+      if (rlsError.name === 'SequelizeDatabaseError' && rlsError.original.code === '42P01') { // 42P01 is undefined_table in Postgres
+         console.warn(`"${tableName}" table not found, skipping RLS policy. It will be applied on next startup.`);
+      } else {
+        console.error(`!!! WARNING: Failed to apply RLS policy to "${tableName}" table. !!!`, rlsError.message);
+      }
+    }
+  }
   setupWebserver() { 
     this.app = express();
     this.server = http.createServer( this.app ); 
@@ -993,6 +1017,14 @@ async function start() {
       await app.sequelize.authenticate();
       app.dbConnected = true;
       console.log('Database connection established successfully.');
+
+      // --- RLS Policies for Supabase Security ---
+      // This addresses the "RLS Disabled in Public" warning from Supabase.
+      // The check ensures these Postgres-specific commands only run on Postgres.
+      if (app.sequelize.getDialect() === 'postgres') {
+        await app.applyRlsPolicy('SequelizeMeta');
+        await app.applyRlsPolicy('player_state');
+      }
 
       // --- Database Cleanup ---
       // Run cleanup once on startup to immediately clear out old records.
