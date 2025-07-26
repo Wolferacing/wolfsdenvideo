@@ -19,7 +19,11 @@ const createSequelizeInstance = (dbUrl) => {
   };
   if (dbUrl.startsWith('postgres')) {
     options.dialect = 'postgres';
-    options.dialectOptions = { ssl: { require: true, rejectUnauthorized: false } };
+    options.dialectOptions = {
+      ssl: { require: true, rejectUnauthorized: false },
+      // This prevents Sequelize from running the slow "pg_timezone_names" query on connect.
+      useUTC: false
+    };
   } else if (dbUrl.startsWith('mysql')) {
     options.dialect = 'mysql';
   } else { // Assume sqlite file path
