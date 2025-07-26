@@ -31,7 +31,9 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
 
       // Now run the player-specific setup
       await this.setupBrowserMessaging();
+      this.setupVisibilityHandler();
       this.setupStatusDisplay();
+      this.isResumingFromPassthrough = false;
       this.initialSyncComplete = false;
       this.currentTime = 0;
       this.syncTimeout = null;
@@ -63,6 +65,28 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
       window.bantermessage(JSON.stringify(msg));
     }
   }  
+  setupVisibilityHandler() {
+    document.addEventListener('visibilitychange', () => {
+      // When the tab/window becomes visible again (e.g., exiting Quest passthrough)
+      if (document.visibilityState === 'visible') {
+        // This should run for ALL users, regardless of auto-sync state.
+        if (this.player && this.readyToPlay) {
+          // If the player is paused, it's likely due to the visibility change (e.g., passthrough).
+          // We should always resume it to maintain the viewing experience.
+          if (this.player.getPlayerState() === YT.PlayerState.PAUSED) {
+            this.core.showToast("Resuming playback on focus...");
+            this.player.playVideo();
+          }
+
+          // For all users, we want to perform a one-time resync to correct any drift
+          // that occurred while the tab was hidden. We'll set a flag to tell the
+          // SYNC_TIME handler to perform a hard seek, bypassing the normal auto-sync logic.
+          this.isResumingFromPassthrough = true;
+          this.core.sendMessage({ path: Commands.REQUEST_SYNC, data: { clientTimestamp: Date.now() } });
+        }
+      }
+    });
+  }
   setupStatusDisplay() {
     // Main container for the entire status display
     const statusContainer = document.createElement('div');
@@ -390,6 +414,23 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
           if (this.statusElement) {
             this.updateGraphDisplay(timediff, latency);
           }
+
+          // If this sync was triggered by resuming from passthrough/focus, perform a
+          // one-time hard seek to get back in sync, regardless of auto-sync state.
+          if (this.isResumingFromPassthrough) {
+            this.isResumingFromPassthrough = false; // Reset the flag
+            this.core.showToast(`Resyncing after pause...`);
+            this.player.seekTo(serverTime);
+            this.player.setPlaybackRate(1.0); // Ensure rate is normal
+            // If auto-sync is on, we should also schedule the next sync to continue.
+            // Otherwise, we're done.
+            if (this.autoSync) {
+              this.syncIntervalMs = SYNC_INTERVAL_FAST; // Start fast after a resync
+              this.scheduleNextSync();
+            }
+            break; // Exit the SYNC_TIME handler for this message
+          }
+
           if (this.autoSync) {
             // If the player is paused but should be auto-syncing, play it.
             // This handles accidental pauses from media keys, etc. A state of PAUSED (2)
