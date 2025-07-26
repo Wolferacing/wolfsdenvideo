@@ -25,54 +25,79 @@ class App{
     this.dbConnected = false;
   };
   
-  async savePlayerState(instanceId) {
+  async _performSave(instanceId) {
     if (!this.dbConnected) return;
     const player = this.videoPlayers[instanceId];
     if (!player) return;
 
-    // Build a map of all unique users to avoid storing redundant names.
-    const userMap = {};
-    if (player.host) {
-      userMap[player.host.id] = player.host.name;
-    }
+    // Clear the timeout handle since we are now executing the save
+    player.saveStateTimeout = null;
 
-    // Create a lean version of the playlist for storage.
-    const leanPlaylist = player.playlist.map(video => {
-      if (video.user && video.user.id) {
-        userMap[video.user.id] = video.user.name;
-      }
-      return {
-        title: video.title,
-        duration: video.duration,
-        link: video.link,
-        userId: video.user ? video.user.id : null
-      };
-    });
-
-    const stateToSave = {
-      playlist: leanPlaylist,
-      userMap: userMap,
-      singers: player.singers,
-      currentTrack: player.currentTrack,
-      lastStartTime: player.lastStartTime,
-      locked: player.locked,
-      canTakeOver: player.canTakeOver,
-      canVote: player.canVote,
-      hostId: player.host ? player.host.id : null,
-      autoAdvance: player.autoAdvance,
-      isKaraoke: player.isKaraoke
-    };
-
+    // This logic is now inside _performSave to be debounced.
     try {
+      // Build a map of all unique users to avoid storing redundant names.
+      const userMap = {};
+      if (player.host) {
+        userMap[player.host.id] = player.host.name;
+      }
+
+      // Create a lean version of the playlist for storage.
+      const leanPlaylist = player.playlist.map(video => {
+        if (video.user && video.user.id) {
+          userMap[video.user.id] = video.user.name;
+        }
+        return {
+          title: video.title,
+          duration: video.duration,
+          link: video.link,
+          userId: video.user ? video.user.id : null
+        };
+      });
+
+      const stateToSave = {
+        playlist: leanPlaylist,
+        userMap: userMap,
+        singers: player.singers,
+        currentTrack: player.currentTrack,
+        lastStartTime: player.lastStartTime,
+        locked: player.locked,
+        canTakeOver: player.canTakeOver,
+        canVote: player.canVote,
+        hostId: player.host ? player.host.id : null,
+        autoAdvance: player.autoAdvance,
+        isKaraoke: player.isKaraoke
+      };
+
       // Use Sequelize's "upsert" method to insert or update the record.
       await models.PlayerState.upsert({
         instanceId: instanceId,
         playerData: stateToSave
       });
+      console.log(`[DEBOUNCED SAVE] Persisted state for instance ${instanceId}.`);
     } catch (err) {
       console.error(`Error saving state for instance ${instanceId}:`, err);
     }
   }
+
+  async savePlayerState(instanceId) {
+    if (!this.dbConnected) return;
+    const player = this.videoPlayers[instanceId];
+    if (!player) return;
+
+    // If there's a pending save, clear it. We'll schedule a new one.
+    if (player.saveStateTimeout) {
+      clearTimeout(player.saveStateTimeout);
+    }
+
+    // Schedule the actual database write to happen after a short delay.
+    // A shorter delay of 1.5 seconds provides a better balance between
+    // responsiveness and reducing database load.
+    const DEBOUNCE_DELAY_MS = 1500;
+    player.saveStateTimeout = setTimeout(() => {
+      this._performSave(instanceId);
+    }, DEBOUNCE_DELAY_MS);
+  }
+
   async cleanupInactiveInstances() {
     if (!this.dbConnected) return;
     const cleanupThreshold = '7 days'; // The inactivity period before an instance is purged.
@@ -743,7 +768,8 @@ class App{
         canTakeOver: true,
         canVote: false,
         currentPlayerUrl: "",
-        lastStartTime: new Date().getTime() / 1000
+        lastStartTime: new Date().getTime() / 1000,
+        saveStateTimeout: null // For debouncing database writes
       };
 
       if (existingState) {
@@ -896,7 +922,7 @@ async function start() {
     app.dbConnected = dbConnected;
 
     // Schedule the periodic cleanup of old database records.
-    const cleanupIntervalMs = 24 * 60 * 60 * 1000;
+    const cleanupIntervalMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
     app.cleanupLoop = setInterval(() => app.cleanupInactiveInstances(), cleanupIntervalMs);
 
     app.setupWebserver();
