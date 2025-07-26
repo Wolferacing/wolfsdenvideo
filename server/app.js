@@ -10,8 +10,8 @@ const Commands = require('../public/commands.js');
 const playlistHandler = require('./handlers/playlistHandler.js');
 const karaokeHandler = require('./handlers/karaokeHandler.js');
 const hostHandler = require('./handlers/hostHandler.js');
-const { Op, Sequelize, DataTypes } = require('sequelize');
-const { Umzug, SequelizeStorage } = require('umzug');
+const { Op } = require('sequelize');
+const { initializeDatabase } = require('./db.js');
 const models = require('./models'); // Sequelize models
 
 const SkipJumpTimePlaylist = 5;
@@ -23,90 +23,8 @@ class App{
     this.mainLoop = null;
     this.cleanupLoop = null;
     this.dbConnected = false;
-    // The sequelize instance is now set in start() after potential migration.
-    this.sequelize = models.sequelize;
-  }
-  async migrateDatabase(app, models) {
-    const oldDbUrl = process.env.DATABASE_URL;
-    const newDbUrl = process.env.NEW_DATABASE_URL;
-
-    console.log(`Source:      ${oldDbUrl.substring(0, 40)}...`);
-    console.log(`Destination: ${newDbUrl.substring(0, 40)}...`);
-
-    // Helper to create a sequelize instance from a URL
-    const createSequelizeInstance = (dbUrl) => {
-      const options = {
-        logging: false, // Don't log every single query during migration
-      };
-      if (dbUrl.startsWith('postgres')) {
-        options.dialect = 'postgres';
-        options.dialectOptions = { ssl: { require: true, rejectUnauthorized: false } };
-      } else if (dbUrl.startsWith('mysql')) {
-        options.dialect = 'mysql';
-      } else { // Assume sqlite file path
-        options.dialect = 'sqlite';
-        options.storage = dbUrl;
-        options.dialectModule = require('@libsql/client');
-      }
-      return new Sequelize(dbUrl, options);
-    };
-
-    const oldSequelize = createSequelizeInstance(oldDbUrl);
-    const newSequelize = createSequelizeInstance(newDbUrl);
-
-    // 1. Run migrations on the new database to ensure the schema is ready.
-    console.log('Applying migrations to the new database...');
-    const umzug = new Umzug({
-      migrations: { glob: 'server/migrations/*.js' },
-      context: newSequelize.getQueryInterface(),
-      storage: new SequelizeStorage({ sequelize: newSequelize }),
-      logger: undefined, // Pass undefined to disable Umzug's verbose logging
-    });
-    await umzug.up();
-    console.log('Migrations applied successfully.');
-
-    // 2. Define the PlayerState model for both connections
-    const PlayerStateModel = require('./models/playerState');
-    const OldPlayerState = PlayerStateModel(oldSequelize, DataTypes);
-    const NewPlayerState = PlayerStateModel(newSequelize, DataTypes);
-
-    // 3. Fetch all data from the old database
-    console.log('Fetching all data from the source database...');
-    const allStates = await OldPlayerState.findAll({ raw: true });
-    console.log(`Found ${allStates.length} records to migrate.`);
-
-    if (allStates.length > 0) {
-      // 4. Copy data in a single transaction for safety.
-      const transaction = await newSequelize.transaction();
-      try {
-        console.log('Starting transaction on destination database...');
-        // Clear the destination table to ensure a clean, exact copy.
-        await NewPlayerState.destroy({ where: {}, truncate: true, transaction });
-        console.log('Destination table truncated.');
-
-        // Insert all rows.
-        await NewPlayerState.bulkCreate(allStates, { transaction });
-        console.log('All records inserted into destination database.');
-
-        await transaction.commit();
-        console.log('Transaction committed.');
-      } catch (err) {
-        console.error('XXX DATABASE MIGRATION FAILED DURING TRANSACTION XXX');
-        await transaction.rollback();
-        console.error('Transaction has been rolled back.');
-        throw err; // Halt the application startup.
-      }
-    }
-
-    console.log('Data migration complete.');
-    // 5. Re-wire the application to use the new database connection.
-    app.sequelize = newSequelize;
-    models.sequelize = newSequelize;
-    models.PlayerState = require('./models/playerState')(newSequelize, DataTypes);
-
-    // 6. Close the old connection pool.
-    await oldSequelize.close();
-  }
+  };
+  
   async savePlayerState(instanceId) {
     if (!this.dbConnected) return;
     const player = this.videoPlayers[instanceId];
@@ -171,30 +89,6 @@ class App{
       }
     } catch (err) {
       console.error('Error during database cleanup of inactive instances:', err);
-    }
-  }
-  async applyRlsPolicy(tableName) {
-    // This helper method encapsulates the logic for applying a "deny all" RLS policy.
-    // It should only be called after checking that the dialect is 'postgres'.
-    try {
-      console.log(`Applying RLS policy to "${tableName}" table for security...`);
-      await this.sequelize.query(`ALTER TABLE "${tableName}" ENABLE ROW LEVEL SECURITY;`);
-      // Use "DROP IF EXISTS" + "CREATE" to make this operation idempotent (safe to run multiple times).
-      await this.sequelize.query(`DROP POLICY IF EXISTS "Deny All on ${tableName}" ON "${tableName}";`);
-      await this.sequelize.query(`
-        CREATE POLICY "Deny All on ${tableName}" ON "${tableName}"
-        FOR ALL
-        USING (false)
-        WITH CHECK (false);
-      `);
-      console.log(`Successfully applied RLS policy to "${tableName}".`);
-    } catch (rlsError) {
-      // It's possible the table doesn't exist yet on a fresh DB. If so, that's okay.
-      if (rlsError.name === 'SequelizeDatabaseError' && rlsError.original.code === '42P01') { // 42P01 is undefined_table in Postgres
-         console.warn(`"${tableName}" table not found, skipping RLS policy. It will be applied on next startup.`);
-      } else {
-        console.error(`!!! WARNING: Failed to apply RLS policy to "${tableName}" table. !!!`, rlsError.message);
-      }
     }
   }
   setupWebserver() { 
@@ -996,50 +890,14 @@ const app = new App();
 
 async function start() {
   try {
-    const oldDbUrl = process.env.DATABASE_URL;
-    const newDbUrl = process.env.NEW_DATABASE_URL;
+    // Initialize the database connection, run migrations, and apply policies.
+    // This single function call replaces all the previous setup logic.
+    const { dbConnected } = await initializeDatabase();
+    app.dbConnected = dbConnected;
 
-    if (newDbUrl && oldDbUrl && newDbUrl.trim() !== '' && newDbUrl !== oldDbUrl) {
-      try {
-        console.log('!!! New database URL detected. Starting automated data migration. !!!');
-        await app.migrateDatabase(app, models);
-        console.log('✔✔✔ Application will now use the new database. ✔✔✔');
-      } catch (migrationError) {
-        console.error('\nXXX --- DATABASE MIGRATION FAILED --- XXX');
-        console.error('The application will fall back to using the original database.');
-        console.error('Migration Error:', migrationError.message);
-        console.error('XXX --------------------------------- XXX\n');
-      }
-    }
-    
-    // --- Database Connection Attempt ---
-    try {
-      await app.sequelize.authenticate();
-      app.dbConnected = true;
-      console.log('Database connection established successfully.');
-
-      // --- RLS Policies for Supabase Security ---
-      // This addresses the "RLS Disabled in Public" warning from Supabase.
-      // The check ensures these Postgres-specific commands only run on Postgres.
-      if (app.sequelize.getDialect() === 'postgres') {
-        await app.applyRlsPolicy('SequelizeMeta');
-        await app.applyRlsPolicy('player_state');
-      }
-
-      // --- Database Cleanup ---
-      // Run cleanup once on startup to immediately clear out old records.
-      await app.cleanupInactiveInstances();
-      // Schedule the cleanup to run periodically (e.g., every 24 hours).
-      const cleanupIntervalMs = 24 * 60 * 60 * 1000;
-      app.cleanupLoop = setInterval(() => app.cleanupInactiveInstances(), cleanupIntervalMs);
-      console.log(`Scheduled periodic database cleanup every ${cleanupIntervalMs / (60 * 60 * 1000)} hours.`);
-      // --- End of Cleanup ---
-    } catch (dbError) {
-      console.warn('!!! WARNING: Could not connect to the database. !!!');
-      console.warn(`!!! Application will run in-memory only. No data will be saved. !!!`);
-      console.warn('Database error:', dbError.message);
-      app.dbConnected = false;
-    }
+    // Schedule the periodic cleanup of old database records.
+    const cleanupIntervalMs = 24 * 60 * 60 * 1000;
+    app.cleanupLoop = setInterval(() => app.cleanupInactiveInstances(), cleanupIntervalMs);
 
     app.setupWebserver();
     app.mainLoop = setInterval(() => app.tickAllInstances(), 1000);

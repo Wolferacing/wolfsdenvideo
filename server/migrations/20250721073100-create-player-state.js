@@ -1,9 +1,8 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // The table name is now 'player_states' to follow Sequelize conventions (plural).
-    // If your table is already named 'player_state', you can keep it, but this is best practice.
-    await queryInterface.createTable('player_states', {
+    // The table name is 'player_state' to match existing queries.
+    await queryInterface.createTable('player_state', {
       instanceId: {
         allowNull: false,
         primaryKey: true,
@@ -26,6 +25,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('player_states');
+    await queryInterface.dropTable('player_state');
   }
 };
