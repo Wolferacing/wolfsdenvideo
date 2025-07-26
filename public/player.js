@@ -69,17 +69,9 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
     document.addEventListener('visibilitychange', () => {
       // When the tab/window becomes visible again (e.g., exiting Quest passthrough)
       if (document.visibilityState === 'visible') {
-        // This should run for ALL users, regardless of auto-sync state.
         if (this.player && this.readyToPlay) {
-          // If the player is paused, it's likely due to the visibility change (e.g., passthrough).
-          // We should always resume it to maintain the viewing experience.
-          if (this.player.getPlayerState() === YT.PlayerState.PAUSED) {
-            this.core.showToast("Resuming playback on focus...");
-            this.player.playVideo();
-          }
-
-          // For all users, we want to perform a one-time resync to correct any drift
-          // that occurred while the tab was hidden. We'll set a flag to tell the
+          // The visibility change triggers a one-time, authoritative resync.
+          // We set a flag to tell the
           // SYNC_TIME handler to perform a hard seek, bypassing the normal auto-sync logic.
           this.isResumingFromPassthrough = true;
           this.core.sendMessage({ path: Commands.REQUEST_SYNC, data: { clientTimestamp: Date.now() } });
@@ -422,6 +414,9 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
             this.core.showToast(`Resyncing after pause...`);
             this.player.seekTo(serverTime);
             this.player.setPlaybackRate(1.0); // Ensure rate is normal
+            // Explicitly call playVideo() after seeking, as seekTo() can sometimes
+            // interrupt playback. This ensures the video resumes as expected.
+            this.player.playVideo();
             // If auto-sync is on, we should also schedule the next sync to continue.
             // Otherwise, we're done.
             if (this.autoSync) {
