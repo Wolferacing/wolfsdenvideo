@@ -32,24 +32,33 @@ async function removeFromPlayers(app, ws, uid) {
   const isHost = player.host.id === ws.u.id;
   const isSelf = uid === ws.u.id;
 
-  // A user can remove themselves, or the host can remove anyone.
   if (isHost || isSelf) {
     const singerIndex = player.singers.findIndex(s => s.user.id === uid);
+    
+    // Correctly determine if the user being removed is the one currently singing.
+    // The current singer is defined by who is in the active playlist, not the upcoming queue.
+    const isCurrentSinger = player.playlist.length > 0 && player.playlist[0].user.id === uid;
 
+    // If the person removed was the one currently singing, stop the main player.
+    // This must be checked first and independently of the singer queue.
+    if (isCurrentSinger) {
+      console.log(`Current singer was removed. Stopping player for instance ${ws.i}.`);
+      await hostHandler.internalStop(app, ws.i);
+    }
+
+    // Now, handle removing the user from the upcoming singer queue if they are in it.
     if (singerIndex > -1) {
-      const wasCurrentSinger = singerIndex === 0;
       const removedSinger = player.singers.splice(singerIndex, 1)[0];
       console.log(`${ws.u.name} removed ${removedSinger.user.name} from the singer list.`);
 
-      // If the person removed was the one currently singing, stop the main player.
-      if (wasCurrentSinger) {
-        console.log(`Current singer was removed. Stopping player for instance ${ws.i}.`);
-        await hostHandler.internalStop(app, ws.i);
-      }
       // Send a granular update for efficiency.
       player.sockets.forEach(socket => app.send(socket, Commands.SINGER_REMOVED, { userId: uid }));
       console.log(`Broadcasting SINGER_REMOVED for user ${uid}.`);
-      await app.savePlayerState(ws.i);
+      
+      // Only save state here if the player wasn't already stopped (which also saves state).
+      if (!isCurrentSinger) {
+        await app.savePlayerState(ws.i);
+      }
     }
   } else {
     app.send(ws, Commands.ERROR);
