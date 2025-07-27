@@ -1,6 +1,23 @@
 const { Sequelize, DataTypes, Op } = require('sequelize');
 const { Umzug, SequelizeStorage } = require('umzug');
 
+const mainDbUrl = process.env.NEW_DATABASE_URL || process.env.DATABASE_URL;
+
+// --- Postgres-specific performance fix ---
+// This fix is applied only when a Postgres database is in use to avoid compatibility
+// issues with other database dialects like MySQL or SQLite.
+if (mainDbUrl && mainDbUrl.startsWith('postgres')) {
+  const { types } = require('pg');
+  // By default, node-postgres (the driver for Sequelize) queries pg_timezone_names on
+  // each new connection to correctly parse TIMESTAMPTZ columns. This is very slow on some platforms.
+  // The fix is to override the type parser and return the raw string value instead.
+  // This is safe as the application logic handles timestamps as numbers or lets Sequelize manage them.
+  const TIMESTAMPTZ_OID = 1184;
+  const TIMESTAMP_OID = 1114;
+  types.setTypeParser(TIMESTAMPTZ_OID, val => val);
+  types.setTypeParser(TIMESTAMP_OID, val => val);
+}
+
 // Helper to create a sequelize instance from a URL.
 // It's defined here so it can be used by both the main connection and the one-time migrator.
 const createSequelizeInstance = (dbUrl) => {
@@ -21,9 +38,9 @@ const createSequelizeInstance = (dbUrl) => {
   if (dbUrl.startsWith('postgres')) {
     options.dialect = 'postgres';
     options.dialectOptions = {
-      ssl: { require: true, rejectUnauthorized: false },
-      // This prevents Sequelize from running the slow "pg_timezone_names" query on connect.
-      useUTC: false
+      ssl: { require: true, rejectUnauthorized: false }
+      // The 'useUTC: false' option was not effective for the 'pg' driver
+      // and did not prevent the slow timezone query. The type parser override above is the correct solution.
     };
   } else if (dbUrl.startsWith('mysql')) {
     options.dialect = 'mysql';
@@ -38,7 +55,6 @@ const createSequelizeInstance = (dbUrl) => {
 // --- Singleton Sequelize Instance ---
 // Use the NEW_DATABASE_URL for the main connection if it exists, otherwise fall back to the old one.
 // This ensures the app connects to the correct database after a potential migration.
-const mainDbUrl = process.env.NEW_DATABASE_URL || process.env.DATABASE_URL;
 const sequelize = createSequelizeInstance(mainDbUrl);
 
 // --- Helper Functions ---
