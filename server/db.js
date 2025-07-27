@@ -9,12 +9,13 @@ const createSequelizeInstance = (dbUrl) => {
   }
   const options = {
     logging: false, // Set to console.log for debugging
-    // Recommended pool settings for a serverless/sleepy environment
+    // Pool settings optimized for a persistent server environment
     pool: {
-      max: 5,
-      min: 0,
+      max: 10,
+      min: 1,  // Keep at least one connection warm to reduce latency on new requests
       acquire: 30000,
-      idle: 10000
+      // Increased idle time to 60 seconds to prevent frequent disconnects/reconnects
+      idle: 60000
     }
   };
   if (dbUrl.startsWith('postgres')) {
