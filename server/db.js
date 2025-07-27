@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes, Op } = require('sequelize');
 const { Umzug, SequelizeStorage } = require('umzug');
+const { createClient } = require('@libsql/client');
 
 const mainDbUrl = process.env.NEW_DATABASE_URL || process.env.DATABASE_URL;
 
@@ -42,14 +43,17 @@ const createSequelizeInstance = (dbUrl) => {
       // The 'useUTC: false' option was not effective for the 'pg' driver
       // and did not prevent the slow timezone query. The type parser override above is the correct solution.
     };
+    return new Sequelize(dbUrl, options);
   } else if (dbUrl.startsWith('mysql')) {
     options.dialect = 'mysql';
-  } else { // Assume sqlite file path
+    return new Sequelize(dbUrl, options);
+  } else { // Assume sqlite/libsql file path
     options.dialect = 'sqlite';
-    options.storage = dbUrl;
-    options.dialectModule = require('@libsql/client');
+    // When using a custom dialect module like @libsql/client, we initialize it
+    // and pass it to Sequelize. The constructor signature changes to a single options object.
+    options.dialectModule = createClient({ url: `file:${dbUrl}` });
+    return new Sequelize(options);
   }
-  return new Sequelize(dbUrl, options);
 };
 
 // --- Singleton Sequelize Instance ---
