@@ -39,7 +39,13 @@ const createSequelizeInstance = (dbUrl) => {
   if (dbUrl.startsWith('postgres')) {
     options.dialect = 'postgres';
     options.dialectOptions = {
-      ssl: { require: true, rejectUnauthorized: false }
+      ssl: { require: true, rejectUnauthorized: false },
+      // Enable TCP keep-alives to prevent idle connections from being
+      // terminated by the database server or intermediate proxies.
+      // This is crucial for long-running applications on cloud platforms.
+      // A 30-second interval is a safe and common value.
+      keepalives: true,
+      keepalives_idle: 30000
       // The 'useUTC: false' option was not effective for the 'pg' driver
       // and did not prevent the slow timezone query. The type parser override above is the correct solution.
     };
