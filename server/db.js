@@ -34,6 +34,24 @@ const createSequelizeInstance = (dbUrl) => {
       acquire: 30000,
       // Increased idle time to 60 seconds to prevent frequent disconnects/reconnects
       idle: 60000
+    },
+    // --- Automatic Retry Configuration ---
+    // This adds resilience against transient network errors by automatically
+    // retrying failed database queries. This prevents the application from
+    // crashing on temporary connection issues.
+    retry: {
+      max: 3, // Maximum number of retries
+      // Match against a list of error types or message regexes.
+      match: [
+        /Connection terminated unexpectedly/, // Specific error from the logs
+        /read ETIMEDOUT/, // Common network timeout error
+        'SequelizeConnectionError',
+        'SequelizeConnectionRefusedError',
+        'SequelizeHostNotFoundError',
+        'SequelizeHostNotReachableError',
+        'SequelizeInvalidConnectionError',
+        'SequelizeConnectionTimedOutError'
+      ]
     }
   };
   if (dbUrl.startsWith('postgres')) {
