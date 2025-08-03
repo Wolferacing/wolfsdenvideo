@@ -79,34 +79,42 @@ async function fromPlaylist(app, ws, data) {
     console.log(`fromPlaylist: user=${ws.u.name}, instance=${ws.i}, id=${playlistId}`);
     app.onlyIfHost(ws, async () => {
         if(app.videoPlayers[ws.i] && (app.videoPlayers[ws.i].playlist.length === 0 || data.shouldClear)) {
-        const player = app.videoPlayers[ws.i];
-        let playlist = await ytfps(playlistId, { limit: 100 });
-        app.resetPlaylist(ws); // Resets playlist, currentTime, currentTrack
-        // --- Duplicate Video Check for bulk add ---
-        const existingVideoIds = new Set();
-        let addedCount = 0;
-        playlist.videos.forEach(v => {
-            const newVideoId = app.getYoutubeId(v.url);
-            if (newVideoId && !existingVideoIds.has(newVideoId)) {
-            player.playlist.push(app._createVideoObject(v, ws.u, 'ytfps'));
-            existingVideoIds.add(newVideoId); // Add to set to prevent duplicates within the same playlist import
-            addedCount++;
+            const player = app.videoPlayers[ws.i];
+            try {
+                const playlist = await ytfps(playlistId, { limit: 100 });
+                app.resetPlaylist(ws); // Resets playlist, currentTime, currentTrack
+                
+                // --- Duplicate Video Check for bulk add ---
+                const existingVideoIds = new Set();
+                let addedCount = 0;
+                playlist.videos.forEach(v => {
+                    const newVideoId = app.getYoutubeId(v.url);
+                    if (newVideoId && !existingVideoIds.has(newVideoId)) {
+                        player.playlist.push(app._createVideoObject(v, ws.u, 'ytfps'));
+                        existingVideoIds.add(newVideoId); // Add to set to prevent duplicates within the same playlist import
+                        addedCount++;
+                    }
+                });
+                
+                const duplicateCount = playlist.videos.length - addedCount;
+                if (duplicateCount > 0) {
+                    app.send(ws, Commands.ERROR, { message: `Added ${addedCount} videos. ${duplicateCount} duplicate(s) were skipped.` });
+                }
+                // --- End of Check ---
+
+                if (player.playlist.length > 0) {
+                    player.lastStartTime = new Date().getTime() / 1000;
+                    player.sockets.forEach(socket => {
+                        app.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, playlist: player.playlist });
+                    });
+                } else {
+                    app.updateClients(ws.i); // This is fine, sends an empty playlist.
+                }
+                await app.savePlayerState(ws.i);
+            } catch (error) {
+                console.error(`Error fetching playlist ${playlistId}:`, error.message);
+                app.send(ws, Commands.ERROR, { message: "Could not load playlist. It might be private or contain no videos." });
             }
-        });
-        const duplicateCount = playlist.videos.length - addedCount;
-        if (duplicateCount > 0) {
-            app.send(ws, Commands.ERROR, { message: `Added ${addedCount} videos. ${duplicateCount} duplicate(s) were skipped.` });
-        }
-        // --- End of Check ---
-        if (player.playlist.length > 0) {
-            player.lastStartTime = new Date().getTime() / 1000;
-            player.sockets.forEach(socket => {
-            app.send(socket, Commands.TRACK_CHANGED, { newTrackIndex: player.currentTrack, newLastStartTime: player.lastStartTime, playlist: player.playlist });
-            });
-        } else {
-            app.updateClients(ws.i); // This is fine, sends an empty playlist.
-        }
-        await app.savePlayerState(ws.i);
         }
     });
 }
