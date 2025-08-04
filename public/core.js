@@ -151,18 +151,36 @@ var Core = class {
     this.createdElements.push(this.playlistContainer);
     scene.appendChild(this.playlistContainer);
   }
-  setVolume(isUp) {
+  setVolume(isUp, amount) {
     if(isUp) {
-      this.params.volume += 1;
+      this.params.volume += amount || 1;
       if(this.params.volume > 100) {
         this.params.volume = 100;
       }
     }else{
-      this.params.volume -= 3;
+      this.params.volume -= amount || 3;
       if(this.params.volume < 0) {
         this.params.volume = 0;
       }
     }
+  }
+  setAbsoluteVolume(amount) {
+    this.params.volume = amount;
+    if(this.params.volume > 100) {
+      this.params.volume = 100;
+    } else if (this.params.volume < 0) {
+      this.params.volume = 0;
+    }
+    this.sendBrowserMessage({path: Commands.SET_VOLUME, data: this.params.volume});
+  }
+  setVolumeIncrement(amount) {
+    this.params.volume += amount;
+    if(this.params.volume > 100) {
+      this.params.volume = 100;
+    } else if (this.params.volume < 0) {
+      this.params.volume = 0;
+    }
+    this.sendBrowserMessage({path: Commands.SET_VOLUME, data: this.params.volume});
   }
   setupJoinLeaveButton() {
     const scene = document.querySelector("a-scene");
@@ -594,6 +612,12 @@ setupButton(scene, playlistContainer, xOffset, iconUrl, callback, text) {
       case Commands.SHOW_REPLACE_PROMPT:
         // This is a notification for the host in the 3D space to check their playlist UI.
         this.showToast("Video unavailable for a user. Check playlist to replace.", 5000);
+        break;
+      case Commands.SET_ABSOLUTE_VOLUME:
+        this.setAbsoluteVolume(json.data);
+        break;
+      case Commands.SET_VOLUME_INCREMENT:
+        this.setVolumeIncrement(json.data);
         break;
     }
   }

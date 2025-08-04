@@ -68,7 +68,9 @@ var Commands = {
   HOST_SEEK: 'host-seek',
   SET_INSTANCE_MODE: 'set-instance-mode',
   LOCAL_SKIP_BACK: 'local-skip-back',
-  LOCAL_SKIP_FORWARD: 'local-skip-forward'
+  LOCAL_SKIP_FORWARD: 'local-skip-forward',
+  SET_ABSOLUTE_VOLUME: 'set-absolute-volume',
+  SET_VOLUME_INCREMENT: 'set-volume-increment'
 };
 if ((typeof process !== 'undefined') && 
 (process.release.name.search(/node|io.js/) !== -1)) {

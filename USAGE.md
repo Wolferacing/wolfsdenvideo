@@ -6,8 +6,8 @@ Fire-V-Player is designed to be embedded in the **Banter** VR social platform. I
 
 The player has two primary modes, determined by which script you include:
 
--   **Playlist Mode:** The default collaborative player. Use `playlist.js`.
--   **Karaoke Mode:** A turn-based system where users join a queue to sing. Use `karaoke.js`.
+- **Playlist Mode:** The default collaborative player. Use `playlist.js`.
+- **Karaoke Mode:** A turn-based system where users join a queue to sing. Use `karaoke.js`.
 
 ## Basic Example (Playlist Mode)
 
@@ -105,3 +105,28 @@ All parameters are optional unless marked as **(Required)**.
 | `announce` | Set to `true` to enable voice announcements for users joining. | `true` |
 | `announce-four-twenty` | Set to `true` to enable a special 4:20 announcement. | `false` |
 | `one-for-each-instance` | Set to `true` to create a unique player instance for each unique user, even with the same `instance` ID. | `false` |
+
+---
+
+## Programmatic Control
+
+You can control the player programmatically using the `window.videoPlayerCore` object once it has been initialized.
+
+### Volume Control
+
+- **Set Absolute Volume:**
+
+```javascript
+// Sets the volume to 50%
+window.videoPlayerCore.setAbsoluteVolume(50);
+```
+
+- **Adjust Volume by Increment:**
+
+```javascript
+// Increases volume by 10%
+window.videoPlayerCore.setVolumeIncrement(10);
+
+// Decreases volume by 15%
+window.videoPlayerCore.setVolumeIncrement(-15);
+```

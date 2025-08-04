@@ -285,9 +285,17 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
         }
         break;
       case Commands.PLAYBACK_UPDATE:
-        // Merge new data into the existing player state.
-        // This prevents the playlist from being wiped out on updates that don't include it.
-        this.playerData = Object.assign(this.playerData || {}, json.data.video);
+        // If this is the very first message a client gets, it should replace its state.
+        // For all subsequent updates, it should merge, because some updates might be
+        // partial (e.g., not including the full playlist).
+        if (json.data.type === 'initial-sync') {
+          this.playerData = json.data.video;
+        } else {
+          // Merge new data into the existing player state.
+          // This prevents the playlist from being wiped out on updates that don't include it.
+          this.playerData = Object.assign(this.playerData || {}, json.data.video);
+        }
+
         // The specific 'set-track' logic is now handled by the TRACK_CHANGED command.
         if (json.data.type === "stop" && this.readyToPlay) {
           this.player.loadVideoById(this.core.getId("https://www.youtube.com/watch?v=GiwStUzx8fg"), 0);
