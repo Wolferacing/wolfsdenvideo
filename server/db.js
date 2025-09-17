@@ -45,6 +45,7 @@ const createSequelizeInstance = (dbUrl) => {
       match: [
         /Connection terminated unexpectedly/, // Specific error from the logs
         /read ETIMEDOUT/, // Common network timeout error
+        /read ECONNRESET/, // Explicitly handle connection resets
         'SequelizeConnectionError',
         'SequelizeConnectionRefusedError',
         'SequelizeHostNotFoundError',
