@@ -542,6 +542,20 @@ class App{
         const now = new Date().getTime() / 1000;
         player.currentTime = now - player.lastStartTime;
 
+        // --- Periodic Time Synchronization ---
+        // To prevent client drift over time, the server periodically sends an authoritative
+        // SYNC_TIME command to all connected video player clients.
+        const SYNC_INTERVAL_SECONDS = 15;
+        if (!player.lastSyncTime || (now - player.lastSyncTime > SYNC_INTERVAL_SECONDS)) {
+          player.lastSyncTime = now;
+          player.sockets.forEach(socket => {
+            // We only need to sync the actual video player elements, not the UIs.
+            if (socket.type === "player") {
+              this.syncWsTime(socket, instanceId);
+            }
+          });
+        }
+
         // Use a while loop to correctly handle advancing multiple tracks after a long sleep/downtime.
         while (true) {
           if (!player.playlist.length) break;
@@ -769,7 +783,8 @@ class App{
         canVote: false,
         currentPlayerUrl: "",
         lastStartTime: new Date().getTime() / 1000,
-        saveStateTimeout: null // For debouncing database writes
+        saveStateTimeout: null, // For debouncing database writes
+        lastSyncTime: 0
       };
 
       if (existingState) {
