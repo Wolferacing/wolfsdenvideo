@@ -142,12 +142,12 @@ var Core = class {
     this.playlistContainer.setAttribute('position', this.params["button-position"] === "0 0 0" ? position : this.params["button-position"]);
     this.playlistContainer.setAttribute('rotation', this.params["button-rotation"] === "0 0 0" ? this.params.rotation : this.params["button-rotation"]);
     this.playlistContainer.setAttribute('scale', this.params["button-scale"]);
-    this.setupPlaylistButton(scene, this.playlistContainer);
+    <!-->this.setupPlaylistButton(scene, this.playlistContainer);
     this.setupVolButton(scene, true, this.playlistContainer);
     this.setupVolButton(scene, false, this.playlistContainer);
     this.setupMuteButton(scene, this.playlistContainer);
-    this.setupSkipButton(scene, true, this.playlistContainer);
-    this.setupSkipButton(scene, false, this.playlistContainer);
+    <!-->this.setupSkipButton(scene, true, this.playlistContainer);
+    <!-->this.setupSkipButton(scene, false, this.playlistContainer);
     this.createdElements.push(this.playlistContainer);
     scene.appendChild(this.playlistContainer);
   }

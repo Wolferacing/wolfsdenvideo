@@ -529,7 +529,7 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
         const url = this.playerData.playlist[currentTrack].link;
         this.player.loadVideoById(this.core.getId(url), currentTime);
         this.player.playVideo();
-        this.core.showToast("Playing: " + this.playerData.playlist[currentTrack].title);
+        //this.core.showToast("Playing: " + this.playerData.playlist[currentTrack].title);
         this.setVolume("spatial");
       }
       this.lastUrl = this.playerData.playlist[currentTrack].link;
@@ -581,13 +581,13 @@ const MAX_SPEED_ADJUSTMENT = 0.05;  // Max speed change is now 5% (0.95x to 1.05
     this.core.params.volume = Number(this.core.params.volume);
     if(this.player.getVolume() != this.core.params.volume) {
       this.player.setVolume(this.core.params.volume);
-      const isSpatial = type === "spatial";
-      const showToast = () => this.core.showToast((isSpatial ? "(spatial) " : "") + "vol: " + (this.core.params.volume) + "%");
-      if(isSpatial) {
-        clearTimeout(this.spatialUpdateTimeout);
-        this.spatialUpdateTimeout = setTimeout(() => showToast(), 600);
-      }else{
-        showToast();
+      //const isSpatial = type === "spatial";
+      //const showToast = () => this.core.showToast((isSpatial ? "(spatial) " : "") + "vol: " + (this.core.params.volume) + "%");
+      //if(isSpatial) {
+        //clearTimeout(this.spatialUpdateTimeout);
+        //this.spatialUpdateTimeout = setTimeout(() => showToast(), 600);
+      //}else{
+        //showToast();
       }
     }
   }
