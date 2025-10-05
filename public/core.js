@@ -252,23 +252,23 @@ var Core = class {
       this.playlistContainer.appendChild(boxTrigger);
     }
   }
-  showToast(text, duration = 3000) {
+  showToast(text, duration = 1000) {
     if(typeof Toastify !== 'undefined') {
       Toastify({
         text: text,
         duration: duration,
         // close: true,
-        gravity: "bottom", // `top` or `bottom`
+        gravity: "top", // `top` or `bottom`
         position: "right", // `left`, `center` or `right`
-        offset: {
-          y: '3em' // Moves the toast up from the bottom edge
-        },
+        //offset: {
+          //y: '3em' // Moves the toast up from the bottom edge
+        //},
         // stopOnFocus: true, // Prevents dismissing of toast on hover
         style: {
           background: `url(https://${this.hostUrl}/assets/Button_bg.png) center center no-repeat`,
           backgroundSize: "cover",
           opacity: 0.7,
-          fontSize: "2em",
+          fontSize: "1em",
           fontFamily: "'Roboto', sans-serif"
         },
         // onClick: function(){} // Callback after click
