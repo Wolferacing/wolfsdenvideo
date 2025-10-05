@@ -3,5 +3,5 @@
 // Do not include "https://", "wss://", or a trailing slash.
 // Example: 'my-cool-player.onrender.com' or 'localhost:3000'
 window.APP_CONFIG = {
-  HOST_URL: 'vidya.firer.at'
+  HOST_URL: 'wolfs-den-video.onrender.com'
 };
